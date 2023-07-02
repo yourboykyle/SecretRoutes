@@ -1,0 +1,16 @@
+[
+{
+  "modid": "SecretRoutes",
+  "name": "Secret Routes Mod",
+  "description": "Secret Routes Waypoints",
+  "version": "1.0",
+  "mcversion": "1.8.9",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Discord: yourboykyle"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
