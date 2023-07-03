@@ -1,3 +1,21 @@
+/*
+ * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
+ * Copyright 2023 yourboykyle
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package xyz.yourboykyle.secretroutes;
 
 import io.github.quantizr.dungeonrooms.DungeonRooms;
@@ -43,7 +61,7 @@ import java.util.Queue;
 @Mod(modid = Main.MODID, version = Main.VERSION)
 public class Main {
     public static final String MODID = "SecretRoutes";
-    public static final String VERSION = "0.1";
+    public static final String VERSION = "1.0";
     public static final String chatPrefix = EnumChatFormatting.AQUA + "Secret Routes > " + EnumChatFormatting.RESET;
     public static final String roomsDataPath = "/rooms.json";
 
