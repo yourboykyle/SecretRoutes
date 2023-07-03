@@ -31,7 +31,6 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import xyz.yourboykyle.secretroutes.commands.*;
 import xyz.yourboykyle.secretroutes.customevents.BlockBreak;
 import xyz.yourboykyle.secretroutes.customevents.BlockPlace;
-import xyz.yourboykyle.secretroutes.customevents.EnterNewRoom;
 import xyz.yourboykyle.secretroutes.customevents.ItemPickedUp;
 import xyz.yourboykyle.secretroutes.events.*;
 import xyz.yourboykyle.secretroutes.utils.Room;
@@ -76,14 +75,14 @@ public class Main {
         MinecraftForge.EVENT_BUS.register(new PlayerTick());
         MinecraftForge.EVENT_BUS.register(new PlayerInteract());
 
-        //Commands
-        ClientCommandHandler.instance.registerCommand(new SetWaypoint());
-        ClientCommandHandler.instance.registerCommand(new ListWaypoints());
+        //Commands (If commented out, it means the command is for development purposes)
+        //ClientCommandHandler.instance.registerCommand(new SetWaypoint());
+        //ClientCommandHandler.instance.registerCommand(new ListWaypoints());
         ClientCommandHandler.instance.registerCommand(new RenderNext());
-        ClientCommandHandler.instance.registerCommand(new enterNewRoom());
-        ClientCommandHandler.instance.registerCommand(new RouteBuilder());
-        ClientCommandHandler.instance.registerCommand(new GetRoom());
-        ClientCommandHandler.instance.registerCommand(new LookCoords());
+        //ClientCommandHandler.instance.registerCommand(new enterNewRoom());
+        //ClientCommandHandler.instance.registerCommand(new RouteBuilder());
+        //ClientCommandHandler.instance.registerCommand(new GetRoom());
+        //ClientCommandHandler.instance.registerCommand(new LookCoords());
 
         //Things to make sure code doesn't break
         currentRoom.add(null, null, true);
