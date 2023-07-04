@@ -21,6 +21,7 @@ package xyz.yourboykyle.secretroutes.customevents;
 import com.google.gson.*;
 import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
 import io.github.quantizr.dungeonrooms.utils.MapUtils;
+import io.github.quantizr.dungeonrooms.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
@@ -34,6 +35,11 @@ import java.util.Map;
 public class EnterNewRoom {
     public static void onEnterNewRoom(Room room) {
         try {
+            Utils.checkForCatacombs();
+            if(!Utils.inCatacombs) {
+                return;
+            }
+
             Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(Main.chatPrefix + "Entered new room \"" + RoomDetection.roomName + "\"."));
 
             Main.currentRoom = room;
