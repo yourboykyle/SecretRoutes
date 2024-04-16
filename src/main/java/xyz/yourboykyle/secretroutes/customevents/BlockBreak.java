@@ -23,9 +23,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import xyz.yourboykyle.secretroutes.Main;
-import xyz.yourboykyle.secretroutes.customevents.SecretCompleted;
 
 public class BlockBreak {
     public void onBlockBreak(BlockEvent.BreakEvent e) {

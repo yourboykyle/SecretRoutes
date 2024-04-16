@@ -16,10 +16,31 @@
  * with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.yourboykyle.secretroutes.customevents;
+package xyz.yourboykyle.secretroutes.commands;
 
-public class SecretCompleted {
-    public static void onSecretCompleted() {
-        //Main.nextPath();
+import net.minecraft.command.CommandBase;
+import net.minecraft.command.CommandException;
+import net.minecraft.command.ICommandSender;
+import xyz.yourboykyle.secretroutes.Main;
+
+public class NextSecret extends CommandBase {
+    @Override
+    public String getCommandName() {
+        return "nextsecret";
+    }
+
+    @Override
+    public String getCommandUsage(ICommandSender sender) {
+        return "/nextsecret";
+    }
+
+    @Override
+    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
+        Main.currentRoom.nextSecret();
+    }
+
+    @Override
+    public int getRequiredPermissionLevel() {
+        return 0;
     }
 }

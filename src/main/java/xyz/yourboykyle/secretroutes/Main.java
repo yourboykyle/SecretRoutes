@@ -46,17 +46,18 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
-import xyz.yourboykyle.secretroutes.commands.*;
+import xyz.yourboykyle.secretroutes.commands.NextSecret;
+import xyz.yourboykyle.secretroutes.commands.RenderNext;
+import xyz.yourboykyle.secretroutes.commands.enterNewRoom;
 import xyz.yourboykyle.secretroutes.customevents.BlockBreak;
 import xyz.yourboykyle.secretroutes.customevents.BlockPlace;
 import xyz.yourboykyle.secretroutes.customevents.ItemPickedUp;
-import xyz.yourboykyle.secretroutes.events.*;
+import xyz.yourboykyle.secretroutes.events.PlayerInteract;
+import xyz.yourboykyle.secretroutes.events.PlayerTick;
+import xyz.yourboykyle.secretroutes.events.WorldRender;
 import xyz.yourboykyle.secretroutes.utils.Room;
 
 import java.awt.*;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
 
 @Mod(modid = Main.MODID, version = Main.VERSION)
 public class Main {
@@ -64,9 +65,10 @@ public class Main {
     public static final String VERSION = "1.0";
     public static final String chatPrefix = EnumChatFormatting.AQUA + "Secret Routes > " + EnumChatFormatting.RESET;
     public static final String roomsDataPath = "/rooms.json";
+    public static final String newRoomsDataPath = "/newrooms.json";
 
     public static Room currentRoom = new Room(null);
-    private static Queue<List<BlockPos>> path = new LinkedList<>();
+    //private static Queue<List<BlockPos>> path = new LinkedList<>();
     private static DungeonRooms dungeonRooms = new DungeonRooms();
 
     public static Main instance = new Main();
@@ -97,7 +99,8 @@ public class Main {
         //ClientCommandHandler.instance.registerCommand(new SetWaypoint());
         //ClientCommandHandler.instance.registerCommand(new ListWaypoints());
         ClientCommandHandler.instance.registerCommand(new RenderNext());
-        //ClientCommandHandler.instance.registerCommand(new enterNewRoom());
+        ClientCommandHandler.instance.registerCommand(new enterNewRoom());
+        ClientCommandHandler.instance.registerCommand(new NextSecret());
         //ClientCommandHandler.instance.registerCommand(new RouteBuilder());
         //ClientCommandHandler.instance.registerCommand(new GetRoom());
         //ClientCommandHandler.instance.registerCommand(new LookCoords());
@@ -114,7 +117,7 @@ public class Main {
         dungeonRooms.postInit(e);
     }
 
-    public static void addToPath(List<BlockPos> newCoords) {
+    /*public static void addToPath(List<BlockPos> newCoords) {
         path.add(newCoords);
     }
     public static List<BlockPos> getPath() {
@@ -128,6 +131,11 @@ public class Main {
     }
     public static Queue<List<BlockPos>> getRoomPaths() {
         return path;
+    }*/
+
+    @SubscribeEvent
+    public void onItemPickup(PlayerEvent.ItemPickupEvent e) {
+        ItemPickedUp.onPickupItem(e);
     }
 
     @SubscribeEvent
@@ -163,12 +171,12 @@ public class Main {
                         return;
                     }
                     if(!entity.getCommandSenderEntity().getName().equals(Minecraft.getMinecraft().thePlayer.getName())) {
-                        //Someone else has picked up the item
+                        // Someone else has picked up the item
                         return;
                     }
 
                     PlayerEvent.ItemPickupEvent itemPickupEvent = new PlayerEvent.ItemPickupEvent(Minecraft.getMinecraft().thePlayer, item);
-                    new ItemPickedUp().onPickupItem(itemPickupEvent);
+                    ItemPickedUp.onPickupItem(itemPickupEvent);
                 }
             }
         } catch (Exception error) {
