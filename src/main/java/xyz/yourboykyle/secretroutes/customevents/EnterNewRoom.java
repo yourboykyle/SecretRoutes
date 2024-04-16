@@ -36,14 +36,16 @@ public class EnterNewRoom {
     public static void onEnterNewRoom(Room room) {
         try {
             Utils.checkForCatacombs();
-            if(!Utils.inCatacombs) {
+            /*if(!Utils.inCatacombs) {
                 return;
-            }
+            }*/
 
             Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(Main.chatPrefix + "Entered new room \"" + RoomDetection.roomName + "\"."));
+            System.out.println("Entered new room \"" + RoomDetection.roomName + "\".");
 
             Main.currentRoom = room;
-            Main.clearPath();
+            //Main.clearPath();
+            System.out.println(Main.currentRoom.currentSecretRoute);
 
             if(room.data == null) {
                 return;
@@ -130,7 +132,7 @@ public class EnterNewRoom {
         for(BlockPos pos : relativeCoords) {
             coords.add(MapUtils.relativeToActual(pos, RoomDetection.roomDirection, RoomDetection.roomCorner));
         }
-        Main.addToPath(coords);
+        //Main.addToPath(coords);
     }
     public static void processStonk(BlockPos coords) {
         Main.currentRoom.add(MapUtils.relativeToActual(coords, RoomDetection.roomDirection, RoomDetection.roomCorner), "stonk");

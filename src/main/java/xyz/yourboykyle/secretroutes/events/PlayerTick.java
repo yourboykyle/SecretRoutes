@@ -19,35 +19,32 @@
 package xyz.yourboykyle.secretroutes.events;
 
 import io.github.quantizr.dungeonrooms.dungeons.catacombs.Waypoints;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import xyz.yourboykyle.secretroutes.Main;
-import xyz.yourboykyle.secretroutes.customevents.SecretCompleted;
-import xyz.yourboykyle.secretroutes.utils.RenderUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
 
 public class PlayerTick {
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent e) {
+        // New Rooms
+        Main.currentRoom.renderLines();
+
         //If all secrets in the room have been completed
         if(Waypoints.allFound) {
             Main.currentRoom = new Room(null);
         }
 
         //Path Maker
-        RenderUtils.drawLineMultipleParticles(EnumParticleTypes.FLAME, Main.getPath());
+        //RenderUtils.drawLineMultipleParticles(EnumParticleTypes.FLAME, Main.getPath());
 
         //Basic check
-        if(Main.currentRoom.getNext() == null || Main.currentRoom.getNext().getKey() == null || Main.currentRoom.getNext().getValue() == null) {
+        /*if(Main.currentRoom.getNext() == null || Main.currentRoom.getNext().getKey() == null || Main.currentRoom.getNext().getValue() == null) {
             return;
-        }
+        }*/
 
+        /*
         //AOTV
         if(Main.currentRoom.getNext().getValue().equals("aotv")) {
             EntityPlayer p = e.player;
@@ -97,6 +94,20 @@ public class PlayerTick {
                 p.addChatComponentMessage(new ChatComponentText(Main.chatPrefix + "Killed the bat!"));
             }
             return;
+        }*/
+
+
+
+        // New Rooms
+
+        if(Main.currentRoom.getSecretType() == Room.SECRET_TYPES.BAT) {
+            BlockPos pos = e.player.getPosition();
+            BlockPos batPos = Main.currentRoom.getSecretLocation();
+
+            if (pos.getX() >= batPos.getX() - 5 && pos.getX() <= batPos.getX() + 5 && pos.getY() >= batPos.getY() - 5 && pos.getY() <= batPos.getY() + 5 && pos.getZ() >= batPos.getZ() - 5 && pos.getZ() <= batPos.getZ() + 5) {
+                Main.currentRoom.nextSecret();
+                System.out.println("Went by bat at " + batPos);
+            }
         }
     }
 }

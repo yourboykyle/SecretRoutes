@@ -19,21 +19,12 @@
 package xyz.yourboykyle.secretroutes.events;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.world.World;
-import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import xyz.yourboykyle.secretroutes.Main;
-import xyz.yourboykyle.secretroutes.customevents.BlockPlace;
-import xyz.yourboykyle.secretroutes.customevents.SecretCompleted;
+import xyz.yourboykyle.secretroutes.utils.Room;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,24 +35,25 @@ public class PlayerInteract {
     @SubscribeEvent
     public void onPlayerInteract(PlayerInteractEvent e) {
         //Basic checks
-        if(Main.currentRoom.getNext() == null || Main.currentRoom.getNext().getKey() == null || Main.currentRoom.getNext().getValue() == null) {
+        /*if(Main.currentRoom.getNext() == null || Main.currentRoom.getNext().getKey() == null || Main.currentRoom.getNext().getValue() == null) {
             return;
         }
-        /*if(clickedChests.contains(e.pos)) {
+        if(clickedChests.contains(e.pos)) {
             return;
-        }*/
+        }
         if(e.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
             return;
-        }
+        }*/
 
         EntityPlayer p = e.entityPlayer;
         BlockPos pos = e.pos;
         Block block = e.world.getBlockState(e.pos).getBlock();
 
-        if(block != Blocks.chest && block != Blocks.trapped_chest && block != Blocks.lever && block != Blocks.skull) {
+        /*if(block != Blocks.chest && block != Blocks.trapped_chest && block != Blocks.lever && block != Blocks.skull) {
             return;
-        }
+        }*/
 
+        /*
         //Chest
         if (Main.currentRoom.getNext().getValue().equals("chest")) {
             if (block == Blocks.chest) {
@@ -116,6 +108,19 @@ public class PlayerInteract {
                 p.addChatComponentMessage(new ChatComponentText(Main.chatPrefix + "Got the wither essence!"));
             }
             return;
+        }*/
+
+
+
+        // New Rooms
+
+        if(Main.currentRoom.getSecretType() == Room.SECRET_TYPES.INTERACT) {
+            BlockPos interactPos = Main.currentRoom.getSecretLocation();
+
+            if(pos.getX() == interactPos.getX() && pos.getY() == interactPos.getY() && pos.getZ() == interactPos.getZ()) {
+                Main.currentRoom.nextSecret();
+                System.out.println("Interacted with block at " + interactPos);
+            }
         }
     }
 }
