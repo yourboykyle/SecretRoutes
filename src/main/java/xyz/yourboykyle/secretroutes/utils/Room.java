@@ -32,6 +32,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Room {
+    public enum WAYPOINT_TYPES {
+        LOCATIONS,
+        ETHERWARPS,
+        MINES,
+        INTERACTS,
+        TNTS
+    };
     public enum SECRET_TYPES {
         INTERACT,
         ITEM,
@@ -49,12 +56,11 @@ public class Room {
             name = roomName;
 
             if (roomName != null) {
-                // New Rooms
                 Gson gson = new GsonBuilder().create();
                 InputStream inputStream = Main.class.getResourceAsStream(Main.newRoomsDataPath);
 
-                BufferedReader newReader = new BufferedReader(new InputStreamReader(inputStream));
-                JsonObject data = gson.fromJson(newReader, JsonObject.class);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                JsonObject data = gson.fromJson(reader, JsonObject.class);
 
                 if(data != null && data.get(name) != null) {
                     currentSecretRoute = data.get(name).getAsJsonArray();

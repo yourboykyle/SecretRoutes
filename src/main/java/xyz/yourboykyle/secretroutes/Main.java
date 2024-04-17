@@ -22,14 +22,11 @@ import io.github.quantizr.dungeonrooms.DungeonRooms;
 import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
 import io.github.quantizr.dungeonrooms.events.PacketEvent;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.network.play.server.S0DPacketCollectItem;
 import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.client.ClientCommandHandler;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -37,13 +34,15 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import xyz.yourboykyle.secretroutes.commands.EnterNewRoom;
 import xyz.yourboykyle.secretroutes.commands.NextSecret;
-import xyz.yourboykyle.secretroutes.commands.enterNewRoom;
+import xyz.yourboykyle.secretroutes.commands.Recording;
 import xyz.yourboykyle.secretroutes.events.ItemPickedUp;
 import xyz.yourboykyle.secretroutes.events.PlayerInteract;
 import xyz.yourboykyle.secretroutes.events.PlayerTick;
 import xyz.yourboykyle.secretroutes.events.WorldRender;
 import xyz.yourboykyle.secretroutes.utils.Room;
+import xyz.yourboykyle.secretroutes.utils.RouteRecording;
 
 import java.awt.*;
 
@@ -51,19 +50,13 @@ import java.awt.*;
 public class Main {
     public static final String MODID = "SecretRoutes";
     public static final String VERSION = "1.0";
-    public static final String newRoomsDataPath = "/rooms.json";
+    public static final String newRoomsDataPath = "/routes.json";
 
     public static Room currentRoom = new Room(null);
+    public static RouteRecording routeRecording = new RouteRecording();
     private static DungeonRooms dungeonRooms = new DungeonRooms();
 
     public static Main instance = new Main();
-
-    //Notification stuff
-    private static final Minecraft mc = Minecraft.getMinecraft();
-    private static String notificationText = "";
-    private static long notificationStartTime = 0;
-    private static final int NOTIFICATION_DURATION = 2000; // milliseconds
-    private static final int textSize = 20;
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
@@ -81,8 +74,9 @@ public class Main {
         MinecraftForge.EVENT_BUS.register(new PlayerTick());
         MinecraftForge.EVENT_BUS.register(new WorldRender());
 
-        ClientCommandHandler.instance.registerCommand(new enterNewRoom());
+        ClientCommandHandler.instance.registerCommand(new EnterNewRoom());
         ClientCommandHandler.instance.registerCommand(new NextSecret());
+        ClientCommandHandler.instance.registerCommand(new Recording());
 
         RoomDetection.roomName = "Example-Room-3";
         RoomDetection.roomCorner = new Point(0, 0);
@@ -126,36 +120,5 @@ public class Main {
             error.printStackTrace();
             Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("There was an error with " + MODID));
         }
-    }
-
-    @SubscribeEvent
-    public void onRenderGameOverlay(RenderGameOverlayEvent.Text event) {
-        if (mc.ingameGUI == null) return;
-
-        long currentTime = System.currentTimeMillis();
-        if (currentTime - notificationStartTime < NOTIFICATION_DURATION) {
-            ScaledResolution scaledResolution = new ScaledResolution(mc);
-            int screenWidth = scaledResolution.getScaledWidth();
-            int screenHeight = scaledResolution.getScaledHeight();
-
-            int notificationWidth = mc.fontRendererObj.getStringWidth(notificationText);
-            int notificationHeight = mc.fontRendererObj.FONT_HEIGHT;
-
-            int xPos = (screenWidth - notificationWidth * textSize / 10) / 2;
-            int yPos = (screenHeight - notificationHeight * textSize / 10) / 2;
-
-            GlStateManager.pushMatrix();
-            GlStateManager.translate(xPos, yPos, 0);
-            GlStateManager.scale(textSize / 10.0, textSize / 10.0, 1.0);
-
-            mc.fontRendererObj.drawString(notificationText, 0, 0, 0xFFFFFF);
-
-            GlStateManager.popMatrix();
-        }
-    }
-
-    public static void displayNotification(String text) {
-        notificationText = text;
-        notificationStartTime = System.currentTimeMillis();
     }
 }
