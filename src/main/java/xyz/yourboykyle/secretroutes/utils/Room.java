@@ -19,6 +19,8 @@
 package xyz.yourboykyle.secretroutes.utils;
 
 import com.google.gson.*;
+import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
+import io.github.quantizr.dungeonrooms.utils.MapUtils;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumParticleTypes;
 import xyz.yourboykyle.secretroutes.Main;
@@ -28,7 +30,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 public class Room {
     public enum SECRET_TYPES {
@@ -36,11 +37,7 @@ public class Room {
         ITEM,
         BAT
     };
-
-    private Queue<Pair<BlockPos, String>> route; // Pairs will be BlockPos to the type of secret
     public String name;
-    public JsonObject data;
-
     public JsonArray currentSecretRoute;
     public int currentSecretIndex = 0;
     public JsonObject currentSecretWaypoints;
@@ -49,36 +46,24 @@ public class Room {
         currentSecretIndex = 0;
 
         try {
-            route = new LinkedList<>();
             name = roomName;
 
             if (roomName != null) {
-                Gson gson = new GsonBuilder().create();
-                InputStream inputStream = Main.class.getResourceAsStream(Main.roomsDataPath);
-
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                JsonObject myData = gson.fromJson(reader, JsonObject.class);
-
-                if(myData != null && myData.get(name) != null) {
-                    data = myData.get(name).getAsJsonObject();
-                }
-
                 // New Rooms
-                Gson newGson = new GsonBuilder().create();
-                InputStream newInputStream = Main.class.getResourceAsStream(Main.newRoomsDataPath);
+                Gson gson = new GsonBuilder().create();
+                InputStream inputStream = Main.class.getResourceAsStream(Main.newRoomsDataPath);
 
-                BufferedReader newReader = new BufferedReader(new InputStreamReader(newInputStream));
-                JsonObject newMyData = newGson.fromJson(newReader, JsonObject.class);
+                BufferedReader newReader = new BufferedReader(new InputStreamReader(inputStream));
+                JsonObject data = gson.fromJson(newReader, JsonObject.class);
 
-                if(newMyData != null && newMyData.get(name) != null) {
-                    currentSecretRoute = newMyData.get(name).getAsJsonArray();
+                if(data != null && data.get(name) != null) {
+                    currentSecretRoute = data.get(name).getAsJsonArray();
                     currentSecretWaypoints = currentSecretRoute.get(currentSecretIndex).getAsJsonObject();
                 }
 
                 System.out.println("Current Secret Route: " + currentSecretRoute);
                 System.out.println("Current Secret (#" + (currentSecretIndex + 1) + "): " + currentSecretWaypoints);
             } else {
-                data = null;
                 currentSecretRoute = null;
             }
         } catch(Exception e) {
@@ -96,23 +81,8 @@ public class Room {
         }
     }
 
-    public void renderLines() {
-        if(currentSecretWaypoints != null) {
-            // Render the lines
-            List<BlockPos> lines = new LinkedList<>();
-
-            JsonArray lineLocations = currentSecretWaypoints.get("locations").getAsJsonArray();
-            for (JsonElement lineLocationElement : lineLocations) {
-                JsonArray lineLocation = lineLocationElement.getAsJsonArray();
-                lines.add(new BlockPos(lineLocation.get(0).getAsInt(), lineLocation.get(1).getAsInt(), lineLocation.get(2).getAsInt()));
-            }
-
-            RenderUtils.drawLineMultipleParticles(EnumParticleTypes.FLAME, lines);
-        }
-    }
-
     public SECRET_TYPES getSecretType() {
-        if(currentSecretWaypoints != null) {
+        if(currentSecretWaypoints != null && currentSecretWaypoints.get("secret") != null && currentSecretWaypoints.get("secret").getAsJsonObject().get("type") != null) {
             String type = currentSecretWaypoints.get("secret").getAsJsonObject().get("type").getAsString();
             if(type.equals("interact")) {
                 return SECRET_TYPES.INTERACT;
@@ -127,32 +97,27 @@ public class Room {
     }
 
     public BlockPos getSecretLocation() {
-        JsonArray location = currentSecretWaypoints.get("secret").getAsJsonObject().get("location").getAsJsonArray();
+        if(currentSecretWaypoints.get("secret") != null && currentSecretWaypoints.get("secret").getAsJsonObject().get("location") != null) {
+            JsonArray location = currentSecretWaypoints.get("secret").getAsJsonObject().get("location").getAsJsonArray();
 
-        return new BlockPos(location.get(0).getAsInt(), location.get(1).getAsInt(), location.get(2).getAsInt());
-    }
-
-
-
-    public Pair<BlockPos, String> getNext() {
-        return route.peek();
-    }
-
-    public void add(BlockPos pos, String type) {
-        if(getNext() == null || getNext().getKey() == null || getNext().getValue() == null) {
-            removeNext();
+            return new BlockPos(location.get(0).getAsInt(), location.get(1).getAsInt(), location.get(2).getAsInt());
         }
-        route.add(new Pair(pos, type));
-    }
-    public void add(BlockPos pos, String type, boolean isInit) {
-        route.add(new Pair(pos, type));
+        return null;
     }
 
-    public void removeNext() {
-        route.poll();
-    }
+    public void renderLines() {
+        if(currentSecretWaypoints != null && currentSecretWaypoints.get("locations") != null) {
+            // Render the lines
+            List<BlockPos> lines = new LinkedList<>();
 
-    public Queue<Pair<BlockPos, String>> getRoute() {
-        return route;
+            JsonArray lineLocations = currentSecretWaypoints.get("locations").getAsJsonArray();
+            for (JsonElement lineLocationElement : lineLocations) {
+                JsonArray lineLocation = lineLocationElement.getAsJsonArray();
+
+                lines.add(MapUtils.relativeToActual(new BlockPos(lineLocation.get(0).getAsInt(), lineLocation.get(1).getAsInt(), lineLocation.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner));
+            }
+
+            RenderUtils.drawLineMultipleParticles(EnumParticleTypes.FLAME, lines);
+        }
     }
 }

@@ -16,7 +16,7 @@
  * with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.yourboykyle.secretroutes.customevents;
+package xyz.yourboykyle.secretroutes.events;
 
 import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
