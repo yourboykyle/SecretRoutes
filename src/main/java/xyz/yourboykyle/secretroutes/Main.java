@@ -61,6 +61,7 @@ public class Main {
         //Events
         MinecraftForge.EVENT_BUS.register(new ItemPickedUp());
         MinecraftForge.EVENT_BUS.register(new OnBlockBreak());
+        MinecraftForge.EVENT_BUS.register(new OnBlockPlace());
         MinecraftForge.EVENT_BUS.register(new OnRecievePacket());
         MinecraftForge.EVENT_BUS.register(new PlayerInteract());
         MinecraftForge.EVENT_BUS.register(new PlayerTick());

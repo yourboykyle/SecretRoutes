@@ -26,7 +26,7 @@ import xyz.yourboykyle.secretroutes.utils.Room;
 
 public class ItemPickedUp {
     @SubscribeEvent
-    public static void onPickupItem(PlayerEvent.ItemPickupEvent e) {
+    public void onPickupItem(PlayerEvent.ItemPickupEvent e) {
         if(Main.currentRoom.getSecretType() == Room.SECRET_TYPES.ITEM) {
             BlockPos pos = e.player.getPosition();
             BlockPos itemPos = Main.currentRoom.getSecretLocation();
