@@ -106,7 +106,8 @@ public class Room {
         if(currentSecretWaypoints.get("secret") != null && currentSecretWaypoints.get("secret").getAsJsonObject().get("location") != null) {
             JsonArray location = currentSecretWaypoints.get("secret").getAsJsonObject().get("location").getAsJsonArray();
 
-            return new BlockPos(location.get(0).getAsInt(), location.get(1).getAsInt(), location.get(2).getAsInt());
+            Main.checkRoomData();
+            return MapUtils.relativeToActual(new BlockPos(location.get(0).getAsInt(), location.get(1).getAsInt(), location.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
         }
         return null;
     }
@@ -120,6 +121,7 @@ public class Room {
             for (JsonElement lineLocationElement : lineLocations) {
                 JsonArray lineLocation = lineLocationElement.getAsJsonArray();
 
+                Main.checkRoomData();
                 lines.add(MapUtils.relativeToActual(new BlockPos(lineLocation.get(0).getAsInt(), lineLocation.get(1).getAsInt(), lineLocation.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner));
             }
 

@@ -1,6 +1,8 @@
 package xyz.yourboykyle.secretroutes.utils;
 
 import com.google.gson.*;
+import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
+import io.github.quantizr.dungeonrooms.utils.MapUtils;
 import net.minecraft.util.BlockPos;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.Room.SECRET_TYPES;
@@ -9,12 +11,13 @@ import xyz.yourboykyle.secretroutes.utils.Room.WAYPOINT_TYPES;
 import java.io.*;
 
 public class RouteRecording {
-    public static boolean recording = false;
-    public String roomName = "Room-Name-Here";
+    public boolean recording = false;
     public JsonObject allSecretRoutes = new JsonObject();
     public JsonArray currentSecretRoute = new JsonArray();
     public JsonObject currentSecretWaypoints = new JsonObject();
-    public int currentSecretIndex = 0;
+
+    // Each waypoint on the locations will be added based on how far the player is from the previous waypoint, this will be used to keep track of said previous waypoint
+    public BlockPos previousLocation;
 
     public RouteRecording() {
         // Create placeholders for the waypoints, as the coordinates are 2D arrays
@@ -28,7 +31,7 @@ public class RouteRecording {
         importRoutes();
 
         // Put stuff for testing in here
-        System.out.println("- Start RouteRecording Testing Data -");
+        /*System.out.println("- Start RouteRecording Testing Data -");
 
         System.out.println("allSecretRoutes before adding: " + allSecretRoutes);
 
@@ -77,7 +80,20 @@ public class RouteRecording {
         importRoutes(filePath);
         System.out.println("Imported routes: " + allSecretRoutes);
 
-        System.out.println("- End RouteRecording Testing Data -");
+        System.out.println("- End RouteRecording Testing Data -");*/
+    }
+
+    public void startRecording() {
+        // Start recording the secret route
+        recording = true;
+    }
+
+    public void stopRecording() {
+        // Stop recording the secret route
+        recording = false;
+
+        currentSecretRoute.add(currentSecretWaypoints);
+        newRoute();
     }
 
     public void importRoutes() {
@@ -91,28 +107,16 @@ public class RouteRecording {
         allSecretRoutes = gson.fromJson(reader, JsonObject.class);
     }
 
-    public void importRoutes(String filePath) {
-        // Import all the current secret routes into the allSecretRoutes JsonObject from a file
-        allSecretRoutes = new JsonObject();
-
-        try {
-            Gson gson = new GsonBuilder().create();
-            FileReader reader = new FileReader(filePath);
-
-            allSecretRoutes = gson.fromJson(reader, JsonObject.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void addWaypoint(WAYPOINT_TYPES type, BlockPos pos) {
         // Add a non-secret waypoint to the current secret waypoints
+        Main.checkRoomData();
+        BlockPos relPos = MapUtils.actualToRelative(pos, RoomDetection.roomDirection, RoomDetection.roomCorner);
 
         JsonArray posArray = new JsonArray();
 
-        posArray.add(new JsonPrimitive(pos.getX()));
-        posArray.add(new JsonPrimitive(pos.getY()));
-        posArray.add(new JsonPrimitive(pos.getZ()));
+        posArray.add(new JsonPrimitive(relPos.getX()));
+        posArray.add(new JsonPrimitive(relPos.getY()));
+        posArray.add(new JsonPrimitive(relPos.getZ()));
 
         if(type == WAYPOINT_TYPES.LOCATIONS) {
             currentSecretWaypoints.get("locations").getAsJsonArray().add(posArray);
@@ -129,12 +133,14 @@ public class RouteRecording {
 
     public void addWaypoint(SECRET_TYPES type, BlockPos pos) {
         // Add a secret waypoint to the current secret waypoints
+        Main.checkRoomData();
+        BlockPos relPos = MapUtils.actualToRelative(pos, RoomDetection.roomDirection, RoomDetection.roomCorner);
 
         JsonArray posArray = new JsonArray();
 
-        posArray.add(new JsonPrimitive(pos.getX()));
-        posArray.add(new JsonPrimitive(pos.getY()));
-        posArray.add(new JsonPrimitive(pos.getZ()));
+        posArray.add(new JsonPrimitive(relPos.getX()));
+        posArray.add(new JsonPrimitive(relPos.getY()));
+        posArray.add(new JsonPrimitive(relPos.getZ()));
 
         JsonObject secret = new JsonObject();
 
@@ -165,7 +171,7 @@ public class RouteRecording {
 
     public void newRoute() {
         // Start a new secret route recording
-        allSecretRoutes.add(roomName, currentSecretRoute);
+        allSecretRoutes.add(RoomDetection.roomName, currentSecretRoute);
         currentSecretRoute = new JsonArray();
 
         currentSecretWaypoints = new JsonObject();

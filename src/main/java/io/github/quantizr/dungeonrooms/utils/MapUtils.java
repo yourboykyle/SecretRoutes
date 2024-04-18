@@ -28,8 +28,8 @@ import net.minecraft.util.Vec4b;
 import net.minecraft.world.storage.MapData;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public class MapUtils {
 
