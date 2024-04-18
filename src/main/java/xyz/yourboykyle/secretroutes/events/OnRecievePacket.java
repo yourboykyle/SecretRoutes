@@ -13,6 +13,7 @@ import net.minecraft.network.play.server.S23PacketBlockChange;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
@@ -43,7 +44,7 @@ public class OnRecievePacket {
                     }
 
                     PlayerEvent.ItemPickupEvent itemPickupEvent = new PlayerEvent.ItemPickupEvent(Minecraft.getMinecraft().thePlayer, item);
-                    ItemPickedUp.onPickupItem(itemPickupEvent);
+                    new ItemPickedUp().onPickupItem(itemPickupEvent);
                 }
             } else if(e.packet instanceof S08PacketPlayerPosLook) {
                 // Route Recording
@@ -61,10 +62,22 @@ public class OnRecievePacket {
                 IBlockState blockState = world.getBlockState(pos);
                 Block block = blockState.getBlock();
 
-                if(Main.routeRecording.recording && block == Blocks.air && firstPacket) {
+                if(block == Blocks.air) {
                     // Block was broken
-                    OnBlockBreak.onBlockBreak(new BlockEvent.BreakEvent(world, pos, blockState, Minecraft.getMinecraft().thePlayer));
+                    if(Main.routeRecording.recording && firstPacket) {
+                        new OnBlockBreak().onBlockBreak(new BlockEvent.BreakEvent(world, pos, blockState, Minecraft.getMinecraft().thePlayer));
+                    }
+                } else if(block == null) {
+                    // Block is null.
+                } else {
+                    // Block was placed
+                    if(Main.routeRecording.recording) {
+                        IBlockState placedAgainst = world.getBlockState(new BlockPos(pos.getX() + 1, pos.getY(), pos.getZ()));
+                        new OnBlockPlace().onBlockPlace(new BlockEvent.PlaceEvent(new BlockSnapshot(world, pos, blockState), placedAgainst, Minecraft.getMinecraft().thePlayer));
+                    }
                 }
+
+
                 firstPacket = !firstPacket;
 
             }

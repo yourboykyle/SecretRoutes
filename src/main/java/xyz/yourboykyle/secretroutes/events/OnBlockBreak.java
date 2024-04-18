@@ -8,7 +8,7 @@ import xyz.yourboykyle.secretroutes.utils.Room;
 
 public class OnBlockBreak {
     @SubscribeEvent
-    public static void onBlockBreak(BlockEvent.BreakEvent e) {
+    public void onBlockBreak(BlockEvent.BreakEvent e) {
         // Route Recording
         if(e.getPlayer().getUniqueID() == Minecraft.getMinecraft().thePlayer.getUniqueID() && Main.routeRecording.recording) {
                 Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.MINES, e.pos);
