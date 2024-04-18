@@ -49,15 +49,12 @@ public class PlayerInteract {
             }
 
             // Route Recording
-            if(block == Blocks.lever || block == Blocks.skull) {
-                // If the block is a lever or skull (essence), then it is a waypoint on the route, going to a secret
-                if (Main.routeRecording.recording) {
+            if(Main.routeRecording.recording) {
+                if (block == Blocks.lever || block == Blocks.skull) {
+                    // If the block is a lever or skull (essence), then it is a waypoint on the route, going to a secret
                     Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.INTERACTS, e.pos);
-                }
-            } else if(block == Blocks.chest || block == Blocks.trapped_chest) {
-                // If the block is a chest or a trapped chest (mimic chest), then it is a waypoint for a secret, so start a new secret waypoint list
-                if (Main.routeRecording.recording) {
-                    System.out.println("Interact Secret At " + e.pos);
+                } else if (block == Blocks.chest || block == Blocks.trapped_chest) {
+                    // If the block is a chest or a trapped chest (mimic chest), then it is a waypoint for a secret, so start a new secret waypoint list
                     Main.routeRecording.addWaypoint(Room.SECRET_TYPES.INTERACT, e.pos);
                     Main.routeRecording.newSecret();
                 }
