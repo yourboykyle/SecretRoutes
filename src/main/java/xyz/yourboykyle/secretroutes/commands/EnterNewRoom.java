@@ -37,9 +37,9 @@ public class EnterNewRoom extends CommandBase {
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         if(args.length == 1) {
-            xyz.yourboykyle.secretroutes.customevents.EnterNewRoom.onEnterNewRoom(new Room(args[0]));
+            xyz.yourboykyle.secretroutes.events.EnterNewRoom.onEnterNewRoom(new Room(args[0]));
         } else {
-            xyz.yourboykyle.secretroutes.customevents.EnterNewRoom.onEnterNewRoom(new Room("Example-Room-3"));
+            xyz.yourboykyle.secretroutes.events.EnterNewRoom.onEnterNewRoom(new Room("Example-Room-3"));
         }
     }
 

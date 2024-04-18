@@ -16,7 +16,7 @@
  * with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.yourboykyle.secretroutes.customevents;
+package xyz.yourboykyle.secretroutes.events;
 
 import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
 import io.github.quantizr.dungeonrooms.utils.Utils;
