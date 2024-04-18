@@ -19,11 +19,13 @@
 package xyz.yourboykyle.secretroutes.events;
 
 import net.minecraft.util.BlockPos;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.Room;
 
 public class ItemPickedUp {
+    @SubscribeEvent
     public static void onPickupItem(PlayerEvent.ItemPickupEvent e) {
         if(Main.currentRoom.getSecretType() == Room.SECRET_TYPES.ITEM) {
             BlockPos pos = e.player.getPosition();

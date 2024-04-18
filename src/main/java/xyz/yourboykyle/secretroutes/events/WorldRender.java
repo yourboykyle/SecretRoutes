@@ -42,6 +42,7 @@ public class WorldRender {
             for (JsonElement etherwarpLocationElement : etherwarpLocations) {
                 JsonArray etherwarpLocation = etherwarpLocationElement.getAsJsonArray();
 
+                Main.checkRoomData();
                 BlockPos pos = MapUtils.relativeToActual(new BlockPos(etherwarpLocation.get(0).getAsInt(), etherwarpLocation.get(1).getAsInt(), etherwarpLocation.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
 
                 SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(),  pos.getY(), pos.getZ(), 128, 0, 128, 1, 1); // Color is purple
@@ -54,6 +55,7 @@ public class WorldRender {
             for (JsonElement mineLocationElement : mineLocations) {
                 JsonArray mineLocation = mineLocationElement.getAsJsonArray();
 
+                Main.checkRoomData();
                 BlockPos pos = MapUtils.relativeToActual(new BlockPos(mineLocation.get(0).getAsInt(), mineLocation.get(1).getAsInt(), mineLocation.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
 
                 SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(),  pos.getY(), pos.getZ(), 255, 255, 0, 1, 1); // Color is yellow
@@ -66,6 +68,7 @@ public class WorldRender {
             for (JsonElement interactLocationElement : interactLocations) {
                 JsonArray interactLocation = interactLocationElement.getAsJsonArray();
 
+                Main.checkRoomData();
                 BlockPos pos = MapUtils.relativeToActual(new BlockPos(interactLocation.get(0).getAsInt(), interactLocation.get(1).getAsInt(), interactLocation.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
 
                 SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(),  pos.getY(), pos.getZ(), 0, 0, 255, 1, 1); // Color is blue
@@ -78,6 +81,7 @@ public class WorldRender {
             for (JsonElement tntLocationElement : tntLocations) {
                 JsonArray tntLocation = tntLocationElement.getAsJsonArray();
 
+                Main.checkRoomData();
                 BlockPos pos = MapUtils.relativeToActual(new BlockPos(tntLocation.get(0).getAsInt(), tntLocation.get(1).getAsInt(), tntLocation.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
 
                 SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(),  pos.getY(), pos.getZ(), 255, 0, 0, 1, 1); // Color is red
@@ -90,6 +94,7 @@ public class WorldRender {
             String type = secret.get("type").getAsString();
             JsonArray location = secret.get("location").getAsJsonArray();
 
+            Main.checkRoomData();
             BlockPos pos = MapUtils.relativeToActual(new BlockPos(location.get(0).getAsInt(), location.get(1).getAsInt(), location.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
 
             if(type.equals("interact")) {

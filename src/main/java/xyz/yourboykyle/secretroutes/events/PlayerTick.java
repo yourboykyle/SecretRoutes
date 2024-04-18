@@ -28,7 +28,6 @@ import xyz.yourboykyle.secretroutes.utils.Room;
 public class PlayerTick {
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent e) {
-
         //If all secrets in the room have been completed
         if(Waypoints.allFound) {
             Main.currentRoom = new Room(null);
@@ -43,6 +42,25 @@ public class PlayerTick {
             if (pos.getX() >= batPos.getX() - 5 && pos.getX() <= batPos.getX() + 5 && pos.getY() >= batPos.getY() - 5 && pos.getY() <= batPos.getY() + 5 && pos.getZ() >= batPos.getZ() - 5 && pos.getZ() <= batPos.getZ() + 5) {
                 Main.currentRoom.nextSecret();
                 System.out.println("Went by bat at " + batPos);
+            }
+        }
+
+        // Route Recording
+        if(Main.routeRecording.recording) {
+            if (Main.routeRecording.previousLocation == null) {
+                Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.LOCATIONS, e.player.getPosition());
+                Main.routeRecording.previousLocation = e.player.getPosition();
+            } else {
+                BlockPos pos = e.player.getPosition();
+                BlockPos prevPos = Main.routeRecording.previousLocation;
+
+                double distance = Math.abs(Math.sqrt(Math.pow(pos.getX() - prevPos.getX(), 2) + Math.pow(pos.getY() - prevPos.getY(), 2) + Math.pow(pos.getZ() - prevPos.getZ(), 2)));
+
+                // If the player has moved 5 blocks or more from the previous waypoint
+                if (distance >= 4.9) {
+                    Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.LOCATIONS, e.player.getPosition());
+                    Main.routeRecording.previousLocation = e.player.getPosition();
+                }
             }
         }
     }

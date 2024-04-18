@@ -18,7 +18,6 @@
 
 package io.github.quantizr.dungeonrooms.dungeons.catacombs;
 
-import com.google.gson.JsonObject;
 import io.github.quantizr.dungeonrooms.DungeonRooms;
 import io.github.quantizr.dungeonrooms.utils.MapUtils;
 import io.github.quantizr.dungeonrooms.utils.RoomDetectionUtils;
@@ -27,19 +26,21 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.settings.GameSettings;
-import net.minecraft.util.*;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import org.lwjgl.Sys;
-import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.customevents.EnterNewRoom;
 import xyz.yourboykyle.secretroutes.utils.Room;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static io.github.quantizr.dungeonrooms.dungeons.catacombs.DungeonManager.*;
 
@@ -263,6 +264,7 @@ public class RoomDetection {
             }
 
             EnterNewRoom.onEnterNewRoom(new Room(roomName));
+            System.out.println("Entered new room: " + roomName);
         }
     }
 

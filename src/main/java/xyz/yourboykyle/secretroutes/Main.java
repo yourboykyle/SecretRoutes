@@ -20,27 +20,18 @@ package xyz.yourboykyle.secretroutes;
 
 import io.github.quantizr.dungeonrooms.DungeonRooms;
 import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
-import io.github.quantizr.dungeonrooms.events.PacketEvent;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.network.play.server.S0DPacketCollectItem;
-import net.minecraft.util.ChatComponentText;
+import io.github.quantizr.dungeonrooms.utils.MapUtils;
+import net.minecraft.util.BlockPos;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import xyz.yourboykyle.secretroutes.commands.EnterNewRoom;
 import xyz.yourboykyle.secretroutes.commands.NextSecret;
 import xyz.yourboykyle.secretroutes.commands.Recording;
-import xyz.yourboykyle.secretroutes.events.ItemPickedUp;
-import xyz.yourboykyle.secretroutes.events.PlayerInteract;
-import xyz.yourboykyle.secretroutes.events.PlayerTick;
-import xyz.yourboykyle.secretroutes.events.WorldRender;
+import xyz.yourboykyle.secretroutes.events.*;
 import xyz.yourboykyle.secretroutes.utils.Room;
 import xyz.yourboykyle.secretroutes.utils.RouteRecording;
 
@@ -68,8 +59,9 @@ public class Main {
         dungeonRooms.init(e);
 
         //Events
-        MinecraftForge.EVENT_BUS.register(Main.instance);
         MinecraftForge.EVENT_BUS.register(new ItemPickedUp());
+        MinecraftForge.EVENT_BUS.register(new OnBlockBreak());
+        MinecraftForge.EVENT_BUS.register(new OnRecievePacket());
         MinecraftForge.EVENT_BUS.register(new PlayerInteract());
         MinecraftForge.EVENT_BUS.register(new PlayerTick());
         MinecraftForge.EVENT_BUS.register(new WorldRender());
@@ -78,9 +70,11 @@ public class Main {
         ClientCommandHandler.instance.registerCommand(new NextSecret());
         ClientCommandHandler.instance.registerCommand(new Recording());
 
-        RoomDetection.roomName = "Example-Room-3";
+        RoomDetection.roomName = "undefined";
         RoomDetection.roomCorner = new Point(0, 0);
         RoomDetection.roomDirection = "NW";
+
+        System.out.println("test: " + MapUtils.actualToRelative(new BlockPos(78, 110, 9), RoomDetection.roomDirection, RoomDetection.roomCorner));
     }
 
     @Mod.EventHandler
@@ -88,37 +82,15 @@ public class Main {
         dungeonRooms.postInit(e);
     }
 
-    @SubscribeEvent
-    public void onItemPickup(PlayerEvent.ItemPickupEvent e) {
-        ItemPickedUp.onPickupItem(e);
-    }
-
-    @SubscribeEvent
-    public void onRecievePacket(PacketEvent.ReceiveEvent e) {
-        try {
-            if (e.packet instanceof S0DPacketCollectItem) { // Note to Hypixel: This is not manipulating packets, it is simply listening and checking for the collect item packet. If that is the correct packet, it simulates creating an itempickedup event client-side
-                S0DPacketCollectItem packet = (S0DPacketCollectItem) e.packet;
-                Entity entity = Minecraft.getMinecraft().theWorld.getEntityByID(packet.getCollectedItemEntityID());
-
-                if(entity instanceof EntityItem) {
-                    EntityItem item = (EntityItem) entity;
-                    entity = Minecraft.getMinecraft().theWorld.getEntityByID(packet.getEntityID());
-                    if(entity == null) {
-                        System.out.println("Entity is null.");
-                        return;
-                    }
-                    if(!entity.getCommandSenderEntity().getName().equals(Minecraft.getMinecraft().thePlayer.getName())) {
-                        // Someone else has picked up the item
-                        return;
-                    }
-
-                    PlayerEvent.ItemPickupEvent itemPickupEvent = new PlayerEvent.ItemPickupEvent(Minecraft.getMinecraft().thePlayer, item);
-                    ItemPickedUp.onPickupItem(itemPickupEvent);
-                }
-            }
-        } catch (Exception error) {
-            error.printStackTrace();
-            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("There was an error with " + MODID));
+    public static void checkRoomData() {
+        if(RoomDetection.roomName == null) {
+            RoomDetection.roomName = "undefined";
+        }
+        if(RoomDetection.roomCorner == null) {
+            RoomDetection.roomCorner = new Point(0, 0);
+        }
+        if(RoomDetection.roomDirection == null) {
+            RoomDetection.roomDirection = "NW";
         }
     }
 }

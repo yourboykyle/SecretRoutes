@@ -26,12 +26,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.Room;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class PlayerInteract {
-    public static List<BlockPos> clickedChests = new ArrayList<BlockPos>();//
-
     @SubscribeEvent
     public void onPlayerInteract(PlayerInteractEvent e) {
         if(e.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
@@ -46,6 +41,12 @@ public class PlayerInteract {
                     Main.currentRoom.nextSecret();
                     System.out.println("Interacted with block at " + interactPos);
                 }
+            }
+
+            // Route Recording
+            if(Main.routeRecording.recording) {
+                System.out.println("pos: " + e.pos);
+                Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.INTERACTS, e.pos);
             }
         }
     }
