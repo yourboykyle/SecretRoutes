@@ -36,5 +36,11 @@ public class ItemPickedUp {
                 System.out.println("Picked up item at " + itemPos);
             }
         }
+
+        // Route Recording
+        if(Main.routeRecording.recording) {
+            Main.routeRecording.addWaypoint(Room.SECRET_TYPES.ITEM, e.player.getPosition());
+            Main.routeRecording.newSecret();
+        }
     }
 }

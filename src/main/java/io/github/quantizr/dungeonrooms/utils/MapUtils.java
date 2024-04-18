@@ -399,6 +399,12 @@ public class MapUtils {
      * @return the actual coordinate of a block given the relative coordinate
      */
     public static BlockPos actualToRelative(BlockPos actual, String cornerDirection, Point locationOfCorner) {
+        if(cornerDirection == null) {
+            cornerDirection = "NW";
+        }
+        if(locationOfCorner == null) {
+            locationOfCorner = new Point(0, 0);
+        }
         double x = 0;
         double z = 0;
         switch (cornerDirection) {
@@ -426,6 +432,12 @@ public class MapUtils {
      * @return the relative coordinate of a block given the actual coordinate
      */
     public static BlockPos relativeToActual(BlockPos relative, String cornerDirection, Point locationOfCorner) {
+        if(cornerDirection == null) {
+            cornerDirection = "NW";
+        }
+        if(locationOfCorner == null) {
+            locationOfCorner = new Point(0, 0);
+        }
         double x = 0;
         double z = 0;
         switch (cornerDirection) {
