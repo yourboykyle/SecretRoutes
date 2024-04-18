@@ -21,8 +21,9 @@ import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.Room;
 
 public class OnRecievePacket {
-    // The S23PacketBlockChange packet is sent twice, even when checking if the block is air. This is a workaround to keep track of if it's the first time the packet is sent, and just ignore the second time
-    public static boolean firstPacket = true;
+    // The S23PacketBlockChange packet is sent twice for each block break and place. These variables are workarounds to keep track of if it's the first time each packet is sent, and just ignore the second time
+    public static boolean firstBlockBreakPacket = true;
+    public static boolean firstBlockPlacePacket = true;
 
     @SubscribeEvent
     public void onRecievePacket(PacketEvent.ReceiveEvent e) {
@@ -64,22 +65,21 @@ public class OnRecievePacket {
 
                 if(block == Blocks.air) {
                     // Block was broken
-                    if(Main.routeRecording.recording && firstPacket) {
+                    if(Main.routeRecording.recording && firstBlockBreakPacket) {
                         new OnBlockBreak().onBlockBreak(new BlockEvent.BreakEvent(world, pos, blockState, Minecraft.getMinecraft().thePlayer));
                     }
                 } else if(block == null) {
                     // Block is null.
                 } else {
                     // Block was placed
-                    if(Main.routeRecording.recording) {
+                    if(Main.routeRecording.recording && firstBlockPlacePacket) {
                         IBlockState placedAgainst = world.getBlockState(new BlockPos(pos.getX() + 1, pos.getY(), pos.getZ()));
                         new OnBlockPlace().onBlockPlace(new BlockEvent.PlaceEvent(new BlockSnapshot(world, pos, blockState), placedAgainst, Minecraft.getMinecraft().thePlayer));
                     }
                 }
 
-
-                firstPacket = !firstPacket;
-
+                firstBlockBreakPacket = !firstBlockBreakPacket;
+                firstBlockPlacePacket = !firstBlockPlacePacket;
             }
         } catch (Exception error) {
             error.printStackTrace();

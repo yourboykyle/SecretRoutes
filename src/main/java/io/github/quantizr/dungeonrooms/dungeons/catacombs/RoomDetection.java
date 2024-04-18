@@ -31,7 +31,7 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import xyz.yourboykyle.secretroutes.customevents.EnterNewRoom;
+import xyz.yourboykyle.secretroutes.events.EnterNewRoom;
 import xyz.yourboykyle.secretroutes.utils.Room;
 
 import java.awt.*;
