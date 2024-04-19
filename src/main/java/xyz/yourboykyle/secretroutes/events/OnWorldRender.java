@@ -46,8 +46,9 @@ public class OnWorldRender {
                 Main.checkRoomData();
                 BlockPos pos = MapUtils.relativeToActual(new BlockPos(startCoords.get(0).getAsInt(), startCoords.get(1).getAsInt(), startCoords.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
 
+                // Render the text
                 GlStateManager.disableTexture2D();
-                //SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), "Start");
+                SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), "Start");
                 GlStateManager.enableTexture2D();
             }
         }

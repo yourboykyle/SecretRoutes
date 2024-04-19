@@ -37,7 +37,7 @@ public class LoadRoute extends CommandBase {
             FileReader reader = new FileReader(filePath);
 
             JsonObject data = gson.fromJson(reader, JsonObject.class);
-            Main.currentRoom = new Room(RoomDetection.roomName, data);
+            Main.currentRoom = new Room(RoomDetection.roomName, filePath);
             Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Loaded Route."));
         } catch (IOException e) {
             e.printStackTrace();
