@@ -77,6 +77,28 @@ public class Room {
         }
     }
 
+    public Room(String roomName, JsonObject data) {
+        currentSecretIndex = 0;
+
+        try {
+            name = roomName;
+
+            if (roomName != null) {
+                if(data != null && data.get(name) != null) {
+                    currentSecretRoute = data.get(name).getAsJsonArray();
+                    currentSecretWaypoints = currentSecretRoute.get(currentSecretIndex).getAsJsonObject();
+                }
+
+                System.out.println("Current Secret Route: " + currentSecretRoute);
+                System.out.println("Current Secret (#" + (currentSecretIndex + 1) + "): " + currentSecretWaypoints);
+            } else {
+                currentSecretRoute = null;
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void nextSecret() {
         currentSecretIndex++;
 

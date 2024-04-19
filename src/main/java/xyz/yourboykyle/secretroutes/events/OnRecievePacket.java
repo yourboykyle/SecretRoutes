@@ -7,7 +7,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
-import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraft.network.play.server.S0DPacketCollectItem;
 import net.minecraft.network.play.server.S23PacketBlockChange;
 import net.minecraft.util.BlockPos;
@@ -18,7 +17,6 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import xyz.yourboykyle.secretroutes.Main;
-import xyz.yourboykyle.secretroutes.utils.Room;
 
 public class OnRecievePacket {
     // The S23PacketBlockChange packet is sent twice for each block break and place. These variables are workarounds to keep track of if it's the first time each packet is sent, and just ignore the second time
@@ -45,14 +43,7 @@ public class OnRecievePacket {
                     }
 
                     PlayerEvent.ItemPickupEvent itemPickupEvent = new PlayerEvent.ItemPickupEvent(Minecraft.getMinecraft().thePlayer, item);
-                    new ItemPickedUp().onPickupItem(itemPickupEvent);
-                }
-            } else if(e.packet instanceof S08PacketPlayerPosLook) {
-                // Route Recording
-                S08PacketPlayerPosLook packet = (S08PacketPlayerPosLook) e.packet;
-
-                if(Main.routeRecording.recording && Minecraft.getMinecraft().thePlayer.isSneaking()) {
-                    Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.ETHERWARPS, Minecraft.getMinecraft().thePlayer.getPosition());
+                    new OnItemPickedUp().onPickupItem(itemPickupEvent);
                 }
             } else if(e.packet instanceof S23PacketBlockChange) {
                 // Route Recording

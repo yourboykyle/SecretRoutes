@@ -91,8 +91,6 @@ public class RouteRecording {
     public void stopRecording() {
         // Stop recording the secret route
         recording = false;
-
-        currentSecretRoute.add(currentSecretWaypoints);
         newRoute();
     }
 
@@ -105,6 +103,22 @@ public class RouteRecording {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         allSecretRoutes = gson.fromJson(reader, JsonObject.class);
+    }
+
+    public void importRoutes(String fileName) {
+        String filePath = System.getProperty("user.home") + File.separator + "Downloads" + File.separator + fileName;
+
+        // Import all the current secret routes into the allSecretRoutes JsonObject from a file
+        allSecretRoutes = new JsonObject();
+
+        try {
+            Gson gson = new GsonBuilder().create();
+            FileReader reader = new FileReader(filePath);
+
+            allSecretRoutes = gson.fromJson(reader, JsonObject.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void addWaypoint(WAYPOINT_TYPES type, BlockPos pos) {

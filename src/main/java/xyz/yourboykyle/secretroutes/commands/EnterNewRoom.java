@@ -21,6 +21,7 @@ package xyz.yourboykyle.secretroutes.commands;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+import xyz.yourboykyle.secretroutes.events.OnEnterNewRoom;
 import xyz.yourboykyle.secretroutes.utils.Room;
 
 public class EnterNewRoom extends CommandBase {
@@ -37,9 +38,9 @@ public class EnterNewRoom extends CommandBase {
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         if(args.length == 1) {
-            xyz.yourboykyle.secretroutes.events.EnterNewRoom.onEnterNewRoom(new Room(args[0]));
+            OnEnterNewRoom.onEnterNewRoom(new Room(args[0]));
         } else {
-            xyz.yourboykyle.secretroutes.events.EnterNewRoom.onEnterNewRoom(new Room("Example-Room-3"));
+            OnEnterNewRoom.onEnterNewRoom(new Room("Example-Room-3"));
         }
     }
 

@@ -18,20 +18,24 @@
 
 package xyz.yourboykyle.secretroutes.events;
 
-import io.github.quantizr.dungeonrooms.dungeons.catacombs.Waypoints;
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.Room;
 
-public class PlayerTick {
+public class OnPlayerTick {
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent e) {
-        //If all secrets in the room have been completed
-        if(Waypoints.allFound) {
-            Main.currentRoom = new Room(null);
+        if(e.player.getUniqueID() != Minecraft.getMinecraft().thePlayer.getUniqueID()) {
+            return;
         }
+
+        //If all secrets in the room have been completed
+        /*if(Waypoints.allFound) {
+            Main.currentRoom = new Room(null);
+        }*/
 
         Main.currentRoom.renderLines();
 

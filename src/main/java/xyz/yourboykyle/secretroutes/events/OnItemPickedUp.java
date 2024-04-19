@@ -24,7 +24,7 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.Room;
 
-public class ItemPickedUp {
+public class OnItemPickedUp {
     @SubscribeEvent
     public void onPickupItem(PlayerEvent.ItemPickupEvent e) {
         if(Main.currentRoom.getSecretType() == Room.SECRET_TYPES.ITEM) {
@@ -39,8 +39,13 @@ public class ItemPickedUp {
 
         // Route Recording
         if(Main.routeRecording.recording) {
-            Main.routeRecording.addWaypoint(Room.SECRET_TYPES.ITEM, e.player.getPosition());
-            Main.routeRecording.newSecret();
+            String itemName = e.pickedUp.getEntityItem().getDisplayName();
+            if (itemName.contains("Decoy") || itemName.contains("Defuse Kit") || itemName.contains("Dungeon Chest Key") ||
+                    itemName.contains("Healing VIII") || itemName.contains("Inflatable Jerry") || itemName.contains("Spirit Leap") ||
+                    itemName.contains("Training Weights") || itemName.contains("Trap") || itemName.contains("Treasure Talisman")) {
+                Main.routeRecording.addWaypoint(Room.SECRET_TYPES.ITEM, e.player.getPosition());
+                Main.routeRecording.newSecret();
+            }
         }
     }
 }

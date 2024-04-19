@@ -27,7 +27,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.Room;
 
-public class PlayerInteract {
+public class OnPlayerInteract {
     @SubscribeEvent
     public void onPlayerInteract(PlayerInteractEvent e) {
         if(e.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
@@ -50,11 +50,11 @@ public class PlayerInteract {
 
             // Route Recording
             if(Main.routeRecording.recording) {
-                if (block == Blocks.lever || block == Blocks.skull) {
-                    // If the block is a lever or skull (essence), then it is a waypoint on the route, going to a secret
+                if (block == Blocks.lever) {
+                    // If the block is a lever, then it is a waypoint on the route, going to a secret
                     Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.INTERACTS, e.pos);
-                } else if (block == Blocks.chest || block == Blocks.trapped_chest) {
-                    // If the block is a chest or a trapped chest (mimic chest), then it is a waypoint for a secret, so start a new secret waypoint list
+                } else if (block == Blocks.skull || block == Blocks.chest || block == Blocks.trapped_chest) {
+                    // If the block is a chest, trapped chest (mimic chest), or skull (essence), then it is a waypoint for a secret, so start a new secret waypoint list
                     Main.routeRecording.addWaypoint(Room.SECRET_TYPES.INTERACT, e.pos);
                     Main.routeRecording.newSecret();
                 }
