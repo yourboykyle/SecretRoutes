@@ -116,6 +116,16 @@ public class Room {
         }
     }
 
+    public void lastSecret() {
+        currentSecretIndex--;
+
+        if(currentSecretIndex >= 0 && !(currentSecretIndex >= currentSecretRoute.size())) {
+            currentSecretWaypoints = currentSecretRoute.get(currentSecretIndex).getAsJsonObject();
+        } else {
+            currentSecretWaypoints = null;
+        }
+    }
+
     public void nextSecret() {
         currentSecretIndex++;
 
