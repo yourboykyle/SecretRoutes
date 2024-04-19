@@ -18,7 +18,9 @@
 
 package xyz.yourboykyle.secretroutes.events;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import xyz.yourboykyle.secretroutes.Main;
@@ -45,6 +47,7 @@ public class OnItemPickedUp {
                     itemName.contains("Training Weights") || itemName.contains("Trap") || itemName.contains("Treasure Talisman")) {
                 Main.routeRecording.addWaypoint(Room.SECRET_TYPES.ITEM, e.player.getPosition());
                 Main.routeRecording.newSecret();
+                Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Added item secret waypoint."));
             }
         }
     }
