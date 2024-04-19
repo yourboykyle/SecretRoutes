@@ -9,6 +9,7 @@ import xyz.yourboykyle.secretroutes.utils.Room.SECRET_TYPES;
 import xyz.yourboykyle.secretroutes.utils.Room.WAYPOINT_TYPES;
 
 import java.io.*;
+import java.util.Map;
 
 public class RouteRecording {
     public boolean recording = false;
@@ -194,11 +195,28 @@ public class RouteRecording {
         File file = new File(filePath, fileName);
         try {
             FileWriter writer = new FileWriter(file);
-            writer.write(allSecretRoutes.toString());
+            writer.write(prettyPrint(allSecretRoutes));
             writer.flush();
             writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static String prettyPrint(JsonObject jsonObject) {
+        // Pretty print the secret routes
+        Gson gson = new GsonBuilder().create();
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("{\n");
+
+        for (Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
+            stringBuilder.append("\t\"").append(entry.getKey()).append("\": ").append(gson.toJson(entry.getValue())).append(",\n");
+        }
+
+        // Remove the last comma and add a new line
+        stringBuilder.deleteCharAt(stringBuilder.length() - 2);
+        stringBuilder.append("}\n");
+        return stringBuilder.toString();
     }
 }
