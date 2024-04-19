@@ -29,6 +29,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import xyz.yourboykyle.secretroutes.commands.EnterNewRoom;
+import xyz.yourboykyle.secretroutes.commands.LoadRoute;
 import xyz.yourboykyle.secretroutes.commands.NextSecret;
 import xyz.yourboykyle.secretroutes.commands.Recording;
 import xyz.yourboykyle.secretroutes.events.*;
@@ -59,15 +60,17 @@ public class Main {
         dungeonRooms.init(e);
 
         //Events
-        MinecraftForge.EVENT_BUS.register(new ItemPickedUp());
-        MinecraftForge.EVENT_BUS.register(new OnBlockBreak());
+        MinecraftForge.EVENT_BUS.register(new OnItemPickedUp());
+        //MinecraftForge.EVENT_BUS.register(new OnBlockBreak()); (Commented because this method is instead called from OnPlaySound, for multiplayer server purposes)
         MinecraftForge.EVENT_BUS.register(new OnBlockPlace());
+        MinecraftForge.EVENT_BUS.register(new OnPlaySound());
         MinecraftForge.EVENT_BUS.register(new OnRecievePacket());
-        MinecraftForge.EVENT_BUS.register(new PlayerInteract());
-        MinecraftForge.EVENT_BUS.register(new PlayerTick());
-        MinecraftForge.EVENT_BUS.register(new WorldRender());
+        MinecraftForge.EVENT_BUS.register(new OnPlayerInteract());
+        MinecraftForge.EVENT_BUS.register(new OnPlayerTick());
+        MinecraftForge.EVENT_BUS.register(new OnWorldRender());
 
         ClientCommandHandler.instance.registerCommand(new EnterNewRoom());
+        ClientCommandHandler.instance.registerCommand(new LoadRoute());
         ClientCommandHandler.instance.registerCommand(new NextSecret());
         ClientCommandHandler.instance.registerCommand(new Recording());
 

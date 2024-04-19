@@ -23,7 +23,7 @@ import io.github.quantizr.dungeonrooms.utils.Utils;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.Room;
 
-public class EnterNewRoom {
+public class OnEnterNewRoom {
     public static void onEnterNewRoom(Room room) {
         try {
             Utils.checkForCatacombs();

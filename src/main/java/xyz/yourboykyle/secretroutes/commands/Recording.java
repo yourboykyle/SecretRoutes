@@ -1,5 +1,6 @@
 package xyz.yourboykyle.secretroutes.commands;
 
+import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -18,7 +19,7 @@ public class Recording extends CommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "/recording start|stop|export|roomname|setbat";
+        return "/recording start|stop|export|getroom|setbat|import <filename.json>";
     }
 
     @Override
@@ -32,8 +33,8 @@ public class Recording extends CommandBase {
         } else if(args[0].equalsIgnoreCase("export")) {
             Main.routeRecording.exportAllRoutes();
             Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Exported all routes to " + System.getProperty("user.home") + File.separator + "Downloads" + File.separator + "routes.json"));
-        } else if(args[0].equalsIgnoreCase("roomname")) {
-            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Room Name: " + Main.currentRoom.name));
+        } else if(args[0].equalsIgnoreCase("getroom")) {
+            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Room Name: " + RoomDetection.roomName + ", Room Corner: " + RoomDetection.roomCorner + ", Room Direction: " + RoomDetection.roomDirection));
         } else if(args[0].equalsIgnoreCase("setbat")) {
             // Route Recording
             if(Main.routeRecording.recording) {
@@ -42,6 +43,13 @@ public class Recording extends CommandBase {
                 Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Added bat waypoint."));
             } else {
                 Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Route recording is not enabled. Run /recording start"));
+            }
+        }  else if(args[0].equalsIgnoreCase("import")) {
+            if(args.length != 2) {
+                Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Usage: /recording import <filename.json>"));
+            } else {
+                Main.routeRecording.importRoutes(args[1]);
+                Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Imported routes from " + args[1]));
             }
         } else {
             Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Usage: " + getCommandUsage(sender)));

@@ -30,7 +30,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.SecretRoutesRenderUtils;
 
-public class WorldRender {
+public class OnWorldRender {
     @SubscribeEvent
     public void onRenderWorld(RenderWorldLastEvent event) {
         GlStateManager.disableDepth();
