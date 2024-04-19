@@ -20,8 +20,6 @@ package xyz.yourboykyle.secretroutes;
 
 import io.github.quantizr.dungeonrooms.DungeonRooms;
 import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
-import io.github.quantizr.dungeonrooms.utils.MapUtils;
-import net.minecraft.util.BlockPos;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -61,7 +59,6 @@ public class Main {
 
         //Events
         MinecraftForge.EVENT_BUS.register(new OnItemPickedUp());
-        //MinecraftForge.EVENT_BUS.register(new OnBlockBreak()); (Commented because this method is instead called from OnPlaySound, for multiplayer server purposes)
         MinecraftForge.EVENT_BUS.register(new OnBlockPlace());
         MinecraftForge.EVENT_BUS.register(new OnPlaySound());
         MinecraftForge.EVENT_BUS.register(new OnRecievePacket());
@@ -77,8 +74,6 @@ public class Main {
         RoomDetection.roomName = "undefined";
         RoomDetection.roomCorner = new Point(0, 0);
         RoomDetection.roomDirection = "NW";
-
-        System.out.println("test: " + MapUtils.actualToRelative(new BlockPos(78, 110, 9), RoomDetection.roomDirection, RoomDetection.roomCorner));
     }
 
     @Mod.EventHandler
