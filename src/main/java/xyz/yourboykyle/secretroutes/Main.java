@@ -40,7 +40,6 @@ import java.awt.*;
 public class Main {
     public static final String MODID = "SecretRoutes";
     public static final String VERSION = "1.0";
-    public static final String newRoomsDataPath = "/routes.json";
 
     public static Room currentRoom = new Room(null);
     public static RouteRecording routeRecording = new RouteRecording();

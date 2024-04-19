@@ -28,7 +28,7 @@ public class RouteRecording {
         currentSecretWaypoints.add("tnts", new JsonArray());
 
         // Import all the current secret routes into the allSecretRoutes JsonObject
-        importRoutes();
+        importRoutes("routes.json");
 
         // Put stuff for testing in here
         /*System.out.println("- Start RouteRecording Testing Data -");
@@ -92,17 +92,6 @@ public class RouteRecording {
         // Stop recording the secret route
         recording = false;
         newRoute();
-    }
-
-    public void importRoutes() {
-        // Import all the current secret routes into the allSecretRoutes JsonObject
-        allSecretRoutes = new JsonObject();
-
-        Gson gson = new GsonBuilder().create();
-        InputStream inputStream = Main.class.getResourceAsStream(Main.newRoomsDataPath);
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-        allSecretRoutes = gson.fromJson(reader, JsonObject.class);
     }
 
     public void importRoutes(String fileName) {
