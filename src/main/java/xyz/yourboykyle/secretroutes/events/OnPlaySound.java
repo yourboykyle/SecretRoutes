@@ -24,8 +24,8 @@ public class OnPlaySound {
                 if(Main.routeRecording.recording && Minecraft.getMinecraft().thePlayer.isSneaking() && Minecraft.getMinecraft().thePlayer.getHeldItem().getItem() == Items.diamond_shovel) {
                     new Thread(() -> {
                         try {
-                            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Detected etherwarp! Please wait 1.5 seconds before continuing the route..."));
-                            Thread.sleep(1500);
+                            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Detected etherwarp! Please wait 0.5 seconds before continuing the route..."));
+                            Thread.sleep(500);
                             BlockPos playerPos = Minecraft.getMinecraft().thePlayer.getPosition();
                             BlockPos targetPos = new BlockPos(playerPos.getX(), playerPos.getY(), playerPos.getZ());
                             targetPos = targetPos.add(-1, -1, -1); // Block under the player, the -1 on X and Z have to be like that, trust the process

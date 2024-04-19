@@ -36,6 +36,22 @@ public class OnWorldRender {
         GlStateManager.disableDepth();
         GlStateManager.disableCull();
 
+        // Render the start waypoint text
+        if(Main.currentRoom.currentSecretIndex == 0) {
+            JsonObject waypoints = Main.currentRoom.currentSecretWaypoints;
+            if (!(waypoints == null || waypoints.get("locations") == null || waypoints.get("locations").getAsJsonArray().get(0) == null)) {
+                // First secret in the route (the start)
+                JsonArray startCoords = Main.currentRoom.currentSecretWaypoints.get("locations").getAsJsonArray().get(0).getAsJsonArray();
+
+                Main.checkRoomData();
+                BlockPos pos = MapUtils.relativeToActual(new BlockPos(startCoords.get(0).getAsInt(), startCoords.get(1).getAsInt(), startCoords.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
+
+                GlStateManager.disableTexture2D();
+                //SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), "Start");
+                GlStateManager.enableTexture2D();
+            }
+        }
+
         // Render the etherwarps
         if(Main.currentRoom.currentSecretWaypoints != null && Main.currentRoom.currentSecretWaypoints.get("etherwarps") != null) {
             JsonArray etherwarpLocations = Main.currentRoom.currentSecretWaypoints.get("etherwarps").getAsJsonArray();
@@ -97,16 +113,19 @@ public class OnWorldRender {
             Main.checkRoomData();
             BlockPos pos = MapUtils.relativeToActual(new BlockPos(location.get(0).getAsInt(), location.get(1).getAsInt(), location.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
 
+            GlStateManager.disableTexture2D();
             if(type.equals("interact")) {
                 SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(),  pos.getY(), pos.getZ(), 0, 0, 255, 1, 1); // Color is blue
+                SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), "Interact");
             } else if(type.equals("item")) {
                 SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(),  pos.getY(), pos.getZ(), 0, 255, 255, 1, 1); // Color is turqoise
+                SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), "Item");
             } else if(type.equals("bat")) {
                 SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(),  pos.getY(), pos.getZ(), 0, 255, 0, 1, 1); // Color is green
+                SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), "Bat");
             }
+            GlStateManager.enableTexture2D();
         }
-
-
 
         GlStateManager.disableLighting();
         GlStateManager.enableDepth();
