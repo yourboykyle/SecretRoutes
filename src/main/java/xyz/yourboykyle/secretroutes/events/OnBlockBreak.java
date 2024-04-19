@@ -39,6 +39,7 @@ public class OnBlockBreak {
 
             if(shouldAddWaypoint) {
                 Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.MINES, e.pos);
+                //Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Added mine waypoint."));
             }
         }
     }

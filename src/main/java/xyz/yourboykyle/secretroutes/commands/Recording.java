@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.Room;
@@ -38,9 +39,13 @@ public class Recording extends CommandBase {
         } else if(args[0].equalsIgnoreCase("setbat")) {
             // Route Recording
             if(Main.routeRecording.recording) {
-                Main.routeRecording.addWaypoint(Room.SECRET_TYPES.BAT, Minecraft.getMinecraft().thePlayer.getPosition());
+                BlockPos playerPos = Minecraft.getMinecraft().thePlayer.getPosition();
+                BlockPos targetPos = new BlockPos(playerPos.getX(), playerPos.getY(), playerPos.getZ());
+                targetPos = targetPos.add(-1, 2, -1); // Block above the player, the -1 on X and Z have to be like that, trust the process
+
+                Main.routeRecording.addWaypoint(Room.SECRET_TYPES.BAT, targetPos);
                 Main.routeRecording.newSecret();
-                Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Added bat waypoint."));
+                Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Added bat secret waypoint."));
             } else {
                 Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Route recording is not enabled. Run /recording start"));
             }

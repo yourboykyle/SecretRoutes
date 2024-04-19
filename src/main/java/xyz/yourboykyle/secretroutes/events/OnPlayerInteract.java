@@ -19,9 +19,11 @@
 package xyz.yourboykyle.secretroutes.events;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import xyz.yourboykyle.secretroutes.Main;
@@ -53,10 +55,12 @@ public class OnPlayerInteract {
                 if (block == Blocks.lever) {
                     // If the block is a lever, then it is a waypoint on the route, going to a secret
                     Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.INTERACTS, e.pos);
+                    Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Added interact waypoint."));
                 } else if (block == Blocks.skull || block == Blocks.chest || block == Blocks.trapped_chest) {
                     // If the block is a chest, trapped chest (mimic chest), or skull (essence), then it is a waypoint for a secret, so start a new secret waypoint list
                     Main.routeRecording.addWaypoint(Room.SECRET_TYPES.INTERACT, e.pos);
                     Main.routeRecording.newSecret();
+                    Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Added interact secret waypoint."));
                 }
             }
         }
