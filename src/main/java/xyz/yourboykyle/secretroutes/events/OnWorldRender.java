@@ -36,23 +36,6 @@ public class OnWorldRender {
         GlStateManager.disableDepth();
         GlStateManager.disableCull();
 
-        // Render the start waypoint text
-        if(Main.currentRoom.currentSecretIndex == 0) {
-            JsonObject waypoints = Main.currentRoom.currentSecretWaypoints;
-            if (!(waypoints == null || waypoints.get("locations") == null || waypoints.get("locations").getAsJsonArray().get(0) == null)) {
-                // First secret in the route (the start)
-                JsonArray startCoords = Main.currentRoom.currentSecretWaypoints.get("locations").getAsJsonArray().get(0).getAsJsonArray();
-
-                Main.checkRoomData();
-                BlockPos pos = MapUtils.relativeToActual(new BlockPos(startCoords.get(0).getAsInt(), startCoords.get(1).getAsInt(), startCoords.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
-
-                // Render the text
-                GlStateManager.disableTexture2D();
-                SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), "Start");
-                GlStateManager.enableTexture2D();
-            }
-        }
-
         // Render the etherwarps
         if(Main.currentRoom.currentSecretWaypoints != null && Main.currentRoom.currentSecretWaypoints.get("etherwarps") != null) {
             JsonArray etherwarpLocations = Main.currentRoom.currentSecretWaypoints.get("etherwarps").getAsJsonArray();
@@ -126,6 +109,23 @@ public class OnWorldRender {
                 SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), "Bat");
             }
             GlStateManager.enableTexture2D();
+        }
+
+        // Render the start waypoint text
+        if(Main.currentRoom.currentSecretIndex == 0) {
+            JsonObject waypoints = Main.currentRoom.currentSecretWaypoints;
+            if (!(waypoints == null || waypoints.get("locations") == null || waypoints.get("locations").getAsJsonArray().get(0) == null)) {
+                // First secret in the route (the start)
+                JsonArray startCoords = Main.currentRoom.currentSecretWaypoints.get("locations").getAsJsonArray().get(0).getAsJsonArray();
+
+                Main.checkRoomData();
+                BlockPos pos = MapUtils.relativeToActual(new BlockPos(startCoords.get(0).getAsInt(), startCoords.get(1).getAsInt(), startCoords.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
+
+                // Render the text
+                GlStateManager.disableTexture2D();
+                SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), "Start");
+                GlStateManager.enableTexture2D();
+            }
         }
 
         GlStateManager.disableLighting();

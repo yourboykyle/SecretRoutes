@@ -204,7 +204,8 @@ public class WaypointUtils {
         GlStateManager.rotate(-Minecraft.getMinecraft().getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
         GlStateManager.rotate(Minecraft.getMinecraft().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
 
-        drawNametag(EnumChatFormatting.YELLOW.toString()+Math.round(dist)+"m");
+        // Shows distance to waypoint
+        //drawNametag(EnumChatFormatting.YELLOW.toString()+Math.round(dist)+"m");
 
         GlStateManager.popMatrix();
 
