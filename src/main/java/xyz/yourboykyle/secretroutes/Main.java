@@ -20,15 +20,16 @@ package xyz.yourboykyle.secretroutes;
 
 import io.github.quantizr.dungeonrooms.DungeonRooms;
 import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import xyz.yourboykyle.secretroutes.commands.EnterNewRoom;
+import org.lwjgl.input.Keyboard;
 import xyz.yourboykyle.secretroutes.commands.LoadRoute;
-import xyz.yourboykyle.secretroutes.commands.NextSecret;
 import xyz.yourboykyle.secretroutes.commands.Recording;
 import xyz.yourboykyle.secretroutes.events.*;
 import xyz.yourboykyle.secretroutes.utils.Room;
@@ -47,6 +48,10 @@ public class Main {
 
     public static Main instance = new Main();
 
+    // Key Binds
+    public static KeyBinding lastSecret = new KeyBinding("Last Secret", Keyboard.KEY_LBRACKET, "Secret Routes");
+    public static KeyBinding nextSecret = new KeyBinding("Next Secret", Keyboard.KEY_RBRACKET, "Secret Routes");
+
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
         dungeonRooms.preInit(e);
@@ -56,20 +61,25 @@ public class Main {
         instance = this;
         dungeonRooms.init(e);
 
-        //Events
-        MinecraftForge.EVENT_BUS.register(new OnItemPickedUp());
+        // Register Events
         MinecraftForge.EVENT_BUS.register(new OnBlockPlace());
-        MinecraftForge.EVENT_BUS.register(new OnPlaySound());
-        MinecraftForge.EVENT_BUS.register(new OnRecievePacket());
+        MinecraftForge.EVENT_BUS.register(new OnItemPickedUp());
+        MinecraftForge.EVENT_BUS.register(new OnKeyInput());
         MinecraftForge.EVENT_BUS.register(new OnPlayerInteract());
         MinecraftForge.EVENT_BUS.register(new OnPlayerTick());
+        MinecraftForge.EVENT_BUS.register(new OnPlaySound());
+        MinecraftForge.EVENT_BUS.register(new OnRecievePacket());
         MinecraftForge.EVENT_BUS.register(new OnWorldRender());
 
-        ClientCommandHandler.instance.registerCommand(new EnterNewRoom());
+        // Register Commands
         ClientCommandHandler.instance.registerCommand(new LoadRoute());
-        ClientCommandHandler.instance.registerCommand(new NextSecret());
         ClientCommandHandler.instance.registerCommand(new Recording());
 
+        // Register Keybinds
+        ClientRegistry.registerKeyBinding(lastSecret);
+        ClientRegistry.registerKeyBinding(nextSecret);
+
+        // Make sure room data isn't null
         RoomDetection.roomName = "undefined";
         RoomDetection.roomCorner = new Point(0, 0);
         RoomDetection.roomDirection = "NW";
