@@ -122,20 +122,101 @@ public class RouteRecording {
         posArray.add(new JsonPrimitive(relPos.getY()));
         posArray.add(new JsonPrimitive(relPos.getZ()));
 
+
         if(type == WAYPOINT_TYPES.LOCATIONS) {
-            currentSecretWaypoints.get("locations").getAsJsonArray().add(posArray);
+            boolean shouldAddWaypoint = true;
+            int count = 0;
+
+            JsonArray array = currentSecretWaypoints.get("locations").getAsJsonArray();
+            for(JsonElement element : array) {
+                JsonArray location = element.getAsJsonArray();
+                if(count < array.size() && location.equals(posArray)) {
+                    shouldAddWaypoint = false;
+                    break;
+                }
+
+                count++;
+            }
+
+            if(shouldAddWaypoint) {
+                currentSecretWaypoints.get("locations").getAsJsonArray().add(posArray);
+            }
         } else if(type == WAYPOINT_TYPES.ETHERWARPS) {
-            currentSecretWaypoints.get("etherwarps").getAsJsonArray().add(posArray);
+            boolean shouldAddWaypoint = true;
+            int count = 0;
+
+            JsonArray array = currentSecretWaypoints.get("etherwarps").getAsJsonArray();
+            for(JsonElement element : array) {
+                JsonArray location = element.getAsJsonArray();
+                if(count < array.size() && location.equals(posArray)) {
+                    shouldAddWaypoint = false;
+                    break;
+                }
+
+                count++;
+            }
+
+            if(shouldAddWaypoint) {
+                currentSecretWaypoints.get("etherwarps").getAsJsonArray().add(posArray);
+            }
         } else if(type == WAYPOINT_TYPES.MINES) {
-            currentSecretWaypoints.get("mines").getAsJsonArray().add(posArray);
+            boolean shouldAddWaypoint = true;
+            int count = 0;
+
+            JsonArray array = currentSecretWaypoints.get("mines").getAsJsonArray();
+            for(JsonElement element : array) {
+                JsonArray location = element.getAsJsonArray();
+                if(count < array.size() && location.equals(posArray)) {
+                    shouldAddWaypoint = false;
+                    break;
+                }
+
+                count++;
+            }
+
+            if(shouldAddWaypoint) {
+                currentSecretWaypoints.get("mines").getAsJsonArray().add(posArray);
+            }
         } else if(type == WAYPOINT_TYPES.INTERACTS) {
-            currentSecretWaypoints.get("interacts").getAsJsonArray().add(posArray);
+            boolean shouldAddWaypoint = true;
+            int count = 0;
+
+            JsonArray array = currentSecretWaypoints.get("interacts").getAsJsonArray();
+            for(JsonElement element : array) {
+                JsonArray location = element.getAsJsonArray();
+                if(count < array.size() && location.equals(posArray)) {
+                    shouldAddWaypoint = false;
+                    break;
+                }
+
+                count++;
+            }
+
+            if(shouldAddWaypoint) {
+                currentSecretWaypoints.get("interacts").getAsJsonArray().add(posArray);
+            }
         } else if(type == WAYPOINT_TYPES.TNTS) {
-            currentSecretWaypoints.get("tnts").getAsJsonArray().add(posArray);
+            boolean shouldAddWaypoint = true;
+            int count = 0;
+
+            JsonArray array = currentSecretWaypoints.get("tnts").getAsJsonArray();
+            for(JsonElement element : array) {
+                JsonArray location = element.getAsJsonArray();
+                if(count < array.size() && location.equals(posArray)) {
+                    shouldAddWaypoint = false;
+                    break;
+                }
+
+                count++;
+            }
+
+            if(shouldAddWaypoint) {
+                currentSecretWaypoints.get("tnts").getAsJsonArray().add(posArray);
+            }
         }
     }
 
-    public void addWaypoint(SECRET_TYPES type, BlockPos pos) {
+    public boolean addWaypoint(SECRET_TYPES type, BlockPos pos) {
         // Add a secret waypoint to the current secret waypoints
         Main.checkRoomData();
         BlockPos relPos = MapUtils.actualToRelative(pos, RoomDetection.roomDirection, RoomDetection.roomCorner);
@@ -156,8 +237,31 @@ public class RouteRecording {
             secret.add("type", new JsonPrimitive("bat"));
         }
 
+        // Make sure the secret hasn't already been recorded
+        boolean shouldAddWaypoint = true;
+
+        int count = 0;
+        for(JsonElement element : currentSecretRoute) {
+            JsonObject waypoints = element.getAsJsonObject();
+            if(count < currentSecretRoute.size() && waypoints.get("secret") != null && waypoints.get("secret").getAsJsonObject().get("location") != null) {
+                JsonObject secretWaypoints = waypoints.get("secret").getAsJsonObject();
+                JsonArray location = secretWaypoints.get("location").getAsJsonArray();
+
+                if(location.equals(posArray)) {
+                    shouldAddWaypoint = false;
+                }
+            }
+
+            count++;
+        }
+
         secret.add("location", posArray);
-        currentSecretWaypoints.add("secret", secret);
+        if(shouldAddWaypoint) {
+            currentSecretWaypoints.add("secret", secret);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void newSecret() {

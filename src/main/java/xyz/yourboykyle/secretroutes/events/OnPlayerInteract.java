@@ -58,9 +58,23 @@ public class OnPlayerInteract {
                     Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Added interact waypoint."));
                 } else if (block == Blocks.skull || block == Blocks.chest || block == Blocks.trapped_chest) {
                     // If the block is a chest, trapped chest (mimic chest), or skull (essence), then it is a waypoint for a secret, so start a new secret waypoint list
-                    Main.routeRecording.addWaypoint(Room.SECRET_TYPES.INTERACT, e.pos);
-                    Main.routeRecording.newSecret();
-                    Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Added interact secret waypoint."));
+                    boolean created = Main.routeRecording.addWaypoint(Room.SECRET_TYPES.INTERACT, e.pos);
+                    if(created) {
+                        Main.routeRecording.newSecret();
+                        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Added interact secret waypoint."));
+
+                        // Stuff so items from chests don't count as secrets (because they're not)
+                        OnItemPickedUp.itemSecretOnCooldown = true;
+
+                        new Thread(() -> {
+                            try {
+                                Thread.sleep(2000);
+                                OnItemPickedUp.itemSecretOnCooldown = false;
+                            } catch (InterruptedException ex) {
+                                ex.printStackTrace();
+                            }
+                        }).start();
+                    }
                 }
             }
         }

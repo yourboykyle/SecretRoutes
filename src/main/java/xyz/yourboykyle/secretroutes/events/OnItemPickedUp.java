@@ -27,6 +27,8 @@ import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.Room;
 
 public class OnItemPickedUp {
+    public static boolean itemSecretOnCooldown = false; // True: do not add item secret waypoint, False: add item secret waypoint
+
     @SubscribeEvent
     public void onPickupItem(PlayerEvent.ItemPickupEvent e) {
         if(Main.currentRoom.getSecretType() == Room.SECRET_TYPES.ITEM) {
@@ -42,9 +44,9 @@ public class OnItemPickedUp {
         // Route Recording
         if(Main.routeRecording.recording) {
             String itemName = e.pickedUp.getEntityItem().getDisplayName();
-            if (itemName.contains("Decoy") || itemName.contains("Defuse Kit") || itemName.contains("Dungeon Chest Key") ||
+            if (!itemSecretOnCooldown && (itemName.contains("Decoy") || itemName.contains("Defuse Kit") || itemName.contains("Dungeon Chest Key") ||
                     itemName.contains("Healing VIII") || itemName.contains("Inflatable Jerry") || itemName.contains("Spirit Leap") ||
-                    itemName.contains("Training Weights") || itemName.contains("Trap") || itemName.contains("Treasure Talisman")) {
+                    itemName.contains("Training Weights") || itemName.contains("Trap") || itemName.contains("Treasure Talisman"))) {
                 Main.routeRecording.addWaypoint(Room.SECRET_TYPES.ITEM, e.player.getPosition());
                 Main.routeRecording.newSecret();
                 Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Added item secret waypoint."));

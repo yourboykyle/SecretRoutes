@@ -43,7 +43,7 @@ public class OnPlayerTick {
             BlockPos pos = e.player.getPosition();
             BlockPos batPos = Main.currentRoom.getSecretLocation();
 
-            if (pos.getX() >= batPos.getX() - 5 && pos.getX() <= batPos.getX() + 5 && pos.getY() >= batPos.getY() - 5 && pos.getY() <= batPos.getY() + 5 && pos.getZ() >= batPos.getZ() - 5 && pos.getZ() <= batPos.getZ() + 5) {
+            if (pos.getX() >= batPos.getX() - 3 && pos.getX() <= batPos.getX() + 3 && pos.getY() >= batPos.getY() - 3 && pos.getY() <= batPos.getY() + 3 && pos.getZ() >= batPos.getZ() - 3 && pos.getZ() <= batPos.getZ() + 3) {
                 Main.currentRoom.nextSecret();
                 System.out.println("Went by bat at " + batPos);
             }
