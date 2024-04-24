@@ -5,6 +5,8 @@ import com.google.gson.JsonElement;
 import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
 import io.github.quantizr.dungeonrooms.utils.MapUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.item.ItemPickaxe;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -35,6 +37,18 @@ public class OnBlockBreak {
             } else {
                 // Waypoint doesn't exist yet
                 shouldAddWaypoint = true;
+            }
+
+            ItemStack heldItem = e.getPlayer().getHeldItem();
+            if(heldItem != null) {
+                // Check if the player is holding a pickaxe
+                if(!(heldItem.getItem() instanceof ItemPickaxe)) {
+                    // Player is not holding a pickaxe, do not add waypoint
+                    shouldAddWaypoint = false;
+                }
+            } else {
+                // Player is not holding anything
+                shouldAddWaypoint = false;
             }
 
             if(shouldAddWaypoint) {
