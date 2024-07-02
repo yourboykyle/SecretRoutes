@@ -27,9 +27,9 @@ public class OnEnterNewRoom {
     public static void onEnterNewRoom(Room room) {
         try {
             Utils.checkForCatacombs();
-            /*if(!Utils.inCatacombs) {
+            if(!Utils.inCatacombs) {
                 return;
-            }*/
+            }
 
             System.out.println("Entered new room \"" + RoomDetection.roomName + "\".");
 

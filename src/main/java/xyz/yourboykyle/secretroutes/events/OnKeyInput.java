@@ -7,10 +7,14 @@ import xyz.yourboykyle.secretroutes.Main;
 public class OnKeyInput {
     @SubscribeEvent
     public void onKeyInput(InputEvent.KeyInputEvent e) {
-        if(Main.lastSecret.isPressed()) {
-            Main.currentRoom.lastSecret();
-        } else if(Main.nextSecret.isPressed()) {
-            Main.currentRoom.nextSecret();
+        try {
+            if (Main.lastSecret.isPressed()) {
+                Main.currentRoom.lastSecret();
+            } else if (Main.nextSecret.isPressed()) {
+                Main.currentRoom.nextSecret();
+            }
+        } catch (Exception error) {
+            error.printStackTrace();
         }
     }
 }

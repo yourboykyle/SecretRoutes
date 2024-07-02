@@ -18,9 +18,6 @@
 
 package xyz.yourboykyle.secretroutes;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import io.github.quantizr.dungeonrooms.DungeonRooms;
 import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
 import net.minecraft.client.settings.KeyBinding;
@@ -86,12 +83,6 @@ public class Main {
         RoomDetection.roomName = "undefined";
         RoomDetection.roomCorner = new Point(0, 0);
         RoomDetection.roomDirection = "NW";
-
-        // Testing
-        String str = "{\"Temple-3\":[{\"locations\":[[7,64,23]],\"etherwarps\":[],\"mines\":[],\"interacts\":[],\"tnts\":[],\"secret\":{\"type\":\"bat\",\"location\":[5,66,25]}},{\"locations\":[[8,64,18],[19,78,25]],\"etherwarps\":[[18,77,26]],\"mines\":[],\"interacts\":[],\"tnts\":[],\"secret\":{\"type\":\"item\",\"location\":[21,78,28]}},{\"locations\":[[21,73,23],[24,69,22],[27,65,24],[28,60,24],[23,59,25],[19,55,25],[14,54,25],[17,54,15]],\"etherwarps\":[[16,53,16]],\"mines\":[],\"interacts\":[],\"tnts\":[],\"secret\":{\"type\":\"interact\",\"location\":[16,54,15]}}],\"Chains-2\":[{\"locations\":[[11,69,17],[14,69,13],[19,69,11]],\"etherwarps\":[],\"mines\":[[24,70,11],[25,70,11],[25,70,10],[26,69,10],[25,69,11],[26,69,11],[25,69,10]],\"interacts\":[],\"tnts\":[],\"secret\":{\"type\":\"interact\",\"location\":[27,69,10]}},{\"locations\":[[19,80,14]],\"etherwarps\":[[18,79,13]],\"mines\":[[17,83,14],[17,84,14],[17,85,14]],\"interacts\":[],\"tnts\":[],\"secret\":{\"type\":\"interact\",\"location\":[17,86,14]}}]}";
-        Gson gson = new GsonBuilder().create();
-        JsonObject json = gson.fromJson(str, JsonObject.class);
-        System.out.println(RouteRecording.prettyPrint(json));
     }
 
     @Mod.EventHandler
