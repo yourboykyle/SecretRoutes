@@ -18,6 +18,7 @@
 
 package xyz.yourboykyle.secretroutes.events;
 
+import io.github.quantizr.dungeonrooms.dungeons.catacombs.DungeonManager;
 import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
 import io.github.quantizr.dungeonrooms.utils.Utils;
 import xyz.yourboykyle.secretroutes.Main;
@@ -26,8 +27,9 @@ import xyz.yourboykyle.secretroutes.utils.Room;
 public class OnEnterNewRoom {
     public static void onEnterNewRoom(Room room) {
         try {
+            // Make sure the player is actually in a dungeon
             Utils.checkForCatacombs();
-            if(!Utils.inCatacombs) {
+            if(!Utils.inCatacombs || DungeonManager.gameStage != 2) {
                 return;
             }
 
