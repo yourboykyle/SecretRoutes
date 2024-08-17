@@ -21,8 +21,10 @@ package xyz.yourboykyle.secretroutes.events;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import io.github.quantizr.dungeonrooms.dungeons.catacombs.DungeonManager;
 import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
 import io.github.quantizr.dungeonrooms.utils.MapUtils;
+import io.github.quantizr.dungeonrooms.utils.Utils;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.BlockPos;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -33,6 +35,12 @@ import xyz.yourboykyle.secretroutes.utils.SecretRoutesRenderUtils;
 public class OnWorldRender {
     @SubscribeEvent
     public void onRenderWorld(RenderWorldLastEvent event) {
+        // Make sure the player is actually in a dungeon
+        Utils.checkForCatacombs();
+        if(!Utils.inCatacombs || DungeonManager.gameStage != 2) {
+            return;
+        }
+
         GlStateManager.disableDepth();
         GlStateManager.disableCull();
 
