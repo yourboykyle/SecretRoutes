@@ -3,6 +3,7 @@ package xyz.yourboykyle.secretroutes.events;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.utils.LogUtils;
 
 public class OnKeyInput {
     @SubscribeEvent
@@ -14,7 +15,7 @@ public class OnKeyInput {
                 Main.currentRoom.nextSecret();
             }
         } catch (Exception error) {
-            error.printStackTrace();
+            LogUtils.error(error);
         }
     }
 }

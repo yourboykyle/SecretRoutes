@@ -27,6 +27,7 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
 
 public class OnPlayerInteract {
@@ -46,7 +47,7 @@ public class OnPlayerInteract {
 
                 if (pos.getX() == interactPos.getX() && pos.getY() == interactPos.getY() && pos.getZ() == interactPos.getZ()) {
                     Main.currentRoom.nextSecret();
-                    System.out.println("Interacted with block at " + interactPos);
+                    LogUtils.info("Interacted with block at " + interactPos);
                 }
             }
 
@@ -71,7 +72,7 @@ public class OnPlayerInteract {
                                 Thread.sleep(2000);
                                 OnItemPickedUp.itemSecretOnCooldown = false;
                             } catch (InterruptedException ex) {
-                                ex.printStackTrace();
+                                LogUtils.error(ex);
                             }
                         }).start();
                     }

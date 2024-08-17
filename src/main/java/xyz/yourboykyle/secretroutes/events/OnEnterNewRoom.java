@@ -22,6 +22,7 @@ import io.github.quantizr.dungeonrooms.dungeons.catacombs.DungeonManager;
 import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
 import io.github.quantizr.dungeonrooms.utils.Utils;
 import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
 
 public class OnEnterNewRoom {
@@ -33,12 +34,11 @@ public class OnEnterNewRoom {
                 return;
             }
 
-            System.out.println("Entered new room \"" + RoomDetection.roomName + "\".");
+            LogUtils.info("Entered new room \"" + RoomDetection.roomName + "\".");
 
             Main.currentRoom = room;
-            System.out.println(Main.currentRoom.currentSecretRoute);
         } catch(Exception e) {
-            e.printStackTrace();
+            LogUtils.error(e);
         }
     }
 }

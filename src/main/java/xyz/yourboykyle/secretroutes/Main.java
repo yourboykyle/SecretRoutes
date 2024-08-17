@@ -35,6 +35,7 @@ import xyz.yourboykyle.secretroutes.commands.LoadRoute;
 import xyz.yourboykyle.secretroutes.commands.Recording;
 import xyz.yourboykyle.secretroutes.commands.SRM;
 import xyz.yourboykyle.secretroutes.events.*;
+import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
 import xyz.yourboykyle.secretroutes.utils.RouteRecording;
 import xyz.yourboykyle.secretroutes.utils.SSLUtils;
@@ -50,7 +51,9 @@ import java.text.SimpleDateFormat;
 public class Main {
     public static final String MODID = "SecretRoutes";
     public static final String VERSION = "1.0";
-    private final static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+    private final static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    public final static File logDir = new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath()+File.separator+"logs" + File.separator + "SecretRoutes");
+    public static File outputLogs;
 
     public static Room currentRoom = new Room(null);
     public static RouteRecording routeRecording = new RouteRecording();
@@ -95,21 +98,28 @@ public class Main {
         RoomDetection.roomName = "undefined";
         RoomDetection.roomCorner = new Point(0, 0);
         RoomDetection.roomDirection = "NW";
-        //Check if file is LATEST_*
-        //If yes, rename to remove LATEST_
 
-        String time = sdf.format(System.currentTimeMillis());
-        File logDir = new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath()+File.separator+"logs" + File.separator + "SecretRoutes");
-        if(!logDir.exists()) {
+        // Set up logging system
+        String date = sdf.format(System.currentTimeMillis());
+        if (!logDir.exists()) {
             logDir.mkdirs();
+        } else {
+            File[] files = logDir.listFiles((dir, name) -> name.startsWith("LATEST"));
+            for(File file : files) {
+                File[] logFiles = logDir.listFiles((dir, name) -> name.contains(date));
+                int logsNo = logFiles == null ? 1 : logFiles.length;
+                String newName = file.getName().replaceFirst("LATEST-", "").split("\\.")[0] + "-" + logsNo + ".log";
+                File renamedFile = new File(logDir + File.separator + newName);
+                file.renameTo(renamedFile);
+            }
+
         }
-        File outputLogs = new File(logDir+File.separator+"LATEST_"+time+"_secretroutes.log");
+        outputLogs = new File(logDir + File.separator + "LATEST-" + date + ".log");
         try {
-            System.out.println(outputLogs);
             outputLogs.createNewFile();
-        }catch(IOException e1) {
+        } catch (IOException e1) {
+            System.out.println("Secret Routes Mod logging file creation failed :(");
             e1.printStackTrace();
-            throw new RuntimeException(e1);
         }
     }
 
@@ -143,7 +153,7 @@ public class Main {
             File configFile = new File(filePath);
             if (!configFile.exists()) {
                 // Download the default routes file from the GitHub repository
-                System.out.println("Downloading routes.json...");
+                LogUtils.info("Downloading routes.json...");
                 SSLUtils.disableSSLCertificateChecking();
 
                 InputStream inputStream = new URL("https://raw.githubusercontent.com/yourboykyle/SecretRoutes/main/routes.json").openStream();
@@ -155,7 +165,7 @@ public class Main {
                 SSLUtils.enableSSLCertificateChecking();
             }
         } catch(IOException e) {
-            e.printStackTrace();
+            LogUtils.error(e);
         }
     }
 }

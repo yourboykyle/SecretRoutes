@@ -31,7 +31,7 @@ public class SSLUtils {
             HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtils.error(e);
         }
     }
 
@@ -46,7 +46,7 @@ public class SSLUtils {
             HttpsURLConnection.setDefaultHostnameVerifier(HttpsURLConnection.getDefaultHostnameVerifier());
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtils.error(e);
         }
     }
 }
