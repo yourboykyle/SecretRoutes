@@ -71,6 +71,30 @@ public class Main {
     }
     @Mod.EventHandler
     public void init(FMLInitializationEvent e) {
+        // Set up logging system
+        String date = sdf.format(System.currentTimeMillis());
+        outputLogs = new File(logDir + File.separator + "LATEST-" + date + ".log");
+        if (!logDir.exists()) {
+            logDir.mkdirs();
+        } else {
+            File[] files = logDir.listFiles((dir, name) -> name.startsWith("LATEST"));
+            for(File file : files) {
+                File[] logFiles = logDir.listFiles((dir, name) -> name.contains(date));
+                int logsNo = logFiles == null ? 1 : logFiles.length;
+                String newName = file.getName().replaceFirst("LATEST-", "").split("\\.")[0] + "-" + logsNo + ".log";
+                File renamedFile = new File(logDir + File.separator + newName);
+                file.renameTo(renamedFile);
+            }
+
+        }
+        try {
+            outputLogs.createNewFile();
+        } catch (IOException e1) {
+            System.out.println("Secret Routes Mod logging file creation failed :(");
+            e1.printStackTrace();
+        }
+
+        // Initialize Other Stuff
         instance = this;
         dungeonRooms.init(e);
         checkRoutesData();
@@ -98,29 +122,6 @@ public class Main {
         RoomDetection.roomName = "undefined";
         RoomDetection.roomCorner = new Point(0, 0);
         RoomDetection.roomDirection = "NW";
-
-        // Set up logging system
-        String date = sdf.format(System.currentTimeMillis());
-        if (!logDir.exists()) {
-            logDir.mkdirs();
-        } else {
-            File[] files = logDir.listFiles((dir, name) -> name.startsWith("LATEST"));
-            for(File file : files) {
-                File[] logFiles = logDir.listFiles((dir, name) -> name.contains(date));
-                int logsNo = logFiles == null ? 1 : logFiles.length;
-                String newName = file.getName().replaceFirst("LATEST-", "").split("\\.")[0] + "-" + logsNo + ".log";
-                File renamedFile = new File(logDir + File.separator + newName);
-                file.renameTo(renamedFile);
-            }
-
-        }
-        outputLogs = new File(logDir + File.separator + "LATEST-" + date + ".log");
-        try {
-            outputLogs.createNewFile();
-        } catch (IOException e1) {
-            System.out.println("Secret Routes Mod logging file creation failed :(");
-            e1.printStackTrace();
-        }
     }
 
     @Mod.EventHandler
