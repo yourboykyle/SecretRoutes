@@ -11,7 +11,10 @@ import net.minecraft.util.BlockPos;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
+
+import java.io.FileWriter;
 
 public class OnBlockBreak {
     @SubscribeEvent
@@ -39,7 +42,6 @@ public class OnBlockBreak {
                     // Waypoint doesn't exist yet
                     shouldAddWaypoint = true;
                 }
-
                 ItemStack heldItem = e.getPlayer().getHeldItem();
                 if(heldItem != null) {
                     // Check if the player is holding a pickaxe
@@ -58,7 +60,7 @@ public class OnBlockBreak {
                 }
             }
         } catch (Exception ex) {
-
+            LogUtils.error(ex);
         }
     }
 }

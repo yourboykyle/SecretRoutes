@@ -10,6 +10,7 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
 import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
 
 import java.io.File;
@@ -40,7 +41,7 @@ public class LoadRoute extends CommandBase {
             Main.currentRoom = new Room(RoomDetection.roomName, filePath);
             Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Loaded Route."));
         } catch (IOException e) {
-            e.printStackTrace();
+            LogUtils.error(e);
         }
     }
 

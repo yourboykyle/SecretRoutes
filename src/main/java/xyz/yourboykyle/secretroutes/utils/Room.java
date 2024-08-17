@@ -71,7 +71,7 @@ public class Room {
                 currentSecretRoute = null;
             }
         } catch(Exception e) {
-            e.printStackTrace();
+           LogUtils.error(e);
         }
     }
 
@@ -95,7 +95,7 @@ public class Room {
                 currentSecretRoute = null;
             }
         } catch(Exception e) {
-            e.printStackTrace();
+            LogUtils.error(e);
         }
     }
 

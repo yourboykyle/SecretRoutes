@@ -17,6 +17,7 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.utils.LogUtils;
 
 public class OnRecievePacket {
     // The S23PacketBlockChange packet is sent twice for each block break and place. These variables are workarounds to keep track of if it's the first time each packet is sent, and just ignore the second time
@@ -34,7 +35,7 @@ public class OnRecievePacket {
                     EntityItem item = (EntityItem) entity;
                     entity = Minecraft.getMinecraft().theWorld.getEntityByID(packet.getEntityID());
                     if(entity == null) {
-                        System.out.println("Entity is null.");
+                        LogUtils.info("Entity is null");
                         return;
                     }
                     if(!entity.getCommandSenderEntity().getName().equals(Minecraft.getMinecraft().thePlayer.getName())) {
@@ -73,7 +74,7 @@ public class OnRecievePacket {
                 firstBlockPlacePacket = !firstBlockPlacePacket;
             }
         } catch (Exception error) {
-            error.printStackTrace();
+            LogUtils.error(error);
             Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("There was an error with the " + Main.MODID + " mod."));
         }
     }
