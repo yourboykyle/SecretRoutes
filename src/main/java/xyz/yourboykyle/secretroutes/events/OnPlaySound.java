@@ -12,6 +12,7 @@ import net.minecraftforge.client.event.sound.PlaySoundEvent;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
 
 public class OnPlaySound {
@@ -32,7 +33,7 @@ public class OnPlaySound {
                             Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.ETHERWARPS, targetPos);
                             Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Etherwarp recorded! You may continue the route."));
                         } catch (InterruptedException ex) {
-                            ex.printStackTrace();
+                            LogUtils.error(ex);
                             BlockPos playerPos = Minecraft.getMinecraft().thePlayer.getPosition();
                             BlockPos targetPos = new BlockPos(playerPos.getX(), playerPos.getY(), playerPos.getZ());
                             targetPos = targetPos.add(-1, -1, -1);

@@ -32,9 +32,9 @@ public class RouteRecording {
         importRoutes("routes.json");
 
         // Put stuff for testing in here
-        /*System.out.println("- Start RouteRecording Testing Data -");
+        /*LogUtils.info("- Start RouteRecording Testing Data -");
 
-        System.out.println("allSecretRoutes before adding: " + allSecretRoutes);
+        LogUtils.info("allSecretRoutes before adding: " + allSecretRoutes);
 
         addWaypoint(WAYPOINT_TYPES.LOCATIONS, new BlockPos(1, 2, 3));
         addWaypoint(WAYPOINT_TYPES.ETHERWARPS, new BlockPos(1, 2, 3));
@@ -42,7 +42,7 @@ public class RouteRecording {
         addWaypoint(WAYPOINT_TYPES.INTERACTS, new BlockPos(1, 2, 3));
         addWaypoint(WAYPOINT_TYPES.TNTS, new BlockPos(1, 2, 3));
         addWaypoint(SECRET_TYPES.INTERACT, new BlockPos(1, 2, 3));
-        System.out.println("Waypoints #1: " + currentSecretWaypoints);
+        LogUtils.info("Waypoints #1: " + currentSecretWaypoints);
 
         newSecret();
 
@@ -52,7 +52,7 @@ public class RouteRecording {
         addWaypoint(WAYPOINT_TYPES.INTERACTS, new BlockPos(2, 3, 4));
         addWaypoint(WAYPOINT_TYPES.TNTS, new BlockPos(2, 3, 4));
         addWaypoint(SECRET_TYPES.ITEM, new BlockPos(2, 3, 4));
-        System.out.println("Waypoints #2: " + currentSecretWaypoints);
+        LogUtils.info("Waypoints #2: " + currentSecretWaypoints);
 
         newSecret();
 
@@ -62,26 +62,26 @@ public class RouteRecording {
         addWaypoint(WAYPOINT_TYPES.INTERACTS, new BlockPos(3, 4, 5));
         addWaypoint(WAYPOINT_TYPES.TNTS, new BlockPos(3, 4, 5));
         addWaypoint(SECRET_TYPES.BAT, new BlockPos(3, 4, 5));
-        System.out.println("Waypoints #3: " + currentSecretWaypoints);
+        LogUtils.info("Waypoints #3: " + currentSecretWaypoints);
 
         newSecret();
 
-        System.out.println(currentSecretRoute);
+        LogUtils.info(currentSecretRoute);
 
         newRoute();
 
-        System.out.println("allSecretRoutes after adding: " + allSecretRoutes);
+        LogUtils.info("allSecretRoutes after adding: " + allSecretRoutes);
 
-        System.out.println("Exporting all routes...");
+        LogUtils.info("Exporting all routes...");
         exportAllRoutes();
-        System.out.println("Exported all routes!");
+        LogUtils.info("Exported all routes!");
 
         allSecretRoutes = new JsonObject();
         String filePath = System.getProperty("user.home") + File.separator + "Downloads" + File.separator + "routes.json";
         importRoutes(filePath);
-        System.out.println("Imported routes: " + allSecretRoutes);
+        LogUtils.info("Imported routes: " + allSecretRoutes);
 
-        System.out.println("- End RouteRecording Testing Data -");*/
+        LogUtils.info("- End RouteRecording Testing Data -");*/
     }
 
     public void startRecording() {
@@ -107,7 +107,7 @@ public class RouteRecording {
 
             allSecretRoutes = gson.fromJson(reader, JsonObject.class);
         } catch (IOException e) {
-            e.printStackTrace();
+            LogUtils.error(e);
         }
     }
 
@@ -303,7 +303,7 @@ public class RouteRecording {
             writer.flush();
             writer.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            LogUtils.error(e);
         }
     }
 
