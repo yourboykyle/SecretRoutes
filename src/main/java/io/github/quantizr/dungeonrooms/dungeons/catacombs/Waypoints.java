@@ -44,6 +44,7 @@ import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
+import xyz.yourboykyle.secretroutes.utils.LogUtils;
 
 import java.awt.*;
 import java.util.*;
@@ -80,102 +81,108 @@ public class Waypoints {
 
     @SubscribeEvent
     public void onWorldRender(RenderWorldLastEvent event) {
-        if (!enabled) return;
-        if (practiceModeOn && !DungeonRooms.keyBindings[2].isKeyDown()) return;
-        String roomName = RoomDetection.roomName;
-        if (roomName.equals("undefined") || DungeonRooms.roomsJson.get(roomName) == null || secretsList == null) return;
-        if (DungeonRooms.waypointsJson.get(roomName) != null) {
-            JsonArray secretsArray = DungeonRooms.waypointsJson.get(roomName).getAsJsonArray();
-            int arraySize = secretsArray.size();
-            for(int i = 0; i < arraySize; i++) {
-                JsonObject secretsObject = secretsArray.get(i).getAsJsonObject();
+        try {
+            if (!enabled) return;
+            if (practiceModeOn && !DungeonRooms.keyBindings[2].isKeyDown()) return;
+            String roomName = RoomDetection.roomName;
+            if (roomName.equals("undefined") || DungeonRooms.roomsJson.get(roomName) == null || secretsList == null)
+                return;
+            if (DungeonRooms.waypointsJson.get(roomName) != null) {
+                JsonArray secretsArray = DungeonRooms.waypointsJson.get(roomName).getAsJsonArray();
+                int arraySize = secretsArray.size();
+                for (int i = 0; i < arraySize; i++) {
+                    JsonObject secretsObject = secretsArray.get(i).getAsJsonObject();
 
-                boolean display = true;
-                for(int j = 1; j <= secretNum; j++) {
-                    if (!secretsList.get(j-1)) {
-                        if (secretsObject.get("secretName").getAsString().substring(0,2).replaceAll("[\\D]", "").equals(String.valueOf(j))) {
-                            display = false;
-                            break;
+                    boolean display = true;
+                    for (int j = 1; j <= secretNum; j++) {
+                        if (!secretsList.get(j - 1)) {
+                            if (secretsObject.get("secretName").getAsString().substring(0, 2).replaceAll("[\\D]", "").equals(String.valueOf(j))) {
+                                display = false;
+                                break;
+                            }
                         }
                     }
+                    if (!display) continue;
+
+                    if (disableWhenAllFound && allFound && !secretsObject.get("category").getAsString().equals("fairysoul"))
+                        continue;
+
+                    BlockPos relative = new BlockPos(secretsObject.get("x").getAsInt(), secretsObject.get("y").getAsInt(), secretsObject.get("z").getAsInt());
+                    BlockPos pos = MapUtils.relativeToActual(relative, RoomDetection.roomDirection, RoomDetection.roomCorner);
+                    Entity viewer = Minecraft.getMinecraft().getRenderViewEntity();
+                    frustum.setPosition(viewer.posX, viewer.posY, viewer.posZ);
+                    if (!frustum.isBoxInFrustum(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, 255, pos.getZ() + 1)) {
+                        continue;
+                    }
+
+
+                    Color color;
+                    switch (secretsObject.get("category").getAsString()) {
+                        case "entrance":
+                            if (!showEntrance) continue;
+                            color = new Color(0, 255, 0);
+                            break;
+                        case "superboom":
+                            if (!showSuperboom) continue;
+                            color = new Color(255, 0, 0);
+                            break;
+                        case "chest":
+                            if (!showSecrets) continue;
+                            color = new Color(2, 213, 250);
+                            break;
+                        case "item":
+                            if (!showSecrets) continue;
+                            color = new Color(2, 64, 250);
+                            break;
+                        case "bat":
+                            if (!showSecrets) continue;
+                            color = new Color(142, 66, 0);
+                            break;
+                        case "wither":
+                            if (!showSecrets) continue;
+                            color = new Color(30, 30, 30);
+                            break;
+                        case "lever":
+                            if (!showSecrets) continue;
+                            color = new Color(250, 217, 2);
+                            break;
+                        case "fairysoul":
+                            if (!showFairySouls) continue;
+                            color = new Color(255, 85, 255);
+                            break;
+                        case "stonk":
+                            if (!showStonk) continue;
+                            color = new Color(146, 52, 235);
+                            break;
+                        default:
+                            color = new Color(190, 255, 252);
+                    }
+
+                    double viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * event.partialTicks;
+                    double viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * event.partialTicks;
+                    double viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * event.partialTicks;
+
+                    double x = pos.getX() - viewerX;
+                    double y = pos.getY() - viewerY;
+                    double z = pos.getZ() - viewerZ;
+                    double distSq = x * x + y * y + z * z;
+
+                    GlStateManager.disableDepth();
+                    GlStateManager.disableCull();
+                    if (showBoundingBox && frustum.isBoxInFrustum(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1)) {
+                        //WaypointUtils.drawFilledBoundingBox(new AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), color, 0.4f);
+                    }
+                    GlStateManager.disableTexture2D();
+                    //if (showBeacon && distSq > 5*5) WaypointUtils.renderBeaconBeam(x, y + 1, z, color.getRGB(), 0.25f, event.partialTicks);
+                    //if (showWaypointText) WaypointUtils.renderWaypointText(secretsObject.get("secretName").getAsString(), pos.up(2), event.partialTicks);
+                    GlStateManager.disableLighting();
+                    GlStateManager.enableTexture2D();
+                    GlStateManager.enableDepth();
+                    GlStateManager.enableCull();
                 }
-                if (!display) continue;
-
-                if (disableWhenAllFound && allFound && !secretsObject.get("category").getAsString().equals("fairysoul")) continue;
-
-                BlockPos relative = new BlockPos(secretsObject.get("x").getAsInt(), secretsObject.get("y").getAsInt(), secretsObject.get("z").getAsInt());
-                BlockPos pos = MapUtils.relativeToActual(relative, RoomDetection.roomDirection, RoomDetection.roomCorner);
-                Entity viewer = Minecraft.getMinecraft().getRenderViewEntity();
-                frustum.setPosition(viewer.posX, viewer.posY, viewer.posZ);
-                if (!frustum.isBoxInFrustum(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, 255, pos.getZ() + 1)){
-                    continue;
-                }
-
-
-                Color color;
-                switch (secretsObject.get("category").getAsString()) {
-                    case "entrance":
-                        if (!showEntrance) continue;
-                        color = new Color(0, 255, 0);
-                        break;
-                    case "superboom":
-                        if (!showSuperboom) continue;
-                        color = new Color(255, 0, 0);
-                        break;
-                    case "chest":
-                        if (!showSecrets) continue;
-                        color = new Color(2, 213, 250);
-                        break;
-                    case "item":
-                        if (!showSecrets) continue;
-                        color = new Color(2, 64, 250);
-                        break;
-                    case "bat":
-                        if (!showSecrets) continue;
-                        color = new Color(142, 66, 0);
-                        break;
-                    case "wither":
-                        if (!showSecrets) continue;
-                        color = new Color(30, 30, 30);
-                        break;
-                    case "lever":
-                        if (!showSecrets) continue;
-                        color = new Color(250, 217, 2);
-                        break;
-                    case "fairysoul":
-                        if (!showFairySouls) continue;
-                        color = new Color(255, 85, 255);
-                        break;
-                    case "stonk":
-                        if (!showStonk) continue;
-                        color = new Color(146, 52, 235);
-                        break;
-                    default:
-                        color = new Color(190, 255, 252);
-                }
-
-                double viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * event.partialTicks;
-                double viewerY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * event.partialTicks;
-                double viewerZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * event.partialTicks;
-
-                double x = pos.getX() - viewerX;
-                double y = pos.getY() - viewerY;
-                double z = pos.getZ() - viewerZ;
-                double distSq = x*x + y*y + z*z;
-
-                GlStateManager.disableDepth();
-                GlStateManager.disableCull();
-                if (showBoundingBox && frustum.isBoxInFrustum(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1)) {
-                    //WaypointUtils.drawFilledBoundingBox(new AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1), color, 0.4f);
-                }
-                GlStateManager.disableTexture2D();
-                //if (showBeacon && distSq > 5*5) WaypointUtils.renderBeaconBeam(x, y + 1, z, color.getRGB(), 0.25f, event.partialTicks);
-                //if (showWaypointText) WaypointUtils.renderWaypointText(secretsObject.get("secretName").getAsString(), pos.up(2), event.partialTicks);
-                GlStateManager.disableLighting();
-                GlStateManager.enableTexture2D();
-                GlStateManager.enableDepth();
-                GlStateManager.enableCull();
             }
+        } catch (Exception e) {
+            LogUtils.error(e);
         }
     }
 
