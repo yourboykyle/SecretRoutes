@@ -42,11 +42,15 @@ import xyz.yourboykyle.secretroutes.utils.SSLUtils;
 import java.awt.*;
 import java.io.*;
 import java.net.URL;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 
 @Mod(modid = Main.MODID, version = Main.VERSION)
 public class Main {
     public static final String MODID = "SecretRoutes";
     public static final String VERSION = "1.0";
+    private final static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 
     public static Room currentRoom = new Room(null);
     public static RouteRecording routeRecording = new RouteRecording();
@@ -91,6 +95,22 @@ public class Main {
         RoomDetection.roomName = "undefined";
         RoomDetection.roomCorner = new Point(0, 0);
         RoomDetection.roomDirection = "NW";
+        //Check if file is LATEST_*
+        //If yes, rename to remove LATEST_
+
+        String time = sdf.format(System.currentTimeMillis());
+        File logDir = new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath()+File.separator+"logs" + File.separator + "SecretRoutes");
+        if(!logDir.exists()) {
+            logDir.mkdirs();
+        }
+        File outputLogs = new File(logDir+File.separator+"LATEST_"+time+"_secretroutes.log");
+        try {
+            System.out.println(outputLogs);
+            outputLogs.createNewFile();
+        }catch(IOException e1) {
+            e1.printStackTrace();
+            throw new RuntimeException(e1);
+        }
     }
 
     @Mod.EventHandler
