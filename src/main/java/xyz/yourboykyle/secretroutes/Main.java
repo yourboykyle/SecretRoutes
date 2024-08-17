@@ -20,6 +20,7 @@ package xyz.yourboykyle.secretroutes;
 
 import io.github.quantizr.dungeonrooms.DungeonRooms;
 import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
@@ -28,6 +29,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import org.apache.commons.io.IOUtils;
 import org.lwjgl.input.Keyboard;
 import xyz.yourboykyle.secretroutes.commands.LoadRoute;
 import xyz.yourboykyle.secretroutes.commands.Recording;
@@ -35,8 +37,11 @@ import xyz.yourboykyle.secretroutes.commands.SRM;
 import xyz.yourboykyle.secretroutes.events.*;
 import xyz.yourboykyle.secretroutes.utils.Room;
 import xyz.yourboykyle.secretroutes.utils.RouteRecording;
+import xyz.yourboykyle.secretroutes.utils.SSLUtils;
 
 import java.awt.*;
+import java.io.*;
+import java.net.URL;
 
 @Mod(modid = Main.MODID, version = Main.VERSION)
 public class Main {
@@ -61,6 +66,7 @@ public class Main {
     public void init(FMLInitializationEvent e) {
         instance = this;
         dungeonRooms.init(e);
+        checkRoutesData();
 
         // Register Events
         MinecraftForge.EVENT_BUS.register(new OnBlockPlace());
@@ -101,6 +107,35 @@ public class Main {
         }
         if(RoomDetection.roomDirection == null) {
             RoomDetection.roomDirection = "NW";
+        }
+    }
+
+    public static void checkRoutesData() {
+        try {
+            String filePath = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes" + File.separator + "routes.json";
+
+            // Check if the config directory exists
+            File configDir = new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes");
+            if (!configDir.exists()) {
+                configDir.mkdirs();
+            }
+
+            File configFile = new File(filePath);
+            if (!configFile.exists()) {
+                // Download the default routes file from the GitHub repository
+                System.out.println("Downloading routes.json...");
+                SSLUtils.disableSSLCertificateChecking();
+
+                InputStream inputStream = new URL("https://raw.githubusercontent.com/yourboykyle/SecretRoutes/main/routes.json").openStream();
+                OutputStream outputStream = new FileOutputStream(configFile);
+                IOUtils.copy(inputStream, outputStream);
+                outputStream.close();
+                inputStream.close();
+
+                SSLUtils.enableSSLCertificateChecking();
+            }
+        } catch(IOException e) {
+            e.printStackTrace();
         }
     }
 }
