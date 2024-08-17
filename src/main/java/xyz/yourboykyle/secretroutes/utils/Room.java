@@ -24,11 +24,10 @@ import io.github.quantizr.dungeonrooms.utils.MapUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumParticleTypes;
-import org.apache.commons.io.IOUtils;
 import xyz.yourboykyle.secretroutes.Main;
 
-import java.io.*;
-import java.net.URL;
+import java.io.File;
+import java.io.FileReader;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -58,22 +57,6 @@ public class Room {
 
             if (roomName != null) {
                 String filePath = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes" + File.separator + "routes.json";
-
-                // Check if the config directory exists
-                File configDir = new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes");
-                if(!configDir.exists()) {
-                    configDir.mkdirs();
-                }
-
-                File configFile = new File(filePath);
-                if(!configFile.exists()) {
-                    // Download the default routes file from the GitHub repository
-                    InputStream inputStream = new URL("https://raw.githubusercontent.com/yourboykyle/SecretRoutes/main/routes.json").openStream();
-                    OutputStream outputStream = new FileOutputStream(configFile);
-                    IOUtils.copy(inputStream, outputStream);
-                    outputStream.close();
-                    inputStream.close();
-                }
 
                 Gson gson = new GsonBuilder().create();
                 FileReader reader = new FileReader(filePath);
