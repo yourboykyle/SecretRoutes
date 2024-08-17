@@ -31,6 +31,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.lwjgl.input.Keyboard;
 import xyz.yourboykyle.secretroutes.commands.LoadRoute;
 import xyz.yourboykyle.secretroutes.commands.Recording;
+import xyz.yourboykyle.secretroutes.commands.SRM;
 import xyz.yourboykyle.secretroutes.events.*;
 import xyz.yourboykyle.secretroutes.utils.Room;
 import xyz.yourboykyle.secretroutes.utils.RouteRecording;
@@ -74,6 +75,7 @@ public class Main {
         // Register Commands
         ClientCommandHandler.instance.registerCommand(new LoadRoute());
         ClientCommandHandler.instance.registerCommand(new Recording());
+        ClientCommandHandler.instance.registerCommand(new SRM());
 
         // Register Keybinds
         ClientRegistry.registerKeyBinding(lastSecret);
