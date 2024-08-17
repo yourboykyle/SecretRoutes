@@ -24,6 +24,7 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
 
 public class OnItemPickedUp {
@@ -37,7 +38,7 @@ public class OnItemPickedUp {
 
             if (pos.getX() >= itemPos.getX() - 10 && pos.getX() <= itemPos.getX() + 10 && pos.getY() >= itemPos.getY() - 10 && pos.getY() <= itemPos.getY() + 10 && pos.getZ() >= itemPos.getZ() - 10 && pos.getZ() <= itemPos.getZ() + 10) {
                 Main.currentRoom.nextSecret();
-                System.out.println("Picked up item at " + itemPos);
+                LogUtils.info("Picked up item at " + itemPos);
             }
         }
 
