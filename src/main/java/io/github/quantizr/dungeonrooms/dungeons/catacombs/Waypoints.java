@@ -19,12 +19,12 @@
 package io.github.quantizr.dungeonrooms.dungeons.catacombs;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.github.quantizr.dungeonrooms.DungeonRooms;
 import io.github.quantizr.dungeonrooms.events.PacketEvent;
 import io.github.quantizr.dungeonrooms.utils.MapUtils;
 import io.github.quantizr.dungeonrooms.utils.Utils;
-import io.github.quantizr.dungeonrooms.utils.WaypointUtils;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -34,7 +34,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
 import net.minecraft.network.play.server.S0DPacketCollectItem;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
@@ -44,11 +43,14 @@ import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
+import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
+import xyz.yourboykyle.secretroutes.utils.RenderUtils;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public class Waypoints {
     public static boolean enabled = true;
@@ -179,6 +181,25 @@ public class Waypoints {
                     GlStateManager.enableTexture2D();
                     GlStateManager.enableDepth();
                     GlStateManager.enableCull();
+
+                    // Render normal lines if config says so
+                    if(Main.currentRoom.currentSecretWaypoints != null && Main.currentRoom.currentSecretWaypoints.get("locations") != null && SRMConfig.particleType == 1) {
+                        List<BlockPos> lines = new LinkedList<>();
+
+                        JsonArray lineLocations = Main.currentRoom.currentSecretWaypoints.get("locations").getAsJsonArray();
+                        for (JsonElement lineLocationElement : lineLocations) {
+                            JsonArray lineLocation = lineLocationElement.getAsJsonArray();
+
+                            Main.checkRoomData();
+                            lines.add(MapUtils.relativeToActual(new BlockPos(lineLocation.get(0).getAsInt(), lineLocation.get(1).getAsInt(), lineLocation.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner));
+                        }
+
+                        if(SRMConfig.modEnabled) {
+                            RenderUtils.drawMultipleNormalLines(lines, event.partialTicks, Color.RED, SRMConfig.width);
+                        }
+                    }
+
+
                 }
             }
         } catch (Exception e) {

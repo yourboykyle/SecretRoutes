@@ -23,6 +23,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
 
@@ -38,7 +39,10 @@ public class OnPlayerTick {
             Main.currentRoom = new Room(null);
         }*/
 
-        Main.currentRoom.renderLines();
+        // Draw Lines
+        if(SRMConfig.modEnabled) {
+            Main.currentRoom.renderLines();
+        }
 
         if(Main.currentRoom.getSecretType() == Room.SECRET_TYPES.BAT) {
             BlockPos pos = e.player.getPosition();

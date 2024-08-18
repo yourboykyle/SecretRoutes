@@ -25,6 +25,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumParticleTypes;
 import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.config.SRMConfig;
 
 import java.io.File;
 import java.io.FileReader;
@@ -157,7 +158,11 @@ public class Room {
                 lines.add(MapUtils.relativeToActual(new BlockPos(lineLocation.get(0).getAsInt(), lineLocation.get(1).getAsInt(), lineLocation.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner));
             }
 
-            RenderUtils.drawLineMultipleParticles(EnumParticleTypes.FLAME, lines);
+
+            if(SRMConfig.particleType == 0) {
+                // Draw flame particles
+                RenderUtils.drawLineMultipleParticles(EnumParticleTypes.FLAME, lines);
+            }
         }
     }
 }
