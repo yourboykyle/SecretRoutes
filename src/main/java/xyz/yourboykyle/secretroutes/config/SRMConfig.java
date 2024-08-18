@@ -9,11 +9,24 @@ import xyz.yourboykyle.secretroutes.Main;
 
 public class SRMConfig extends Config {
     @Switch(
-            name = "Main Toggle",
-            description = "Enable / disable the mod",
+            name = "Render Routes",
             size = OptionSize.DUAL
     )
     public static boolean modEnabled = true;
+
+    @Dropdown(
+            name = "Line Type",
+            options = {"Fire Particles", "Lines"}
+    )
+    public static int particleType = 0;
+
+    @Slider(
+            name = "Line width (not for particles)",
+            min = 1,
+            max = 10.1F,
+            step = 1
+    )
+    public static int width = 5;
 
     public SRMConfig() {
         super(new Mod(Main.MODID, ModType.SKYBLOCK), Main.MODID + ".json");
