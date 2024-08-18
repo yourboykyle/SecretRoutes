@@ -20,12 +20,17 @@ package xyz.yourboykyle.secretroutes.utils;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
 
+import java.awt.*;
 import java.util.List;
 
 public class RenderUtils {
@@ -126,6 +131,69 @@ public class RenderUtils {
                 }
 
                 drawLineParticles(lastLoc, loc, particle);
+                lastLoc = loc;
+            }
+        }
+    }
+
+    public static void drawNormalLine(BlockPos pos1, BlockPos pos2, Color colour, float partialTicks, boolean depth, int width) {
+        Entity render = Minecraft.getMinecraft().getRenderViewEntity();
+        WorldRenderer worldRenderer = Tessellator.getInstance().getWorldRenderer();
+
+        double realX = render.lastTickPosX + (render.posX - render.lastTickPosX) * partialTicks;
+        double realY = render.lastTickPosY + (render.posY - render.lastTickPosY) * partialTicks;
+        double realZ = render.lastTickPosZ + (render.posZ - render.lastTickPosZ) * partialTicks;
+
+        GlStateManager.pushAttrib();
+
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(-realX, -realY, -realZ);
+        GlStateManager.disableTexture2D();
+        if (!depth) {
+            GlStateManager.disableDepth();
+            GlStateManager.depthMask(false);
+        }
+        GlStateManager.disableLighting();
+        GlStateManager.enableBlend();
+        GlStateManager.disableAlpha();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        GL11.glLineWidth(width);
+        GlStateManager.color(colour.getRed() / 255f, colour.getGreen() / 255f, colour.getBlue()/ 255f, colour.getAlpha() / 255f);
+        worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
+
+        worldRenderer.pos(pos1.getX(), pos1.getY(), pos1.getZ()).endVertex();
+        worldRenderer.pos(pos2.getX(), pos2.getY(), pos2.getZ()).endVertex();
+        Tessellator.getInstance().draw();
+
+        GlStateManager.translate(realX, realY, realZ);
+        GlStateManager.disableBlend();
+        if (!depth) {
+            GlStateManager.enableDepth();
+            GlStateManager.depthMask(true);
+        }
+        GlStateManager.enableAlpha();
+        GlStateManager.enableTexture2D();
+        GlStateManager.enableLighting();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.popMatrix();
+
+        GlStateManager.popAttrib();
+    }
+
+
+    public static void drawMultipleNormalLines(List<BlockPos> locations, float partialTicks, Color color, int width) {
+        if(locations == null) {
+            return;
+        }
+        if(locations.size() >= 2) {
+            BlockPos lastLoc = null;
+            for (BlockPos loc : locations) {
+                if (lastLoc == null) {
+                    lastLoc = loc;
+                    continue;
+                }
+
+                drawNormalLine(lastLoc, loc, color, partialTicks, true, width);
                 lastLoc = loc;
             }
         }

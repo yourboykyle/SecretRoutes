@@ -1,10 +1,13 @@
 package xyz.yourboykyle.secretroutes.commands;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.util.ChatComponentText;
+import xyz.yourboykyle.secretroutes.Main;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class SRM extends CommandBase {
     @Override
@@ -19,11 +22,20 @@ public class SRM extends CommandBase {
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
-        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Secret routes mod is loaded..."));
+        Main.config.openGui();
     }
 
     @Override
     public int getRequiredPermissionLevel() {
         return 0;
+    }
+
+    @Override
+    public List<String> getCommandAliases()
+    {
+        List<String> aliases = new ArrayList<>();
+        aliases.add("secretroutes");
+        aliases.add("secretroutesmod");
+        return aliases;
     }
 }
