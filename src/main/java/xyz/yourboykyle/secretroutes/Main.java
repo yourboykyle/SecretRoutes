@@ -34,6 +34,7 @@ import org.lwjgl.input.Keyboard;
 import xyz.yourboykyle.secretroutes.commands.LoadRoute;
 import xyz.yourboykyle.secretroutes.commands.Recording;
 import xyz.yourboykyle.secretroutes.commands.SRM;
+import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.events.*;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
@@ -43,14 +44,13 @@ import xyz.yourboykyle.secretroutes.utils.SSLUtils;
 import java.awt.*;
 import java.io.*;
 import java.net.URL;
-import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 
 @Mod(modid = Main.MODID, version = Main.VERSION)
 public class Main {
     public static final String MODID = "SecretRoutes";
     public static final String VERSION = "1.0";
+
     private final static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     public final static File logDir = new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath()+File.separator+"logs" + File.separator + "SecretRoutes");
     public static File outputLogs;
@@ -60,6 +60,9 @@ public class Main {
     private static DungeonRooms dungeonRooms = new DungeonRooms();
 
     public static Main instance = new Main();
+    public static SRMConfig config;
+
+    public static String logFilePath = "";
 
     // Key Binds
     public static KeyBinding lastSecret = new KeyBinding("Last Secret", Keyboard.KEY_LBRACKET, "Secret Routes");
@@ -93,6 +96,9 @@ public class Main {
             System.out.println("Secret Routes Mod logging file creation failed :(");
             e1.printStackTrace();
         }
+
+        // Set up Config
+        config = new SRMConfig();
 
         // Initialize Other Stuff
         instance = this;

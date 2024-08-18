@@ -67,7 +67,7 @@ public class MapUtils {
             if (j / 4 == 0) {
                 rgba = (i + i / 128 & 1) * 8 + 16 << 24;
             } else {
-                rgba = MapColor.mapColorArray[j / 4].func_151643_b(j & 3);
+                rgba = MapColor.mapColorArray[j / 4].getMapColor(j & 3);
             }
             map[x][y] = rgba & 0x00FFFFFF; //get rgb value from rgba
         }

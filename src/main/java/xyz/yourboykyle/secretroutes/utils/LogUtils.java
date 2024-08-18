@@ -19,7 +19,7 @@ public class LogUtils {
         error.printStackTrace(pw);
         String stackTrace = sw.toString();
 
-        appendToFile("====================\n[ERROR] " + error.getMessage() + "\n" + stackTrace);
+        appendToFile("====================\n[ERROR] " + stackTrace);
         if(Minecraft.getMinecraft().thePlayer != null) {
             Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Error caught by Secret Routes. Check latest logs at .minecraft/logs/SecretRoutes/LATEST-{date}.log"));
         }

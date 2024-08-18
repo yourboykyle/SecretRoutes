@@ -30,6 +30,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.SecretRoutesRenderUtils;
 
 public class OnWorldRender {
@@ -37,7 +38,7 @@ public class OnWorldRender {
     public void onRenderWorld(RenderWorldLastEvent event) {
         // Make sure the player is actually in a dungeon
         Utils.checkForCatacombs();
-        if(!Utils.inCatacombs || DungeonManager.gameStage != 2) {
+        if(!Utils.inCatacombs || DungeonManager.gameStage != 2 || !SRMConfig.modEnabled) {
             return;
         }
 
