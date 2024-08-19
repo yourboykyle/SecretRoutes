@@ -5,11 +5,14 @@ import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
 import io.github.quantizr.dungeonrooms.utils.MapUtils;
 import net.minecraft.util.BlockPos;
 import xyz.yourboykyle.secretroutes.Main;
-import xyz.yourboykyle.secretroutes.config.pages.RecordingPage;
+import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.Room.SECRET_TYPES;
 import xyz.yourboykyle.secretroutes.utils.Room.WAYPOINT_TYPES;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Map;
 
 public class RouteRecording {
@@ -90,8 +93,8 @@ public class RouteRecording {
         // Start recording the secret route
         recording = true;
 
-        RecordingPage.recordingHUD.enable();
-        RecordingPage.currentRoomHUD.enable();
+        SRMConfig.recordingHUD.enable();
+        SRMConfig.currentRoomHUD.enable();
     }
 
     public void stopRecording() {
@@ -99,8 +102,8 @@ public class RouteRecording {
         recording = false;
         newRoute();
 
-        RecordingPage.recordingHUD.disable();
-        RecordingPage.currentRoomHUD.disable();
+        SRMConfig.recordingHUD.disable();
+        SRMConfig.currentRoomHUD.disable();
     }
 
     public void importRoutes(String fileName) {
