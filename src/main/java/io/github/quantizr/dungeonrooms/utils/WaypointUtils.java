@@ -18,6 +18,7 @@
 
 package io.github.quantizr.dungeonrooms.utils;
 
+import cc.polyfrost.oneconfig.config.core.OneColor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -111,7 +112,7 @@ public class WaypointUtils {
         tessellator.draw();
     }
 
-    public static void drawFilledBoundingBox(AxisAlignedBB aabb, Color c, float alphaMultiplier) {
+    public static void drawFilledBoundingBox(AxisAlignedBB aabb, OneColor c, float alphaMultiplier) {
         GlStateManager.enableBlend();
         GlStateManager.disableLighting();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
