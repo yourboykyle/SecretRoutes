@@ -18,6 +18,7 @@
 
 package xyz.yourboykyle.secretroutes.utils;
 
+import cc.polyfrost.oneconfig.config.core.OneColor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -35,7 +36,7 @@ import java.util.List;
 
 public class RenderUtils {
     private static final ResourceLocation beaconBeam = new ResourceLocation("textures/entity/beacon_beam.png");
-    public static void drawBoxAtBlock(double x, double y, double z, int colorR, int colorG, int colorB, double width, double height, double alpha) {
+    public static void drawBoxAtBlock(double x, double y, double z, OneColor color, double width, double height, double alpha) {
         GL11.glPushMatrix();
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glEnable(GL11.GL_BLEND);
@@ -46,7 +47,7 @@ public class RenderUtils {
 
         GL11.glTranslated(x, y, z);
 
-        GL11.glColor4f(colorR / 255.0f, colorG / 255.0f, colorB / 255.0f, (float) alpha);
+        GL11.glColor4f(color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f, (float) alpha);
 
         GL11.glBegin(GL11.GL_LINE_STRIP);
         GL11.glVertex3d(width, height, width);
