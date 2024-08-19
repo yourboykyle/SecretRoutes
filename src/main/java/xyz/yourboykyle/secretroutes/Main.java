@@ -51,6 +51,7 @@ public class Main {
     public static final String MODID = "@ID@";
     public static final String NAME = "@NAME@";
     public static final String VERSION = "@VER@";
+    public static final String ROUTES_PATH = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes";
 
     private final static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     public final static File logDir = new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath()+File.separator+"logs" + File.separator + "SecretRoutes");
@@ -64,6 +65,7 @@ public class Main {
     public static SRMConfig config;
 
     public static String logFilePath = "";
+    public static String routesFilePath = null;
 
     // Key Binds
     public static KeyBinding lastSecret = new KeyBinding("Last Secret", Keyboard.KEY_LBRACKET, "Secret Routes");
@@ -154,6 +156,7 @@ public class Main {
 
             // Check if the config directory exists
             File configDir = new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes");
+            routesFilePath = configDir.getAbsolutePath();
             if (!configDir.exists()) {
                 configDir.mkdirs();
             }
