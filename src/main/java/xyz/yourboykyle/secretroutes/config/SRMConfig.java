@@ -2,15 +2,18 @@ package xyz.yourboykyle.secretroutes.config;
 
 import cc.polyfrost.oneconfig.config.Config;
 import cc.polyfrost.oneconfig.config.annotations.*;
-import cc.polyfrost.oneconfig.config.core.OneColor;
 import cc.polyfrost.oneconfig.config.data.Mod;
 import cc.polyfrost.oneconfig.config.data.ModType;
 import cc.polyfrost.oneconfig.config.data.OptionSize;
 import cc.polyfrost.oneconfig.config.data.PageLocation;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.pages.ColorsPage;
+import xyz.yourboykyle.secretroutes.config.annotations.DynamicDropdownAnnotation;
+
+
 
 public class SRMConfig extends Config {
+
     @Switch(
             name = "Render Routes",
             size = OptionSize.DUAL
@@ -31,15 +34,20 @@ public class SRMConfig extends Config {
     )
     public static int width = 5;
 
-    @Dropdown(
-            name = "Routes file",
+/*
+    @DynamicDropdownAnnotation(
+            name = "Route Files",
             options = {"1", "2", "3", "4"}
+            //options = FileUtils.getRouteFileNamesArray()
     )
-    public static int configIndex = 0;
+    public static String selectedRouteFile;
+
+ */
+
 
 
     @Page(
-            name = "Custom Colours",
+            name = "Custom Colors",
             location = PageLocation.TOP,
             description = "Custom colors for waypoints and tracking lines"
     )
@@ -49,4 +57,5 @@ public class SRMConfig extends Config {
         super(new Mod(Main.MODID, ModType.SKYBLOCK), Main.MODID + ".json");
         initialize();
     }
+
 }
