@@ -46,10 +46,11 @@ import java.io.*;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 
-@Mod(modid = Main.MODID, version = Main.VERSION)
+@Mod(modid = Main.MODID, name = Main.NAME, version = Main.VERSION)
 public class Main {
-    public static final String MODID = "SecretRoutes";
-    public static final String VERSION = "0.3";
+    public static final String MODID = "@ID@";
+    public static final String NAME = "@NAME@";
+    public static final String VERSION = "@VER@";
 
     private final static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     public final static File logDir = new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath()+File.separator+"logs" + File.separator + "SecretRoutes");
