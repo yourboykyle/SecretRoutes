@@ -8,6 +8,7 @@ import cc.polyfrost.oneconfig.config.data.ModType;
 import cc.polyfrost.oneconfig.config.data.OptionSize;
 import cc.polyfrost.oneconfig.config.data.PageLocation;
 import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.config.huds.RecordingHUD;
 import xyz.yourboykyle.secretroutes.config.pages.ColorsPage;
 import xyz.yourboykyle.secretroutes.utils.FileUtils;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
@@ -38,13 +39,31 @@ public class SRMConfig extends Config {
     @Text(
             name = "Routes file name",
             placeholder = "routes.json"
+
     )
     public static String routesFileName = "routes.json";
+
+    @Button(
+            name = "Update routes",
+            text = "Update routes",
+            description = "Downloads the routes.json from github",
+            size = 2
+    )
+    Runnable runnable = () -> {
+        new Thread(() -> {
+            Main.updateRoutes();
+        }).start();
+    };
+
+    @HUD(
+            name = "Recording info"
+    )
+    public RecordingHUD recordingHUD = new RecordingHUD();
 
 
     @Page(
             name = "Custom Colours",
-            location = PageLocation.TOP,
+            location = PageLocation.BOTTOM,
             description = "Custom colors for waypoints and tracking lines"
     )
     public static ColorsPage colours = new ColorsPage();
