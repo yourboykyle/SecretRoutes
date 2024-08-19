@@ -20,6 +20,8 @@ package xyz.yourboykyle.secretroutes;
 
 import io.github.quantizr.dungeonrooms.DungeonRooms;
 import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
+import io.github.quantizr.dungeonrooms.handlers.PacketHandler;
+import io.github.quantizr.dungeonrooms.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.client.ClientCommandHandler;
@@ -29,6 +31,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import org.apache.commons.io.IOUtils;
 import org.lwjgl.input.Keyboard;
 import xyz.yourboykyle.secretroutes.commands.ChangeRoute;
@@ -117,6 +121,8 @@ public class Main {
         MinecraftForge.EVENT_BUS.register(new OnRecievePacket());
         MinecraftForge.EVENT_BUS.register(new OnWorldRender());
 
+        MinecraftForge.EVENT_BUS.register(this);
+
         // Register Commands
         ClientCommandHandler.instance.registerCommand(new LoadRoute());
         ClientCommandHandler.instance.registerCommand(new Recording());
@@ -162,20 +168,72 @@ public class Main {
 
             File configFile = new File(filePath);
             if (!configFile.exists()) {
-                // Download the default routes file from the GitHub repository
-                LogUtils.info("Downloading routes.json...");
-                SSLUtils.disableSSLCertificateChecking();
-
-                InputStream inputStream = new URL("https://raw.githubusercontent.com/yourboykyle/SecretRoutes/main/routes.json").openStream();
-                OutputStream outputStream = new FileOutputStream(configFile);
-                IOUtils.copy(inputStream, outputStream);
-                outputStream.close();
-                inputStream.close();
-
-                SSLUtils.enableSSLCertificateChecking();
+                updateRoutes(configFile);
             }
-        } catch(IOException e) {
+        } catch(Exception e) {
             LogUtils.error(e);
+        }
+    }
+
+    public static void updateRoutes(File configFile) {
+        try {
+            LogUtils.info("Downloading routes.json...");
+            SSLUtils.disableSSLCertificateChecking();
+
+            InputStream inputStream = new URL("https://raw.githubusercontent.com/yourboykyle/SecretRoutes/main/routes.json").openStream();
+            OutputStream outputStream = new FileOutputStream(configFile);
+            IOUtils.copy(inputStream, outputStream);
+            outputStream.close();
+            inputStream.close();
+
+            SSLUtils.enableSSLCertificateChecking();
+        }catch(Exception e){
+            LogUtils.error(e);
+        }
+    }
+
+    public static void updateRoutes() {
+        File configFile = new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes" + File.separator + "routes.json");
+        try {
+            LogUtils.info("Downloading routes.json...");
+            SSLUtils.disableSSLCertificateChecking();
+
+            InputStream inputStream = new URL("https://raw.githubusercontent.com/yourboykyle/SecretRoutes/main/routes.json").openStream();
+            OutputStream outputStream = new FileOutputStream(configFile);
+            IOUtils.copy(inputStream, outputStream);
+            outputStream.close();
+            inputStream.close();
+
+            SSLUtils.enableSSLCertificateChecking();
+        } catch (Exception e){
+            LogUtils.error(e);
+        }
+    }
+
+    @SubscribeEvent
+    public void onServerConnect(FMLNetworkEvent.ClientConnectedToServerEvent event) {
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc.getCurrentServerData() == null) return;
+        if (mc.getCurrentServerData().serverIP.toLowerCase().contains("hypixel.")) {
+            //Packets are used in this mod solely to detect when the player picks up an item. No packets are modified or created.
+            event.manager.channel().pipeline().addBefore("packet_handler", "secretroutes_packet_handler", new PacketHandler());
+
+            new Thread(() -> {
+                try {
+                    while (mc.thePlayer == null) {
+                        //Yes, I'm too lazy to code something proper so I'm busy-waiting, shut up. no :) -carmel
+                        //It usually waits for less than half a second
+                        Thread.sleep(100);
+                    }
+                    Thread.sleep(3000);
+                    if (mc.getCurrentServerData().serverIP.toLowerCase().contains("hypixel.")) {
+                        Utils.checkForConflictingHotkeys();
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            }).start();
         }
     }
 }
