@@ -12,20 +12,23 @@ public class RecordingHUD extends SingleTextHud {
     public static OneColor hudColour = new OneColor(255, 255, 255);
 
     public RecordingHUD(){
-        super("", true);
+        super("", false);
     }
 
     @Override
     public String getText(boolean example) {
         if(Main.routeRecording.recording){
-            /*
-            if(recording.message != ""){
-                return recording.message
-            }
-
-             */
-            return "Recording...";
+            return Main.routeRecording.recordingMessage;
         }
         return "";
+    }
+
+    public void enable() {
+        this.enabled = true;
+        // Cant be accessed from static context
+    }
+
+    public void disable() {
+        this.enabled = false;
     }
 }

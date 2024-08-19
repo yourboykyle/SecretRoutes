@@ -14,7 +14,7 @@ public class OnBlockPlace {
         // Route Recording
         if(e.placedBlock.getBlock() == Blocks.tnt) {
             Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.TNTS, e.pos);
-            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Added TNT waypoint."));
+            Main.routeRecording.setRecordingMessage("Added TNT waypoint.");
         }
     }
 }

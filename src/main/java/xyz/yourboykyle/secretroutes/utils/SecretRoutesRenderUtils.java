@@ -23,6 +23,8 @@ import io.github.quantizr.dungeonrooms.utils.WaypointUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumChatFormatting;
+import xyz.yourboykyle.secretroutes.config.pages.ColorsPage;
 
 import java.awt.*;
 
@@ -128,6 +130,60 @@ public class SecretRoutesRenderUtils {
         double x = worldX - playerX;
         double y = worldY - playerY;
         double z = worldZ - playerZ;
+
+        switch(ColorsPage.startWaypointIndex){
+            case 0:
+                text = EnumChatFormatting.BLACK + text;
+                break;
+            case 1:
+                text = EnumChatFormatting.DARK_BLUE + text;
+                break;
+            case 2:
+                text = EnumChatFormatting.DARK_GREEN + text;
+                break;
+            case 3:
+                text = EnumChatFormatting.DARK_AQUA + text;
+                break;
+            case 4:
+                text = EnumChatFormatting.DARK_RED + text;
+                break;
+            case 5:
+                text = EnumChatFormatting.DARK_PURPLE + text;
+                break;
+            case 6:
+                text = EnumChatFormatting.GOLD + text;
+                break;
+            case 7:
+                text = EnumChatFormatting.GRAY + text;
+                break;
+            case 8:
+                text = EnumChatFormatting.DARK_GRAY + text;
+                break;
+            case 9:
+                text = EnumChatFormatting.BLUE + text;
+                break;
+            case 10:
+                text = EnumChatFormatting.GREEN + text;
+                break;
+            case 11:
+                text = EnumChatFormatting.AQUA + text;
+                break;
+            case 12:
+                text = EnumChatFormatting.RED + text;
+                break;
+            case 13:
+                text = EnumChatFormatting.LIGHT_PURPLE + text;
+                break;
+            case 14:
+                text = EnumChatFormatting.YELLOW + text;
+                break;
+            case 15:
+                text = EnumChatFormatting.WHITE + text;
+                break;
+            default:
+                text = EnumChatFormatting.RED + text;
+                break;
+        }
 
         WaypointUtils.renderWaypointText(text, pos, 0);
     }
