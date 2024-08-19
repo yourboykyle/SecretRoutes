@@ -31,8 +31,9 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
-import xyz.yourboykyle.secretroutes.config.pages.ColorsPage;
 import xyz.yourboykyle.secretroutes.utils.SecretRoutesRenderUtils;
+
+import java.util.ArrayList;
 
 public class OnWorldRender {
     @SubscribeEvent
@@ -42,6 +43,12 @@ public class OnWorldRender {
         if(!Utils.inCatacombs || DungeonManager.gameStage != 2 || !SRMConfig.modEnabled) {
             return;
         }
+
+        ArrayList<BlockPos> etherwarpPositions = new ArrayList<>();
+        ArrayList<BlockPos> minesPositions = new ArrayList<>();
+        ArrayList<BlockPos> interactsPositions = new ArrayList<>();
+        ArrayList<BlockPos> superboomsPositions = new ArrayList<>();
+
 
         GlStateManager.disableDepth();
         GlStateManager.disableCull();
@@ -55,7 +62,8 @@ public class OnWorldRender {
                 Main.checkRoomData();
                 BlockPos pos = MapUtils.relativeToActual(new BlockPos(etherwarpLocation.get(0).getAsInt(), etherwarpLocation.get(1).getAsInt(), etherwarpLocation.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
 
-                SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(),  pos.getY(), pos.getZ(), ColorsPage.etherWarp, 1, 1); // Color is purple
+                etherwarpPositions.add(pos);
+                SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(),  pos.getY(), pos.getZ(), SRMConfig.etherWarp, 1, 1);
             }
         }
 
@@ -67,8 +75,9 @@ public class OnWorldRender {
 
                 Main.checkRoomData();
                 BlockPos pos = MapUtils.relativeToActual(new BlockPos(mineLocation.get(0).getAsInt(), mineLocation.get(1).getAsInt(), mineLocation.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
+                minesPositions.add(pos);
 
-                SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(),  pos.getY(), pos.getZ(), ColorsPage.mine, 1, 1); // Color is yellow
+                SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(),  pos.getY(), pos.getZ(), SRMConfig.mine, 1, 1);
             }
         }
 
@@ -80,8 +89,9 @@ public class OnWorldRender {
 
                 Main.checkRoomData();
                 BlockPos pos = MapUtils.relativeToActual(new BlockPos(interactLocation.get(0).getAsInt(), interactLocation.get(1).getAsInt(), interactLocation.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
+                interactsPositions.add(pos);
 
-                SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(),  pos.getY(), pos.getZ(),ColorsPage.interacts, 1, 1); // Color is blue
+                SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(),  pos.getY(), pos.getZ(), SRMConfig.interacts, 1, 1);
             }
         }
 
@@ -93,8 +103,9 @@ public class OnWorldRender {
 
                 Main.checkRoomData();
                 BlockPos pos = MapUtils.relativeToActual(new BlockPos(tntLocation.get(0).getAsInt(), tntLocation.get(1).getAsInt(), tntLocation.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
+                superboomsPositions.add(pos);
 
-                SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(),  pos.getY(), pos.getZ(),ColorsPage.superbooms, 1, 1); // Color is red
+                SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(),  pos.getY(), pos.getZ(), SRMConfig.superbooms, 1, 1);
             }
         }
 
@@ -109,14 +120,40 @@ public class OnWorldRender {
 
             GlStateManager.disableTexture2D();
             if(type.equals("interact")) {
-                SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(),  pos.getY(), pos.getZ(), ColorsPage.secretsInteract, 1, 1); // Color is blue
-                SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), "Interact");
+                SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(),  pos.getY(), pos.getZ(), SRMConfig.secretsInteract, 1, 1);
+                if(SRMConfig.interactTextToggle) {
+                    SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.interactWaypointColorIndex) + "Interact", SRMConfig.interactTextSize);
+                }
             } else if(type.equals("item")) {
-                SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(),  pos.getY(), pos.getZ(), ColorsPage.secretsItem, 1, 1); // Color is turqoise
-                SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), "Item");
+                SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(),  pos.getY(), pos.getZ(), SRMConfig.secretsItem, 1, 1);
+                if(SRMConfig.itemTextToggle) {
+                    SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.itemWaypointColorIndex) + "Item", SRMConfig.itemTextSize);
+                }
             } else if(type.equals("bat")) {
-                SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(),  pos.getY(), pos.getZ(), ColorsPage.secretsBat, 1, 1); // Color is green
-                SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), "Bat");
+                SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(),  pos.getY(), pos.getZ(), SRMConfig.secretsBat, 1, 1);
+                if(SRMConfig.batTextToggle) {
+                    SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.batWaypointColorIndex) + "Bat", SRMConfig.batTextSize);
+                }
+            }
+            if(SRMConfig.etherwarpsTextToggle) {
+                for(BlockPos etherwarpPos : etherwarpPositions) {
+                    SecretRoutesRenderUtils.drawText(etherwarpPos.getX(), etherwarpPos.getY(), etherwarpPos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.etherwarpsWaypointColorIndex) + "etherwarp", SRMConfig.etherwarpsTextSize);
+                }
+            }
+            if(SRMConfig.minesTextToggle) {
+                for(BlockPos minePos : minesPositions) {
+                    SecretRoutesRenderUtils.drawText(minePos.getX(), minePos.getY(), minePos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.minesWaypointColorIndex) + "stonk", SRMConfig.minesTextSize);
+                }
+            }
+            if(SRMConfig.interactsTextToggle) {
+                for(BlockPos interactPos : interactsPositions) {
+                    SecretRoutesRenderUtils.drawText(interactPos.getX(), interactPos.getY(), interactPos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.interactsWaypointColorIndex) + "interact", SRMConfig.interactsTextSize);
+                }
+            }
+            if(SRMConfig.superboomsTextToggle) {
+                for(BlockPos superboomPos : superboomsPositions) {
+                    SecretRoutesRenderUtils.drawText(superboomPos.getX(), superboomPos.getY(), superboomPos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.superboomsWaypointColorIndex) + "superboom", SRMConfig.superboomsTextSize);
+                }
             }
             GlStateManager.enableTexture2D();
         }
@@ -133,7 +170,9 @@ public class OnWorldRender {
 
                 // Render the text
                 GlStateManager.disableTexture2D();
-                SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), "Start");
+                if(SRMConfig.startTextToggle) {
+                    SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.startWaypointColorIndex) + "Start", SRMConfig.startTextSize);
+                }
                 GlStateManager.enableTexture2D();
             }
         }

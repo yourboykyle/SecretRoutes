@@ -3,13 +3,13 @@
   "modid": "SecretRoutes",
   "name": "Secret Routes Mod",
   "description": "Secret Routes Waypoints",
-  "version": "0.3.0.1",
+  "version": "0.4",
   "mcversion": "1.8.9",
   "url": "",
   "updateUrl": "",
   "authorList": ["Discord: yourboykyle", "Wyan (wyannnnn)"],
   "credits": "",
-  "logoFile": "",
+  "logoFile": "logo.png",
   "screenshots": [],
   "dependencies": []
 }

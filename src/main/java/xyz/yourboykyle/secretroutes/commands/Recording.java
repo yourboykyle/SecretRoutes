@@ -25,6 +25,9 @@ public class Recording extends CommandBase {
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
+        if(args.length == 0){
+            Main.config.openGui();
+        }
         if(args[0].equalsIgnoreCase("start")) {
             Main.routeRecording.startRecording();
             Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Started recording"));
@@ -45,7 +48,7 @@ public class Recording extends CommandBase {
 
                 Main.routeRecording.addWaypoint(Room.SECRET_TYPES.BAT, targetPos);
                 Main.routeRecording.newSecret();
-                Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Added bat secret waypoint."));
+                Main.routeRecording.setRecordingMessage("Added bat secret waypoint.");
             } else {
                 Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Route recording is not enabled. Run /recording start"));
             }
