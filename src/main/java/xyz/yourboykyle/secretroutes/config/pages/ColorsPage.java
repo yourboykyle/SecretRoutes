@@ -1,18 +1,17 @@
 package xyz.yourboykyle.secretroutes.config.pages;
 
+import cc.polyfrost.oneconfig.config.annotations.Button;
 import cc.polyfrost.oneconfig.config.annotations.Color;
 import cc.polyfrost.oneconfig.config.annotations.Header;
 import cc.polyfrost.oneconfig.config.core.OneColor;
 
 public class ColorsPage {
     @Header(
-            text = "Colors"
+            text = "Colors",
+            size = 2
     )
     public static boolean ignored;
-    @Header(
-            text = ""
-    )
-    public static boolean ignored2;
+
 
     @Color(
             name="Line color"
@@ -54,4 +53,18 @@ public class ColorsPage {
     )
     public static OneColor secretsBat = new OneColor(0, 255, 0);
 
+    @Button(
+            name = "Reset to default colors",
+            text = "Reset"
+    )
+    Runnable runnable = () -> {
+        lineColor = new OneColor(255, 0, 0);
+        etherWarp = new OneColor(128, 0, 128);
+        mine = new OneColor(255, 255, 0);
+        interacts = new OneColor(0, 0, 255);
+        superbooms = new OneColor(255, 0, 0);
+        secretsItem = new OneColor(0, 255, 255);
+        secretsInteract = new OneColor(0, 0, 255);
+        secretsBat = new OneColor(0, 255, 0);
+    };
 }
