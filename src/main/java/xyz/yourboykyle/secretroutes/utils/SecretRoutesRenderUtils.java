@@ -24,9 +24,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
-import xyz.yourboykyle.secretroutes.config.pages.ColorsPage;
-
-import java.awt.*;
 
 public class SecretRoutesRenderUtils {
     public static void drawBoxAtBlock(double worldX, double worldY, double worldZ, OneColor color) {
@@ -119,7 +116,7 @@ public class SecretRoutesRenderUtils {
         WaypointUtils.renderBeaconBeam(x, y, z, RGB, alpha, 0);
     }
 
-    public static void drawText(double worldX, double worldY, double worldZ, String text) {
+    public static void drawText(double worldX, double worldY, double worldZ, String text, float size) {
         BlockPos pos = new BlockPos(worldX, worldY, worldZ);
 
         Minecraft mc = Minecraft.getMinecraft();
@@ -131,60 +128,47 @@ public class SecretRoutesRenderUtils {
         double y = worldY - playerY;
         double z = worldZ - playerZ;
 
-        switch(ColorsPage.startWaypointIndex){
-            case 0:
-                text = EnumChatFormatting.BLACK + text;
-                break;
-            case 1:
-                text = EnumChatFormatting.DARK_BLUE + text;
-                break;
-            case 2:
-                text = EnumChatFormatting.DARK_GREEN + text;
-                break;
-            case 3:
-                text = EnumChatFormatting.DARK_AQUA + text;
-                break;
-            case 4:
-                text = EnumChatFormatting.DARK_RED + text;
-                break;
-            case 5:
-                text = EnumChatFormatting.DARK_PURPLE + text;
-                break;
-            case 6:
-                text = EnumChatFormatting.GOLD + text;
-                break;
-            case 7:
-                text = EnumChatFormatting.GRAY + text;
-                break;
-            case 8:
-                text = EnumChatFormatting.DARK_GRAY + text;
-                break;
-            case 9:
-                text = EnumChatFormatting.BLUE + text;
-                break;
-            case 10:
-                text = EnumChatFormatting.GREEN + text;
-                break;
-            case 11:
-                text = EnumChatFormatting.AQUA + text;
-                break;
-            case 12:
-                text = EnumChatFormatting.RED + text;
-                break;
-            case 13:
-                text = EnumChatFormatting.LIGHT_PURPLE + text;
-                break;
-            case 14:
-                text = EnumChatFormatting.YELLOW + text;
-                break;
-            case 15:
-                text = EnumChatFormatting.WHITE + text;
-                break;
-            default:
-                text = EnumChatFormatting.RED + text;
-                break;
-        }
+        text = EnumChatFormatting.BOLD + text;
 
-        WaypointUtils.renderWaypointText(text, pos, 0);
+        WaypointUtils.renderWaypointText(text, pos, 0, size);
+    }
+
+    public static String getTextColor(int index) {
+        switch (index) {
+            case 0:
+                return EnumChatFormatting.BLACK.toString();
+            case 1:
+                return EnumChatFormatting.DARK_BLUE.toString();
+            case 2:
+                return EnumChatFormatting.DARK_GREEN.toString();
+            case 3:
+                return EnumChatFormatting.DARK_AQUA.toString();
+            case 4:
+                return EnumChatFormatting.DARK_RED.toString();
+            case 5:
+                return EnumChatFormatting.DARK_PURPLE.toString();
+            case 6:
+                return EnumChatFormatting.GOLD.toString();
+            case 7:
+                return EnumChatFormatting.GRAY.toString();
+            case 8:
+                return EnumChatFormatting.DARK_GRAY.toString();
+            case 9:
+                return EnumChatFormatting.BLUE.toString();
+            case 10:
+                return EnumChatFormatting.GREEN.toString();
+            case 11:
+                return EnumChatFormatting.AQUA.toString();
+            case 12:
+                return EnumChatFormatting.RED.toString();
+            case 13:
+                return EnumChatFormatting.LIGHT_PURPLE.toString();
+            case 14:
+                return EnumChatFormatting.YELLOW.toString();
+            case 15:
+                return EnumChatFormatting.WHITE.toString();
+            default:
+                return EnumChatFormatting.RED.toString();
+        }
     }
 }

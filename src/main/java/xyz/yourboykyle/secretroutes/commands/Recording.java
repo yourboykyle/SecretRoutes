@@ -9,7 +9,6 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.Room;
-import xyz.yourboykyle.secretroutes.utils.RouteRecording;
 
 import java.io.File;
 
@@ -26,6 +25,9 @@ public class Recording extends CommandBase {
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
+        if(args.length == 0){
+            Main.config.openGui();
+        }
         if(args[0].equalsIgnoreCase("start")) {
             Main.routeRecording.startRecording();
             Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Started recording"));
