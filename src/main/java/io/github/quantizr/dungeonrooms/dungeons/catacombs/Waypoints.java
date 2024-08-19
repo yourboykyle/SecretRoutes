@@ -45,6 +45,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
+import xyz.yourboykyle.secretroutes.config.pages.ColorsPage;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.RenderUtils;
 
@@ -195,7 +196,7 @@ public class Waypoints {
                         }
 
                         if(SRMConfig.modEnabled) {
-                            RenderUtils.drawMultipleNormalLines(lines, event.partialTicks, Color.RED, SRMConfig.width);
+                            RenderUtils.drawMultipleNormalLines(lines, event.partialTicks, ColorsPage.lineColor, SRMConfig.width);
                         }
                     }
 

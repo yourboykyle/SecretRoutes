@@ -137,7 +137,7 @@ public class RenderUtils {
         }
     }
 
-    public static void drawNormalLine(BlockPos pos1, BlockPos pos2, Color colour, float partialTicks, boolean depth, int width) {
+    public static void drawNormalLine(BlockPos pos1, BlockPos pos2, OneColor colour, float partialTicks, boolean depth, int width) {
         Entity render = Minecraft.getMinecraft().getRenderViewEntity();
         WorldRenderer worldRenderer = Tessellator.getInstance().getWorldRenderer();
 
@@ -182,7 +182,7 @@ public class RenderUtils {
     }
 
 
-    public static void drawMultipleNormalLines(List<BlockPos> locations, float partialTicks, Color color, int width) {
+    public static void drawMultipleNormalLines(List<BlockPos> locations, float partialTicks, OneColor color, int width) {
         if(locations == null) {
             return;
         }
