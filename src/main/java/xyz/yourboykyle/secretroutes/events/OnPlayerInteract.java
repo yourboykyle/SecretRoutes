@@ -56,13 +56,13 @@ public class OnPlayerInteract {
                 if (block == Blocks.lever) {
                     // If the block is a lever, then it is a waypoint on the route, going to a secret
                     Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.INTERACTS, e.pos);
-                    Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Added interact waypoint."));
+                    Main.routeRecording.setRecordingMessage("Added interact waypoint.");
                 } else if (block == Blocks.skull || block == Blocks.chest || block == Blocks.trapped_chest) {
                     // If the block is a chest, trapped chest (mimic chest), or skull (essence), then it is a waypoint for a secret, so start a new secret waypoint list
                     boolean created = Main.routeRecording.addWaypoint(Room.SECRET_TYPES.INTERACT, e.pos);
                     if(created) {
                         Main.routeRecording.newSecret();
-                        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Added interact secret waypoint."));
+                        Main.routeRecording.setRecordingMessage("Added interact secret waypoint.");
 
                         // Stuff so items from chests don't count as secrets (because they're not)
                         OnItemPickedUp.itemSecretOnCooldown = true;

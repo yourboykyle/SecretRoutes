@@ -26,10 +26,11 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.*;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
-
-import java.awt.*;
 
 public class WaypointUtils {
     private static final ResourceLocation beaconBeam = new ResourceLocation("textures/entity/beacon_beam.png");
@@ -173,7 +174,7 @@ public class WaypointUtils {
         GlStateManager.disableBlend();
     }
 
-    public static void renderWaypointText(String str, BlockPos loc, float partialTicks) {
+    public static void renderWaypointText(String str, BlockPos loc, float partialTicks, float size) {
         GlStateManager.alphaFunc(516, 0.1F);
 
         GlStateManager.pushMatrix();
@@ -197,7 +198,7 @@ public class WaypointUtils {
         GlStateManager.translate(x, y, z);
         GlStateManager.translate(0, viewer.getEyeHeight(), 0);
 
-        drawNametag(str);
+        drawNametag(str, size);
 
         GlStateManager.rotate(-Minecraft.getMinecraft().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(Minecraft.getMinecraft().getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
@@ -213,9 +214,10 @@ public class WaypointUtils {
         GlStateManager.disableLighting();
     }
 
-    public static void drawNametag(String str) {
+    public static void drawNametag(String str, float size) {
         FontRenderer fontrenderer = Minecraft.getMinecraft().fontRendererObj;
-        float f = 1.6F;
+
+        float f = 1.6F * size * 0.5F;
         float f1 = 0.016666668F * f;
         GlStateManager.pushMatrix();
         GL11.glNormal3f(0.0F, 1.0F, 0.0F);
@@ -247,7 +249,7 @@ public class WaypointUtils {
 
         GlStateManager.enableDepth();
         GlStateManager.enableBlend();
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
         GlStateManager.popMatrix();
     }
 }

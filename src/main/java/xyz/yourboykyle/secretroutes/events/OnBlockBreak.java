@@ -13,6 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
+import xyz.yourboykyle.secretroutes.utils.RouteRecording;
 
 import java.io.FileWriter;
 
@@ -56,7 +57,7 @@ public class OnBlockBreak {
 
                 if(shouldAddWaypoint) {
                     Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.MINES, e.pos);
-                    //Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Added mine waypoint."));
+                    Main.routeRecording.setRecordingMessage("Added mine waypoint.");
                 }
             }
         } catch (Exception ex) {
