@@ -14,6 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
+import xyz.yourboykyle.secretroutes.utils.RouteRecording;
 
 public class OnPlaySound {
     @SubscribeEvent
@@ -26,19 +27,20 @@ public class OnPlaySound {
                     new Thread(() -> {
                         try {
                             Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Detected etherwarp! Please wait 0.5 seconds before continuing the route..."));
+                            Main.routeRecording.setRecordingMessage("Detected etherwarp! Please wait 0.5 seconds before continuing the route...");
                             Thread.sleep(500);
                             BlockPos playerPos = Minecraft.getMinecraft().thePlayer.getPosition();
                             BlockPos targetPos = new BlockPos(playerPos.getX(), playerPos.getY(), playerPos.getZ());
                             targetPos = targetPos.add(-1, -1, -1); // Block under the player, the -1 on X and Z have to be like that, trust the process
                             Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.ETHERWARPS, targetPos);
-                            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Etherwarp recorded! You may continue the route."));
+                            Main.routeRecording.setRecordingMessage("Etherwarp recorded! You may continue the route.");
                         } catch (InterruptedException ex) {
                             LogUtils.error(ex);
                             BlockPos playerPos = Minecraft.getMinecraft().thePlayer.getPosition();
                             BlockPos targetPos = new BlockPos(playerPos.getX(), playerPos.getY(), playerPos.getZ());
                             targetPos = targetPos.add(-1, -1, -1);
                             Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.ETHERWARPS, targetPos);
-                            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Etherwarp recorded! You may continue the route."));
+                            Main.routeRecording.setRecordingMessage("Etherwarp recorded! You may continue the route.");
                         }
                     }).start();
                 }

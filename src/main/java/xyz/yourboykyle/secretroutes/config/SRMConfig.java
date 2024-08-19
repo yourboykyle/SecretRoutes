@@ -10,6 +10,7 @@ import cc.polyfrost.oneconfig.config.data.PageLocation;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.huds.RecordingHUD;
 import xyz.yourboykyle.secretroutes.config.pages.ColorsPage;
+import xyz.yourboykyle.secretroutes.config.pages.RecordingPage;
 import xyz.yourboykyle.secretroutes.utils.FileUtils;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 
@@ -55,11 +56,6 @@ public class SRMConfig extends Config {
         }).start();
     };
 
-    @HUD(
-            name = "Recording info"
-    )
-    public RecordingHUD recordingHUD = new RecordingHUD();
-
 
     @Page(
             name = "Custom Colours",
@@ -67,6 +63,13 @@ public class SRMConfig extends Config {
             description = "Custom colors for waypoints and tracking lines"
     )
     public static ColorsPage colours = new ColorsPage();
+
+    @Page(
+            name = "Recording HUD",
+            location =  PageLocation.BOTTOM,
+            description = "HUD for recording routes"
+    )
+    public static RecordingPage recordingPage = new RecordingPage();
 
     public SRMConfig() {
         super(new Mod(Main.MODID, ModType.SKYBLOCK), Main.MODID + ".json");

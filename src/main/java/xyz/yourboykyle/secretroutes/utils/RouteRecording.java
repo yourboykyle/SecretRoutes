@@ -5,6 +5,7 @@ import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
 import io.github.quantizr.dungeonrooms.utils.MapUtils;
 import net.minecraft.util.BlockPos;
 import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.config.pages.RecordingPage;
 import xyz.yourboykyle.secretroutes.utils.Room.SECRET_TYPES;
 import xyz.yourboykyle.secretroutes.utils.Room.WAYPOINT_TYPES;
 
@@ -16,6 +17,7 @@ public class RouteRecording {
     public JsonObject allSecretRoutes = new JsonObject();
     public JsonArray currentSecretRoute = new JsonArray();
     public JsonObject currentSecretWaypoints = new JsonObject();
+    public String recordingMessage = "Recording...";
 
     // Each waypoint on the locations will be added based on how far the player is from the previous waypoint, this will be used to keep track of said previous waypoint
     public BlockPos previousLocation;
@@ -87,12 +89,18 @@ public class RouteRecording {
     public void startRecording() {
         // Start recording the secret route
         recording = true;
+
+        RecordingPage.recordingHUD.enable();
+        RecordingPage.currentRoomHUD.enable();
     }
 
     public void stopRecording() {
         // Stop recording the secret route
         recording = false;
         newRoute();
+
+        RecordingPage.recordingHUD.disable();
+        RecordingPage.currentRoomHUD.disable();
     }
 
     public void importRoutes(String fileName) {
@@ -322,5 +330,19 @@ public class RouteRecording {
         stringBuilder.deleteCharAt(stringBuilder.length() - 2);
         stringBuilder.append("}\n");
         return stringBuilder.toString();
+    }
+
+    public void setRecordingMessage(String message) {
+        recordingMessage = message;
+        new Thread(() -> {
+            try {
+                Thread.sleep(1500);
+                if (recordingMessage.equals(message)) {
+                    recordingMessage = "Recording...";
+                }
+            } catch (InterruptedException e) {
+                LogUtils.error(e);
+            }
+        }).start();
     }
 }
