@@ -39,6 +39,11 @@ public class OnPlayerTick {
             Main.currentRoom = new Room(null);
         }*/
 
+        // Auto Updates
+        if (SRMConfig.autoUpdate) {
+            Main.updateManager.checkUpdate();
+        }
+
         // Draw Lines
         if(SRMConfig.modEnabled) {
             Main.currentRoom.renderLines();
