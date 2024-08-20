@@ -4,6 +4,7 @@ import com.google.gson.*;
 import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
 import io.github.quantizr.dungeonrooms.utils.MapUtils;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumChatFormatting;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.Room.SECRET_TYPES;
@@ -14,6 +15,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
+
+import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 
 public class RouteRecording {
     public boolean recording = false;
@@ -313,6 +316,7 @@ public class RouteRecording {
             writer.write(prettyPrint(allSecretRoutes));
             writer.flush();
             writer.close();
+            sendChatMessage(EnumChatFormatting.DARK_GREEN+"Exported routes to " + filePath + File.separator + fileName);
         } catch (IOException e) {
             LogUtils.error(e);
         }

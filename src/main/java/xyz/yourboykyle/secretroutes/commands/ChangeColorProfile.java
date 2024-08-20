@@ -22,7 +22,7 @@ public class ChangeColorProfile extends CommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "/changecolorprofile [list|load [profile]]";
+        return "/changecolorprofile [list|load|save] [profile]";
     }
 
     @Override
@@ -31,32 +31,34 @@ public class ChangeColorProfile extends CommandBase {
            Main.config.openGui();
        } else if (args.length == 1) {
            if(args[0].equals("list")){
-               sendChatMessage("Color Profiles:", EnumChatFormatting.DARK_AQUA);
+               sendChatMessage(EnumChatFormatting.DARK_AQUA+"Color Profiles:");
                for(String profile : FileUtils.getFileNames(Main.COLOR_PROFILE_PATH)){
-                   sendChatMessage(" - "+profile, EnumChatFormatting.AQUA);
+                   sendChatMessage(EnumChatFormatting.AQUA+" - "+profile);
                }
            }else if(args[0].equals("load")){
                if(!loadDefault) {
-                   sendChatMessage("Incorrect usage: /changecolorprofile load [profile]. Run again to load default", EnumChatFormatting.RED);
+                   sendChatMessage(EnumChatFormatting.RED + "Incorrect usage: /changecolorprofile load [profile]. Run again to load default");
                    loadDefault = true;
                }else{
-                   sendChatMessage("Loaded default color profile", EnumChatFormatting.DARK_GREEN);
+                   sendChatMessage(EnumChatFormatting.DARK_GREEN+"Loaded default color profile");
                }
            } else if (args[0].equals("save")) {
-               sendChatMessage("Incorrect usage: /changecolorprofile save [profile]", EnumChatFormatting.RED);
+               sendChatMessage(EnumChatFormatting.RED+"Incorrect usage: /changecolorprofile save [profile]");
            } else{
-               sendChatMessage("Incorrect usage: /changecolorprofile [list|load|save] [profile]", EnumChatFormatting.RED);
+               sendChatMessage(EnumChatFormatting.RED+"Incorrect usage: /changecolorprofile [list|load|save] [profile]");
            }
 
        } else if (args.length == 2) {
            if(args[0].equals("load")){
                  if(Main.loadColorConfig(args[1])){
-                     sendChatMessage("Loaded "+args[1]+" as color profile", EnumChatFormatting.DARK_GREEN);
+                     sendChatMessage(EnumChatFormatting.DARK_GREEN+"Loaded "+EnumChatFormatting.GREEN+args[1]+EnumChatFormatting.DARK_GREEN+" as color profile");
                  }
 
 
+           }else if(args[0].equals("save")){
+                Main.writeColorConfig(args[1]);
            }else{
-               sendChatMessage("Incorrect usage: /changecolorprofile [list|load [profile]]", EnumChatFormatting.RED);
+               sendChatMessage(EnumChatFormatting.RED+"Incorrect usage: /changecolorprofile [list|load|save] [profile]");
            }
 
        }

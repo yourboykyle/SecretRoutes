@@ -84,6 +84,7 @@ sourceSets {
 // Adds the Polyfrost maven repository so that we can get the libraries necessary to develop the mod.
 repositories {
     maven("https://repo.polyfrost.org/releases")
+    maven("https://repo.nea.moe/releases")
 }
 
 // Configures the libraries/dependencies for your mod.
@@ -98,6 +99,11 @@ dependencies {
     if (platform.isLegacyForge) {
         compileOnly("org.spongepowered:mixin:0.7.11-SNAPSHOT")
         shade("cc.polyfrost:oneconfig-wrapper-launchwrapper:1.0.0-beta17")
+    }
+
+    // Import auto update
+    shadow("moe.nea:libautoupdate:1.3.1") {
+        exclude(module = "gson")
     }
 }
 
