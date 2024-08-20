@@ -8,6 +8,16 @@
 [![Total Downloads](https://img.shields.io/github/downloads/yourboykyle/SecretRoutes/total?label=downloads&color=208a19&logo=github&style=for-the-badge)](https://github.com/yourboykyle/SecretRoutes/releases)
 </div>
 
-Instructions:
-- Just put it into your mods folder, or compile it yourself. (Source code is in the github, setup for IntelliJ Idea)
-- If you have any questions, join the discord: https://discord.gg/M7aN8EsfR7
+## Instructions:
+- Download the latest release: https://github.com/yourboykyle/SecretRoutes/releases/latest
+- Put the .jar in your `.minecraft/mods` folder
+- Watch the video for instructions: https://youtu.be/p3-KPTbXWFw
+- If you have any questions, join the discord: https://discord.gg/secretroutes
+
+## Credits:
+- @yourboykyle (me) - developer
+- @wyannnnn - developer
+- @zzyyrraa - recorded routes
+- https://github.com/Quantizr/DungeonRoomsMod - code for room detection
+- https://github.com/Soopyboo32/SoopyV2 - code for some rendering functions (translated from JS to java)
+- https://github.com/Dungeons-Guide/Skyblock-Dungeons-Guide - code for some rendering functions
