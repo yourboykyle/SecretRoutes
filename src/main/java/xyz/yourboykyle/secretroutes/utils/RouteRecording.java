@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
+import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
 
 public class RouteRecording {
     public boolean recording = false;
@@ -24,6 +25,11 @@ public class RouteRecording {
     public JsonArray currentSecretRoute = new JsonArray();
     public JsonObject currentSecretWaypoints = new JsonObject();
     public String recordingMessage = "Recording...";
+    private static int tntWaypoints = 0;
+    private static int interactWaypoints = 0;
+    private static int minewaypoints = 0;
+    private static int etherwaypoints = 0;
+    private static int locationwaypoints = 0;
 
     // Each waypoint on the locations will be added based on how far the player is from the previous waypoint, this will be used to keep track of said previous waypoint
     public BlockPos previousLocation;
@@ -95,7 +101,7 @@ public class RouteRecording {
     public void startRecording() {
         // Start recording the secret route
         recording = true;
-
+        sendVerboseMessage("§eRecording started...");
         SRMConfig.recordingHUD.enable();
         SRMConfig.currentRoomHUD.enable();
     }
@@ -103,8 +109,19 @@ public class RouteRecording {
     public void stopRecording() {
         // Stop recording the secret route
         recording = false;
+        //Log the results of the recording : number of
         newRoute();
-
+        sendVerboseMessage("§eRecording stopped.");
+        sendVerboseMessage("§6  Locations: " + locationwaypoints);
+        sendVerboseMessage("§6  Etherwarps: " + etherwaypoints);
+        sendVerboseMessage("§6  Mines: " + minewaypoints);
+        sendVerboseMessage("§6  Interacts: " + interactWaypoints);
+        sendVerboseMessage("§6  TNTs: " + tntWaypoints);
+        locationwaypoints = 0;
+        etherwaypoints = 0;
+        minewaypoints = 0;
+        interactWaypoints = 0;
+        tntWaypoints = 0;
         SRMConfig.recordingHUD.disable();
         SRMConfig.currentRoomHUD.disable();
     }
@@ -126,6 +143,9 @@ public class RouteRecording {
     }
 
     public void addWaypoint(WAYPOINT_TYPES type, BlockPos pos) {
+
+
+        sendVerboseMessage("§d Adding waypoint...");
         // Add a non-secret waypoint to the current secret waypoints
         Main.checkRoomData();
         BlockPos relPos = MapUtils.actualToRelative(pos, RoomDetection.roomDirection, RoomDetection.roomCorner);
@@ -136,7 +156,7 @@ public class RouteRecording {
         posArray.add(new JsonPrimitive(relPos.getY()));
         posArray.add(new JsonPrimitive(relPos.getZ()));
 
-
+        sendVerboseMessage("§d  Waypoint Type: " + type);
         if(type == WAYPOINT_TYPES.LOCATIONS) {
             boolean shouldAddWaypoint = true;
             int count = 0;
@@ -153,9 +173,12 @@ public class RouteRecording {
             }
 
             if(shouldAddWaypoint) {
+                locationwaypoints++;
+                sendVerboseMessage("§d  Adding location waypoint...");
                 currentSecretWaypoints.get("locations").getAsJsonArray().add(posArray);
             }
         } else if(type == WAYPOINT_TYPES.ETHERWARPS) {
+            etherwaypoints++;
             boolean shouldAddWaypoint = true;
             int count = 0;
 
@@ -171,9 +194,11 @@ public class RouteRecording {
             }
 
             if(shouldAddWaypoint) {
+                sendVerboseMessage("§d  Adding etherwarp waypoint...");
                 currentSecretWaypoints.get("etherwarps").getAsJsonArray().add(posArray);
             }
         } else if(type == WAYPOINT_TYPES.MINES) {
+            minewaypoints++;
             boolean shouldAddWaypoint = true;
             int count = 0;
 
@@ -189,9 +214,11 @@ public class RouteRecording {
             }
 
             if(shouldAddWaypoint) {
+                sendVerboseMessage("§d  Adding mine waypoint...");
                 currentSecretWaypoints.get("mines").getAsJsonArray().add(posArray);
             }
         } else if(type == WAYPOINT_TYPES.INTERACTS) {
+            interactWaypoints++;
             boolean shouldAddWaypoint = true;
             int count = 0;
 
@@ -207,9 +234,11 @@ public class RouteRecording {
             }
 
             if(shouldAddWaypoint) {
+                sendVerboseMessage("§d  Adding interact waypoint...");
                 currentSecretWaypoints.get("interacts").getAsJsonArray().add(posArray);
             }
         } else if(type == WAYPOINT_TYPES.TNTS) {
+            tntWaypoints++;
             boolean shouldAddWaypoint = true;
             int count = 0;
 
@@ -217,6 +246,7 @@ public class RouteRecording {
             for(JsonElement element : array) {
                 JsonArray location = element.getAsJsonArray();
                 if(count < array.size() && location.equals(posArray)) {
+                    sendVerboseMessage("§5 Waypoint not added");
                     shouldAddWaypoint = false;
                     break;
                 }
@@ -225,6 +255,7 @@ public class RouteRecording {
             }
 
             if(shouldAddWaypoint) {
+                sendVerboseMessage("§d  Adding TNT waypoint...");
                 currentSecretWaypoints.get("tnts").getAsJsonArray().add(posArray);
             }
         }
