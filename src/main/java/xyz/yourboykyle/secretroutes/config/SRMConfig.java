@@ -579,6 +579,24 @@ public class SRMConfig extends Config {
         superboomsTextSize = 3;
     };
 
+    @Text(
+            name = "Dev pasword",
+            description = "The password to access the dev options",
+            subcategory = "General",
+            category = "Dev",
+            size = 2
+    )
+    public static String devPassword = "";
+
+    @Switch(
+            name= "Verbose logging",
+            description = "Adds more detailed logging, usefull for debugging",
+            subcategory = "Chat logging",
+            category = "Dev",
+            size = OptionSize.DUAL
+    )
+    public static boolean verboseLogging = false;
+
 
 
 
@@ -619,34 +637,16 @@ public class SRMConfig extends Config {
             optionNames.get("interactsTextSize").addHideCondition(() -> !lambda("interactsTextToggle"));
             optionNames.get("superboomsWaypointColorIndex").addHideCondition(() -> !lambda("superboomsTextToggle"));
             optionNames.get("superboomsTextSize").addHideCondition(() -> !lambda("superboomsTextToggle"));
+
+            optionNames.get("Verbose logging").addHideCondition(() -> !isDevPasswordCorrect());
+
+
+
         } catch (Exception e) {
             LogUtils.error(e);
         }
-        //hideIf("particleType", "modEnabled");
-        /*
-        hideIf("width", "modEnabled");
-        hideIf("routesFileName", "modEnabled");
-        hideIf("runnable", "modEnabled");
-        hideIf("runnable9", "modEnabled");
-
-        hideIf("startWaypointColorIndex", "startTextToggle");
-        hideIf("startTextSize", "startTextToggle");
-        hideIf("interactWaypointColorIndex", "interactTextToggle");
-        hideIf("interactTextSize", "interactTextToggle");
-        hideIf("itemWaypointColorIndex", "itemTextToggle");
-        hideIf("itemTextSize", "itemTextToggle");
-        hideIf("batWaypointColorIndex", "batTextToggle");
-        hideIf("batTextSize", "batTextToggle");
-
-        hideIf("etherwarpsWaypointColorIndex", "etherwarpsTextToggle");
-        hideIf("etherwarpsTextSize", "etherwarpsTextToggle");
-        hideIf("minesWaypointColorIndex", "minesTextToggle");
-        hideIf("minesTextSize", "minesTextToggle");
-        hideIf("interactsWaypointColorIndex", "interactsTextToggle");
-        hideIf("interactsTextSize", "interactsTextToggle");
-        hideIf("superboomsWaypointColorIndex", "superboomsTextToggle");
-        hideIf("superboomsTextSize", "superboomsTextToggle");
-
-         */
+    }
+    public boolean isDevPasswordCorrect(){
+        return devPassword.equals("KyleIsMyDaddy");
     }
 }
