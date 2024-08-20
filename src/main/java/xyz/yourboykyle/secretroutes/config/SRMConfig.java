@@ -3,18 +3,25 @@ package xyz.yourboykyle.secretroutes.config;
 import cc.polyfrost.oneconfig.config.Config;
 import cc.polyfrost.oneconfig.config.annotations.*;
 import cc.polyfrost.oneconfig.config.core.OneColor;
+import cc.polyfrost.oneconfig.config.data.InfoType;
 import cc.polyfrost.oneconfig.config.data.Mod;
 import cc.polyfrost.oneconfig.config.data.ModType;
 import cc.polyfrost.oneconfig.config.data.OptionSize;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.huds.CurrentRoomHUD;
 import xyz.yourboykyle.secretroutes.config.huds.RecordingHUD;
 import xyz.yourboykyle.secretroutes.utils.FileUtils;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
+
+import java.io.File;
+import java.util.function.Supplier;
+
+import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 
 public class SRMConfig extends Config {
     @Switch(
@@ -97,9 +104,9 @@ public class SRMConfig extends Config {
 
                 Main.routeRecording.addWaypoint(Room.SECRET_TYPES.BAT, targetPos);
                 Main.routeRecording.newSecret();
-                Main.routeRecording.setRecordingMessage("Added bat secret waypoint.");
+                Main.routeRecording.setRecordingMessage(EnumChatFormatting.YELLOW+"Added bat secret waypoint.");
             } else {
-                Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Route recording is not enabled. Press the start recording button to begin."));
+                sendChatMessage(EnumChatFormatting.RED+"Route recording is not enabled. Press the start recording button to begin.");
             }
         }).start();
     };
@@ -169,6 +176,79 @@ public class SRMConfig extends Config {
     public static CurrentRoomHUD currentRoomHUD = new CurrentRoomHUD();
 
 
+    //Color profile saving and loading
+    @Text(
+            name = "Color Profile Name",
+            description = "The name of the color profile to save or load",
+            subcategory = "Profiles",
+            category = "Rendering",
+            placeholder = "default.json"
+    )
+    public static String colorProfileName = "default.json";
+    @Info(
+            text = "Will auto append the .json extension if not provided",
+            subcategory = "Profiles",
+            category = "Rendering",
+            type = InfoType.INFO
+    )
+    public static boolean a;
+    @Button(
+            name = "Save Color Profile",
+            text = "Save",
+            description = "Write the current color profile, excluding waypoints, to a file",
+            subcategory = "Profiles",
+            category = "Rendering"
+    )
+    Runnable runnable10 = () -> {
+        new Thread(() -> {
+            Main.writeColorConfig(colorProfileName);
+        }).start();
+    };
+    @Button(
+            name = "Load Color Profile",
+            text = "Load",
+            description = "Reads the color profile from a file",
+            subcategory = "Profiles",
+            category = "Rendering"
+    )
+    Runnable runnable11 = () -> {
+        new Thread(() -> {
+            if(Main.loadColorConfig(colorProfileName.isEmpty() ? "default.json" : colorProfileName)){
+                sendChatMessage(EnumChatFormatting.DARK_GREEN + "Loaded "+ EnumChatFormatting.GREEN + colorProfileName + EnumChatFormatting.DARK_GREEN + " as color profile");
+            }
+        }).start();
+    };
+    @Button(
+            name = "List all Color Profiles",
+            text = "List",
+            description = "Lists all the color profiles in the color profile directory",
+            subcategory = "Profiles",
+            category = "Rendering"
+    )
+    Runnable runnable12 = () -> {
+        new Thread(() -> {
+            sendChatMessage("Color Profiles:", EnumChatFormatting.DARK_AQUA);
+            for(String name :FileUtils.getFileNames(Main.COLOR_PROFILE_PATH)){
+                sendChatMessage(" - "+name, EnumChatFormatting.AQUA);
+            }
+        }).start();
+    };
+    @Button(
+            name = "Import Color Profile",
+            text = "Import",
+            description = "Select a color profile to import, this will be copied to .minecraft/config/SecretRoutes/colorprofiles",
+            subcategory = "Profiles",
+            category = "Rendering"
+    )
+    Runnable runnable13 = () -> {
+        new Thread(() -> {
+            try {
+                FileUtils.copyFileToDirectory(FileUtils.promptUserForFile(), Main.COLOR_PROFILE_PATH);
+            } catch (Exception e) {
+                LogUtils.error(e);
+            }
+        }).start();
+    };
 
     // Rendering
     @Color(
@@ -501,32 +581,72 @@ public class SRMConfig extends Config {
 
 
 
+
+
+    public Boolean lambda(String dependentOption) {
+        try {
+            return (boolean) optionNames.get(dependentOption).get();
+        } catch (IllegalAccessException ignored) {
+            return true;
+        }
+    }
+
     public SRMConfig() {
         super(new Mod(Main.MODID, ModType.SKYBLOCK), Main.MODID + ".json");
         initialize();
 
-        addDependency("particleType", "modEnabled");
-        addDependency("width", "modEnabled");
-        addDependency("routesFileName", "modEnabled");
-        addDependency("runnable", "modEnabled");
-        addDependency("runnable9", "modEnabled");
+        try {
+            optionNames.get("particleType").addHideCondition(() -> !lambda("modEnabled"));
+            optionNames.get("width").addHideCondition(() -> !lambda("modEnabled"));
+            optionNames.get("routesFileName").addHideCondition(() -> !lambda("modEnabled"));
+            optionNames.get("runnable").addHideCondition(() -> !lambda("modEnabled"));
+            optionNames.get("runnable9").addHideCondition(() -> !lambda("modEnabled"));
 
-        addDependency("startWaypointColorIndex", "startTextToggle");
-        addDependency("startTextSize", "startTextToggle");
-        addDependency("interactWaypointColorIndex", "interactTextToggle");
-        addDependency("interactTextSize", "interactTextToggle");
-        addDependency("itemWaypointColorIndex", "itemTextToggle");
-        addDependency("itemTextSize", "itemTextToggle");
-        addDependency("batWaypointColorIndex", "batTextToggle");
-        addDependency("batTextSize", "batTextToggle");
+            optionNames.get("startWaypointColorIndex").addHideCondition(() -> !lambda("startTextToggle"));
+            optionNames.get("startTextSize").addHideCondition(() -> !lambda("startTextToggle"));
+            optionNames.get("interactWaypointColorIndex").addHideCondition(() -> !lambda("interactTextToggle"));
+            optionNames.get("interactTextSize").addHideCondition(() -> !lambda("interactTextToggle"));
+            optionNames.get("itemWaypointColorIndex").addHideCondition(() -> !lambda("itemTextToggle"));
+            optionNames.get("itemTextSize").addHideCondition(() -> !lambda("itemTextToggle"));
+            optionNames.get("batWaypointColorIndex").addHideCondition(() -> !lambda("batTextToggle"));
+            optionNames.get("batTextSize").addHideCondition(() -> !lambda("batTextToggle"));
 
-        addDependency("etherwarpsWaypointColorIndex", "etherwarpsTextToggle");
-        addDependency("etherwarpsTextSize", "etherwarpsTextToggle");
-        addDependency("minesWaypointColorIndex", "minesTextToggle");
-        addDependency("minesTextSize", "minesTextToggle");
-        addDependency("interactsWaypointColorIndex", "interactsTextToggle");
-        addDependency("interactsTextSize", "interactsTextToggle");
-        addDependency("superboomsWaypointColorIndex", "superboomsTextToggle");
-        addDependency("superboomsTextSize", "superboomsTextToggle");
+            optionNames.get("etherwarpsWaypointColorIndex").addHideCondition(() -> !lambda("etherwarpsTextToggle"));
+            optionNames.get("etherwarpsTextSize").addHideCondition(() -> !lambda("etherwarpsTextToggle"));
+            optionNames.get("minesWaypointColorIndex").addHideCondition(() -> !lambda("minesTextToggle"));
+            optionNames.get("minesTextSize").addHideCondition(() -> !lambda("minesTextToggle"));
+            optionNames.get("interactsWaypointColorIndex").addHideCondition(() -> !lambda("interactsTextToggle"));
+            optionNames.get("interactsTextSize").addHideCondition(() -> !lambda("interactsTextToggle"));
+            optionNames.get("superboomsWaypointColorIndex").addHideCondition(() -> !lambda("superboomsTextToggle"));
+            optionNames.get("superboomsTextSize").addHideCondition(() -> !lambda("superboomsTextToggle"));
+        } catch (Exception e) {
+            LogUtils.error(e);
+        }
+        //hideIf("particleType", "modEnabled");
+        /*
+        hideIf("width", "modEnabled");
+        hideIf("routesFileName", "modEnabled");
+        hideIf("runnable", "modEnabled");
+        hideIf("runnable9", "modEnabled");
+
+        hideIf("startWaypointColorIndex", "startTextToggle");
+        hideIf("startTextSize", "startTextToggle");
+        hideIf("interactWaypointColorIndex", "interactTextToggle");
+        hideIf("interactTextSize", "interactTextToggle");
+        hideIf("itemWaypointColorIndex", "itemTextToggle");
+        hideIf("itemTextSize", "itemTextToggle");
+        hideIf("batWaypointColorIndex", "batTextToggle");
+        hideIf("batTextSize", "batTextToggle");
+
+        hideIf("etherwarpsWaypointColorIndex", "etherwarpsTextToggle");
+        hideIf("etherwarpsTextSize", "etherwarpsTextToggle");
+        hideIf("minesWaypointColorIndex", "minesTextToggle");
+        hideIf("minesTextSize", "minesTextToggle");
+        hideIf("interactsWaypointColorIndex", "interactsTextToggle");
+        hideIf("interactsTextSize", "interactsTextToggle");
+        hideIf("superboomsWaypointColorIndex", "superboomsTextToggle");
+        hideIf("superboomsTextSize", "superboomsTextToggle");
+
+         */
     }
 }

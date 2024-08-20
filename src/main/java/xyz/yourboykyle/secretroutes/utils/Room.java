@@ -57,7 +57,7 @@ public class Room {
             name = roomName;
 
             if (roomName != null) {
-                String filePath = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes" + File.separator + SRMConfig.routesFileName;
+                String filePath = Main.ROUTES_PATH + File.separator + SRMConfig.routesFileName;
 
                 Gson gson = new GsonBuilder().create();
                 FileReader reader = new FileReader(filePath);

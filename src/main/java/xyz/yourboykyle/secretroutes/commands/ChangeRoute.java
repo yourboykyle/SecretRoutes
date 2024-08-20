@@ -5,6 +5,7 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.FileUtils;
@@ -12,6 +13,8 @@ import xyz.yourboykyle.secretroutes.utils.FileUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 
 public class ChangeRoute extends CommandBase {
     private ArrayList<String> subCommands = new ArrayList<>();
@@ -35,26 +38,24 @@ public class ChangeRoute extends CommandBase {
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
-        Minecraft.getMinecraft().thePlayer.addChatMessage(new net.minecraft.util.ChatComponentText("Change route... (WIP)"));
         if(args.length == 0){
-            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Incorrect usage: /changeroute [list|load [route]]"));
+            sendChatMessage("Incorrect usage: /changeroute [list|load [route]]", EnumChatFormatting.RED);
             return;
         }
         if(args.length == 1 && args[0].equals(subCommands.get(0))){
-            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("list called, list all the files"));
             entries.addAll(FileUtils.getRouteFileNames());
+            sendChatMessage("Routes:", EnumChatFormatting.DARK_AQUA);
             for(String entry : entries){
-                Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("File: "+entry));
+                sendChatMessage(" - "+entry, EnumChatFormatting.AQUA);
             }
         }else if(args.length == 1 && args[0].equals(subCommands.get(1))){
-            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Incorrect usage: /changeroute load [routename]"));
+            sendChatMessage("Incorrect usage: /changeroute load [routename]", EnumChatFormatting.RED);
         }else if(args.length == 2 && args[0].equals(subCommands.get(1))){
-            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("This command will load the route of the specified file name"));
             if(FileUtils.doesFileExist(Main.ROUTES_PATH+ File.separator+args[1])){
                 SRMConfig.routesFileName = args[1];
-                Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Loaded "+args[1]+" as filename for custom routes"));
+                sendChatMessage("Loaded "+args[1]+" as filename for custom routes", EnumChatFormatting.DARK_GREEN);
             }else{
-                Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Specified file does not exist"));
+                sendChatMessage("Specified file does not exist", EnumChatFormatting.RED);
             }
         }
     }

@@ -2,7 +2,9 @@ package xyz.yourboykyle.secretroutes.utils;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
 import xyz.yourboykyle.secretroutes.Main;
+import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 
 import java.io.FileWriter;
 import java.io.PrintWriter;
@@ -21,7 +23,7 @@ public class LogUtils {
 
         appendToFile("====================\n[ERROR] " + stackTrace);
         if(Minecraft.getMinecraft().thePlayer != null) {
-            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Error caught by Secret Routes. Check latest logs at .minecraft/logs/SecretRoutes/LATEST-{date}.log"));
+            sendChatMessage(EnumChatFormatting.DARK_RED+"Error caught by Secret Routes. Check latest logs at .minecraft/logs/SecretRoutes/LATEST-{date}.log");
         }
     }
 
