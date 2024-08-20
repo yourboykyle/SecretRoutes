@@ -17,7 +17,7 @@ public class FileUtils {
         File[] files = new File(path).listFiles();
         List<String> list = new ArrayList<>();
         for(File f : files){
-            list.add(f.getName());
+            if(f.getName().contains(".json")){ list.add(f.getName());}
         }
         return list;
     }
@@ -37,7 +37,7 @@ public class FileUtils {
     public static File promptUserForFile() {
         Frame frame = new Frame();
         frame.setVisible(false);
-        frame.setAlwaysOnTop(false);
+        frame.setAlwaysOnTop(true);
 
         FileDialog fileDialog = new FileDialog(frame, "Select a file", FileDialog.LOAD);
 

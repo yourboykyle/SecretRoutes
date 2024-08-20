@@ -18,12 +18,17 @@
 
 package xyz.yourboykyle.secretroutes;
 
+import cc.polyfrost.oneconfig.config.core.OneColor;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import io.github.quantizr.dungeonrooms.DungeonRooms;
 import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
 import io.github.quantizr.dungeonrooms.handlers.PacketHandler;
 import io.github.quantizr.dungeonrooms.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -35,28 +40,28 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import org.apache.commons.io.IOUtils;
 import org.lwjgl.input.Keyboard;
-import xyz.yourboykyle.secretroutes.commands.ChangeRoute;
-import xyz.yourboykyle.secretroutes.commands.LoadRoute;
-import xyz.yourboykyle.secretroutes.commands.Recording;
-import xyz.yourboykyle.secretroutes.commands.SRM;
+import xyz.yourboykyle.secretroutes.commands.*;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.events.*;
-import xyz.yourboykyle.secretroutes.utils.LogUtils;
-import xyz.yourboykyle.secretroutes.utils.Room;
-import xyz.yourboykyle.secretroutes.utils.RouteRecording;
-import xyz.yourboykyle.secretroutes.utils.SSLUtils;
+import xyz.yourboykyle.secretroutes.utils.*;
 
 import java.awt.*;
 import java.io.*;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Map;
+
+import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 
 @Mod(modid = Main.MODID, name = Main.NAME, version = Main.VERSION)
 public class Main {
     public static final String MODID = "@ID@";
     public static final String NAME = "@NAME@";
     public static final String VERSION = "@VER@";
-    public static final String ROUTES_PATH = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes";
+    public static final String ROUTES_PATH = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes"+File.separator+"routes";
+    public static final String COLOR_PROFILE_PATH = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes"+File.separator+"colorprofiles";
     private final static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     public final static File logDir = new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "logs" + File.separator + "SecretRoutes");
     public static File outputLogs;
@@ -110,6 +115,7 @@ public class Main {
         instance = this;
         dungeonRooms.init(e);
         checkRoutesData();
+        checkProfilesData();
 
         // Register Events
         MinecraftForge.EVENT_BUS.register(new OnBlockPlace());
@@ -128,6 +134,7 @@ public class Main {
         ClientCommandHandler.instance.registerCommand(new Recording());
         ClientCommandHandler.instance.registerCommand(new SRM());
         ClientCommandHandler.instance.registerCommand(new ChangeRoute());
+        ClientCommandHandler.instance.registerCommand(new ChangeColorProfile());
 
         // Register Keybinds
         ClientRegistry.registerKeyBinding(lastSecret);
@@ -155,13 +162,85 @@ public class Main {
             RoomDetection.roomDirection = "NW";
         }
     }
+    public static void checkProfilesData(){
+        try{
+            String filePath = COLOR_PROFILE_PATH+File.separator+ "default.json";
+
+            File colorProfileDir = new File(COLOR_PROFILE_PATH);
+            if(!colorProfileDir.exists()){
+                colorProfileDir.mkdirs();
+            }
+            if(FileUtils.getFileNames(COLOR_PROFILE_PATH).isEmpty()){
+                writeColorConfig(filePath);
+            }
+            //Implement logic for writing to file
+        }catch(Exception e){
+            LogUtils.error(e);
+        }
+    }
+    public static void writeColorConfig(String path){
+            if(!path.endsWith(".json")){
+                path += ".json";
+            }
+            Map<String, OneColor> defaultColors = new HashMap<>();
+            defaultColors.put("lineColor", SRMConfig.lineColor);
+            defaultColors.put("etherWarp", SRMConfig.etherWarp);
+            defaultColors.put("mine", SRMConfig.mine);
+            defaultColors.put("interacts", SRMConfig.interacts);
+            defaultColors.put("superbooms", SRMConfig.superbooms);
+            defaultColors.put("secretsItem", SRMConfig.secretsItem);
+            defaultColors.put("secretsInteract", SRMConfig.secretsInteract);
+            defaultColors.put("secretsBat", SRMConfig.secretsBat);
+
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            String json = gson.toJson(defaultColors);
+
+            try (FileWriter writer = new FileWriter(path)) {
+                writer.write(json);
+                sendChatMessage("Color profile created successfully.", EnumChatFormatting.DARK_GREEN);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+    }
+    public static boolean loadColorConfig(String path) {
+        try {
+            if (!path.endsWith(".json")) {
+                path += ".json";
+            }
+            String finalPath = COLOR_PROFILE_PATH + File.separator + path;
+            if(!new File(finalPath).exists()){
+                sendChatMessage("Color profile not found, please select different one or create it.", EnumChatFormatting.RED);
+                return false;
+            }
+            Gson gson = new GsonBuilder()
+                    .registerTypeAdapter(OneColor.class, new OneColorDeserializer())
+                    .create();
+            FileReader reader = new FileReader(finalPath);
+            Type type = new TypeToken<Map<String, OneColor>>() {}.getType();
+            Map<String, OneColor> data = gson.fromJson(reader, type);
+
+            SRMConfig.lineColor = data.get("lineColor");
+            SRMConfig.etherWarp = data.get("etherWarp");
+            SRMConfig.mine = data.get("mine");
+            SRMConfig.interacts = data.get("interacts");
+            SRMConfig.superbooms = data.get("superbooms");
+            SRMConfig.secretsItem = data.get("secretsItem");
+            SRMConfig.secretsInteract = data.get("secretsInteract");
+            SRMConfig.secretsBat = data.get("secretsBat");
+            return true;
+        } catch (Exception e) {
+            LogUtils.error(e);
+        }
+        return false;
+    }
+
 
     public static void checkRoutesData() {
         try {
-            String filePath = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes" + File.separator + "routes.json";
+            String filePath = ROUTES_PATH+File.separator+ "routes.json";
 
             // Check if the config directory exists
-            File configDir = new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes");
+            File configDir = new File(ROUTES_PATH);
             if (!configDir.exists()) {
                 configDir.mkdirs();
             }
@@ -193,7 +272,7 @@ public class Main {
     }
 
     public static void updateRoutes() {
-        File configFile = new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes" + File.separator + "routes.json");
+        File configFile = new File(ROUTES_PATH+File.separator + "routes.json");
         try {
             LogUtils.info("Downloading routes.json...");
             SSLUtils.disableSSLCertificateChecking();
