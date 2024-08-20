@@ -3,18 +3,24 @@ package xyz.yourboykyle.secretroutes.config;
 import cc.polyfrost.oneconfig.config.Config;
 import cc.polyfrost.oneconfig.config.annotations.*;
 import cc.polyfrost.oneconfig.config.core.OneColor;
+import cc.polyfrost.oneconfig.config.data.InfoType;
 import cc.polyfrost.oneconfig.config.data.Mod;
 import cc.polyfrost.oneconfig.config.data.ModType;
 import cc.polyfrost.oneconfig.config.data.OptionSize;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.huds.CurrentRoomHUD;
 import xyz.yourboykyle.secretroutes.config.huds.RecordingHUD;
 import xyz.yourboykyle.secretroutes.utils.FileUtils;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
+
+import java.io.File;
+
+import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 
 public class SRMConfig extends Config {
     @Switch(
@@ -169,6 +175,63 @@ public class SRMConfig extends Config {
     public static CurrentRoomHUD currentRoomHUD = new CurrentRoomHUD();
 
 
+    //Color profile saving and loading
+    @Text(
+            name = "Color Profile Name",
+            description = "The name of the color profile to save or load",
+            subcategory = "Profiles",
+            category = "Rendering",
+            placeholder = "default.json"
+    )
+    public static String colorProfileName = "default.json";
+    @Info(
+            text = "Will auto append the .json extension if not provided",
+            subcategory = "Profiles",
+            category = "Rendering",
+            type = InfoType.INFO
+    )
+    public static boolean a;
+    @Button(
+            name = "Save Color Profile",
+            text = "Save",
+            description = "Write the current color profile, excluding waypoints, to a file",
+            subcategory = "Profiles",
+            category = "Rendering"
+    )
+    Runnable runnable10 = () -> {
+        new Thread(() -> {
+            Main.writeColorConfig(Main.COLOR_PROFILE_PATH + File.separator + colorProfileName);
+        }).start();
+    };
+    @Button(
+            name = "Load Color Profile",
+            text = "Load",
+            description = "Reads the color profile from a file",
+            subcategory = "Profiles",
+            category = "Rendering"
+    )
+    Runnable runnable11 = () -> {
+        new Thread(() -> {
+            if(Main.loadColorConfig(colorProfileName.isEmpty() ? "default.json" : colorProfileName)){
+                sendChatMessage("Loaded "+colorProfileName+" as color profile", EnumChatFormatting.DARK_GREEN);
+            }
+        }).start();
+    };
+    @Button(
+            name = "List all Color Profiles",
+            text = "List",
+            description = "Lists all the color profiles in the color profile directory",
+            subcategory = "Profiles",
+            category = "Rendering"
+    )
+    Runnable runnable12 = () -> {
+        new Thread(() -> {
+            sendChatMessage("Color Profiles:", EnumChatFormatting.DARK_AQUA);
+            for(String name :FileUtils.getFileNames(Main.COLOR_PROFILE_PATH)){
+                sendChatMessage(" - "+name, EnumChatFormatting.AQUA);
+            }
+        }).start();
+    };
 
     // Rendering
     @Color(
@@ -498,6 +561,10 @@ public class SRMConfig extends Config {
         superboomsWaypointColorIndex = 12;
         superboomsTextSize = 3;
     };
+
+
+
+
 
 
 
