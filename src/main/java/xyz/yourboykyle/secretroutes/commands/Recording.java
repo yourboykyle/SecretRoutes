@@ -7,10 +7,13 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.Room;
 
 import java.io.File;
+
+import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 
 public class Recording extends CommandBase {
     @Override
@@ -30,15 +33,12 @@ public class Recording extends CommandBase {
         }
         if(args[0].equalsIgnoreCase("start")) {
             Main.routeRecording.startRecording();
-            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Started recording"));
         } else if(args[0].equalsIgnoreCase("stop")) {
             Main.routeRecording.stopRecording();
-            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Stopped recording"));
         } else if(args[0].equalsIgnoreCase("export")) {
             Main.routeRecording.exportAllRoutes();
-            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Exported all routes to " + System.getProperty("user.home") + File.separator + "Downloads" + File.separator + "routes.json"));
         } else if(args[0].equalsIgnoreCase("getroom")) {
-            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Room Name: " + RoomDetection.roomName + ", Room Corner: " + RoomDetection.roomCorner + ", Room Direction: " + RoomDetection.roomDirection));
+           sendChatMessage(EnumChatFormatting.BLUE+"Room Name: " + RoomDetection.roomName + ", Room Corner: " + RoomDetection.roomCorner + ", Room Direction: " + RoomDetection.roomDirection);
         } else if(args[0].equalsIgnoreCase("setbat")) {
             // Route Recording
             if(Main.routeRecording.recording) {
@@ -50,17 +50,17 @@ public class Recording extends CommandBase {
                 Main.routeRecording.newSecret();
                 Main.routeRecording.setRecordingMessage("Added bat secret waypoint.");
             } else {
-                Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Route recording is not enabled. Run /recording start"));
+                sendChatMessage(EnumChatFormatting.RED+"Route recording is not enabled. Run /recording start");
             }
         }  else if(args[0].equalsIgnoreCase("import")) {
             if(args.length != 2) {
-                Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Usage: /recording import <filename.json>"));
+              sendChatMessage(EnumChatFormatting.RED+"Usage: /recording import <filename.json>");
             } else {
                 Main.routeRecording.importRoutes(args[1]);
-                Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Imported routes from " + args[1]));
+                sendChatMessage(EnumChatFormatting.DARK_GREEN+"Imported routes from " + EnumChatFormatting.GREEN + args[1]);
             }
         } else {
-            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Usage: " + getCommandUsage(sender)));
+           sendChatMessage(EnumChatFormatting.RED + "Usage: " + getCommandUsage(sender));
         }
     }
 
