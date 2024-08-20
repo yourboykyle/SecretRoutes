@@ -21,7 +21,6 @@ public class OnBlockPlace {
             Main.routeRecording.setRecordingMessage("Added TNT waypoint.");
             return;
         }
-        ChatUtils.sendVerboseMessage("§d Held Item: " + Minecraft.getMinecraft().thePlayer.getHeldItem().getItem());
         ItemStack heldItem = Minecraft.getMinecraft().thePlayer.getHeldItem();
         if(heldItem != null) {
             ChatUtils.sendVerboseMessage("§d Held Item: " + heldItem.getItem());

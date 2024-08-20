@@ -84,7 +84,27 @@ public class SRMConfig extends Config {
         }).start();
     };
 
+    @Switch(
+            name = "Auto updates",
+            description = "Automatically checks for updates on startup",
+            subcategory = "Updates"
+    )
+    public static boolean autoUpdate = true;
 
+    @Switch(
+            name = "Don't confirm before updating",
+            description = "Automatically downloads and installs updates Without prompting",
+            subcategory = "Updates"
+    )
+    public static boolean autoUpdateNoConfirm = false;
+
+    @Info(
+            text = "This goes to github to check for updates. It will prompt for an update, unless \"Don't confirm before updating\" is enabled",
+            subcategory = "Updates",
+            type = InfoType.INFO,
+            size = OptionSize.DUAL
+    )
+    public static boolean a;
 
     // Recording
 
@@ -185,13 +205,15 @@ public class SRMConfig extends Config {
             placeholder = "default.json"
     )
     public static String colorProfileName = "default.json";
+
     @Info(
             text = "Will auto append the .json extension if not provided",
             subcategory = "Profiles",
             category = "Rendering",
             type = InfoType.INFO
     )
-    public static boolean a;
+    public static boolean b;
+
     @Button(
             name = "Save Color Profile",
             text = "Save",
@@ -204,6 +226,7 @@ public class SRMConfig extends Config {
             Main.writeColorConfig(colorProfileName);
         }).start();
     };
+
     @Button(
             name = "Load Color Profile",
             text = "Load",
@@ -218,6 +241,7 @@ public class SRMConfig extends Config {
             }
         }).start();
     };
+
     @Button(
             name = "List all Color Profiles",
             text = "List",
@@ -233,6 +257,7 @@ public class SRMConfig extends Config {
             }
         }).start();
     };
+
     @Button(
             name = "Import Color Profile",
             text = "Import",
@@ -597,6 +622,15 @@ public class SRMConfig extends Config {
     )
     public static boolean verboseLogging = false;
 
+    @Switch(
+            name= "Force outdated",
+            description = "Forces the version to be outdated, useful for testing the auto updater",
+            subcategory = "General",
+            category = "Dev",
+            size = OptionSize.DUAL
+    )
+    public static boolean autoUpdateTesting = false;
+
 
 
 
@@ -620,6 +654,8 @@ public class SRMConfig extends Config {
             optionNames.get("runnable").addHideCondition(() -> !lambda("modEnabled"));
             optionNames.get("runnable9").addHideCondition(() -> !lambda("modEnabled"));
 
+            optionNames.get("autoUpdateNoConfirm").addHideCondition(() -> !lambda("autoUpdate"));
+
             optionNames.get("startWaypointColorIndex").addHideCondition(() -> !lambda("startTextToggle"));
             optionNames.get("startTextSize").addHideCondition(() -> !lambda("startTextToggle"));
             optionNames.get("interactWaypointColorIndex").addHideCondition(() -> !lambda("interactTextToggle"));
@@ -638,7 +674,8 @@ public class SRMConfig extends Config {
             optionNames.get("superboomsWaypointColorIndex").addHideCondition(() -> !lambda("superboomsTextToggle"));
             optionNames.get("superboomsTextSize").addHideCondition(() -> !lambda("superboomsTextToggle"));
 
-            optionNames.get("Verbose logging").addHideCondition(() -> !isDevPasswordCorrect());
+            optionNames.get("verboseLogging").addHideCondition(() -> !isDevPasswordCorrect());
+            optionNames.get("autoUpdateTesting").addHideCondition(() -> !isDevPasswordCorrect());
 
 
 
@@ -647,6 +684,10 @@ public class SRMConfig extends Config {
         }
     }
     public boolean isDevPasswordCorrect(){
-        return devPassword.equals("KyleIsMyDaddy");
+        if(devPassword.equals("KyleIsMyDaddy")) {
+            return true;
+        }
+        verboseLogging = false;
+        return false;
     }
 }
