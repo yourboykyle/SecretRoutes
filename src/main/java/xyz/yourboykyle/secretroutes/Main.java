@@ -19,8 +19,7 @@
 package xyz.yourboykyle.secretroutes;
 
 import cc.polyfrost.oneconfig.config.core.OneColor;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import io.github.quantizr.dungeonrooms.DungeonRooms;
 import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
@@ -44,6 +43,7 @@ import xyz.yourboykyle.secretroutes.commands.*;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.events.*;
 import xyz.yourboykyle.secretroutes.utils.*;
+import xyz.yourboykyle.secretroutes.utils.multiStorage.Triple;
 
 import java.awt.*;
 import java.io.*;
@@ -164,7 +164,7 @@ public class Main {
     }
     public static void checkProfilesData(){
         try{
-            String filePath = COLOR_PROFILE_PATH+File.separator+ "default.json";
+            String filePath = "default.json";
 
             File colorProfileDir = new File(COLOR_PROFILE_PATH);
             if(!colorProfileDir.exists()){
@@ -178,11 +178,11 @@ public class Main {
             LogUtils.error(e);
         }
     }
-    public static void writeColorConfig(String path){
+    public static void writeColorConfig(String path) {
             if(!path.endsWith(".json")){
                 path += ".json";
             }
-            Map<String, OneColor> defaultColors = new HashMap<>();
+            Map<String, Object> defaultColors = new HashMap<>();
             defaultColors.put("lineColor", SRMConfig.lineColor);
             defaultColors.put("etherWarp", SRMConfig.etherWarp);
             defaultColors.put("mine", SRMConfig.mine);
@@ -192,12 +192,36 @@ public class Main {
             defaultColors.put("secretsInteract", SRMConfig.secretsInteract);
             defaultColors.put("secretsBat", SRMConfig.secretsBat);
 
+            defaultColors.put("startTextToggle", SRMConfig.startTextToggle);
+            defaultColors.put("startWaypointColorIndex", SRMConfig.startWaypointColorIndex);
+            defaultColors.put("startTextSize", SRMConfig.startTextSize);
+            defaultColors.put("interactTextToggle", SRMConfig.interactTextToggle);
+            defaultColors.put("interactTextSize", SRMConfig.interactTextSize);
+            defaultColors.put("interactWaypointColorIndex", SRMConfig.interactWaypointColorIndex);
+            defaultColors.put("itemTextToggle", SRMConfig.itemTextToggle);
+            defaultColors.put("itemWaypointColorIndex", SRMConfig.itemWaypointColorIndex);
+            defaultColors.put("itemTextSize", SRMConfig.itemTextSize);
+            defaultColors.put("batTextToggle", SRMConfig.batTextToggle);
+            defaultColors.put("batWaypointColorIndex", SRMConfig.batWaypointColorIndex);
+            defaultColors.put("batTextSize", SRMConfig.batTextSize);
+            defaultColors.put("etherwarpsTextToggle", SRMConfig.etherwarpsTextToggle);
+            defaultColors.put("etherwarpsWaypointColorIndex", SRMConfig.etherwarpsWaypointColorIndex);
+            defaultColors.put("etherwarpsTextSize", SRMConfig.etherwarpsTextSize);
+            defaultColors.put("minesTextToggle", SRMConfig.minesTextToggle);
+            defaultColors.put("minesWaypointColorIndex", SRMConfig.minesWaypointColorIndex);
+            defaultColors.put("minesTextSize", SRMConfig.minesTextSize);
+            defaultColors.put("interactsTextToggle", SRMConfig.interactsTextToggle);
+            defaultColors.put("interactsWaypointColorIndex", SRMConfig.interactsWaypointColorIndex);
+            defaultColors.put("interactsTextSize", SRMConfig.interactsTextSize);
+            defaultColors.put("superboomsTextToggle", SRMConfig.superboomsTextToggle);
+            defaultColors.put("superboomsWaypointColorIndex", SRMConfig.superboomsWaypointColorIndex);
+            defaultColors.put("superboomsTextSize", SRMConfig.superboomsTextSize);
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             String json = gson.toJson(defaultColors);
 
-            try (FileWriter writer = new FileWriter(path)) {
+            try (FileWriter writer = new FileWriter(COLOR_PROFILE_PATH+File.separator+path)) {
                 writer.write(json);
-                sendChatMessage("Color profile created successfully.", EnumChatFormatting.DARK_GREEN);
+                sendChatMessage(EnumChatFormatting.GREEN+path+EnumChatFormatting.DARK_GREEN+" color profile created successfully.");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -209,24 +233,47 @@ public class Main {
             }
             String finalPath = COLOR_PROFILE_PATH + File.separator + path;
             if(!new File(finalPath).exists()){
-                sendChatMessage("Color profile not found, please select different one or create it.", EnumChatFormatting.RED);
+                sendChatMessage(EnumChatFormatting.RED+"Color profile not found, please select different one or create it.");
                 return false;
             }
-            Gson gson = new GsonBuilder()
-                    .registerTypeAdapter(OneColor.class, new OneColorDeserializer())
-                    .create();
+            Gson gson = new GsonBuilder().create();
             FileReader reader = new FileReader(finalPath);
-            Type type = new TypeToken<Map<String, OneColor>>() {}.getType();
-            Map<String, OneColor> data = gson.fromJson(reader, type);
+            JsonObject data = gson.fromJson(reader, JsonObject.class);
 
-            SRMConfig.lineColor = data.get("lineColor");
-            SRMConfig.etherWarp = data.get("etherWarp");
-            SRMConfig.mine = data.get("mine");
-            SRMConfig.interacts = data.get("interacts");
-            SRMConfig.superbooms = data.get("superbooms");
-            SRMConfig.secretsItem = data.get("secretsItem");
-            SRMConfig.secretsInteract = data.get("secretsInteract");
-            SRMConfig.secretsBat = data.get("secretsBat");
+            SRMConfig.lineColor = parseOneColor(data.get("lineColor"));
+            SRMConfig.etherWarp = parseOneColor(data.get("etherWarp"));
+            SRMConfig.mine = parseOneColor(data.get("mine"));
+            SRMConfig.interacts = parseOneColor(data.get("interacts"));
+            SRMConfig.superbooms = parseOneColor(data.get("superbooms"));
+            SRMConfig.secretsItem = parseOneColor(data.get("secretsItem"));
+            SRMConfig.secretsInteract = parseOneColor(data.get("secretsInteract"));
+            SRMConfig.secretsBat = parseOneColor(data.get("secretsBat"));
+
+            SRMConfig.startTextToggle = data.get("startTextToggle").getAsBoolean();
+            SRMConfig.startWaypointColorIndex = data.get("startWaypointColorIndex").getAsInt();
+            SRMConfig.startTextSize = data.get("startTextSize").getAsFloat();
+            SRMConfig.interactTextToggle =  data.get("interactTextToggle").getAsBoolean();
+            SRMConfig.interactWaypointColorIndex = data.get("interactWaypointColorIndex").getAsInt();
+            SRMConfig.interactTextSize = data.get("interactTextSize").getAsFloat();
+            SRMConfig.itemTextToggle =  data.get("itemTextToggle").getAsBoolean();
+            SRMConfig.itemWaypointColorIndex = data.get("itemWaypointColorIndex").getAsInt();
+            SRMConfig.itemTextSize = data.get("itemTextSize").getAsFloat();
+            SRMConfig.batTextToggle =  data.get("batTextToggle").getAsBoolean();
+            SRMConfig.batWaypointColorIndex = data.get("batWaypointColorIndex").getAsInt();
+            SRMConfig.batTextSize = data.get("batTextSize").getAsFloat();
+            SRMConfig.etherwarpsTextToggle =  data.get("etherwarpsTextToggle").getAsBoolean();
+            SRMConfig.etherwarpsWaypointColorIndex = data.get("etherwarpsWaypointColorIndex").getAsInt();
+            SRMConfig.etherwarpsTextSize = data.get("etherwarpsTextSize").getAsFloat();
+            SRMConfig.minesTextToggle =  data.get("minesTextToggle").getAsBoolean();
+            SRMConfig.minesWaypointColorIndex = data.get("minesWaypointColorIndex").getAsInt();
+            SRMConfig.minesTextSize = data.get("minesTextSize").getAsFloat();
+            SRMConfig.interactsTextToggle =  data.get("interactsTextToggle").getAsBoolean();
+            SRMConfig.interactsWaypointColorIndex = data.get("interactsWaypointColorIndex").getAsInt();
+            SRMConfig.interactsTextSize = data.get("interactsTextSize").getAsFloat();
+            SRMConfig.superboomsTextToggle =  data.get("superboomsTextToggle").getAsBoolean();
+            SRMConfig.superboomsWaypointColorIndex = data.get("superboomsWaypointColorIndex").getAsInt();
+            SRMConfig.superboomsTextSize = data.get("superboomsTextSize").getAsFloat();
+
             return true;
         } catch (Exception e) {
             LogUtils.error(e);
@@ -272,7 +319,7 @@ public class Main {
     }
 
     public static void updateRoutes() {
-        File configFile = new File(ROUTES_PATH+File.separator + "routes.json");
+        File configFile = new File(ROUTES_PATH + File.separator + "routes.json");
         try {
             LogUtils.info("Downloading routes.json...");
             SSLUtils.disableSSLCertificateChecking();
@@ -314,5 +361,15 @@ public class Main {
 
             }).start();
         }
+    }
+    public static OneColor parseOneColor(JsonElement json){
+        JsonObject jsonObject = json.getAsJsonObject();
+        JsonArray hsba = jsonObject.getAsJsonArray("hsba");
+        int hue = hsba.get(0).getAsInt();
+        int saturation = hsba.get(1).getAsInt();
+        int brightness = hsba.get(2).getAsInt();
+        int alpha = hsba.get(3).getAsInt();
+        int chromaSpeed = jsonObject.get("dataBit").getAsInt();
+        return new OneColor(hue, saturation, brightness, alpha, chromaSpeed);
     }
 }

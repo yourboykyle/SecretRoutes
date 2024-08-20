@@ -10,10 +10,11 @@ public class OneColorDeserializer implements JsonDeserializer<OneColor> {
     public OneColor deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         JsonObject jsonObject = json.getAsJsonObject();
         JsonArray hsba = jsonObject.getAsJsonArray("hsba");
-        float hue = hsba.get(0).getAsFloat();
-        float saturation = hsba.get(1).getAsFloat();
-        float brightness = hsba.get(2).getAsFloat();
-        float alpha = hsba.get(3).getAsFloat();
-        return new OneColor(hue, saturation, brightness, alpha);
+        int hue = hsba.get(0).getAsInt();
+        int saturation = hsba.get(1).getAsInt();
+        int brightness = hsba.get(2).getAsInt();
+        int alpha = hsba.get(3).getAsInt();
+        int chromaSpeed = jsonObject.get("dataBit").getAsInt();
+        return new OneColor(hue, saturation, brightness, alpha, chromaSpeed);
     }
 }
