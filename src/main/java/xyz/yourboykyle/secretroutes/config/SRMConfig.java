@@ -9,17 +9,14 @@ import cc.polyfrost.oneconfig.config.data.ModType;
 import cc.polyfrost.oneconfig.config.data.OptionSize;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.huds.CurrentRoomHUD;
 import xyz.yourboykyle.secretroutes.config.huds.RecordingHUD;
+import xyz.yourboykyle.secretroutes.utils.ChatUtils;
 import xyz.yourboykyle.secretroutes.utils.FileUtils;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
-
-import java.io.File;
-import java.util.function.Supplier;
 
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 
@@ -91,13 +88,6 @@ public class SRMConfig extends Config {
     )
     public static boolean autoUpdate = true;
 
-    @Switch(
-            name = "Don't confirm before updating",
-            description = "Automatically downloads and installs updates Without prompting",
-            subcategory = "Updates"
-    )
-    public static boolean autoUpdateNoConfirm = false;
-
     @Info(
             text = "This goes to github to check for updates. It will prompt for an update, unless \"Don't confirm before updating\" is enabled",
             subcategory = "Updates",
@@ -105,6 +95,20 @@ public class SRMConfig extends Config {
             size = OptionSize.DUAL
     )
     public static boolean a;
+
+    @Button(
+            name = "Check for updates",
+            text = "Check for updates",
+            description = "Manually check for an update if you wish to make sure",
+            subcategory = "Updates",
+            size = 2
+    )
+    Runnable runnable14 = () -> {
+        new Thread(() -> {
+            ChatUtils.sendChatMessage("Checking for updates, please wait a few seconds...");
+            Main.updateManager.checkUpdate(true);
+        }).start();
+    };
 
     // Recording
 
@@ -615,7 +619,7 @@ public class SRMConfig extends Config {
 
     @Switch(
             name= "Verbose logging",
-            description = "Adds more detailed logging, usefull for debugging",
+            description = "Adds more detailed logging, useful for debugging",
             subcategory = "Chat logging",
             category = "Dev",
             size = OptionSize.DUAL
@@ -653,8 +657,7 @@ public class SRMConfig extends Config {
             optionNames.get("routesFileName").addHideCondition(() -> !lambda("modEnabled"));
             optionNames.get("runnable").addHideCondition(() -> !lambda("modEnabled"));
             optionNames.get("runnable9").addHideCondition(() -> !lambda("modEnabled"));
-
-            optionNames.get("autoUpdateNoConfirm").addHideCondition(() -> !lambda("autoUpdate"));
+            optionNames.get("runnable14").addHideCondition(() -> !lambda("modEnabled"));
 
             optionNames.get("startWaypointColorIndex").addHideCondition(() -> !lambda("startTextToggle"));
             optionNames.get("startTextSize").addHideCondition(() -> !lambda("startTextToggle"));
@@ -676,9 +679,6 @@ public class SRMConfig extends Config {
 
             optionNames.get("verboseLogging").addHideCondition(() -> !isDevPasswordCorrect());
             optionNames.get("autoUpdateTesting").addHideCondition(() -> !isDevPasswordCorrect());
-
-
-
         } catch (Exception e) {
             LogUtils.error(e);
         }

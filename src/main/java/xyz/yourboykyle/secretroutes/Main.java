@@ -110,6 +110,10 @@ public class Main {
         // Set up Config
         config = new SRMConfig();
 
+        // Auto Updates
+        LogUtils.info("Checking for updates...");
+        Main.updateManager.checkUpdate();
+
         // Initialize Other Stuff
         instance = this;
         dungeonRooms.init(e);

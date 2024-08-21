@@ -101,7 +101,9 @@ public class GithubReleaseUpdateSource extends JsonUpdateSource {
     public CompletableFuture<UpdateData> checkUpdate(String updateStream) {
         CompletableFuture<List<GithubRelease>> releases = getJsonFromURL(getReleaseApiUrl(), new TypeToken<List<GithubRelease>>() {
         }.getType());
-        return releases.thenApply(it -> it == null ? null : selectUpdate(updateStream, it));
+        return releases.thenApply(it -> {
+            return it == null ? null : selectUpdate(updateStream, it);
+        });
     }
 
     /**

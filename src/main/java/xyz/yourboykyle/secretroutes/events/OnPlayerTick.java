@@ -39,11 +39,6 @@ public class OnPlayerTick {
             Main.currentRoom = new Room(null);
         }*/
 
-        // Auto Updates
-        if (SRMConfig.autoUpdate) {
-            Main.updateManager.checkUpdate();
-        }
-
         // Draw Lines
         if(SRMConfig.modEnabled) {
             Main.currentRoom.renderLines();
@@ -58,6 +53,17 @@ public class OnPlayerTick {
                 LogUtils.info("Went by bat at " + batPos);
             }
         }
+        if(Main.currentRoom.getSecretType() == Room.SECRET_TYPES.ITEM){
+            BlockPos pos = e.player.getPosition();
+            BlockPos itemPos = Main.currentRoom.getSecretLocation();
+
+            if(pos.getX() == itemPos.getX() && pos.getZ() == itemPos.getZ() && pos.getY() <= itemPos.getY()+1 && pos.getY() >= itemPos.getY()-1){
+
+            }
+
+
+        }
+
 
         // Route Recording
         if(Main.routeRecording.recording) {
