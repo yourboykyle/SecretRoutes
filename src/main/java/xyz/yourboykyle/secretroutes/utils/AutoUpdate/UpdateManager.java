@@ -69,7 +69,9 @@ public class UpdateManager {
 
                     LogUtils.info("Current version: " + context.getCurrentVersion());
                     LogUtils.info("Latest version: " + update.getUpdate().getVersionNumber());
-                    if (update.isUpdateAvailable()) {
+
+
+                    if (checkVersion(update)) {
                         updateState = UpdateState.AVAILABLE;
                         LogUtils.info("Update available");
 
@@ -122,8 +124,8 @@ public class UpdateManager {
         }).thenAcceptAsync(aVoid -> {
             LogUtils.info("Update download completed, setting exit hook");
             updateState = UpdateState.DOWNLOADED;
-            //potentialUpdate.executePreparedUpdate();
-            ChatUtils.sendChatMessage("Download of update complete.");
+            potentialUpdate.executePreparedUpdate();
+            ChatUtils.sendChatMessage("§eDownload of update complete.");
             ChatUtils.sendChatMessage("§aThe update will be installed after your next restart.");
         }, MinecraftExecutor.INSTANCE));
         SSLUtils.enableSSLCertificateChecking();
@@ -137,7 +139,7 @@ public class UpdateManager {
 
                 @Override
                 public String display() {
-                    if (SRMConfig.autoUpdateTesting) {
+                    if (SRMConfig.forceUpdateDEBUG) {
                         return "Force Outdated";
                     }
                     return normalDelegate.display();
@@ -145,7 +147,7 @@ public class UpdateManager {
 
                 @Override
                 public boolean isOlderThan(JsonElement element) {
-                    if (SRMConfig.autoUpdateTesting) {
+                    if (SRMConfig.forceUpdateDEBUG) {
                         return true;
                     }
                     return normalDelegate.isOlderThan(element);
@@ -173,5 +175,22 @@ public class UpdateManager {
         QUEUED,
         DOWNLOADED,
         NONE
+    }
+
+    public boolean checkVersion(PotentialUpdate update){
+        String[] currentV = Main.VERSION.split("\\.");
+        String[] nextV =  update.getUpdate().getVersionName().substring(1).split("\\.");
+
+        for(int i = 0; i < currentV.length && i< nextV.length; i++){
+            if(Integer.parseInt(currentV[i]) < Integer.parseInt(nextV[i])){
+                return true;
+            }else if(Integer.parseInt(currentV[i]) > Integer.parseInt(nextV[i])){
+                return false;
+            }
+        }
+        if(currentV.length < nextV.length){
+            return true;
+        }
+        return false;
     }
 }

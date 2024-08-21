@@ -19,6 +19,7 @@ import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
 
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
+import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
 
 public class SRMConfig extends Config {
     @Switch(
@@ -30,7 +31,7 @@ public class SRMConfig extends Config {
 
     @Dropdown(
             name = "Line Type",
-            options = {"Fire Particles", "Lines"},
+            options = {"Fire Particles", "Lines", "None"},
             subcategory = "General"
     )
     public static int particleType = 0;
@@ -87,7 +88,7 @@ public class SRMConfig extends Config {
             subcategory = "Updates"
     )
     public static boolean autoUpdate = true;
-
+/*
     @Info(
             text = "This goes to github to check for updates. It will prompt for an update, unless \"Don't confirm before updating\" is enabled",
             subcategory = "Updates",
@@ -95,6 +96,8 @@ public class SRMConfig extends Config {
             size = OptionSize.DUAL
     )
     public static boolean a;
+
+ */
 
     @Button(
             name = "Check for updates",
@@ -627,13 +630,29 @@ public class SRMConfig extends Config {
     public static boolean verboseLogging = false;
 
     @Switch(
+            name= "Better recording",
+            description = "Adds more detailed logging for recording, useful for debugging",
+            subcategory = "Chat logging",
+            category = "Dev"
+    )
+    public static boolean verboseRecording = true;
+    //More verbose logging options will come in future releases
+    @Switch(
+            name= "Better updating",
+            description = "adds more detailed logging for updating, useful for debugging",
+            subcategory = "Chat logging",
+            category = "Dev"
+    )
+    public static boolean verboseUpdating = true;
+
+    @Switch(
             name= "Force outdated",
             description = "Forces the version to be outdated, useful for testing the auto updater",
             subcategory = "General",
             category = "Dev",
             size = OptionSize.DUAL
     )
-    public static boolean autoUpdateTesting = false;
+    public static boolean forceUpdateDEBUG = false;
 
 
 
@@ -643,6 +662,7 @@ public class SRMConfig extends Config {
         try {
             return (boolean) optionNames.get(dependentOption).get();
         } catch (IllegalAccessException ignored) {
+            sendVerboseMessage("Error in lambda function");
             return true;
         }
     }
@@ -677,17 +697,20 @@ public class SRMConfig extends Config {
             optionNames.get("superboomsWaypointColorIndex").addHideCondition(() -> !lambda("superboomsTextToggle"));
             optionNames.get("superboomsTextSize").addHideCondition(() -> !lambda("superboomsTextToggle"));
 
-            optionNames.get("verboseLogging").addHideCondition(() -> !isDevPasswordCorrect());
-            optionNames.get("autoUpdateTesting").addHideCondition(() -> !isDevPasswordCorrect());
+            optionNames.get("forceUpdateDEBUG").addHideCondition(() -> isDevPasswordNotCorrect());
+            optionNames.get("verboseLogging").addHideCondition(() -> isDevPasswordNotCorrect());
+            optionNames.get("verboseRecording").addHideCondition(() -> !lambda("verboseLogging"));
+            optionNames.get("verboseUpdating").addHideCondition(() -> !lambda("verboseLogging"));
         } catch (Exception e) {
             LogUtils.error(e);
         }
     }
-    public boolean isDevPasswordCorrect(){
+    public boolean isDevPasswordNotCorrect(){
         if(devPassword.equals("KyleIsMyDaddy")) {
-            return true;
+            return false;
         }
         verboseLogging = false;
-        return false;
+        forceUpdateDEBUG = false;
+        return true;
     }
 }
