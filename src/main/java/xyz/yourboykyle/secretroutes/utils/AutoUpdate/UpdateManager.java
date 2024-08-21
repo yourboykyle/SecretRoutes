@@ -7,9 +7,9 @@ import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.ChatUtils;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
+import xyz.yourboykyle.secretroutes.utils.SSLUtils;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
@@ -52,11 +52,9 @@ public class UpdateManager {
 
     public void checkUpdate(boolean forceDownload) {
         if (updateState != UpdateState.NONE) {
-            //LogUtils.info("Trying to perform update check while another update is already in progress");
+            LogUtils.info("Trying to perform update check while another update is already in progress");
             return;
         }
-
-        LogUtils.info("Starting update check");
 
         setActivePromise(context.checkUpdate("full")
                 .thenAcceptAsync(update -> {
@@ -69,22 +67,33 @@ public class UpdateManager {
 
                     potentialUpdate = update;
 
-                    LogUtils.info("New Update: " + update.getUpdate().getVersionNumber());
-                    LogUtils.info("Current Version: " + update.getContext().getCurrentVersion());
+                    LogUtils.info("Current version: " + context.getCurrentVersion());
+                    LogUtils.info("Latest version: " + update.getUpdate().getVersionNumber());
                     if (update.isUpdateAvailable()) {
                         updateState = UpdateState.AVAILABLE;
+                        LogUtils.info("Update available");
 
                         if (forceDownload) {
-                            LogUtils.info("forceDownload & update is available!");
+                            LogUtils.info("Update available, forceDownload is enabled");
                             ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "Secret Routes Mod found a new update: " + update.getUpdate().getVersionName() + ", starting to download now.");
                             queueUpdate();
                         } else {
-                            LogUtils.info("update is available!");
+                            LogUtils.info("Update available, forceDownload is disabled");
                             ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "Secret Routes Mod found a new update: " + update.getUpdate().getVersionName());
+                            if(SRMConfig.autoUpdate) {
+                                LogUtils.info("Update available, autoUpdate is enabled");
+                                ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "Automatically downloading new Secret Routes Mod update... (you can disable this in the config menu)");
+                                queueUpdate();
+                            } else {
+                                LogUtils.info("Update available, autoUpdate is disabled");
+                                ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "Press on the \"Check for updates\" button in the config menu to download the update.");
+                            }
                         }
                     } else if (forceDownload) {
-                        LogUtils.info("forceDownload & update is NOT available!");
+                        LogUtils.info("No update available, forceDownload is enabled");
                         ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "Secret Routes Mod didn't find a new update.");
+                    } else {
+                        LogUtils.info("No update available.");
                     }
                 }, MinecraftExecutor.INSTANCE)
         );
@@ -96,10 +105,11 @@ public class UpdateManager {
 
     public void queueUpdate() {
         if (updateState != UpdateState.AVAILABLE) {
-            LogUtils.info("Trying to enqueue an update while another one is already downloaded or none is present");
+            LogUtils.info("Trying to queue an update while another one is already downloaded or none is present");
             return;
         }
 
+        SSLUtils.disableSSLCertificateChecking();
         updateState = UpdateState.QUEUED;
         setActivePromise(CompletableFuture.supplyAsync((Supplier<Void>) () -> {
             LogUtils.info("Update download started");
@@ -112,17 +122,18 @@ public class UpdateManager {
         }).thenAcceptAsync(aVoid -> {
             LogUtils.info("Update download completed, setting exit hook");
             updateState = UpdateState.DOWNLOADED;
-            potentialUpdate.executePreparedUpdate();
+            //potentialUpdate.executePreparedUpdate();
             ChatUtils.sendChatMessage("Download of update complete.");
             ChatUtils.sendChatMessage("§aThe update will be installed after your next restart.");
         }, MinecraftExecutor.INSTANCE));
+        SSLUtils.enableSSLCertificateChecking();
     }
 
     private static final UpdateContext context = new UpdateContext(
             UpdateSource.githubUpdateSource("yourboykyle", "SecretRoutes"),
             UpdateTarget.deleteAndSaveInTheSameFolder(UpdateManager.class),
             new CurrentVersion() {
-                private final CurrentVersion normalDelegate = CurrentVersion.ofTag(Main.VERSION);
+                private final CurrentVersion normalDelegate = CurrentVersion.ofTag("v" + Main.VERSION);
 
                 @Override
                 public String display() {
@@ -142,7 +153,7 @@ public class UpdateManager {
 
                 @Override
                 public String toString() {
-                    return "ForceOutdateDelegate(" + normalDelegate + ")";
+                    return "" + normalDelegate;
                 }
             },
             Main.MODID

@@ -4,9 +4,9 @@ public class Main {
     public static void main(String[] args) {
 
         UpdateContext updater = new UpdateContext(
-                UpdateSource.githubUpdateSource("hannibal002", "SkyHanni"),
+                UpdateSource.githubUpdateSource("yourboykyle", "SecretRoutes"),
                 UpdateTarget.deleteAndSaveInTheSameFolder(Main.class),
-                CurrentVersion.ofTag("1.1.0"),
+                CurrentVersion.ofTag("0.3.1"),
                 "test"
         );
         updater.cleanup();
