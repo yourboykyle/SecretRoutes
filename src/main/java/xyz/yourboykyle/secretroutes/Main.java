@@ -20,7 +20,6 @@ package xyz.yourboykyle.secretroutes;
 
 import cc.polyfrost.oneconfig.config.core.OneColor;
 import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
 import io.github.quantizr.dungeonrooms.DungeonRooms;
 import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
 import io.github.quantizr.dungeonrooms.handlers.PacketHandler;
@@ -43,11 +42,10 @@ import xyz.yourboykyle.secretroutes.commands.*;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.events.*;
 import xyz.yourboykyle.secretroutes.utils.*;
-import xyz.yourboykyle.secretroutes.utils.multiStorage.Triple;
+import xyz.yourboykyle.secretroutes.utils.AutoUpdate.UpdateManager;
 
 import java.awt.*;
 import java.io.*;
-import java.lang.reflect.Type;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -68,6 +66,7 @@ public class Main {
 
     public static Room currentRoom = new Room(null);
     public static RouteRecording routeRecording = new RouteRecording();
+    public static UpdateManager updateManager = new UpdateManager();
     private static DungeonRooms dungeonRooms = new DungeonRooms();
 
     public static Main instance = new Main();
@@ -110,6 +109,9 @@ public class Main {
 
         // Set up Config
         config = new SRMConfig();
+
+        // Auto Updates
+        LogUtils.info("Checking for updates...");
 
         // Initialize Other Stuff
         instance = this;
@@ -341,6 +343,18 @@ public class Main {
         Minecraft mc = Minecraft.getMinecraft();
         if (mc.getCurrentServerData() == null) return;
         if (mc.getCurrentServerData().serverIP.toLowerCase().contains("hypixel.")) {
+
+            new Thread (() ->{
+                try{
+                    Main.updateManager.checkUpdate();
+                }catch (Exception e){
+                    LogUtils.error(e);
+                }
+            }).start();
+
+
+
+
             //Packets are used in this mod solely to detect when the player picks up an item. No packets are modified or created.
             event.manager.channel().pipeline().addBefore("packet_handler", "secretroutes_packet_handler", new PacketHandler());
 

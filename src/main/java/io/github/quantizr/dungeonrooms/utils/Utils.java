@@ -21,10 +21,7 @@ package io.github.quantizr.dungeonrooms.utils;
 import io.github.quantizr.dungeonrooms.DungeonRooms;
 import io.github.quantizr.dungeonrooms.handlers.ScoreboardHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.GameSettings;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.scoreboard.ScoreObjective;
-import net.minecraft.util.ChatComponentText;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -32,14 +29,12 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.BaseConfiguration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Stream;
 import java.util.zip.InflaterInputStream;
@@ -99,7 +94,7 @@ public class Utils {
 
     public static void checkForConflictingHotkeys() {
         Minecraft mc = Minecraft.getMinecraft();
-        for (KeyBinding drmKeybind : DungeonRooms.keyBindings) {
+        /*for (KeyBinding drmKeybind : DungeonRooms.keyBindings) {
             for (KeyBinding keybinding : mc.gameSettings.keyBindings) {
                 if (drmKeybind.getKeyCode() != 0 && drmKeybind != keybinding && drmKeybind.getKeyCode() == keybinding.getKeyCode()) {
                     mc.thePlayer.addChatMessage(new ChatComponentText("§d§l--- Dungeon Rooms Mod ---\n"
@@ -111,7 +106,7 @@ public class Utils {
                     ));
                 }
             }
-        }
+        }*/
 
     }
 
