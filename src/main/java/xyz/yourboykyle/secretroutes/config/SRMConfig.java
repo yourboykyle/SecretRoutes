@@ -18,6 +18,8 @@ import xyz.yourboykyle.secretroutes.utils.FileUtils;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
 
+import java.io.File;
+
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
 
@@ -75,7 +77,10 @@ public class SRMConfig extends Config {
     Runnable runnable9 = () -> {
         new Thread(() -> {
             try {
-                FileUtils.copyFileToDirectory(FileUtils.promptUserForFile(), Main.ROUTES_PATH);
+                File file = FileUtils.promptUserForFile();
+                if(file != null) {
+                    FileUtils.copyFileToDirectory(file, Main.ROUTES_PATH);
+                }
             } catch (Exception e) {
                 LogUtils.error(e);
             }
@@ -275,7 +280,10 @@ public class SRMConfig extends Config {
     Runnable runnable13 = () -> {
         new Thread(() -> {
             try {
-                FileUtils.copyFileToDirectory(FileUtils.promptUserForFile(), Main.COLOR_PROFILE_PATH);
+                File file = FileUtils.promptUserForFile();
+                if(file != null) {
+                    FileUtils.copyFileToDirectory(file, Main.COLOR_PROFILE_PATH);
+                }
             } catch (Exception e) {
                 LogUtils.error(e);
             }
@@ -649,11 +657,17 @@ public class SRMConfig extends Config {
             name= "Force outdated",
             description = "Forces the version to be outdated, useful for testing the auto updater",
             subcategory = "General",
-            category = "Dev",
-            size = OptionSize.DUAL
+            category = "Dev"
     )
     public static boolean forceUpdateDEBUG = false;
 
+    @Info(
+            text = "Do not turn this on unless you know exactly what you are doing",
+            type = InfoType.ERROR,
+            category = "Dev",
+            subcategory = "general"
+    )
+    public static boolean c;
 
 
 
@@ -699,6 +713,7 @@ public class SRMConfig extends Config {
 
             optionNames.get("forceUpdateDEBUG").addHideCondition(() -> isDevPasswordNotCorrect());
             optionNames.get("verboseLogging").addHideCondition(() -> isDevPasswordNotCorrect());
+            optionNames.get("c").addHideCondition(() -> isDevPasswordNotCorrect());
             optionNames.get("verboseRecording").addHideCondition(() -> !lambda("verboseLogging"));
             optionNames.get("verboseUpdating").addHideCondition(() -> !lambda("verboseLogging"));
         } catch (Exception e) {
