@@ -3,8 +3,7 @@ package xyz.yourboykyle.secretroutes.utils;
 import xyz.yourboykyle.secretroutes.Main;
 
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -68,6 +67,20 @@ public class FileUtils {
             Files.copy(sourceFile.toPath(), targetFilePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             LogUtils.error(e);
+        }
+    }
+
+    public static void copyResourceToFile(String resourcePath, File destination) throws IOException {
+        try (InputStream inputStream = FileUtils.class.getResourceAsStream(resourcePath);
+             OutputStream outputStream = new FileOutputStream(destination)) {
+            if (inputStream == null) {
+                throw new FileNotFoundException("Resource not found: " + resourcePath);
+            }
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
         }
     }
 }

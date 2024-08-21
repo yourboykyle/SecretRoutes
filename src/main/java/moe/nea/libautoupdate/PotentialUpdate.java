@@ -2,18 +2,22 @@ package moe.nea.libautoupdate;
 
 import lombok.Value;
 import lombok.val;
+import org.apache.commons.io.IOUtils;
+import xyz.yourboykyle.secretroutes.utils.ChatUtils;
+import xyz.yourboykyle.secretroutes.utils.FileUtils;
+import xyz.yourboykyle.secretroutes.utils.SSLUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 @Value
 public class PotentialUpdate {
+   private final static String verboseTag = "Update";
+
     /**
      * The update data of this update.
      */
@@ -42,6 +46,8 @@ public class PotentialUpdate {
         return context.getCurrentVersion().isOlderThan(update.getVersionNumber());
     }
 
+
+
     private File getFile(String name) {
         getUpdateDirectory().mkdirs();
         return new File(getUpdateDirectory(), name);
@@ -67,17 +73,34 @@ public class PotentialUpdate {
      * Extracts the updater jar (for the post exit stage) into the storage directory.
      */
     public void extractUpdater() throws IOException {
+        /*
         val file = getFile("updater.jar");
         try (val from = getClass().getResourceAsStream("/updater.jar");
              val to = new FileOutputStream(file)) {
             UpdateUtils.connect(from, to);
         }
+
+         */
+        SSLUtils.disableSSLCertificateChecking();
+        ChatUtils.sendVerboseMessage("§eDownloading updater.jar from " + update.getDownloadAsURL(), verboseTag);
+        ChatUtils.sendVerboseMessage("§eTo: " + getFile("updater.jar"), verboseTag);
+        InputStream inputStream = new URL("https://raw.githubusercontent.com/yourboykyle/SecretRoutes/main/updater.jar").openStream();
+        OutputStream outputStream = new FileOutputStream(getFile("updater.jar"));
+        ChatUtils.sendVerboseMessage("§eStreams opened", verboseTag);
+        IOUtils.copy(inputStream, outputStream);
+        ChatUtils.sendVerboseMessage("§eStreams copied", verboseTag);
+        outputStream.close();
+        inputStream.close();
+        ChatUtils.sendVerboseMessage("§eStreams closed", verboseTag);
+        SSLUtils.enableSSLCertificateChecking();
+
     }
 
     /**
      * Download the updated jar into the storage directory.
      */
     public void downloadUpdate() throws IOException {
+        /*
         try (val from = UpdateUtils.openUrlConnection(update.getDownloadAsURL());
              val to = new FileOutputStream(getUpdateJarStorage())) {
             UpdateUtils.connect(from, to);
@@ -91,12 +114,28 @@ public class PotentialUpdate {
                                 update.getSha256());
             }
         }
+         */
+        SSLUtils.disableSSLCertificateChecking();
+        ChatUtils.sendVerboseMessage("§eDownloading update from " + update.getDownloadAsURL(), verboseTag);
+        ChatUtils.sendVerboseMessage("§eTo: " + getUpdateJarStorage());
+        InputStream inputStream = update.getDownloadAsURL().openStream();
+        OutputStream outputStream = new FileOutputStream(getUpdateJarStorage());
+        ChatUtils.sendVerboseMessage("§eStreams opened", verboseTag);
+        IOUtils.copy(inputStream, outputStream);
+        ChatUtils.sendVerboseMessage("§eStreams copied", verboseTag);
+        outputStream.close();
+        inputStream.close();
+        ChatUtils.sendVerboseMessage("§eStreams closed", verboseTag);
+        SSLUtils.enableSSLCertificateChecking();
+
+
     }
 
     /**
      * Prepare the layout of the storage directory.
      */
     public void prepareUpdate() throws IOException {
+        ChatUtils.sendVerboseMessage("§ePreparing update", verboseTag);
         extractUpdater();
         downloadUpdate();
     }

@@ -112,7 +112,6 @@ public class Main {
 
         // Auto Updates
         LogUtils.info("Checking for updates...");
-        Main.updateManager.checkUpdate();
 
         // Initialize Other Stuff
         instance = this;
@@ -344,6 +343,18 @@ public class Main {
         Minecraft mc = Minecraft.getMinecraft();
         if (mc.getCurrentServerData() == null) return;
         if (mc.getCurrentServerData().serverIP.toLowerCase().contains("hypixel.")) {
+
+            new Thread (() ->{
+                try{
+                    Main.updateManager.checkUpdate();
+                }catch (Exception e){
+                    LogUtils.error(e);
+                }
+            }).start();
+
+
+
+
             //Packets are used in this mod solely to detect when the player picks up an item. No packets are modified or created.
             event.manager.channel().pipeline().addBefore("packet_handler", "secretroutes_packet_handler", new PacketHandler());
 

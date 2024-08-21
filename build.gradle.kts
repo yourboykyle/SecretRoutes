@@ -18,6 +18,7 @@ plugins {
     java
 }
 
+
 // Gets the mod name, version and id from the `gradle.properties` file.
 val mod_name: String by project
 val mod_version: String by project
