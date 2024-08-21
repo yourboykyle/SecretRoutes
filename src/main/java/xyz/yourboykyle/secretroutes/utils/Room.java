@@ -21,7 +21,6 @@ package xyz.yourboykyle.secretroutes.utils;
 import com.google.gson.*;
 import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
 import io.github.quantizr.dungeonrooms.utils.MapUtils;
-import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumParticleTypes;
 import xyz.yourboykyle.secretroutes.Main;
@@ -100,10 +99,12 @@ public class Room {
         }
     }
 
-    public void lastSecret() {
-        currentSecretIndex--;
+    public void lastSecretKeybind() {
+        if(currentSecretIndex > 0) {
+            currentSecretIndex--;
+        }
 
-        if(currentSecretIndex >= 0 && !(currentSecretIndex >= currentSecretRoute.size())) {
+        if(!(currentSecretIndex >= currentSecretRoute.size())) {
             currentSecretWaypoints = currentSecretRoute.get(currentSecretIndex).getAsJsonObject();
         } else {
             currentSecretWaypoints = null;
@@ -117,6 +118,20 @@ public class Room {
             currentSecretWaypoints = currentSecretRoute.get(currentSecretIndex).getAsJsonObject();
         } else {
             currentSecretWaypoints = null;
+        }
+    }
+
+    public void nextSecretKeybind() {
+        if(currentSecretRoute != null) {
+            if(currentSecretIndex < currentSecretRoute.size() - 1) {
+                currentSecretIndex++;
+            }
+
+            if (!(currentSecretIndex >= currentSecretRoute.size())) {
+                currentSecretWaypoints = currentSecretRoute.get(currentSecretIndex).getAsJsonObject();
+            } else {
+                currentSecretWaypoints = null;
+            }
         }
     }
 

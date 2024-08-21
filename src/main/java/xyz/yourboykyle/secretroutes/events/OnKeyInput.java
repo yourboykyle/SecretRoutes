@@ -10,9 +10,9 @@ public class OnKeyInput {
     public void onKeyInput(InputEvent.KeyInputEvent e) {
         try {
             if (Main.lastSecret.isPressed()) {
-                Main.currentRoom.lastSecret();
+                Main.currentRoom.lastSecretKeybind();
             } else if (Main.nextSecret.isPressed()) {
-                Main.currentRoom.nextSecret();
+                Main.currentRoom.nextSecretKeybind();
             }
         } catch (Exception error) {
             LogUtils.error(error);

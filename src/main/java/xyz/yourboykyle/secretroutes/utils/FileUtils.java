@@ -69,18 +69,4 @@ public class FileUtils {
             LogUtils.error(e);
         }
     }
-
-    public static void copyResourceToFile(String resourcePath, File destination) throws IOException {
-        try (InputStream inputStream = FileUtils.class.getResourceAsStream(resourcePath);
-             OutputStream outputStream = new FileOutputStream(destination)) {
-            if (inputStream == null) {
-                throw new FileNotFoundException("Resource not found: " + resourcePath);
-            }
-            byte[] buffer = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, bytesRead);
-            }
-        }
-    }
 }

@@ -29,7 +29,6 @@ import io.github.quantizr.dungeonrooms.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -62,7 +61,7 @@ public class DungeonRooms {
     public static HashMap<String,HashMap<String,long[]>> ROOM_DATA = new HashMap<>();
 
     public static boolean usingSBPSecrets = false;
-    public static KeyBinding[] keyBindings = new KeyBinding[3];
+    //public static KeyBinding[] keyBindings = new KeyBinding[3];
     public static String imageHotkeyOpen = "gui";
     static int tickAmount = 1;
 

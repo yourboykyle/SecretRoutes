@@ -71,7 +71,7 @@ public class UpdateManager {
                     LogUtils.info("Latest version: " + update.getUpdate().getVersionNumber());
 
 
-                    if (checkVersion(update)) {
+                    if (checkVersion(update) || SRMConfig.forceUpdateDEBUG) {
                         updateState = UpdateState.AVAILABLE;
                         LogUtils.info("Update available");
 
@@ -148,6 +148,7 @@ public class UpdateManager {
                 @Override
                 public boolean isOlderThan(JsonElement element) {
                     if (SRMConfig.forceUpdateDEBUG) {
+                        LogUtils.info("isOlderThan: force update!");
                         return true;
                     }
                     return normalDelegate.isOlderThan(element);

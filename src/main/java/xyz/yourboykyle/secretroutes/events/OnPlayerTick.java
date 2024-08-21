@@ -53,15 +53,24 @@ public class OnPlayerTick {
                 LogUtils.info("Went by bat at " + batPos);
             }
         }
-        if(Main.currentRoom.getSecretType() == Room.SECRET_TYPES.ITEM){
+
+        if(Main.currentRoom.getSecretType() == Room.SECRET_TYPES.ITEM) {
             BlockPos pos = e.player.getPosition();
             BlockPos itemPos = Main.currentRoom.getSecretLocation();
 
-            if(pos.getX() == itemPos.getX() && pos.getZ() == itemPos.getZ() && pos.getY() <= itemPos.getY()+1 && pos.getY() >= itemPos.getY()-1){
-
+            if (pos.getX() >= itemPos.getX() - 2 && pos.getX() <= itemPos.getX() + 2 && pos.getY() >= itemPos.getY() - 2 && pos.getY() <= itemPos.getY() + 2 && pos.getZ() >= itemPos.getZ() - 2 && pos.getZ() <= itemPos.getZ() + 2) {
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(1500);
+                        if (Main.currentRoom.getSecretType() == Room.SECRET_TYPES.ITEM) {
+                            Main.currentRoom.nextSecret();
+                            LogUtils.info("Picked up item at " + itemPos);
+                        }
+                    } catch (InterruptedException e1) {
+                        LogUtils.error(e1);
+                    }
+                }).start();
             }
-
-
         }
 
 
