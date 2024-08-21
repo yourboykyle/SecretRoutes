@@ -84,8 +84,9 @@ public class Waypoints {
     @SubscribeEvent
     public void onWorldRender(RenderWorldLastEvent event) {
         try {
-            if (!enabled || DungeonRooms.keyBindings == null || DungeonRooms.keyBindings[2] == null) return;
-            if (practiceModeOn && !DungeonRooms.keyBindings[2].isKeyDown()) return;
+            Boolean check = true;
+            if (!enabled) check = false;
+            if (check && practiceModeOn/* && !DungeonRooms.keyBindings[2].isKeyDown()*/) return;
             String roomName = RoomDetection.roomName;
             if (roomName.equals("undefined") || DungeonRooms.roomsJson.get(roomName) == null || secretsList == null)
                 return;
@@ -201,6 +202,7 @@ public class Waypoints {
 
 
                 }
+            }else{
             }
         } catch (Exception e) {
             LogUtils.error(e);

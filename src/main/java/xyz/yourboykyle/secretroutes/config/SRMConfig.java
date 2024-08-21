@@ -9,19 +9,19 @@ import cc.polyfrost.oneconfig.config.data.ModType;
 import cc.polyfrost.oneconfig.config.data.OptionSize;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.huds.CurrentRoomHUD;
 import xyz.yourboykyle.secretroutes.config.huds.RecordingHUD;
+import xyz.yourboykyle.secretroutes.utils.ChatUtils;
 import xyz.yourboykyle.secretroutes.utils.FileUtils;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
 
 import java.io.File;
-import java.util.function.Supplier;
 
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
+import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
 
 public class SRMConfig extends Config {
     @Switch(
@@ -33,7 +33,7 @@ public class SRMConfig extends Config {
 
     @Dropdown(
             name = "Line Type",
-            options = {"Fire Particles", "Lines"},
+            options = {"Fire Particles", "Lines", "None"},
             subcategory = "General"
     )
     public static int particleType = 0;
@@ -77,14 +77,46 @@ public class SRMConfig extends Config {
     Runnable runnable9 = () -> {
         new Thread(() -> {
             try {
-                FileUtils.copyFileToDirectory(FileUtils.promptUserForFile(), Main.ROUTES_PATH);
+                File file = FileUtils.promptUserForFile();
+                if(file != null) {
+                    FileUtils.copyFileToDirectory(file, Main.ROUTES_PATH);
+                }
             } catch (Exception e) {
                 LogUtils.error(e);
             }
         }).start();
     };
 
+    @Switch(
+            name = "Auto updates",
+            description = "Automatically checks for updates on startup",
+            subcategory = "Updates"
+    )
+    public static boolean autoUpdate = true;
+/*
+    @Info(
+            text = "This goes to github to check for updates. It will prompt for an update, unless \"Don't confirm before updating\" is enabled",
+            subcategory = "Updates",
+            type = InfoType.INFO,
+            size = OptionSize.DUAL
+    )
+    public static boolean a;
 
+ */
+
+    @Button(
+            name = "Check for updates",
+            text = "Check for updates",
+            description = "Manually check for an update if you wish to make sure",
+            subcategory = "Updates",
+            size = 2
+    )
+    Runnable runnable14 = () -> {
+        new Thread(() -> {
+            ChatUtils.sendChatMessage("Checking for updates, please wait a few seconds...");
+            Main.updateManager.checkUpdate(true);
+        }).start();
+    };
 
     // Recording
 
@@ -185,13 +217,15 @@ public class SRMConfig extends Config {
             placeholder = "default.json"
     )
     public static String colorProfileName = "default.json";
+
     @Info(
             text = "Will auto append the .json extension if not provided",
             subcategory = "Profiles",
             category = "Rendering",
             type = InfoType.INFO
     )
-    public static boolean a;
+    public static boolean b;
+
     @Button(
             name = "Save Color Profile",
             text = "Save",
@@ -204,6 +238,7 @@ public class SRMConfig extends Config {
             Main.writeColorConfig(colorProfileName);
         }).start();
     };
+
     @Button(
             name = "Load Color Profile",
             text = "Load",
@@ -218,6 +253,7 @@ public class SRMConfig extends Config {
             }
         }).start();
     };
+
     @Button(
             name = "List all Color Profiles",
             text = "List",
@@ -233,6 +269,7 @@ public class SRMConfig extends Config {
             }
         }).start();
     };
+
     @Button(
             name = "Import Color Profile",
             text = "Import",
@@ -243,7 +280,10 @@ public class SRMConfig extends Config {
     Runnable runnable13 = () -> {
         new Thread(() -> {
             try {
-                FileUtils.copyFileToDirectory(FileUtils.promptUserForFile(), Main.COLOR_PROFILE_PATH);
+                File file = FileUtils.promptUserForFile();
+                if(file != null) {
+                    FileUtils.copyFileToDirectory(file, Main.COLOR_PROFILE_PATH);
+                }
             } catch (Exception e) {
                 LogUtils.error(e);
             }
@@ -590,13 +630,44 @@ public class SRMConfig extends Config {
 
     @Switch(
             name= "Verbose logging",
-            description = "Adds more detailed logging, usefull for debugging",
+            description = "Adds more detailed logging, useful for debugging",
             subcategory = "Chat logging",
             category = "Dev",
             size = OptionSize.DUAL
     )
     public static boolean verboseLogging = false;
 
+    @Switch(
+            name= "Better recording",
+            description = "Adds more detailed logging for recording, useful for debugging",
+            subcategory = "Chat logging",
+            category = "Dev"
+    )
+    public static boolean verboseRecording = true;
+    //More verbose logging options will come in future releases
+    @Switch(
+            name= "Better updating",
+            description = "adds more detailed logging for updating, useful for debugging",
+            subcategory = "Chat logging",
+            category = "Dev"
+    )
+    public static boolean verboseUpdating = true;
+
+    @Switch(
+            name= "Force outdated",
+            description = "Forces the version to be outdated, useful for testing the auto updater",
+            subcategory = "General",
+            category = "Dev"
+    )
+    public static boolean forceUpdateDEBUG = false;
+
+    @Info(
+            text = "Do not turn this on unless you know exactly what you are doing",
+            type = InfoType.ERROR,
+            category = "Dev",
+            subcategory = "general"
+    )
+    public static boolean c;
 
 
 
@@ -605,6 +676,7 @@ public class SRMConfig extends Config {
         try {
             return (boolean) optionNames.get(dependentOption).get();
         } catch (IllegalAccessException ignored) {
+            sendVerboseMessage("Error in lambda function");
             return true;
         }
     }
@@ -619,6 +691,7 @@ public class SRMConfig extends Config {
             optionNames.get("routesFileName").addHideCondition(() -> !lambda("modEnabled"));
             optionNames.get("runnable").addHideCondition(() -> !lambda("modEnabled"));
             optionNames.get("runnable9").addHideCondition(() -> !lambda("modEnabled"));
+            optionNames.get("runnable14").addHideCondition(() -> !lambda("modEnabled"));
 
             optionNames.get("startWaypointColorIndex").addHideCondition(() -> !lambda("startTextToggle"));
             optionNames.get("startTextSize").addHideCondition(() -> !lambda("startTextToggle"));
@@ -638,15 +711,21 @@ public class SRMConfig extends Config {
             optionNames.get("superboomsWaypointColorIndex").addHideCondition(() -> !lambda("superboomsTextToggle"));
             optionNames.get("superboomsTextSize").addHideCondition(() -> !lambda("superboomsTextToggle"));
 
-            optionNames.get("Verbose logging").addHideCondition(() -> !isDevPasswordCorrect());
-
-
-
+            optionNames.get("forceUpdateDEBUG").addHideCondition(() -> isDevPasswordNotCorrect());
+            optionNames.get("verboseLogging").addHideCondition(() -> isDevPasswordNotCorrect());
+            optionNames.get("c").addHideCondition(() -> isDevPasswordNotCorrect());
+            optionNames.get("verboseRecording").addHideCondition(() -> !lambda("verboseLogging"));
+            optionNames.get("verboseUpdating").addHideCondition(() -> !lambda("verboseLogging"));
         } catch (Exception e) {
             LogUtils.error(e);
         }
     }
-    public boolean isDevPasswordCorrect(){
-        return devPassword.equals("KyleIsMyDaddy");
+    public boolean isDevPasswordNotCorrect(){
+        if(devPassword.equals("KyleIsMyDaddy")) {
+            return false;
+        }
+        verboseLogging = false;
+        forceUpdateDEBUG = false;
+        return true;
     }
 }

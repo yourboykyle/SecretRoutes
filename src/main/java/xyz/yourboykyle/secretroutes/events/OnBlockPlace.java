@@ -11,22 +11,21 @@ import xyz.yourboykyle.secretroutes.utils.ChatUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
 
 public class OnBlockPlace {
+    private static final String verboseTag = "Recording";
     @SubscribeEvent
     public void onBlockPlace(BlockEvent.PlaceEvent e) {
-        ChatUtils.sendVerboseMessage("§d Block placed: " + e.placedBlock.getBlock().getLocalizedName());
+        ChatUtils.sendVerboseMessage("§d Block placed: " + e.placedBlock.getBlock().getLocalizedName(), verboseTag);
         // Route Recording
         if(e.placedBlock.getBlock() == Blocks.tnt) {
-            ChatUtils.sendVerboseMessage("§d TNT placed at: " + e.pos);
+            ChatUtils.sendVerboseMessage("§d TNT placed at: " + e.pos, verboseTag);
             Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.TNTS, e.pos);
             Main.routeRecording.setRecordingMessage("Added TNT waypoint.");
             return;
         }
-        ChatUtils.sendVerboseMessage("§d Held Item: " + Minecraft.getMinecraft().thePlayer.getHeldItem().getItem());
         ItemStack heldItem = Minecraft.getMinecraft().thePlayer.getHeldItem();
         if(heldItem != null) {
-            ChatUtils.sendVerboseMessage("§d Held Item: " + heldItem.getItem());
             if(heldItem.getItem() == Item.getItemFromBlock(Blocks.tnt)) {
-                ChatUtils.sendVerboseMessage("§d TNT held");
+                ChatUtils.sendVerboseMessage("§d TNT held", verboseTag);
                 Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.TNTS, e.pos);
                 Main.routeRecording.setRecordingMessage("Added TNT waypoint.");
             }

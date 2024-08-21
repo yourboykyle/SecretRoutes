@@ -3,8 +3,7 @@ package xyz.yourboykyle.secretroutes.utils;
 import xyz.yourboykyle.secretroutes.Main;
 
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
