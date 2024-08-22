@@ -654,6 +654,14 @@ public class SRMConfig extends Config {
     public static boolean verboseUpdating = true;
 
     @Switch(
+            name= "Better info",
+            description = "adds more detailed logging for info, useful for debugging",
+            subcategory = "Chat logging",
+            category = "Dev"
+    )
+    public static boolean verboseInfo = false;
+
+    @Switch(
             name= "Force outdated",
             description = "Forces the version to be outdated, useful for testing the auto updater",
             subcategory = "General",
@@ -665,7 +673,7 @@ public class SRMConfig extends Config {
             text = "Do not turn this on unless you know exactly what you are doing",
             type = InfoType.ERROR,
             category = "Dev",
-            subcategory = "general"
+            subcategory = "General"
     )
     public static boolean c;
 
@@ -716,6 +724,7 @@ public class SRMConfig extends Config {
             optionNames.get("c").addHideCondition(() -> isDevPasswordNotCorrect());
             optionNames.get("verboseRecording").addHideCondition(() -> !lambda("verboseLogging"));
             optionNames.get("verboseUpdating").addHideCondition(() -> !lambda("verboseLogging"));
+            optionNames.get("verboseInfo").addHideCondition(() -> !lambda("verboseLogging"));
         } catch (Exception e) {
             LogUtils.error(e);
         }
