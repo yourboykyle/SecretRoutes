@@ -18,6 +18,8 @@
 
 package xyz.yourboykyle.secretroutes.events;
 
+import cc.polyfrost.oneconfig.config.core.OneColor;
+import cc.polyfrost.oneconfig.libs.checker.units.qual.A;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -26,13 +28,14 @@ import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
 import io.github.quantizr.dungeonrooms.utils.MapUtils;
 import io.github.quantizr.dungeonrooms.utils.Utils;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.*;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
-import xyz.yourboykyle.secretroutes.utils.SecretRoutesRenderUtils;
+import xyz.yourboykyle.secretroutes.utils.*;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class OnWorldRender {
@@ -48,6 +51,8 @@ public class OnWorldRender {
         ArrayList<BlockPos> minesPositions = new ArrayList<>();
         ArrayList<BlockPos> interactsPositions = new ArrayList<>();
         ArrayList<BlockPos> superboomsPositions = new ArrayList<>();
+        ArrayList<BlockPos> enderpearlsPositions = new ArrayList<>();
+        ArrayList<Tuple<Float, Float>> enderpearlAngles = new ArrayList<>();
 
 
         GlStateManager.disableDepth();
@@ -109,6 +114,45 @@ public class OnWorldRender {
             }
         }
 
+        // Render the ender pearls
+        if(Main.currentRoom.currentSecretWaypoints != null && Main.currentRoom.currentSecretWaypoints.get("enderpearls") != null) {
+            JsonArray enderpearlAnglesArray = Main.currentRoom.currentSecretWaypoints.get("enderpearlangles").getAsJsonArray();
+            for (JsonElement pearlAngleElement : enderpearlAnglesArray) {
+                JsonArray pearlAngle = pearlAngleElement.getAsJsonArray();
+
+                Main.checkRoomData();
+                enderpearlAngles.add(new Tuple<>(pearlAngle.get(0).getAsFloat(), pearlAngle.get(0).getAsFloat()));
+            }
+
+            JsonArray pearlLocations = Main.currentRoom.currentSecretWaypoints.get("enderpearls").getAsJsonArray();
+            int index = 0;
+            for (JsonElement pearlLocationElement : pearlLocations) {
+
+                JsonArray pearlLocation = pearlLocationElement.getAsJsonArray();
+
+                Main.checkRoomData();
+                BlockPos pos = MapUtils.relativeToActual(new BlockPos(pearlLocation.get(0).getAsInt(), pearlLocation.get(1).getAsInt(), pearlLocation.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
+                enderpearlsPositions.add(pos);
+
+                SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(),  pos.getY(), pos.getZ(), SRMConfig.enderpearls, 1, 1);
+
+                float yawRad = (float) Math.toRadians(RotationUtils.relativeToActualYaw(enderpearlAngles.get(index).getSecond(), RoomDetection.roomDirection));
+                float pitchRad = (float) Math.toRadians(enderpearlAngles.get(index).getFirst());
+
+                float length = 10.0F;
+                float x = (float) (-Math.cos(pitchRad) * Math.sin(yawRad));
+                float y = (float) -Math.sin(pitchRad);
+                float z = (float) (Math.cos(yawRad) * Math.cos(pitchRad));
+
+                Vec3 direction = new Vec3(x, y, z).normalize();
+
+                ChatUtils.sendVerboseMessage("math coords: " + direction.xCoord * length + " " + direction.yCoord * length + " " + direction.zCoord * length);
+                RenderUtils.drawNormalLine(pos.getX() + 0.5F, pos.getY() + 1.62F, pos.getZ() + 0.5F, (float) (direction.xCoord * length), (float) (direction.yCoord * length), (float) (direction.zCoord * length), SRMConfig.pearlLineColor, event.partialTicks, true, SRMConfig.pearlLineWidth);
+
+                index++;
+            }
+        }
+
         // Render the secret
         if(Main.currentRoom.currentSecretWaypoints != null && Main.currentRoom.currentSecretWaypoints.get("secret") != null) {
             JsonObject secret = Main.currentRoom.currentSecretWaypoints.get("secret").getAsJsonObject();
@@ -153,6 +197,11 @@ public class OnWorldRender {
             if(SRMConfig.superboomsTextToggle) {
                 for(BlockPos superboomPos : superboomsPositions) {
                     SecretRoutesRenderUtils.drawText(superboomPos.getX(), superboomPos.getY(), superboomPos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.superboomsWaypointColorIndex) + "superboom", SRMConfig.superboomsTextSize);
+                }
+            }
+            if(SRMConfig.enderpearlTextToggle) {
+                for(BlockPos enderpearlPos : enderpearlsPositions) {
+                    SecretRoutesRenderUtils.drawText(enderpearlPos.getX(), enderpearlPos.getY(), enderpearlPos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.enderpearlWaypointColorIndex) + "ender pearl", SRMConfig.enderpearlTextSize);
                 }
             }
             GlStateManager.enableTexture2D();

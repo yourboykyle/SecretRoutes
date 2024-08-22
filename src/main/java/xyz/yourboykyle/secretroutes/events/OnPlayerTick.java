@@ -86,7 +86,7 @@ public class OnPlayerTick {
                 double distance = Math.abs(Math.sqrt(Math.pow(pos.getX() - prevPos.getX(), 2) + Math.pow(pos.getY() - prevPos.getY(), 2) + Math.pow(pos.getZ() - prevPos.getZ(), 2)));
 
                 // If the player has moved 5 blocks or more from the previous waypoint
-                if (distance >= 4.9) {
+                if (distance >= 2.4) {
                     Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.LOCATIONS, e.player.getPosition());
                     Main.routeRecording.previousLocation = e.player.getPosition();
                 }

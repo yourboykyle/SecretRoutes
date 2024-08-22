@@ -8,12 +8,22 @@ import xyz.yourboykyle.secretroutes.config.SRMConfig;
 
 public class ChatUtils {
     public static void sendChatMessage(String message, EnumChatFormatting color) {
+        if(Minecraft.getMinecraft().thePlayer == null){
+            return;
+        }
         Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(message).setChatStyle(new ChatStyle().setColor(color)));
-        LogUtils.info("Sent chat message: " + message);
+        //if(!SRMConfig.verboseInfo){
+            LogUtils.info("Sent chat message: " + message);
+        //}
     }
     public static void sendChatMessage(String message) {
+        if(Minecraft.getMinecraft().thePlayer == null){
+            return;
+        }
         Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(message));
-        LogUtils.info("Sent chat message: " + message);
+        //if(!SRMConfig.verboseInfo){
+            LogUtils.info("Sent chat message: " + message);
+        //}
     }
 
     public static void sendVerboseMessage(String message){
@@ -22,6 +32,9 @@ public class ChatUtils {
         }
     }
     public static boolean sendVerboseMessage(String message, String TAG){
+        if(Minecraft.getMinecraft().thePlayer == null){
+            return false;
+        }
         switch(TAG){
             case "Recording":
                 if(SRMConfig.verboseRecording){
@@ -36,7 +49,7 @@ public class ChatUtils {
                 }
                 return false;
             case "Info":
-                if(SRMConfig.verboseInfo){
+                if(SRMConfig.verboseInfo && !message.contains("Sent chat message")){
                     sendVerboseMessage("§d[Info] " + message);
                     return true;
                 }
