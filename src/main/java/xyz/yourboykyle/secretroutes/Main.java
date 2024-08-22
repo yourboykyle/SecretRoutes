@@ -41,6 +41,7 @@ import org.lwjgl.input.Keyboard;
 import xyz.yourboykyle.secretroutes.commands.*;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.events.*;
+import xyz.yourboykyle.secretroutes.events.OnMouseInput;
 import xyz.yourboykyle.secretroutes.utils.*;
 import xyz.yourboykyle.secretroutes.utils.AutoUpdate.UpdateManager;
 
@@ -128,6 +129,7 @@ public class Main {
         MinecraftForge.EVENT_BUS.register(new OnPlaySound());
         MinecraftForge.EVENT_BUS.register(new OnRecievePacket());
         MinecraftForge.EVENT_BUS.register(new OnWorldRender());
+        MinecraftForge.EVENT_BUS.register(new OnMouseInput());
 
         MinecraftForge.EVENT_BUS.register(this);
 

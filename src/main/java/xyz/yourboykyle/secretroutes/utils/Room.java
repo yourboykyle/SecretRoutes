@@ -37,7 +37,8 @@ public class Room {
         ETHERWARPS,
         MINES,
         INTERACTS,
-        TNTS
+        TNTS,
+        ENDERPEARLS,
     };
     public enum SECRET_TYPES {
         INTERACT,

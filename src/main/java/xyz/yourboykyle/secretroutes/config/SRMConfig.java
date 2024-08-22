@@ -46,6 +46,15 @@ public class SRMConfig extends Config {
     )
     public static int width = 5;
 
+
+    @Slider(
+            name = "Line width (for ender pearls)",
+            min = 1, max = 10.1F,
+            step = 1,
+            subcategory = "General"
+    )
+    public static int pearlLineWidth = 5;
+
     @Text(
             name = "Routes file name",
             placeholder = "routes.json",
@@ -299,6 +308,13 @@ public class SRMConfig extends Config {
     public static OneColor lineColor = new OneColor(255, 0, 0);
 
     @Color(
+            name = "Pearl line color",
+            subcategory = "Waypoint Colors",
+            category = "Rendering"
+    )
+    public static OneColor pearlLineColor = new OneColor(0, 255, 255);
+
+    @Color(
             name="EtherWarp",
             subcategory = "Waypoint Colors",
             category = "Rendering"
@@ -325,6 +341,13 @@ public class SRMConfig extends Config {
             category = "Rendering"
     )
     public static OneColor superbooms = new OneColor(255, 0, 0);
+
+    @Color(
+            name="enderpearls",
+            subcategory = "Waypoint Colors",
+            category = "Rendering"
+    )
+    public static OneColor enderpearls = new OneColor(0, 255, 255);
 
     @Color(
             name = "Secrets - item",
@@ -583,6 +606,33 @@ public class SRMConfig extends Config {
     )
     public static float superboomsTextSize = 3;
 
+    // Superboom waypoints
+    @Switch(
+            name = "Ender Pearl text toggle",
+            size =  OptionSize.DUAL,
+            subcategory = "Waypoint Text Rendering",
+            category = "Rendering"
+    )
+    public static boolean enderpearlTextToggle = true;
+
+    @Dropdown(
+            name = "Ender Pearl waypoint text color",
+            options = {"Black", "Dark blue", "Dark green", "Dark aqua", "Dark red", "Dark purple", "Gold", "Gray", "Dark gray", "Blue", "Green", "Aqua", "Red", "Light purple", "Yellow", "White"},
+            size = OptionSize.DUAL,
+            subcategory = "Waypoint Text Rendering",
+            category = "Rendering"
+    )
+    public static int enderpearlWaypointColorIndex = 11;
+
+    @Slider(
+            name = "Ender Pearl waypoint text size",
+            min = 1,
+            max = 10,
+            subcategory = "Waypoint Text Rendering",
+            category = "Rendering"
+    )
+    public static float enderpearlTextSize = 3;
+
     // Reset to text defaults
     @Button(
             name = "Reset to text defaults",
@@ -617,10 +667,13 @@ public class SRMConfig extends Config {
         superboomsTextToggle = false;
         superboomsWaypointColorIndex = 12;
         superboomsTextSize = 3;
+        enderpearlTextToggle = true;
+        enderpearlWaypointColorIndex = 11;
+        enderpearlTextSize = 3;
     };
 
     @Text(
-            name = "Dev pasword",
+            name = "Dev password",
             description = "The password to access the dev options",
             subcategory = "General",
             category = "Dev",
@@ -680,6 +733,8 @@ public class SRMConfig extends Config {
 
 
 
+
+
     public Boolean lambda(String dependentOption) {
         try {
             return (boolean) optionNames.get(dependentOption).get();
@@ -718,6 +773,8 @@ public class SRMConfig extends Config {
             optionNames.get("interactsTextSize").addHideCondition(() -> !lambda("interactsTextToggle"));
             optionNames.get("superboomsWaypointColorIndex").addHideCondition(() -> !lambda("superboomsTextToggle"));
             optionNames.get("superboomsTextSize").addHideCondition(() -> !lambda("superboomsTextToggle"));
+            optionNames.get("enderpearlWaypointColorIndex").addHideCondition(() -> !lambda("enderpearlTextToggle"));
+            optionNames.get("enderpearlTextSize").addHideCondition(() -> !lambda("enderpearlTextToggle"));
 
             optionNames.get("forceUpdateDEBUG").addHideCondition(() -> isDevPasswordNotCorrect());
             optionNames.get("verboseLogging").addHideCondition(() -> isDevPasswordNotCorrect());

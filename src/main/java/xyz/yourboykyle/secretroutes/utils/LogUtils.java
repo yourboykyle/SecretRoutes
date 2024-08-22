@@ -13,7 +13,7 @@ import java.io.StringWriter;
 
 public class LogUtils {
     public static void info(String msg) {
-        if(!sendVerboseMessage(msg, "Info")){
+        if(!sendVerboseMessage(msg, "Info")) {
             appendToFile("====================\n[INFO] " + msg);
         }
     }
