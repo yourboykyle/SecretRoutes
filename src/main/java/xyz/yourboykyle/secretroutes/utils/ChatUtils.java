@@ -21,20 +21,29 @@ public class ChatUtils {
             sendChatMessage(message);
         }
     }
-    public static void sendVerboseMessage(String message, String TAG){
+    public static boolean sendVerboseMessage(String message, String TAG){
         switch(TAG){
             case "Recording":
                 if(SRMConfig.verboseRecording){
                     sendVerboseMessage("§d[Recording] " + message);
+                    return true;
                 }
-                break;
+                return false;
             case "Update":
                 if(SRMConfig.verboseUpdating){
                     sendVerboseMessage("§d[Update] " + message);
+                    return true;
                 }
+                return false;
+            case "Info":
+                if(SRMConfig.verboseInfo){
+                    sendVerboseMessage("§d[Info] " + message);
+                    return true;
+                }
+                return false;
             default:
                 sendChatMessage("§d[" + TAG + "] " + message);
-                break;
+                return true;
         }
 
     }
