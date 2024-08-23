@@ -33,17 +33,17 @@ public class SRMConfig extends Config {
 
     @Dropdown(
             name = "Line Type",
-            options = {"Fire Particles", "Lines", "None"},
+            options = {"Particles", "Lines", "None"},
             subcategory = "General"
     )
     public static int lineType = 0;
 
     @Dropdown(
             name = "Particle Type",
-            options = {"Barrier", "Block Crack", "Block Dust", "Cloud", "Crit", "Depth Suspend", "Drip Lava", "Drip Water", "Enchantment Table", "Explode", "Fireworks Spark", "Flame", "Footstep", "Happy Villager", "Heart", "Huge Explosion", "Instant Spell", "Large Explode", "Large Smoke", "Lava", "Magic Crit", "Mob Spell", "Mob Spell Ambient", "Note", "Portal", "Red Dust", "Slime", "Smoke", "Snowball Poof", "Snow Shovel", "Spell", "Splash", "Suspended", "Town Aura", "Villager Angry", "Villager Happy", "Wake", "Witch Magic"},
+            options = {"Explosion Normal", "Explosion Large", "Explosion Huge", "Fireworks Spark", "Bubble", "Water Splash", "Water Wake", "Suspended", "Suspended Depth", "Crit", "Magic Crit", "Smoke Normal", "Smoke Large", "Spell", "Instant Spell", "Mob Spell", "Mob Spell Ambient", "Witch Magic", "Drip Water", "Drip Lava", "Villager Angry", "Villager Happy", "Town Aura", "Note", "Portal", "Enchantment Table", "Flame", "Lava", "Footstep", "Cloud", "Redstone", "Snowball", "Snow Shovel", "Slime", "Heart", "Barrier", "Water Drop", "Item Take", "Mob Appearance"},
             subcategory = "General"
     )
-    public static int particle = 0;
+    public static int particles = 0;
 
     @Slider(
             name = "Line width (not for particles)",
