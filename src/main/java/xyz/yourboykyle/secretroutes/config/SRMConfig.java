@@ -36,7 +36,14 @@ public class SRMConfig extends Config {
             options = {"Fire Particles", "Lines", "None"},
             subcategory = "General"
     )
-    public static int particleType = 0;
+    public static int lineType = 0;
+
+    @Dropdown(
+            name = "Particle Type",
+            options = {"Barrier", "Block Crack", "Block Dust", "Cloud", "Crit", "Depth Suspend", "Drip Lava", "Drip Water", "Enchantment Table", "Explode", "Fireworks Spark", "Flame", "Footstep", "Happy Villager", "Heart", "Huge Explosion", "Instant Spell", "Large Explode", "Large Smoke", "Lava", "Magic Crit", "Mob Spell", "Mob Spell Ambient", "Note", "Portal", "Red Dust", "Slime", "Smoke", "Snowball Poof", "Snow Shovel", "Spell", "Splash", "Suspended", "Town Aura", "Villager Angry", "Villager Happy", "Wake", "Witch Magic"},
+            subcategory = "General"
+    )
+    public static int particle = 0;
 
     @Slider(
             name = "Line width (not for particles)",
@@ -755,6 +762,7 @@ public class SRMConfig extends Config {
             optionNames.get("runnable").addHideCondition(() -> !lambda("modEnabled"));
             optionNames.get("runnable9").addHideCondition(() -> !lambda("modEnabled"));
             optionNames.get("runnable14").addHideCondition(() -> !lambda("modEnabled"));
+            optionNames.get("particleType").addHideCondition(() -> !isEqualTo(lineType,0));
 
             optionNames.get("startWaypointColorIndex").addHideCondition(() -> !lambda("startTextToggle"));
             optionNames.get("startTextSize").addHideCondition(() -> !lambda("startTextToggle"));
@@ -793,5 +801,8 @@ public class SRMConfig extends Config {
         verboseLogging = false;
         forceUpdateDEBUG = false;
         return true;
+    }
+    public boolean isEqualTo(Object a, Object b){
+        return a.equals(b);
     }
 }

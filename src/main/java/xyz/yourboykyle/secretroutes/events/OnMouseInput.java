@@ -2,7 +2,6 @@ package xyz.yourboykyle.secretroutes.events;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
@@ -10,8 +9,6 @@ import org.lwjgl.input.Mouse;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
-
-import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
 
 public class OnMouseInput {
 
@@ -34,7 +31,7 @@ public class OnMouseInput {
                 if(item.getDisplayName().toLowerCase().contains("ender pearl")){
                     LogUtils.info("§bPlayer is holding an ender pearl");
                     if(Main.routeRecording.recording) {
-                        Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.ENDERPEARLS, player.getPosition());
+                        Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.ENDERPEARLS, player);
                     }
                 }
 
