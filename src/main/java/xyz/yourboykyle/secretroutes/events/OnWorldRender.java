@@ -27,11 +27,15 @@ import io.github.quantizr.dungeonrooms.utils.MapUtils;
 import io.github.quantizr.dungeonrooms.utils.Utils;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.Tuple;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
+import xyz.yourboykyle.secretroutes.utils.RenderUtils;
+import xyz.yourboykyle.secretroutes.utils.RotationUtils;
 import xyz.yourboykyle.secretroutes.utils.SecretRoutesRenderUtils;
+import xyz.yourboykyle.secretroutes.utils.multiStorage.Triple;
 
 import java.util.ArrayList;
 
@@ -48,6 +52,7 @@ public class OnWorldRender {
         ArrayList<BlockPos> minesPositions = new ArrayList<>();
         ArrayList<BlockPos> interactsPositions = new ArrayList<>();
         ArrayList<BlockPos> superboomsPositions = new ArrayList<>();
+        ArrayList<Tuple<Float, Float>> enderpearlAngles = new ArrayList<>();
 
 
         GlStateManager.disableDepth();
@@ -106,6 +111,60 @@ public class OnWorldRender {
                 superboomsPositions.add(pos);
 
                 SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(),  pos.getY(), pos.getZ(), SRMConfig.superbooms, 1, 1);
+            }
+        }
+
+        // Render the ender pearls
+        if(Main.currentRoom.currentSecretWaypoints != null && Main.currentRoom.currentSecretWaypoints.get("enderpearls") != null) {
+            JsonArray enderpearlAnglesArray = Main.currentRoom.currentSecretWaypoints.get("enderpearlangles").getAsJsonArray();
+            for (JsonElement pearlAngleElement : enderpearlAnglesArray) {
+                JsonArray pearlAngle = pearlAngleElement.getAsJsonArray();
+
+                Main.checkRoomData();
+                enderpearlAngles.add(new Tuple<>(pearlAngle.get(0).getAsFloat(), pearlAngle.get(1).getAsFloat()));
+            }
+
+            JsonArray pearlLocations = Main.currentRoom.currentSecretWaypoints.get("enderpearls").getAsJsonArray();
+            int index = 0;
+            for (JsonElement pearlLocationElement : pearlLocations) {
+
+                JsonArray pearlLocation = pearlLocationElement.getAsJsonArray();
+
+                Main.checkRoomData();
+                double posX = pearlLocation.get(0).getAsDouble();
+                double posY = pearlLocation.get(1).getAsDouble();
+                double posZ = pearlLocation.get(2).getAsDouble();
+
+                Triple<Double, Double, Double> positions = MapUtils.relativeToActual(posX, posY, posZ, RoomDetection.roomDirection, RoomDetection.roomCorner);
+                posX = positions.getOne() - 0.25;
+                posY = positions.getTwo();
+                posZ = positions.getThree() - 0.25;
+
+                SecretRoutesRenderUtils.drawBoxAtBlock(posX, posY, posZ, SRMConfig.enderpearls, 0.5, 0);
+
+                double yawRadians = (float) Math.toRadians(RotationUtils.relativeToActualYaw(enderpearlAngles.get(index).getSecond(), RoomDetection.roomDirection));
+                double pitchRadians = (float) Math.toRadians(enderpearlAngles.get(index).getFirst());
+
+                double length = 10.0D;
+                double x = -Math.sin(yawRadians) * Math.cos(pitchRadians);
+                double y = -Math.sin(pitchRadians);
+                double z = Math.cos(yawRadians) * Math.cos(pitchRadians);
+
+                double sideLength = Math.sqrt(x * x + y * y + z * z);
+                x /= sideLength;
+                y /= sideLength;
+                z /= sideLength;
+
+                double newX = posX + x * length;
+                double newY = posY + y * length;
+                double newZ = posZ + z * length;
+
+                RenderUtils.drawNormalLine((float) posX + 0.25F, (float) posY + 1.62F, (float) posZ + 0.25F, (float) newX, (float) newY, (float) newZ, SRMConfig.pearlLineColor, event.partialTicks, true, SRMConfig.pearlLineWidth);
+                if(SRMConfig.enderpearlTextToggle) {
+                    SecretRoutesRenderUtils.drawText(posX, posY, posZ, SecretRoutesRenderUtils.getTextColor(SRMConfig.enderpearlWaypointColorIndex) + "ender pearl", SRMConfig.enderpearlTextSize);
+                }
+
+                index++;
             }
         }
 

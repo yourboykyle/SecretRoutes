@@ -16,7 +16,7 @@ public class OnBlockPlace {
     public void onBlockPlace(BlockEvent.PlaceEvent e) {
         ChatUtils.sendVerboseMessage("§d Block placed: " + e.placedBlock.getBlock().getLocalizedName(), verboseTag);
         // Route Recording
-        if(e.placedBlock.getBlock() == Blocks.tnt) {
+        if(e.placedBlock.getBlock() == Blocks.tnt && Main.routeRecording.recording) {
             ChatUtils.sendVerboseMessage("§d TNT placed at: " + e.pos, verboseTag);
             Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.TNTS, e.pos);
             Main.routeRecording.setRecordingMessage("Added TNT waypoint.");
@@ -24,7 +24,7 @@ public class OnBlockPlace {
         }
         ItemStack heldItem = Minecraft.getMinecraft().thePlayer.getHeldItem();
         if(heldItem != null) {
-            if(heldItem.getItem() == Item.getItemFromBlock(Blocks.tnt)) {
+            if(heldItem.getItem() == Item.getItemFromBlock(Blocks.tnt) && Main.routeRecording.recording) {
                 ChatUtils.sendVerboseMessage("§d TNT held", verboseTag);
                 Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.TNTS, e.pos);
                 Main.routeRecording.setRecordingMessage("Added TNT waypoint.");

@@ -198,4 +198,49 @@ public class RenderUtils {
             }
         }
     }
+
+    //
+    public static void drawNormalLine(float x1, float y1, float z1, float x2, float y2, float z2, OneColor colour, float partialTicks, boolean depth, int width) {
+        Entity render = Minecraft.getMinecraft().getRenderViewEntity();
+        WorldRenderer worldRenderer = Tessellator.getInstance().getWorldRenderer();
+
+        double realX = render.lastTickPosX + (render.posX - render.lastTickPosX) * partialTicks;
+        double realY = render.lastTickPosY + (render.posY - render.lastTickPosY) * partialTicks;
+        double realZ = render.lastTickPosZ + (render.posZ - render.lastTickPosZ) * partialTicks;
+
+        GlStateManager.pushAttrib();
+
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(-realX, -realY, -realZ);
+        GlStateManager.disableTexture2D();
+        if (!depth) {
+            GlStateManager.disableDepth();
+            GlStateManager.depthMask(false);
+        }
+        GlStateManager.disableLighting();
+        GlStateManager.enableBlend();
+        GlStateManager.disableAlpha();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        GL11.glLineWidth(width);
+        GlStateManager.color(colour.getRed() / 255f, colour.getGreen() / 255f, colour.getBlue()/ 255f, colour.getAlpha() / 255f);
+        worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
+
+        worldRenderer.pos(x1, y1, z1).endVertex();
+        worldRenderer.pos(x2, y2, z2).endVertex();
+        Tessellator.getInstance().draw();
+
+        GlStateManager.translate(realX, realY, realZ);
+        GlStateManager.disableBlend();
+        if (!depth) {
+            GlStateManager.enableDepth();
+            GlStateManager.depthMask(true);
+        }
+        GlStateManager.enableAlpha();
+        GlStateManager.enableTexture2D();
+        GlStateManager.enableLighting();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.popMatrix();
+
+        GlStateManager.popAttrib();
+    }
 }

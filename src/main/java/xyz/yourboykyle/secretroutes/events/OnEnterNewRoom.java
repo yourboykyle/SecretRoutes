@@ -35,6 +35,7 @@ public class OnEnterNewRoom {
             }
 
             LogUtils.info("Entered new room \"" + RoomDetection.roomName + "\".");
+            LogUtils.info("Room direction: \"" + RoomDetection.roomDirection);
 
             Main.currentRoom = room;
         } catch(Exception e) {

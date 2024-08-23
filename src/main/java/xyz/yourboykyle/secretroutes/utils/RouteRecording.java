@@ -3,12 +3,15 @@ package xyz.yourboykyle.secretroutes.utils;
 import com.google.gson.*;
 import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
 import io.github.quantizr.dungeonrooms.utils.MapUtils;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.Room.SECRET_TYPES;
 import xyz.yourboykyle.secretroutes.utils.Room.WAYPOINT_TYPES;
+import xyz.yourboykyle.secretroutes.utils.multiStorage.Triple;
 
 import java.io.File;
 import java.io.FileReader;
@@ -31,6 +34,8 @@ public class RouteRecording {
     private static int minewaypoints = 0;
     private static int etherwaypoints = 0;
     private static int locationwaypoints = 0;
+    private static int enderPearlWaypoints = 0;
+    private static int enderPearlAngleWaypoints = 0;
 
     // Each waypoint on the locations will be added based on how far the player is from the previous waypoint, this will be used to keep track of said previous waypoint
     public BlockPos previousLocation;
@@ -42,6 +47,8 @@ public class RouteRecording {
         currentSecretWaypoints.add("mines", new JsonArray());
         currentSecretWaypoints.add("interacts", new JsonArray());
         currentSecretWaypoints.add("tnts", new JsonArray());
+        currentSecretWaypoints.add("enderpearls", new JsonArray());
+        currentSecretWaypoints.add("enderpearlangles", new JsonArray());
 
         // Import all the current secret routes into the allSecretRoutes JsonObject
         importRoutes("routes.json");
@@ -118,11 +125,15 @@ public class RouteRecording {
         sendVerboseMessage("§6  Mines: " + minewaypoints, verboseTag);
         sendVerboseMessage("§6  Interacts: " + interactWaypoints, verboseTag);
         sendVerboseMessage("§6  TNTs: " + tntWaypoints, verboseTag);
+        sendVerboseMessage("§6  Enderpearls: " + enderPearlWaypoints, verboseTag);
+        sendVerboseMessage("§6  Enderpearl Angles (should equal enderpearls): " + enderPearlAngleWaypoints, verboseTag);
         locationwaypoints = 0;
         etherwaypoints = 0;
         minewaypoints = 0;
         interactWaypoints = 0;
         tntWaypoints = 0;
+        enderPearlWaypoints = 0;
+        enderPearlAngleWaypoints = 0;
         SRMConfig.recordingHUD.disable();
         SRMConfig.currentRoomHUD.disable();
     }
@@ -130,22 +141,22 @@ public class RouteRecording {
     public void importRoutes(String fileName) {
         String filePath = System.getProperty("user.home") + File.separator + "Downloads" + File.separator + fileName;
 
-        // Import all the current secret routes into the allSecretRoutes JsonObject from a file
-        allSecretRoutes = new JsonObject();
+        if(new File(filePath).exists()) {
+            // Import all the current secret routes into the allSecretRoutes JsonObject from a file
+            allSecretRoutes = new JsonObject();
 
-        try {
-            Gson gson = new GsonBuilder().create();
-            FileReader reader = new FileReader(filePath);
+            try {
+                Gson gson = new GsonBuilder().create();
+                FileReader reader = new FileReader(filePath);
 
-            allSecretRoutes = gson.fromJson(reader, JsonObject.class);
-        } catch (IOException e) {
-            LogUtils.error(e);
+                allSecretRoutes = gson.fromJson(reader, JsonObject.class);
+            } catch (IOException e) {
+                LogUtils.error(e);
+            }
         }
     }
 
     public void addWaypoint(WAYPOINT_TYPES type, BlockPos pos) {
-
-
         sendVerboseMessage("§d Adding waypoint...", verboseTag);
         // Add a non-secret waypoint to the current secret waypoints
         Main.checkRoomData();
@@ -262,6 +273,59 @@ public class RouteRecording {
         }
     }
 
+    public void addWaypoint(WAYPOINT_TYPES type, EntityPlayer player) {
+        sendVerboseMessage("§d Adding waypoint...", verboseTag);
+        // Add a non-secret waypoint to the current secret waypoints
+        Main.checkRoomData();
+        JsonArray posArray = new JsonArray();
+
+        Triple<Double, Double, Double> relativePos = MapUtils.actualToRelative(player.posX, player.posY, player.posZ, RoomDetection.roomDirection, RoomDetection.roomCorner);
+        posArray.add(new JsonPrimitive(relativePos.getOne()));
+        posArray.add(new JsonPrimitive(relativePos.getTwo()));
+        posArray.add(new JsonPrimitive(relativePos.getThree()));
+
+        sendVerboseMessage("§d  Waypoint Type: " + type, verboseTag);
+        if(type == WAYPOINT_TYPES.ENDERPEARLS) {
+            enderPearlWaypoints++;
+            enderPearlAngleWaypoints++;
+            boolean shouldAddWaypoint = true;
+            int count = 0;
+
+            JsonArray array = currentSecretWaypoints.get("enderpearls").getAsJsonArray();
+            for(JsonElement element : array) {
+                JsonArray location = element.getAsJsonArray();
+                if(count < array.size() && location.equals(posArray)) {
+                    shouldAddWaypoint = false;
+                    break;
+                }
+
+                count++;
+            }
+
+            JsonArray anglePosArray = new JsonArray();
+            anglePosArray.add(new JsonPrimitive(Minecraft.getMinecraft().thePlayer.rotationPitch));
+            anglePosArray.add(new JsonPrimitive(RotationUtils.actualToRelativeYaw(Minecraft.getMinecraft().thePlayer.rotationYaw % 360, RoomDetection.roomDirection)));
+
+            JsonArray anglesArray = currentSecretWaypoints.get("enderpearlangles").getAsJsonArray();
+            for(JsonElement element : anglesArray) {
+                JsonArray rotation = element.getAsJsonArray();
+                if(count < array.size() && rotation.equals(anglePosArray)) {
+                    shouldAddWaypoint = false;
+                    break;
+                }
+
+                count++;
+            }
+
+            if(shouldAddWaypoint) {
+                sendVerboseMessage("§d  Adding Ender Pearl waypoint...", verboseTag);
+                currentSecretWaypoints.get("enderpearls").getAsJsonArray().add(posArray);
+                currentSecretWaypoints.get("enderpearlangles").getAsJsonArray().add(anglePosArray);
+            }
+
+        }
+    }
+
     public boolean addWaypoint(SECRET_TYPES type, BlockPos pos) {
         // Add a secret waypoint to the current secret waypoints
         Main.checkRoomData();
@@ -321,6 +385,8 @@ public class RouteRecording {
         currentSecretWaypoints.add("mines", new JsonArray());
         currentSecretWaypoints.add("interacts", new JsonArray());
         currentSecretWaypoints.add("tnts", new JsonArray());
+        currentSecretWaypoints.add("enderpearls", new JsonArray());
+        currentSecretWaypoints.add("enderpearlangles", new JsonArray());
     }
 
     public void newRoute() {
@@ -335,6 +401,8 @@ public class RouteRecording {
         currentSecretWaypoints.add("mines", new JsonArray());
         currentSecretWaypoints.add("interacts", new JsonArray());
         currentSecretWaypoints.add("tnts", new JsonArray());
+        currentSecretWaypoints.add("enderpearls", new JsonArray());
+        currentSecretWaypoints.add("enderpearlangles", new JsonArray());
     }
 
     public void exportAllRoutes() {
@@ -348,7 +416,7 @@ public class RouteRecording {
             writer.write(prettyPrint(allSecretRoutes));
             writer.flush();
             writer.close();
-            sendChatMessage(EnumChatFormatting.DARK_GREEN+"Exported routes to " + filePath + File.separator + fileName);
+            sendChatMessage(EnumChatFormatting.DARK_GREEN + "Exported routes to " + filePath + File.separator + fileName);
         } catch (IOException e) {
             LogUtils.error(e);
         }
