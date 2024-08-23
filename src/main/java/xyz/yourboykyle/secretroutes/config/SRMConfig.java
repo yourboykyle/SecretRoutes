@@ -36,7 +36,14 @@ public class SRMConfig extends Config {
             options = {"Fire Particles", "Lines", "None"},
             subcategory = "General"
     )
-    public static int particleType = 0;
+    public static int lineType = 0;
+
+    @Dropdown(
+            name = "Particle Type",
+            options = {"Barrier", "Block Crack", "Block Dust", "Cloud", "Crit", "Depth Suspend", "Drip Lava", "Drip Water", "Enchantment Table", "Explode", "Fireworks Spark", "Flame", "Footstep", "Happy Villager", "Heart", "Huge Explosion", "Instant Spell", "Large Explode", "Large Smoke", "Lava", "Magic Crit", "Mob Spell", "Mob Spell Ambient", "Note", "Portal", "Red Dust", "Slime", "Smoke", "Snowball Poof", "Snow Shovel", "Spell", "Splash", "Suspended", "Town Aura", "Villager Angry", "Villager Happy", "Wake", "Witch Magic"},
+            subcategory = "General"
+    )
+    public static int particle = 0;
 
     @Slider(
             name = "Line width (not for particles)",
@@ -45,6 +52,15 @@ public class SRMConfig extends Config {
             subcategory = "General"
     )
     public static int width = 5;
+
+
+    @Slider(
+            name = "Line width (for ender pearls)",
+            min = 1, max = 10.1F,
+            step = 1,
+            subcategory = "General"
+    )
+    public static int pearlLineWidth = 5;
 
     @Text(
             name = "Routes file name",
@@ -299,6 +315,13 @@ public class SRMConfig extends Config {
     public static OneColor lineColor = new OneColor(255, 0, 0);
 
     @Color(
+            name = "Pearl line color",
+            subcategory = "Waypoint Colors",
+            category = "Rendering"
+    )
+    public static OneColor pearlLineColor = new OneColor(0, 255, 255);
+
+    @Color(
             name="EtherWarp",
             subcategory = "Waypoint Colors",
             category = "Rendering"
@@ -325,6 +348,13 @@ public class SRMConfig extends Config {
             category = "Rendering"
     )
     public static OneColor superbooms = new OneColor(255, 0, 0);
+
+    @Color(
+            name="enderpearls",
+            subcategory = "Waypoint Colors",
+            category = "Rendering"
+    )
+    public static OneColor enderpearls = new OneColor(0, 255, 255);
 
     @Color(
             name = "Secrets - item",
@@ -583,6 +613,33 @@ public class SRMConfig extends Config {
     )
     public static float superboomsTextSize = 3;
 
+    // Superboom waypoints
+    @Switch(
+            name = "Ender Pearl text toggle",
+            size =  OptionSize.DUAL,
+            subcategory = "Waypoint Text Rendering",
+            category = "Rendering"
+    )
+    public static boolean enderpearlTextToggle = true;
+
+    @Dropdown(
+            name = "Ender Pearl waypoint text color",
+            options = {"Black", "Dark blue", "Dark green", "Dark aqua", "Dark red", "Dark purple", "Gold", "Gray", "Dark gray", "Blue", "Green", "Aqua", "Red", "Light purple", "Yellow", "White"},
+            size = OptionSize.DUAL,
+            subcategory = "Waypoint Text Rendering",
+            category = "Rendering"
+    )
+    public static int enderpearlWaypointColorIndex = 11;
+
+    @Slider(
+            name = "Ender Pearl waypoint text size",
+            min = 1,
+            max = 10,
+            subcategory = "Waypoint Text Rendering",
+            category = "Rendering"
+    )
+    public static float enderpearlTextSize = 3;
+
     // Reset to text defaults
     @Button(
             name = "Reset to text defaults",
@@ -617,10 +674,13 @@ public class SRMConfig extends Config {
         superboomsTextToggle = false;
         superboomsWaypointColorIndex = 12;
         superboomsTextSize = 3;
+        enderpearlTextToggle = true;
+        enderpearlWaypointColorIndex = 11;
+        enderpearlTextSize = 3;
     };
 
     @Text(
-            name = "Dev pasword",
+            name = "Dev password",
             description = "The password to access the dev options",
             subcategory = "General",
             category = "Dev",
@@ -654,6 +714,14 @@ public class SRMConfig extends Config {
     public static boolean verboseUpdating = true;
 
     @Switch(
+            name= "Better info",
+            description = "adds more detailed logging for info, useful for debugging",
+            subcategory = "Chat logging",
+            category = "Dev"
+    )
+    public static boolean verboseInfo = false;
+
+    @Switch(
             name= "Force outdated",
             description = "Forces the version to be outdated, useful for testing the auto updater",
             subcategory = "General",
@@ -665,9 +733,11 @@ public class SRMConfig extends Config {
             text = "Do not turn this on unless you know exactly what you are doing",
             type = InfoType.ERROR,
             category = "Dev",
-            subcategory = "general"
+            subcategory = "General"
     )
     public static boolean c;
+
+
 
 
 
@@ -692,6 +762,7 @@ public class SRMConfig extends Config {
             optionNames.get("runnable").addHideCondition(() -> !lambda("modEnabled"));
             optionNames.get("runnable9").addHideCondition(() -> !lambda("modEnabled"));
             optionNames.get("runnable14").addHideCondition(() -> !lambda("modEnabled"));
+            optionNames.get("particleType").addHideCondition(() -> !isEqualTo(lineType,0));
 
             optionNames.get("startWaypointColorIndex").addHideCondition(() -> !lambda("startTextToggle"));
             optionNames.get("startTextSize").addHideCondition(() -> !lambda("startTextToggle"));
@@ -710,12 +781,15 @@ public class SRMConfig extends Config {
             optionNames.get("interactsTextSize").addHideCondition(() -> !lambda("interactsTextToggle"));
             optionNames.get("superboomsWaypointColorIndex").addHideCondition(() -> !lambda("superboomsTextToggle"));
             optionNames.get("superboomsTextSize").addHideCondition(() -> !lambda("superboomsTextToggle"));
+            optionNames.get("enderpearlWaypointColorIndex").addHideCondition(() -> !lambda("enderpearlTextToggle"));
+            optionNames.get("enderpearlTextSize").addHideCondition(() -> !lambda("enderpearlTextToggle"));
 
             optionNames.get("forceUpdateDEBUG").addHideCondition(() -> isDevPasswordNotCorrect());
             optionNames.get("verboseLogging").addHideCondition(() -> isDevPasswordNotCorrect());
             optionNames.get("c").addHideCondition(() -> isDevPasswordNotCorrect());
             optionNames.get("verboseRecording").addHideCondition(() -> !lambda("verboseLogging"));
             optionNames.get("verboseUpdating").addHideCondition(() -> !lambda("verboseLogging"));
+            optionNames.get("verboseInfo").addHideCondition(() -> !lambda("verboseLogging"));
         } catch (Exception e) {
             LogUtils.error(e);
         }
@@ -727,5 +801,8 @@ public class SRMConfig extends Config {
         verboseLogging = false;
         forceUpdateDEBUG = false;
         return true;
+    }
+    public boolean isEqualTo(Object a, Object b){
+        return a.equals(b);
     }
 }

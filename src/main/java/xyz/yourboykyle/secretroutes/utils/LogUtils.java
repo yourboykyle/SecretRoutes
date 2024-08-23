@@ -5,6 +5,7 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import xyz.yourboykyle.secretroutes.Main;
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
+import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
 
 import java.io.FileWriter;
 import java.io.PrintWriter;
@@ -12,7 +13,9 @@ import java.io.StringWriter;
 
 public class LogUtils {
     public static void info(String msg) {
-        appendToFile("====================\n[INFO] " + msg);
+        if(!sendVerboseMessage(msg, "Info")) {
+            appendToFile("====================\n[INFO] " + msg);
+        }
     }
 
     public static void error(Exception error) {

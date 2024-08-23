@@ -37,7 +37,8 @@ public class Room {
         ETHERWARPS,
         MINES,
         INTERACTS,
-        TNTS
+        TNTS,
+        ENDERPEARLS,
     };
     public enum SECRET_TYPES {
         INTERACT,
@@ -174,7 +175,7 @@ public class Room {
             }
 
 
-            if(SRMConfig.particleType == 0) {
+            if(SRMConfig.lineType == 0) {
                 // Draw flame particles
                 RenderUtils.drawLineMultipleParticles(EnumParticleTypes.FLAME, lines);
             }
