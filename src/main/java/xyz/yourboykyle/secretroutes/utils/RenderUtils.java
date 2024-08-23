@@ -30,6 +30,7 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
+import xyz.yourboykyle.secretroutes.utils.multiStorage.Triple;
 
 import java.util.List;
 
@@ -181,28 +182,26 @@ public class RenderUtils {
     }
 
 
-    public static void drawMultipleNormalLines(List<BlockPos> locations, float partialTicks, OneColor color, int width) {
+    public static void drawMultipleNormalLines(List<Triple<Double, Double, Double>> locations, float partialTicks, OneColor color, int width) {
         if(locations == null) {
             return;
         }
         if(locations.size() >= 2) {
-            BlockPos lastLoc = null;
-            for (BlockPos loc : locations) {
+            Triple<Double, Double, Double> lastLoc = null;
+            for (Triple<Double, Double, Double> loc : locations) {
                 if (lastLoc == null) {
                     lastLoc = loc;
                     continue;
                 }
 
-                lastLoc.add(0, 0.5, 0);
-                loc.add(0, 0.5, 0);
-                drawNormalLine(lastLoc, loc, color, partialTicks, true, width);
+                drawNormalLine(lastLoc.getOne(), lastLoc.getTwo(), lastLoc.getThree(), loc.getOne(), loc.getTwo(), loc.getThree(), color, partialTicks, true, width);
                 lastLoc = loc;
             }
         }
     }
 
     //
-    public static void drawNormalLine(float x1, float y1, float z1, float x2, float y2, float z2, OneColor colour, float partialTicks, boolean depth, int width) {
+    public static void drawNormalLine(double x1, double y1, double z1, double x2, double y2, double z2, OneColor colour, float partialTicks, boolean depth, int width) {
         Entity render = Minecraft.getMinecraft().getRenderViewEntity();
         WorldRenderer worldRenderer = Tessellator.getInstance().getWorldRenderer();
 

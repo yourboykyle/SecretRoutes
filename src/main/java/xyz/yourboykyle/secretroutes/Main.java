@@ -188,10 +188,12 @@ public class Main {
             }
             Map<String, Object> defaultColors = new HashMap<>();
             defaultColors.put("lineColor", SRMConfig.lineColor);
+            defaultColors.put("pearlLineColor", SRMConfig.pearlLineColor);
             defaultColors.put("etherWarp", SRMConfig.etherWarp);
             defaultColors.put("mine", SRMConfig.mine);
             defaultColors.put("interacts", SRMConfig.interacts);
             defaultColors.put("superbooms", SRMConfig.superbooms);
+            defaultColors.put("enderpearls", SRMConfig.enderpearls);
             defaultColors.put("secretsItem", SRMConfig.secretsItem);
             defaultColors.put("secretsInteract", SRMConfig.secretsInteract);
             defaultColors.put("secretsBat", SRMConfig.secretsBat);
@@ -220,6 +222,9 @@ public class Main {
             defaultColors.put("superboomsTextToggle", SRMConfig.superboomsTextToggle);
             defaultColors.put("superboomsWaypointColorIndex", SRMConfig.superboomsWaypointColorIndex);
             defaultColors.put("superboomsTextSize", SRMConfig.superboomsTextSize);
+            defaultColors.put("enderpearlTextToggle", SRMConfig.enderpearlTextToggle);
+            defaultColors.put("enderpearlWaypointColorIndex", SRMConfig.enderpearlWaypointColorIndex);
+            defaultColors.put("enderpearlTextSize", SRMConfig.enderpearlTextSize);
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             String json = gson.toJson(defaultColors);
 
@@ -245,10 +250,12 @@ public class Main {
             JsonObject data = gson.fromJson(reader, JsonObject.class);
 
             SRMConfig.lineColor = parseOneColor(data.get("lineColor"));
+            SRMConfig.pearlLineColor = parseOneColor(data.get("pearlLineColor"));
             SRMConfig.etherWarp = parseOneColor(data.get("etherWarp"));
             SRMConfig.mine = parseOneColor(data.get("mine"));
             SRMConfig.interacts = parseOneColor(data.get("interacts"));
             SRMConfig.superbooms = parseOneColor(data.get("superbooms"));
+            SRMConfig.enderpearls = parseOneColor(data.get("enderpearls"));
             SRMConfig.secretsItem = parseOneColor(data.get("secretsItem"));
             SRMConfig.secretsInteract = parseOneColor(data.get("secretsInteract"));
             SRMConfig.secretsBat = parseOneColor(data.get("secretsBat"));
@@ -277,6 +284,9 @@ public class Main {
             SRMConfig.superboomsTextToggle =  data.get("superboomsTextToggle").getAsBoolean();
             SRMConfig.superboomsWaypointColorIndex = data.get("superboomsWaypointColorIndex").getAsInt();
             SRMConfig.superboomsTextSize = data.get("superboomsTextSize").getAsFloat();
+            SRMConfig.enderpearlTextToggle =  data.get("enderpearlTextToggle").getAsBoolean();
+            SRMConfig.enderpearlWaypointColorIndex = data.get("enderpearlWaypointColorIndex").getAsInt();
+            SRMConfig.enderpearlTextSize = data.get("enderpearlTextSize").getAsFloat();
 
             return true;
         } catch (Exception e) {

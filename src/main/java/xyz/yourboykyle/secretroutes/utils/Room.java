@@ -24,6 +24,7 @@ import io.github.quantizr.dungeonrooms.utils.MapUtils;
 import net.minecraft.util.BlockPos;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
+import net.minecraft.util.EnumParticleTypes;
 
 import java.io.File;
 import java.io.FileReader;
@@ -178,13 +179,20 @@ public class Room {
 
             if(SRMConfig.lineType == 0) {
                 //Add tick delay
-
+                if(c<SRMConfig.tickInterval){
+                    c++;
+                    return;
+                }
+                c = 0;
+                int particleType = SRMConfig.particles;
+                if(particleType >= 36) {
+                    particleType += 3;
+                }
                 // Draw particles based on enum
                 try{
-                    RenderUtils.drawLineMultipleParticles(EnumParticleTypes.getParticleFromId(SRMConfig.particles), lines);
+                    RenderUtils.drawLineMultipleParticles(EnumParticleTypes.getParticleFromId(particleType), lines);
                 }catch(Exception e){
                     LogUtils.error(e);
-                    sendVerboseMessage("Invalid particle type: " + SRMConfig.particles + "with name: " + EnumParticleTypes.getParticleFromId(SRMConfig.particles).getParticleName(), "Info");
                 }
             }
         }
