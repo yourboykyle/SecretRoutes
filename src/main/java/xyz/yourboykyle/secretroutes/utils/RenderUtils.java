@@ -193,6 +193,8 @@ public class RenderUtils {
                     continue;
                 }
 
+                lastLoc.add(0, 0.5, 0);
+                loc.add(0, 0.5, 0);
                 drawNormalLine(lastLoc, loc, color, partialTicks, true, width);
                 lastLoc = loc;
             }

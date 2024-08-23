@@ -128,7 +128,7 @@ public class SecretRoutesRenderUtils {
         WaypointUtils.renderBeaconBeam(x, y, z, RGB, alpha, 0);
     }
 
-    public static void drawText(double worldX, double worldY, double worldZ, String text, float size) {
+    public static void drawText(double worldX, double worldY, double worldZ, String text, float size, float partialTicks) {
         BlockPos pos = new BlockPos(worldX, worldY, worldZ);
 
         Minecraft mc = Minecraft.getMinecraft();
@@ -142,7 +142,7 @@ public class SecretRoutesRenderUtils {
 
         text = EnumChatFormatting.BOLD + text;
 
-        WaypointUtils.renderWaypointText(text, pos, 0, size);
+        WaypointUtils.renderWaypointText(text, pos, partialTicks, size);
     }
 
     public static String getTextColor(int index) {
