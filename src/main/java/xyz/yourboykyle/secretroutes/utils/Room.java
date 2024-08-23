@@ -22,7 +22,6 @@ import com.google.gson.*;
 import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
 import io.github.quantizr.dungeonrooms.utils.MapUtils;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumParticleTypes;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 
@@ -31,7 +30,10 @@ import java.io.FileReader;
 import java.util.LinkedList;
 import java.util.List;
 
+import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
+
 public class Room {
+    int c = 0;
     public enum WAYPOINT_TYPES {
         LOCATIONS,
         ETHERWARPS,
@@ -174,10 +176,16 @@ public class Room {
                 lines.add(MapUtils.relativeToActual(new BlockPos(lineLocation.get(0).getAsInt(), lineLocation.get(1).getAsInt(), lineLocation.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner));
             }
 
-
             if(SRMConfig.lineType == 0) {
-                // Draw flame particles
-                RenderUtils.drawLineMultipleParticles(EnumParticleTypes.FLAME, lines);
+                //Add tick delay
+
+                // Draw particles based on enum
+                try{
+                    RenderUtils.drawLineMultipleParticles(EnumParticleTypes.getParticleFromId(SRMConfig.particles), lines);
+                }catch(Exception e){
+                    LogUtils.error(e);
+                    sendVerboseMessage("Invalid particle type: " + SRMConfig.particles + "with name: " + EnumParticleTypes.getParticleFromId(SRMConfig.particles).getParticleName(), "Info");
+                }
             }
         }
     }
