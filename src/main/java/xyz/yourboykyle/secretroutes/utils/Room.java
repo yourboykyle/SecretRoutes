@@ -175,7 +175,7 @@ public class Room {
             }
 
 
-            if(SRMConfig.particleType == 0) {
+            if(SRMConfig.lineType == 0) {
                 // Draw flame particles
                 RenderUtils.drawLineMultipleParticles(EnumParticleTypes.FLAME, lines);
             }

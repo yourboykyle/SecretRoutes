@@ -184,7 +184,7 @@ public class Waypoints {
                     GlStateManager.enableCull();
 
                     // Render normal lines if config says so
-                    if(Main.currentRoom.currentSecretWaypoints != null && Main.currentRoom.currentSecretWaypoints.get("locations") != null && SRMConfig.particleType == 1) {
+                    if(Main.currentRoom.currentSecretWaypoints != null && Main.currentRoom.currentSecretWaypoints.get("locations") != null && SRMConfig.lineType == 1) {
                         List<BlockPos> lines = new LinkedList<>();
 
                         JsonArray lineLocations = Main.currentRoom.currentSecretWaypoints.get("locations").getAsJsonArray();

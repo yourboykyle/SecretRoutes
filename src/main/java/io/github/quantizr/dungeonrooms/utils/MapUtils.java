@@ -26,6 +26,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
 import net.minecraft.util.Vec4b;
 import net.minecraft.world.storage.MapData;
+import xyz.yourboykyle.secretroutes.utils.multiStorage.Triple;
 
 import java.awt.*;
 import java.util.List;
@@ -428,6 +429,36 @@ public class MapUtils {
         return new BlockPos(x, actual.getY(), z);
     }
 
+    public static Triple<Double, Double, Double> actualToRelative(double posX, double posY, double posZ, String cornerDirection, Point locationOfCorner) {
+        if(cornerDirection == null) {
+            cornerDirection = "NW";
+        }
+        if(locationOfCorner == null) {
+            locationOfCorner = new Point(0, 0);
+        }
+        double x = 0;
+        double z = 0;
+        switch (cornerDirection) {
+            case "NW":
+                x = posX - locationOfCorner.getX();
+                z = posZ - locationOfCorner.getY(); //.getY in a point is the MC Z coord
+                break;
+            case "NE":
+                x = posZ - locationOfCorner.getY();
+                z = -(posX - locationOfCorner.getX());
+                break;
+            case "SE":
+                x = -(posX - locationOfCorner.getX());
+                z = -(posZ - locationOfCorner.getY());
+                break;
+            case "SW":
+                x = -(posZ - locationOfCorner.getY());
+                z = posX - locationOfCorner.getX();
+                break;
+        }
+        return new Triple<>(x, posY, z);
+    }
+
     /**
      * @return the relative coordinate of a block given the actual coordinate
      */
@@ -459,5 +490,35 @@ public class MapUtils {
                 break;
         }
         return new BlockPos(x, relative.getY(), z);
+    }
+
+    public static Triple<Double, Double, Double> relativeToActual(double posX, double posY, double posZ, String cornerDirection, Point locationOfCorner) {
+        if(cornerDirection == null) {
+            cornerDirection = "NW";
+        }
+        if(locationOfCorner == null) {
+            locationOfCorner = new Point(0, 0);
+        }
+        double x = 0;
+        double z = 0;
+        switch (cornerDirection) {
+            case "NW":
+                x = posX + locationOfCorner.getX();
+                z = posZ + locationOfCorner.getY(); //.getY in a point is the MC Z coord
+                break;
+            case "NE":
+                x = -(posZ - locationOfCorner.getX());
+                z = posX + locationOfCorner.getY();
+                break;
+            case "SE":
+                x = -(posX - locationOfCorner.getX());
+                z = -(posZ - locationOfCorner.getY());
+                break;
+            case "SW":
+                x = posZ + locationOfCorner.getX();
+                z = -(posX - locationOfCorner.getY());
+                break;
+        }
+        return new Triple<>(x, posY, z);
     }
 }

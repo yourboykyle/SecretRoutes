@@ -4,12 +4,14 @@ import com.google.gson.*;
 import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
 import io.github.quantizr.dungeonrooms.utils.MapUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.Room.SECRET_TYPES;
 import xyz.yourboykyle.secretroutes.utils.Room.WAYPOINT_TYPES;
+import xyz.yourboykyle.secretroutes.utils.multiStorage.Triple;
 
 import java.io.File;
 import java.io.FileReader;
@@ -268,7 +270,22 @@ public class RouteRecording {
                 sendVerboseMessage("§d  Adding TNT waypoint...", verboseTag);
                 currentSecretWaypoints.get("tnts").getAsJsonArray().add(posArray);
             }
-        } else if(type == WAYPOINT_TYPES.ENDERPEARLS) {
+        }
+    }
+
+    public void addWaypoint(WAYPOINT_TYPES type, EntityPlayer player) {
+        sendVerboseMessage("§d Adding waypoint...", verboseTag);
+        // Add a non-secret waypoint to the current secret waypoints
+        Main.checkRoomData();
+        JsonArray posArray = new JsonArray();
+
+        Triple<Double, Double, Double> relativePos = MapUtils.actualToRelative(player.posX, player.posY, player.posZ, RoomDetection.roomDirection, RoomDetection.roomCorner);
+        posArray.add(new JsonPrimitive(relativePos.getOne()));
+        posArray.add(new JsonPrimitive(relativePos.getTwo()));
+        posArray.add(new JsonPrimitive(relativePos.getThree()));
+
+        sendVerboseMessage("§d  Waypoint Type: " + type, verboseTag);
+        if(type == WAYPOINT_TYPES.ENDERPEARLS) {
             enderPearlWaypoints++;
             enderPearlAngleWaypoints++;
             boolean shouldAddWaypoint = true;
