@@ -4,7 +4,6 @@ import lombok.Value;
 import lombok.val;
 import org.apache.commons.io.IOUtils;
 import xyz.yourboykyle.secretroutes.utils.ChatUtils;
-import xyz.yourboykyle.secretroutes.utils.FileUtils;
 import xyz.yourboykyle.secretroutes.utils.SSLUtils;
 
 import java.io.*;
@@ -84,7 +83,7 @@ public class PotentialUpdate {
         SSLUtils.disableSSLCertificateChecking();
         ChatUtils.sendVerboseMessage("§eDownloading updater.jar from " + update.getDownloadAsURL(), verboseTag);
         ChatUtils.sendVerboseMessage("§eTo: " + getFile("updater.jar"), verboseTag);
-        InputStream inputStream = new URL("https://raw.githubusercontent.com/yourboykyle/SecretRoutes/main/updater.jar").openStream();
+        InputStream inputStream = new URL("http://raw.githubusercontent.com/yourboykyle/SecretRoutes/main/updater.jar").openStream();
         OutputStream outputStream = new FileOutputStream(getFile("updater.jar"));
         ChatUtils.sendVerboseMessage("§eStreams opened", verboseTag);
         IOUtils.copy(inputStream, outputStream);
@@ -93,7 +92,6 @@ public class PotentialUpdate {
         inputStream.close();
         ChatUtils.sendVerboseMessage("§eStreams closed", verboseTag);
         SSLUtils.enableSSLCertificateChecking();
-
     }
 
     /**
@@ -127,8 +125,6 @@ public class PotentialUpdate {
         inputStream.close();
         ChatUtils.sendVerboseMessage("§eStreams closed", verboseTag);
         SSLUtils.enableSSLCertificateChecking();
-
-
     }
 
     /**
