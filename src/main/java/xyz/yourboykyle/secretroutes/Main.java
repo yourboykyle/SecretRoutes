@@ -355,7 +355,7 @@ public class Main {
 
 
 
-            //Packets are used in this mod solely to detect when the player picks up an item. No packets are modified or created.
+            //Packets are used in this mod soulely to detect when the player picks up an item. No packets are modified or created.
             event.manager.channel().pipeline().addBefore("packet_handler", "secretroutes_packet_handler", new PacketHandler());
 
             new Thread(() -> {
