@@ -159,7 +159,7 @@ public class OnWorldRender {
                 double newY = posY + y * length;
                 double newZ = posZ + z * length;
 
-                RenderUtils.drawNormalLine((float) posX + 0.25F, (float) posY + 1.62F, (float) posZ + 0.25F, (float) newX, (float) newY, (float) newZ, SRMConfig.pearlLineColor, event.partialTicks, true, SRMConfig.pearlLineWidth);
+                RenderUtils.drawNormalLine(posX + 0.25F, posY + 1.62F, posZ + 0.25F, newX, newY, newZ, SRMConfig.pearlLineColor, event.partialTicks, true, SRMConfig.pearlLineWidth);
                 if(SRMConfig.enderpearlTextToggle) {
                     SecretRoutesRenderUtils.drawText(posX, posY, posZ, SecretRoutesRenderUtils.getTextColor(SRMConfig.enderpearlWaypointColorIndex) + "ender pearl", SRMConfig.enderpearlTextSize, event.partialTicks);
                 }

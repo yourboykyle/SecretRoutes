@@ -46,6 +46,16 @@ public class SRMConfig extends Config {
     public static int particles = 0;
 
     @Slider(
+            name = "Tick inverval",
+            description = "The interval between when the game renders the particles. Higher values will reduce lag, but may cause the particles to be less smooth",
+            min = 0, max = 20.1F,
+            step = 1,
+            subcategory = "General"
+    )
+    public static int tickInterval = 1;
+
+
+    @Slider(
             name = "Line width (not for particles)",
             min = 1, max = 10.1F,
             step = 1,
@@ -386,10 +396,12 @@ public class SRMConfig extends Config {
     )
     Runnable runnable7 = () -> {
         lineColor = new OneColor(255, 0, 0);
+        pearlLineColor = new OneColor(0, 255, 255);
         etherWarp = new OneColor(128, 0, 128);
         mine = new OneColor(255, 255, 0);
         interacts = new OneColor(0, 0, 255);
         superbooms = new OneColor(255, 0, 0);
+        enderpearls = new OneColor(0, 255, 255);
         secretsItem = new OneColor(0, 255, 255);
         secretsInteract = new OneColor(0, 0, 255);
         secretsBat = new OneColor(0, 255, 0);
@@ -756,13 +768,17 @@ public class SRMConfig extends Config {
         initialize();
 
         try {
-            optionNames.get("particleType").addHideCondition(() -> !lambda("modEnabled"));
+            optionNames.get("lineType").addHideCondition(() -> !lambda("modEnabled"));
             optionNames.get("width").addHideCondition(() -> !lambda("modEnabled"));
             optionNames.get("routesFileName").addHideCondition(() -> !lambda("modEnabled"));
             optionNames.get("runnable").addHideCondition(() -> !lambda("modEnabled"));
             optionNames.get("runnable9").addHideCondition(() -> !lambda("modEnabled"));
             optionNames.get("runnable14").addHideCondition(() -> !lambda("modEnabled"));
-            optionNames.get("particleType").addHideCondition(() -> !isEqualTo(lineType,0));
+            optionNames.get("particles").addHideCondition(() -> !isEqualTo(lineType,0));
+            optionNames.get("particles").addHideCondition(() -> !lambda("modEnabled"));
+            optionNames.get("tickInterval").addHideCondition(() -> !isEqualTo(lineType,0));
+            optionNames.get("tickInterval").addHideCondition(() -> !lambda("modEnabled"));
+            optionNames.get("pearlLineWidth").addHideCondition(() -> !lambda("modEnabled"));
 
             optionNames.get("startWaypointColorIndex").addHideCondition(() -> !lambda("startTextToggle"));
             optionNames.get("startTextSize").addHideCondition(() -> !lambda("startTextToggle"));
