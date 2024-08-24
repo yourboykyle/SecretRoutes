@@ -780,7 +780,7 @@ public class SRMConfig extends Config {
             optionNames.get("tickInterval").addHideCondition(() -> !lambda("modEnabled"));
             optionNames.get("pearlLineWidth").addHideCondition(() -> !lambda("modEnabled"));
 
-            optionNames.get("autoDownload").addHideCondition(() -> !lambda("autoUpdate"));
+            optionNames.get("autoDownload").addHideCondition(() -> !lambda("autoCheckUpdates"));
 
             optionNames.get("startWaypointColorIndex").addHideCondition(() -> !lambda("startTextToggle"));
             optionNames.get("startTextSize").addHideCondition(() -> !lambda("startTextToggle"));

@@ -142,8 +142,8 @@ public class OnWorldRender {
 
                 SecretRoutesRenderUtils.drawBoxAtBlock(posX, posY, posZ, SRMConfig.enderpearls, 0.5, 0);
 
-                double yawRadians = (float) Math.toRadians(RotationUtils.relativeToActualYaw(enderpearlAngles.get(index).getSecond(), RoomDetection.roomDirection));
-                double pitchRadians = (float) Math.toRadians(enderpearlAngles.get(index).getFirst());
+                double yawRadians = Math.toRadians(RotationUtils.relativeToActualYaw(enderpearlAngles.get(index).getSecond(), RoomDetection.roomDirection));
+                double pitchRadians = Math.toRadians(enderpearlAngles.get(index).getFirst());
 
                 double length = 10.0D;
                 double x = -Math.sin(yawRadians) * Math.cos(pitchRadians);
@@ -155,10 +155,12 @@ public class OnWorldRender {
                 y /= sideLength;
                 z /= sideLength;
 
+
+
                 double newX = posX + x * length;
                 double newY = posY + y * length;
                 double newZ = posZ + z * length;
-
+                //SecretRoutesRenderUtils.drawBoxAtBlock(newX, newY, newZ, SRMConfig.enderpearls, 0.03125, 0);
                 RenderUtils.drawNormalLine(posX + 0.25F, posY + 1.62F, posZ + 0.25F, newX, newY, newZ, SRMConfig.pearlLineColor, event.partialTicks, true, SRMConfig.pearlLineWidth);
                 if(SRMConfig.enderpearlTextToggle) {
                     SecretRoutesRenderUtils.drawText(posX, posY, posZ, SecretRoutesRenderUtils.getTextColor(SRMConfig.enderpearlWaypointColorIndex) + "ender pearl", SRMConfig.enderpearlTextSize, event.partialTicks);
