@@ -50,7 +50,7 @@ public class UpdateManager {
         LogUtils.info("Reset update state");
     }
 
-    public void checkUpdate(boolean forceDownload) {
+    public void checkUpdate(boolean forceCheck) {
         if (updateState != UpdateState.NONE) {
             LogUtils.info("Trying to perform update check while another update is already in progress");
             return;
@@ -71,28 +71,26 @@ public class UpdateManager {
                     LogUtils.info("Latest version: " + update.getUpdate().getVersionNumber());
 
 
-                    if (checkVersion(update) || SRMConfig.forceUpdateDEBUG) {
+                    if (checkVersion(update) || SRMConfig.forceUpdateDEBUG) { // Dev option to test auto update: Forces an out of date version no matter what (HIDDED THROUGH A (not very secure) DEV PASSWORD)
                         updateState = UpdateState.AVAILABLE;
                         LogUtils.info("Update available");
 
-                        if (forceDownload) {
-                            LogUtils.info("Update available, forceDownload is enabled");
-                            ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "Secret Routes Mod found a new update: " + update.getUpdate().getVersionName() + ", starting to download now.");
-                            queueUpdate();
+                        if (forceCheck) {
+                            LogUtils.info("Update available, forceCheck is enabled");
+                            ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "Secret Routes Mod found a new update: " + update.getUpdate().getVersionName() + ". Download at https://github.com/yourboykyle/SecretRoutes/releases/latest");
                         } else {
-                            LogUtils.info("Update available, forceDownload is disabled");
+                            LogUtils.info("Update available, forceCheck is disabled");
                             ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "Secret Routes Mod found a new update: " + update.getUpdate().getVersionName());
-                            if(SRMConfig.autoUpdate) {
+                            if(SRMConfig.autoDownload || SRMConfig.forceUpdateDEBUG){
                                 LogUtils.info("Update available, autoUpdate is enabled");
-                                ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "Automatically downloading new Secret Routes Mod update... (you can disable this in the config menu)");
+                                ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "Automatically downloading new Secret Routes Mod update, since AutoDownload is true...");
                                 queueUpdate();
-                            } else {
-                                LogUtils.info("Update available, autoUpdate is disabled");
-                                ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "Press on the \"Check for updates\" button in the config menu to download the update.");
+                            }else if(SRMConfig.autoCheckUpdates){
+                                ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "New update found: visit https://github.com/yourboykyle/SecretRoutes/releases/latest to download the new version.");
                             }
                         }
-                    } else if (forceDownload) {
-                        LogUtils.info("No update available, forceDownload is enabled");
+                    } else if (forceCheck) {
+                        LogUtils.info("No update available, forceCheck is enabled");
                         ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "Secret Routes Mod didn't find a new update.");
                     } else {
                         LogUtils.info("No update available.");

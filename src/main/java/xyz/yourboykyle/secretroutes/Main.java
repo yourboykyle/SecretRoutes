@@ -355,14 +355,15 @@ public class Main {
         Minecraft mc = Minecraft.getMinecraft();
         if (mc.getCurrentServerData() == null) return;
         if (mc.getCurrentServerData().serverIP.toLowerCase().contains("hypixel.")) {
-
-            new Thread (() ->{
-                try{
-                    Main.updateManager.checkUpdate();
-                }catch (Exception e){
-                    LogUtils.error(e);
-                }
-            }).start();
+            if(SRMConfig.autoCheckUpdates) {
+                new Thread(() -> {
+                    try {
+                        Main.updateManager.checkUpdate();
+                    } catch (Exception e) {
+                        LogUtils.error(e);
+                    }
+                }).start();
+            }
 
 
 
