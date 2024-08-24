@@ -114,21 +114,20 @@ public class SRMConfig extends Config {
     };
 
     @Switch(
-            name = "Auto updates",
-            description = "Automatically checks for updates on startup",
+            name = "Notify for new updates",
+            description = "Automatically checks for updates on startup. WILL NOT AUTO UPDATE",
             subcategory = "Updates"
     )
-    public static boolean autoUpdate = true;
-/*
-    @Info(
-            text = "This goes to github to check for updates. It will prompt for an update, unless \"Don't confirm before updating\" is enabled",
-            subcategory = "Updates",
-            type = InfoType.INFO,
-            size = OptionSize.DUAL
-    )
-    public static boolean a;
+    public static boolean autoCheckUpdates = true;
 
- */
+
+    @Switch(
+            name = "Auto download new updates",
+            description = "Automatically downloads updates when they are available",
+            subcategory = "Updates"
+    )
+    public static boolean autoDownload = false;
+
 
     @Button(
             name = "Check for updates",
@@ -756,6 +755,7 @@ public class SRMConfig extends Config {
 
     public Boolean lambda(String dependentOption) {
         try {
+
             return (boolean) optionNames.get(dependentOption).get();
         } catch (IllegalAccessException ignored) {
             sendVerboseMessage("Error in lambda function");
@@ -779,6 +779,8 @@ public class SRMConfig extends Config {
             optionNames.get("tickInterval").addHideCondition(() -> !isEqualTo(lineType,0));
             optionNames.get("tickInterval").addHideCondition(() -> !lambda("modEnabled"));
             optionNames.get("pearlLineWidth").addHideCondition(() -> !lambda("modEnabled"));
+
+            optionNames.get("autoDownload").addHideCondition(() -> !lambda("autoUpdate"));
 
             optionNames.get("startWaypointColorIndex").addHideCondition(() -> !lambda("startTextToggle"));
             optionNames.get("startTextSize").addHideCondition(() -> !lambda("startTextToggle"));
