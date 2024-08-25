@@ -349,6 +349,23 @@ public class Main {
             LogUtils.error(e);
         }
     }
+    public static void updatePearlRoutes() {
+        File configFile = new File(ROUTES_PATH + File.separator + "pearlroutes.json");
+        try {
+            LogUtils.info("Downloading routes.json...");
+            SSLUtils.disableSSLCertificateChecking();
+
+            InputStream inputStream = new URL("https://raw.githubusercontent.com/yourboykyle/SecretRoutes/main/pearlroutes.json").openStream();
+            OutputStream outputStream = new FileOutputStream(configFile);
+            IOUtils.copy(inputStream, outputStream);
+            outputStream.close();
+            inputStream.close();
+
+            SSLUtils.enableSSLCertificateChecking();
+        } catch (Exception e){
+            LogUtils.error(e);
+        }
+    }
 
     @SubscribeEvent
     public void onServerConnect(FMLNetworkEvent.ClientConnectedToServerEvent event) {

@@ -60,7 +60,12 @@ public class Room {
             name = roomName;
 
             if (roomName != null) {
-                String filePath = Main.ROUTES_PATH + File.separator + SRMConfig.routesFileName;
+                String filePath;
+                if(SRMConfig.pearls) {
+                    filePath = Main.ROUTES_PATH + File.separator + SRMConfig.pearlRoutesFileName;
+                }else{
+                    filePath = Main.ROUTES_PATH + File.separator + SRMConfig.routesFileName;
+                }
 
                 Gson gson = new GsonBuilder().create();
                 FileReader reader = new FileReader(filePath);

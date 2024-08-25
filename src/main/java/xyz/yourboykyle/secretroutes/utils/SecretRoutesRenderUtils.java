@@ -50,7 +50,7 @@ public class SecretRoutesRenderUtils {
 
         RenderUtils.drawBoxAtBlock(x, y, z, color, width, height, 1);
     }
-    public static void drawBoxAtBlock(double worldX, double worldY, double worldZ, OneColor color, double width, int height) {
+    public static void drawBoxAtBlock(double worldX, double worldY, double worldZ, OneColor color, double width, double height) {
         Minecraft mc = Minecraft.getMinecraft();
         double playerX = mc.getRenderManager().viewerPosX;
         double playerY = mc.getRenderManager().viewerPosY;
