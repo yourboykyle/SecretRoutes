@@ -241,7 +241,7 @@ public class RenderUtils {
         GlStateManager.enableLighting();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.popMatrix();
-
         GlStateManager.popAttrib();
     }
+
 }

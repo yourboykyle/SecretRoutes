@@ -733,6 +733,14 @@ public class SRMConfig extends Config {
     public static boolean verboseInfo = false;
 
     @Switch(
+            name= "Better rendering",
+            description = "adds more detailed logging rendering, useful for debugging",
+            subcategory = "Chat logging",
+            category = "Dev"
+    )
+    public static boolean verboseRendering = false;
+
+    @Switch(
             name= "Force outdated",
             description = "Forces the version to be outdated, useful for testing the auto updater",
             subcategory = "General",
@@ -808,6 +816,7 @@ public class SRMConfig extends Config {
             optionNames.get("verboseRecording").addHideCondition(() -> !lambda("verboseLogging"));
             optionNames.get("verboseUpdating").addHideCondition(() -> !lambda("verboseLogging"));
             optionNames.get("verboseInfo").addHideCondition(() -> !lambda("verboseLogging"));
+            optionNames.get("verboseRendering").addHideCondition(() -> !lambda("verboseLogging"));
         } catch (Exception e) {
             LogUtils.error(e);
         }

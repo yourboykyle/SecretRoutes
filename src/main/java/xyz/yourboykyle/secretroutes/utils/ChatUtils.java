@@ -13,7 +13,7 @@ public class ChatUtils {
         }
         Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(message).setChatStyle(new ChatStyle().setColor(color)));
         //if(!SRMConfig.verboseInfo){
-            LogUtils.info("Sent chat message: " + message);
+           // LogUtils.info("Sent chat message: " + message);
         //}
     }
     public static void sendChatMessage(String message) {
@@ -51,6 +51,12 @@ public class ChatUtils {
             case "Info":
                 if(SRMConfig.verboseInfo && !message.contains("Sent chat message")){
                     sendVerboseMessage("§d[Info] " + message);
+                    return true;
+                }
+                return false;
+            case "Rendering":
+                if(SRMConfig.verboseRendering){
+                    sendVerboseMessage("§5[Rendering] " + message);
                     return true;
                 }
                 return false;
