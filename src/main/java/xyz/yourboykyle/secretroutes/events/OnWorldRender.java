@@ -39,7 +39,10 @@ import xyz.yourboykyle.secretroutes.utils.multiStorage.Triple;
 
 import java.util.ArrayList;
 
+import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
+
 public class OnWorldRender {
+    private final static String verboseTAG = "Rendering";
     @SubscribeEvent
     public void onRenderWorld(RenderWorldLastEvent event) {
         // Make sure the player is actually in a dungeon
@@ -52,6 +55,7 @@ public class OnWorldRender {
         ArrayList<BlockPos> minesPositions = new ArrayList<>();
         ArrayList<BlockPos> interactsPositions = new ArrayList<>();
         ArrayList<BlockPos> superboomsPositions = new ArrayList<>();
+        ArrayList<Triple<Double, Double, Double>> enderpearlPositons = new ArrayList<>();
         ArrayList<Tuple<Float, Float>> enderpearlAngles = new ArrayList<>();
 
 
@@ -141,14 +145,18 @@ public class OnWorldRender {
                 posZ = positions.getThree() - 0.25;
 
                 SecretRoutesRenderUtils.drawBoxAtBlock(posX, posY, posZ, SRMConfig.enderpearls, 0.5, 0);
+                double yaw = RotationUtils.relativeToActualYaw(enderpearlAngles.get(index).getSecond(), RoomDetection.roomDirection);
+                double pitch = enderpearlAngles.get(index).getFirst();
 
-                double yawRadians = Math.toRadians(RotationUtils.relativeToActualYaw(enderpearlAngles.get(index).getSecond(), RoomDetection.roomDirection));
-                double pitchRadians = Math.toRadians(enderpearlAngles.get(index).getFirst());
+                double yawRadians = Math.toRadians(yaw);
+                double pitchRadians = Math.toRadians(pitch);
+
+
 
                 double length = 10.0D;
-                double x = -Math.sin(yawRadians) * Math.cos(pitchRadians);
-                double y = -Math.sin(pitchRadians);
-                double z = Math.cos(yawRadians) * Math.cos(pitchRadians);
+                double x = -Math.sin(yawRadians) * Math.cos(pitchRadians); // (z)
+                double y = -Math.sin(pitchRadians); // z
+                double z = Math.cos(yawRadians) * Math.cos(pitchRadians); // (x)
 
                 double sideLength = Math.sqrt(x * x + y * y + z * z);
                 x /= sideLength;
@@ -157,15 +165,13 @@ public class OnWorldRender {
 
 
 
-                double newX = posX + x * length;
-                double newY = posY + y * length;
-                double newZ = posZ + z * length;
-                //SecretRoutesRenderUtils.drawBoxAtBlock(newX, newY, newZ, SRMConfig.enderpearls, 0.03125, 0);
+                double newX = posX + x * length + 0.25;
+                double newY = posY + y * length+ 1.62;
+                double newZ = posZ + z * length+ 0.25;
+                //sendVerboseMessage("Origin: (" + (posX +0.25f)+ ", " + (posY +1.62f) + ", " + posZ +(0.25)+") to End: (" + newX + ", " + newY + ", " + newZ + ") with a angles of ("+yaw+", "+pitch+") -> ("+yawRadians+", "+pitchRadians+")", verboseTAG);
+                //SecretRoutesRenderUtils.drawBoxAtBlock(newX, newY, newZ, SRMConfig.enderpearls, 0.03125, 0.03125);
                 RenderUtils.drawNormalLine(posX + 0.25F, posY + 1.62F, posZ + 0.25F, newX, newY, newZ, SRMConfig.pearlLineColor, event.partialTicks, true, SRMConfig.pearlLineWidth);
-                if(SRMConfig.enderpearlTextToggle) {
-                    SecretRoutesRenderUtils.drawText(posX, posY, posZ, SecretRoutesRenderUtils.getTextColor(SRMConfig.enderpearlWaypointColorIndex) + "ender pearl", SRMConfig.enderpearlTextSize, event.partialTicks);
-                }
-
+                enderpearlPositons.add(new Triple<>(posX, posY, posZ));
                 index++;
             }
         }
@@ -216,6 +222,11 @@ public class OnWorldRender {
                     SecretRoutesRenderUtils.drawText(superboomPos.getX(), superboomPos.getY(), superboomPos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.superboomsWaypointColorIndex) + "superboom", SRMConfig.superboomsTextSize, event.partialTicks);
                 }
             }
+            if(SRMConfig.enderpearlTextToggle) {
+                for(Triple<Double, Double, Double> enderpearlPos : enderpearlPositons) {
+                    SecretRoutesRenderUtils.drawText(enderpearlPos.getOne(), enderpearlPos.getTwo(), enderpearlPos.getThree(), SecretRoutesRenderUtils.getTextColor(SRMConfig.enderpearlWaypointColorIndex) + "ender pearl", SRMConfig.enderpearlTextSize, event.partialTicks);
+                }
+            }
             GlStateManager.enableTexture2D();
         }
 
@@ -230,11 +241,11 @@ public class OnWorldRender {
                 BlockPos pos = MapUtils.relativeToActual(new BlockPos(startCoords.get(0).getAsInt(), startCoords.get(1).getAsInt(), startCoords.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
 
                 // Render the text
-                GlStateManager.disableTexture2D();
+                //GlStateManager.disableTexture2D();
                 if(SRMConfig.startTextToggle) {
                     SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.startWaypointColorIndex) + "Start", SRMConfig.startTextSize, event.partialTicks);
                 }
-                GlStateManager.enableTexture2D();
+                //GlStateManager.enableTexture2D();
             }
         }
 
