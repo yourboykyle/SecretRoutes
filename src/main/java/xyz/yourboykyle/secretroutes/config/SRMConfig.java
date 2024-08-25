@@ -72,13 +72,31 @@ public class SRMConfig extends Config {
     )
     public static int pearlLineWidth = 5;
 
+    @DualOption(
+            name = "Type of routes",
+            left = "No pearls", right = "Pearls",
+            description = "Toggle the default between pearls and no pearls",
+            subcategory = "General",
+            size = OptionSize.DUAL
+    )
+    public static boolean pearls = true;
+
     @Text(
             name = "Routes file name",
+            description = "The file name used when No pearls is selected",
             placeholder = "routes.json",
             subcategory = "General"
 
     )
     public static String routesFileName = "routes.json";
+    @Text(
+            name = "Pearl routes file name",
+            description = "The file name used when Pearls is selected",
+            placeholder = "pearlroutes.json",
+            subcategory = "General"
+
+    )
+    public static String pearlRoutesFileName = "pearlroutes.json";
 
     @Button(
             name = "Update routes",
@@ -89,7 +107,11 @@ public class SRMConfig extends Config {
     )
     Runnable runnable = () -> {
         new Thread(() -> {
-            Main.updateRoutes();
+            if(pearls){
+                Main.updatePearlRoutes();
+            }else{
+                Main.updateRoutes();
+            }
         }).start();
     };
 
