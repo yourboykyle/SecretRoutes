@@ -3,20 +3,20 @@ package xyz.yourboykyle.secretroutes.config;
 import cc.polyfrost.oneconfig.config.Config;
 import cc.polyfrost.oneconfig.config.annotations.*;
 import cc.polyfrost.oneconfig.config.core.OneColor;
+import cc.polyfrost.oneconfig.config.core.OneKeyBind;
 import cc.polyfrost.oneconfig.config.data.InfoType;
 import cc.polyfrost.oneconfig.config.data.Mod;
 import cc.polyfrost.oneconfig.config.data.ModType;
 import cc.polyfrost.oneconfig.config.data.OptionSize;
+import cc.polyfrost.oneconfig.libs.universal.UKeyboard;
+import io.github.quantizr.dungeonrooms.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.huds.CurrentRoomHUD;
 import xyz.yourboykyle.secretroutes.config.huds.RecordingHUD;
-import xyz.yourboykyle.secretroutes.utils.ChatUtils;
-import xyz.yourboykyle.secretroutes.utils.FileUtils;
-import xyz.yourboykyle.secretroutes.utils.LogUtils;
-import xyz.yourboykyle.secretroutes.utils.Room;
+import xyz.yourboykyle.secretroutes.utils.*;
 
 import java.io.File;
 
@@ -43,7 +43,7 @@ public class SRMConfig extends Config {
             options = {"Explosion Normal", "Explosion Large", "Explosion Huge", "Fireworks Spark", "Bubble", "Water Splash", "Water Wake", "Suspended", "Suspended Depth", "Crit", "Magic Crit", "Smoke Normal", "Smoke Large", "Spell", "Instant Spell", "Mob Spell", "Mob Spell Ambient", "Witch Magic", "Drip Water", "Drip Lava", "Villager Angry", "Villager Happy", "Town Aura", "Note", "Portal", "Enchantment Table", "Flame", "Lava", "Footstep", "Cloud", "Redstone", "Snowball", "Snow Shovel", "Slime", "Heart", "Barrier", "Water Drop", "Item Take", "Mob Appearance"},
             subcategory = "General"
     )
-    public static int particles = 0;
+    public static int particles = 26;
 
     @Slider(
             name = "Tick inverval",
@@ -541,11 +541,18 @@ public class SRMConfig extends Config {
     // Etherwarp waypoints
     @Switch(
             name = "Etherwarp text toggle",
-            size =  OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
     )
     public static boolean etherwarpsTextToggle = false;
+
+    @Switch(
+            name = "Etherwarp enumeration toggle",
+            subcategory = "Waypoint Text Rendering",
+            category = "Rendering",
+            description = "Adds a number to the etherwarp waypoints"
+    )
+    public static boolean etherwarpsEnumToggle = false;
 
     @Dropdown(
             name = "Etherwarp waypoint text color",
@@ -574,6 +581,14 @@ public class SRMConfig extends Config {
     )
     public static boolean minesTextToggle = false;
 
+    @Switch(
+            name = "Stonk enumeration toggle",
+            subcategory = "Waypoint Text Rendering",
+            category = "Rendering",
+            description = "Adds a number to the mines waypoints"
+    )
+    public static boolean minesEnumToggle = false;
+
     @Dropdown(
             name = "Stonk waypoint text color",
             options = {"Black", "Dark blue", "Dark green", "Dark aqua", "Dark red", "Dark purple", "Gold", "Gray", "Dark gray", "Blue", "Green", "Aqua", "Red", "Light purple", "Yellow", "White"},
@@ -595,11 +610,19 @@ public class SRMConfig extends Config {
     // Interacts waypoints
     @Switch(
             name = "Interact text toggle",
-            size =  OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
+            size = OptionSize.DUAL,
             category = "Rendering"
     )
     public static boolean interactsTextToggle = false;
+
+    @Switch(
+            name = "Interact enumeration toggle",
+            subcategory = "Waypoint Text Rendering",
+            category = "Rendering",
+            description = "Adds a number to the interact waypoints"
+    )
+    public static boolean interactsEnumToggle = false;
 
     @Dropdown(
             name = "Interact waypoint text color",
@@ -622,11 +645,19 @@ public class SRMConfig extends Config {
     // Superboom waypoints
     @Switch(
             name = "Superboom text toggle",
-            size =  OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
+            size = OptionSize.DUAL,
             category = "Rendering"
     )
     public static boolean superboomsTextToggle = false;
+
+    @Switch(
+            name = "Superboom enumeration toggle",
+            subcategory = "Waypoint Text Rendering",
+            category = "Rendering",
+            description = "Adds a number to the superboom waypoints"
+    )
+    public static boolean superboomsEnumToggle = false;
 
     @Dropdown(
             name = "Superboom waypoint text color",
@@ -646,14 +677,22 @@ public class SRMConfig extends Config {
     )
     public static float superboomsTextSize = 3;
 
-    // Superboom waypoints
+    // Enderpearl waypoints
     @Switch(
             name = "Ender Pearl text toggle",
-            size =  OptionSize.DUAL,
+            size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
     )
     public static boolean enderpearlTextToggle = true;
+
+    @Switch(
+            name = "Enderpearl enumeration toggle",
+            subcategory = "Waypoint Text Rendering",
+            category = "Rendering",
+            description = "Adds a number to the superboom waypoints"
+    )
+    public static boolean enderpearlEnumToggle = false;
 
     @Dropdown(
             name = "Ender Pearl waypoint text color",
@@ -696,18 +735,23 @@ public class SRMConfig extends Config {
         batWaypointColorIndex = 10;
         batTextSize = 3;
         etherwarpsTextToggle = false;
+        etherwarpsEnumToggle = false;
         etherwarpsWaypointColorIndex = 5;
         etherwarpsTextSize = 3;
         minesTextToggle = false;
+        minesEnumToggle = false;
         minesWaypointColorIndex = 14;
         minesTextSize = 3;
         interactsTextToggle = false;
+        interactsEnumToggle = false;
         interactsWaypointColorIndex = 9;
         interactsTextSize = 3;
         superboomsTextToggle = false;
+        superboomsEnumToggle = false;
         superboomsWaypointColorIndex = 12;
         superboomsTextSize = 3;
         enderpearlTextToggle = true;
+        enderpearlEnumToggle = false;
         enderpearlWaypointColorIndex = 11;
         enderpearlTextSize = 3;
     };
@@ -778,6 +822,78 @@ public class SRMConfig extends Config {
     )
     public static boolean c;
 
+    @Dropdown(
+            name = "Custom Pearl Orientation",
+            options = {"Default", "SW", "NW", "NE", "SE"},
+            category = "Dev"
+    )
+    public static int customPearlOrientation = 0;
+
+    @KeyBind(
+            name = "Next Secret",
+            description = "Cycles to the next secret",
+            category = "Keybinds",
+            subcategory = "Secrets",
+            size = OptionSize.DUAL
+    )
+    public static OneKeyBind nextSecret = new OneKeyBind(UKeyboard.KEY_RBRACKET);
+
+    @KeyBind(
+            name = "Last Secret",
+            description = "Cycles to the last secret",
+            category = "Keybinds",
+            subcategory = "Secrets",
+            size = OptionSize.DUAL
+    )
+    public static OneKeyBind lastSecret = new OneKeyBind(UKeyboard.KEY_LBRACKET);
+
+    @Switch(
+            name = "Custom Secret Sound",
+            description = "Plays a custom sound when a secret is found",
+            category = "General",
+            subcategory = "Sound",
+            size = OptionSize.DUAL
+    )
+    public static boolean customSecretSound = false;
+
+    @Dropdown(
+            name = "Custom Secret Sound",
+            options = {"mob.blaze.hit", "fire.ignite", "random.orb", "random.break", "mob.guardian.land.hit", "note.pling", "zyra.meow"},
+            category = "General",
+            subcategory = "Sound"
+    )
+    public static int customSecretSoundIndex = 0;
+
+    @Slider(
+            name = "Custom Secret Sound Volume",
+            min = 0,
+            max = 1.0f,
+            category = "General",
+            subcategory = "Sound"
+    )
+    public static float customSecretSoundVolume = 1.0f;
+
+    @Slider(
+            name = "Custom Secret Sound Pitch",
+            min = 0,
+            max = 2.0f,
+            category = "General",
+            subcategory = "Sound"
+    )
+    public static float customSecretSoundPitch = 1.0f;
+
+    @Button(
+            name = "Play Custom Secret Sound",
+            text = "Play",
+            description = "Plays the custom secret sound",
+            category = "General",
+            subcategory = "Sound",
+            size = 2
+    )
+    public static Runnable runnable15 = ()->{
+        SecretSounds.secretChime(true);
+    };
+
 
 
 
@@ -821,14 +937,19 @@ public class SRMConfig extends Config {
             optionNames.get("batWaypointColorIndex").addHideCondition(() -> !lambda("batTextToggle"));
             optionNames.get("batTextSize").addHideCondition(() -> !lambda("batTextToggle"));
 
+            optionNames.get("etherwarpsEnumToggle").addHideCondition(() -> !lambda("etherwarpsTextToggle"));
             optionNames.get("etherwarpsWaypointColorIndex").addHideCondition(() -> !lambda("etherwarpsTextToggle"));
             optionNames.get("etherwarpsTextSize").addHideCondition(() -> !lambda("etherwarpsTextToggle"));
+            optionNames.get("minesEnumToggle").addHideCondition(() -> !lambda("minesTextToggle"));
             optionNames.get("minesWaypointColorIndex").addHideCondition(() -> !lambda("minesTextToggle"));
             optionNames.get("minesTextSize").addHideCondition(() -> !lambda("minesTextToggle"));
+            optionNames.get("interactsEnumToggle").addHideCondition(() -> !lambda("interactsTextToggle"));
             optionNames.get("interactsWaypointColorIndex").addHideCondition(() -> !lambda("interactsTextToggle"));
             optionNames.get("interactsTextSize").addHideCondition(() -> !lambda("interactsTextToggle"));
+            optionNames.get("superboomsEnumToggle").addHideCondition(() -> !lambda("superboomsTextToggle"));
             optionNames.get("superboomsWaypointColorIndex").addHideCondition(() -> !lambda("superboomsTextToggle"));
             optionNames.get("superboomsTextSize").addHideCondition(() -> !lambda("superboomsTextToggle"));
+            optionNames.get("enderpearlEnumToggle").addHideCondition(() -> !lambda("enderpearlTextToggle"));
             optionNames.get("enderpearlWaypointColorIndex").addHideCondition(() -> !lambda("enderpearlTextToggle"));
             optionNames.get("enderpearlTextSize").addHideCondition(() -> !lambda("enderpearlTextToggle"));
 
@@ -839,6 +960,18 @@ public class SRMConfig extends Config {
             optionNames.get("verboseUpdating").addHideCondition(() -> !lambda("verboseLogging"));
             optionNames.get("verboseInfo").addHideCondition(() -> !lambda("verboseLogging"));
             optionNames.get("verboseRendering").addHideCondition(() -> !lambda("verboseLogging"));
+
+
+            optionNames.get("customSecretSoundIndex").addHideCondition(() -> !lambda("customSecretSound"));
+            optionNames.get("customSecretSoundVolume").addHideCondition(() -> !lambda("customSecretSound"));
+            optionNames.get("customSecretSoundPitch").addHideCondition(() -> !lambda("customSecretSound"));
+            optionNames.get("runnable15").addHideCondition(() -> !lambda("customSecretSound"));
+
+            registerKeyBind(lastSecret, () -> { if(Utils.inCatacombs) { Main.currentRoom.lastSecretKeybind(); } else { sendChatMessage("§cYou are not in a dungeon!"); }});
+            registerKeyBind(nextSecret, () -> { if(Utils.inCatacombs) { Main.currentRoom.nextSecretKeybind(); } else { sendChatMessage("§cYou are not in a dungeon!"); }});
+
+
+
         } catch (Exception e) {
             LogUtils.error(e);
         }

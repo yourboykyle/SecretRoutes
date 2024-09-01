@@ -30,7 +30,7 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
-import xyz.yourboykyle.secretroutes.utils.multiStorage.Triple;
+import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 
 import java.util.List;
 
@@ -111,7 +111,11 @@ public class RenderUtils {
         double z = loc1.getZ();
 
         for (int i = 0; i <= maxPoints; i++) {
-            spawnParticleAtLocation(new BlockPos(x, y, z), new BlockPos(0, 0, 0), particle);
+            double offsetRot = Math.atan2 (distanceX, distanceY);
+            double offsetX = Math.cos(offsetRot)*0.25;
+            double offsetZ = Math.sin(offsetRot)*0.25;
+
+            spawnParticleAtLocation(new BlockPos(x, y, z), new BlockPos(offsetX, 0, offsetZ), particle);
 
             x += deltaX;
             y += deltaY;
