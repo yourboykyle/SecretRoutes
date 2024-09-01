@@ -35,9 +35,11 @@ import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.RenderUtils;
 import xyz.yourboykyle.secretroutes.utils.RotationUtils;
 import xyz.yourboykyle.secretroutes.utils.SecretRoutesRenderUtils;
-import xyz.yourboykyle.secretroutes.utils.multiStorage.Triple;
+import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
 
@@ -61,6 +63,8 @@ public class OnWorldRender {
 
         GlStateManager.disableDepth();
         GlStateManager.disableCull();
+
+
 
         // Render the etherwarps
         if(Main.currentRoom.currentSecretWaypoints != null && Main.currentRoom.currentSecretWaypoints.get("etherwarps") != null) {
@@ -115,6 +119,26 @@ public class OnWorldRender {
                 superboomsPositions.add(pos);
 
                 SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(),  pos.getY(), pos.getZ(), SRMConfig.superbooms, 1, 1);
+            }
+        }
+        // Render normal lines if config says so
+        if(Main.currentRoom.currentSecretWaypoints != null && Main.currentRoom.currentSecretWaypoints.get("locations") != null && SRMConfig.lineType == 1) {
+            List<Triple<Double, Double, Double>> lines = new LinkedList<>();
+
+            JsonArray lineLocations = Main.currentRoom.currentSecretWaypoints.get("locations").getAsJsonArray();
+            for (JsonElement lineLocationElement : lineLocations) {
+                JsonArray lineLocation = lineLocationElement.getAsJsonArray();
+
+                Main.checkRoomData();
+                Triple<Double, Double, Double> linePos = MapUtils.relativeToActual(lineLocation.get(0).getAsDouble(), lineLocation.get(1).getAsDouble(), lineLocation.get(2).getAsDouble(), RoomDetection.roomDirection, RoomDetection.roomCorner);
+                linePos.setOne(linePos.getOne() + 0.5);
+                linePos.setTwo(linePos.getTwo() + 0.5);
+                linePos.setThree(linePos.getThree() + 0.5);
+                lines.add(linePos);
+            }
+
+            if(SRMConfig.modEnabled) {
+                RenderUtils.drawMultipleNormalLines(lines, event.partialTicks, SRMConfig.lineColor, SRMConfig.width);
             }
         }
 
@@ -203,28 +227,38 @@ public class OnWorldRender {
                 }
             }
             if(SRMConfig.etherwarpsTextToggle) {
+                int iEtherwarp = 1;
                 for(BlockPos etherwarpPos : etherwarpPositions) {
-                    SecretRoutesRenderUtils.drawText(etherwarpPos.getX(), etherwarpPos.getY(), etherwarpPos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.etherwarpsWaypointColorIndex) + "etherwarp", SRMConfig.etherwarpsTextSize, event.partialTicks);
+                    String text = SRMConfig.etherwarpsEnumToggle ? "etherwarp" : "etherwarp " + iEtherwarp++;
+                    SecretRoutesRenderUtils.drawText(etherwarpPos.getX(), etherwarpPos.getY(), etherwarpPos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.etherwarpsWaypointColorIndex) + text, SRMConfig.etherwarpsTextSize, event.partialTicks);
                 }
             }
             if(SRMConfig.minesTextToggle) {
+                int iMine = 1;
                 for(BlockPos minePos : minesPositions) {
-                    SecretRoutesRenderUtils.drawText(minePos.getX(), minePos.getY(), minePos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.minesWaypointColorIndex) + "stonk", SRMConfig.minesTextSize, event.partialTicks);
+                    String text = SRMConfig.minesEnumToggle ? "mine" : "mine " + iMine++;
+                    SecretRoutesRenderUtils.drawText(minePos.getX(), minePos.getY(), minePos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.minesWaypointColorIndex) + text, SRMConfig.minesTextSize, event.partialTicks);
                 }
             }
             if(SRMConfig.interactsTextToggle) {
+                int iInteract = 1;
                 for(BlockPos interactPos : interactsPositions) {
-                    SecretRoutesRenderUtils.drawText(interactPos.getX(), interactPos.getY(), interactPos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.interactsWaypointColorIndex) + "interact", SRMConfig.interactsTextSize, event.partialTicks);
+                    String text = SRMConfig.interactsEnumToggle ? "interact" : "interact " + iInteract;
+                    SecretRoutesRenderUtils.drawText(interactPos.getX(), interactPos.getY(), interactPos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.interactsWaypointColorIndex) + text, SRMConfig.interactsTextSize, event.partialTicks);
                 }
             }
             if(SRMConfig.superboomsTextToggle) {
+                int iSuperboom = 1;
                 for(BlockPos superboomPos : superboomsPositions) {
-                    SecretRoutesRenderUtils.drawText(superboomPos.getX(), superboomPos.getY(), superboomPos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.superboomsWaypointColorIndex) + "superboom", SRMConfig.superboomsTextSize, event.partialTicks);
+                    String text = SRMConfig.superboomsEnumToggle ? "superboom" : "superboom " + iSuperboom++;
+                    SecretRoutesRenderUtils.drawText(superboomPos.getX(), superboomPos.getY(), superboomPos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.superboomsWaypointColorIndex) + text, SRMConfig.superboomsTextSize, event.partialTicks);
                 }
             }
             if(SRMConfig.enderpearlTextToggle) {
+                int iEnderpearl = 1;
                 for(Triple<Double, Double, Double> enderpearlPos : enderpearlPositons) {
-                    SecretRoutesRenderUtils.drawText(enderpearlPos.getOne(), enderpearlPos.getTwo(), enderpearlPos.getThree(), SecretRoutesRenderUtils.getTextColor(SRMConfig.enderpearlWaypointColorIndex) + "ender pearl", SRMConfig.enderpearlTextSize, event.partialTicks);
+                    String text = SRMConfig.enderpearlEnumToggle ? "ender pearl" : "ender pearl " + iEnderpearl++;
+                    SecretRoutesRenderUtils.drawText(enderpearlPos.getOne(), enderpearlPos.getTwo(), enderpearlPos.getThree(), SecretRoutesRenderUtils.getTextColor(SRMConfig.enderpearlWaypointColorIndex) + text, SRMConfig.enderpearlTextSize, event.partialTicks);
                 }
             }
             GlStateManager.enableTexture2D();
