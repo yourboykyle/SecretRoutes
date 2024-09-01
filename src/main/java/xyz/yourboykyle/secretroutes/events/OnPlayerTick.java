@@ -26,6 +26,7 @@ import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
+import xyz.yourboykyle.secretroutes.utils.SecretSounds;
 
 public class OnPlayerTick {
     @SubscribeEvent
@@ -49,6 +50,7 @@ public class OnPlayerTick {
             BlockPos batPos = Main.currentRoom.getSecretLocation();
 
             if (pos.getX() >= batPos.getX() - 3 && pos.getX() <= batPos.getX() + 3 && pos.getY() >= batPos.getY() - 3 && pos.getY() <= batPos.getY() + 3 && pos.getZ() >= batPos.getZ() - 3 && pos.getZ() <= batPos.getZ() + 3) {
+                SecretSounds.secretChime();
                 Main.currentRoom.nextSecret();
                 LogUtils.info("Went by bat at " + batPos);
             }
@@ -63,6 +65,7 @@ public class OnPlayerTick {
                     try {
                         Thread.sleep(1500);
                         if (Main.currentRoom.getSecretType() == Room.SECRET_TYPES.ITEM) {
+                            SecretSounds.secretChime();
                             Main.currentRoom.nextSecret();
                             LogUtils.info("Picked up item at " + itemPos);
                         }

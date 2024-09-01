@@ -27,6 +27,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
+import xyz.yourboykyle.secretroutes.utils.SecretSounds;
 
 public class OnPlayerInteract {
     @SubscribeEvent
@@ -39,7 +40,7 @@ public class OnPlayerInteract {
             if(block != Blocks.chest && block != Blocks.trapped_chest && block != Blocks.lever && block != Blocks.skull) {
                 return;
             }
-
+            SecretSounds.secretChime();
             if (Main.currentRoom.getSecretType() == Room.SECRET_TYPES.INTERACT) {
                 BlockPos interactPos = Main.currentRoom.getSecretLocation();
 

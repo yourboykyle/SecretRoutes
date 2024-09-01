@@ -26,7 +26,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.Vec3;
 import net.minecraft.util.Vec4b;
 import net.minecraft.world.storage.MapData;
-import xyz.yourboykyle.secretroutes.utils.multiStorage.Triple;
+import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 
 import java.awt.*;
 import java.util.List;

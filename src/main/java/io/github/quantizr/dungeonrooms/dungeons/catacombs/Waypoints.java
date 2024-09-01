@@ -47,7 +47,7 @@ import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.RenderUtils;
-import xyz.yourboykyle.secretroutes.utils.multiStorage.Triple;
+import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 
 import java.awt.*;
 import java.util.List;
@@ -183,27 +183,6 @@ public class Waypoints {
                     GlStateManager.enableTexture2D();
                     GlStateManager.enableDepth();
                     GlStateManager.enableCull();
-
-                    // Render normal lines if config says so
-                    if(Main.currentRoom.currentSecretWaypoints != null && Main.currentRoom.currentSecretWaypoints.get("locations") != null && SRMConfig.lineType == 1) {
-                        List<Triple<Double, Double, Double>> lines = new LinkedList<>();
-
-                        JsonArray lineLocations = Main.currentRoom.currentSecretWaypoints.get("locations").getAsJsonArray();
-                        for (JsonElement lineLocationElement : lineLocations) {
-                            JsonArray lineLocation = lineLocationElement.getAsJsonArray();
-
-                            Main.checkRoomData();
-                            Triple<Double, Double, Double> linePos = MapUtils.relativeToActual(lineLocation.get(0).getAsDouble(), lineLocation.get(1).getAsDouble(), lineLocation.get(2).getAsDouble(), RoomDetection.roomDirection, RoomDetection.roomCorner);
-                            linePos.setOne(linePos.getOne() + 0.5);
-                            linePos.setTwo(linePos.getTwo() + 0.5);
-                            linePos.setThree(linePos.getThree() + 0.5);
-                            lines.add(linePos);
-                        }
-
-                        if(SRMConfig.modEnabled) {
-                            RenderUtils.drawMultipleNormalLines(lines, event.partialTicks, SRMConfig.lineColor, SRMConfig.width);
-                        }
-                    }
 
 
                 }

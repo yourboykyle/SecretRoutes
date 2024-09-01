@@ -1,4 +1,4 @@
-package xyz.yourboykyle.secretroutes.utils.multiStorage;
+package xyz.yourboykyle.secretroutes.utils.multistorage;
 
 public class Triple <X, Y, Z> extends Tuple<X, Y>{
     private Z three;
