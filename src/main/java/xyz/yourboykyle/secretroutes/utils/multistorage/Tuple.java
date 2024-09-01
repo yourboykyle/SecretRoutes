@@ -1,4 +1,4 @@
-package xyz.yourboykyle.secretroutes.utils.multiStorage;
+package xyz.yourboykyle.secretroutes.utils.multistorage;
 
 public class Tuple<Y, Z> {
     private Y one;

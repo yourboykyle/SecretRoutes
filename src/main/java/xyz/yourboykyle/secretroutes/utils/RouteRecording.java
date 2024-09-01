@@ -11,7 +11,7 @@ import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.Room.SECRET_TYPES;
 import xyz.yourboykyle.secretroutes.utils.Room.WAYPOINT_TYPES;
-import xyz.yourboykyle.secretroutes.utils.multiStorage.Triple;
+import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 
 import java.io.File;
 import java.io.FileReader;

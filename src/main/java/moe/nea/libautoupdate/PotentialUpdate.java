@@ -3,6 +3,7 @@ package moe.nea.libautoupdate;
 import lombok.Value;
 import lombok.val;
 import org.apache.commons.io.IOUtils;
+import xyz.yourboykyle.secretroutes.utils.autoupdate.Updater;
 import xyz.yourboykyle.secretroutes.utils.ChatUtils;
 import xyz.yourboykyle.secretroutes.utils.SSLUtils;
 
@@ -132,14 +133,10 @@ public class PotentialUpdate {
      */
     public void prepareUpdate() throws IOException {
         ChatUtils.sendVerboseMessage("§ePreparing update", verboseTag);
-        extractUpdater();
         downloadUpdate();
     }
 
-    /**
-     * Execute the update.
-     * This is done by first preparing the storage directory using {@link #prepareUpdate()} and then setting the {@link ExitHookInvoker}
-     */
+
     public void executeUpdate() throws IOException {
         prepareUpdate();
         executePreparedUpdate();
@@ -150,11 +147,8 @@ public class PotentialUpdate {
      * Identical to {@link #executeUpdate()} if {@link #prepareUpdate()} was called beforehand.
      */
     public void executePreparedUpdate() {
-        ExitHookInvoker.setExitHook(
-                getContext().getIdentifier(),
-                getUpdateUUID(),
-                getFile("updater.jar"),
-                context.getTarget().generateUpdateActions(this));
+        ChatUtils.sendVerboseMessage("§eSetting exit hook", verboseTag);
+        Updater.setUpdateAtShutdown(getUpdateJarStorage().getAbsolutePath(), context.getCurrentVersion().toString(), update.getVersionNumber().toString());
     }
 
     /**

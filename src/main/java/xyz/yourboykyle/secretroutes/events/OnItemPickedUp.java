@@ -26,6 +26,7 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
+import xyz.yourboykyle.secretroutes.utils.SecretSounds;
 
 public class OnItemPickedUp {
     public static boolean itemSecretOnCooldown = false; // True: do not add item secret waypoint, False: add item secret waypoint
@@ -38,6 +39,7 @@ public class OnItemPickedUp {
 
             if (pos.getX() >= itemPos.getX() - 10 && pos.getX() <= itemPos.getX() + 10 && pos.getY() >= itemPos.getY() - 10 && pos.getY() <= itemPos.getY() + 10 && pos.getZ() >= itemPos.getZ() - 10 && pos.getZ() <= itemPos.getZ() + 10) {
                 Main.currentRoom.nextSecret();
+                SecretSounds.secretChime();
                 LogUtils.info("Picked up item at " + itemPos);
             }
         }

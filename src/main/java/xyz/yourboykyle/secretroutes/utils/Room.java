@@ -109,6 +109,7 @@ public class Room {
     }
 
     public void lastSecretKeybind() {
+
         if(currentSecretIndex > 0) {
             currentSecretIndex--;
         }

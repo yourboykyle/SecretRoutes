@@ -27,7 +27,9 @@ import io.github.quantizr.dungeonrooms.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.ClientCommandHandler;
+import net.minecraftforge.client.event.sound.SoundEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
@@ -43,7 +45,7 @@ import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.events.*;
 import xyz.yourboykyle.secretroutes.events.OnMouseInput;
 import xyz.yourboykyle.secretroutes.utils.*;
-import xyz.yourboykyle.secretroutes.utils.AutoUpdate.UpdateManager;
+import xyz.yourboykyle.secretroutes.utils.autoupdate.UpdateManager;
 
 import java.awt.*;
 import java.io.*;
@@ -61,9 +63,12 @@ public class Main {
     public static final String VERSION = "@VER@";
     public static final String ROUTES_PATH = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes"+File.separator+"routes";
     public static final String COLOR_PROFILE_PATH = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes"+File.separator+"colorprofiles";
+    public static final String tmpDir = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "SecretRoutes" + File.separator + "tmp";
     private final static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     public final static File logDir = new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "logs" + File.separator + "SecretRoutes");
     public static File outputLogs;
+    private static final ResourceLocation SOUND_EVENT = new ResourceLocation("secretroutesmod", "custom_sound");
+    public static SoundEvent customSound;
 
     public static Room currentRoom = new Room(null);
     public static RouteRecording routeRecording = new RouteRecording();
@@ -75,16 +80,13 @@ public class Main {
 
     public static String logFilePath = "";
 
-    // Key Binds
-    public static KeyBinding lastSecret = new KeyBinding("Last Secret", Keyboard.KEY_LBRACKET, "Secret Routes");
-    public static KeyBinding nextSecret = new KeyBinding("Next Secret", Keyboard.KEY_RBRACKET, "Secret Routes");
-
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
         dungeonRooms.preInit(e);
     }
     @Mod.EventHandler
     public void init(FMLInitializationEvent e) {
+        String jarpath = Main.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         // Set up logging system
         String date = sdf.format(System.currentTimeMillis());
         outputLogs = new File(logDir + File.separator + "LATEST-" + date + ".log");
@@ -107,6 +109,20 @@ public class Main {
             System.out.println("Secret Routes Mod logging file creation failed :(");
             e1.printStackTrace();
         }
+        LogUtils.info("Jarpath: "+jarpath);
+        if(!new File(tmpDir).exists()){
+            new File(tmpDir).mkdirs();
+        }
+
+        File batchFile = new File(tmpDir + File.separator + "update.bat");
+        if(batchFile.exists()){
+            batchFile.delete();
+        }
+        File shellFile = new File(tmpDir + File.separator + "update.sh");
+        if(shellFile.exists()){
+            shellFile.delete();
+        }
+
 
         // Set up Config
         config = new SRMConfig();
@@ -123,7 +139,6 @@ public class Main {
         // Register Events
         MinecraftForge.EVENT_BUS.register(new OnBlockPlace());
         MinecraftForge.EVENT_BUS.register(new OnItemPickedUp());
-        MinecraftForge.EVENT_BUS.register(new OnKeyInput());
         MinecraftForge.EVENT_BUS.register(new OnPlayerInteract());
         MinecraftForge.EVENT_BUS.register(new OnPlayerTick());
         MinecraftForge.EVENT_BUS.register(new OnPlaySound());
@@ -140,9 +155,7 @@ public class Main {
         ClientCommandHandler.instance.registerCommand(new ChangeRoute());
         ClientCommandHandler.instance.registerCommand(new ChangeColorProfile());
 
-        // Register Keybinds
-        ClientRegistry.registerKeyBinding(lastSecret);
-        ClientRegistry.registerKeyBinding(nextSecret);
+
 
         // Make sure room data isn't null
         RoomDetection.roomName = "undefined";
@@ -211,18 +224,23 @@ public class Main {
             defaultColors.put("batWaypointColorIndex", SRMConfig.batWaypointColorIndex);
             defaultColors.put("batTextSize", SRMConfig.batTextSize);
             defaultColors.put("etherwarpsTextToggle", SRMConfig.etherwarpsTextToggle);
+            defaultColors.put("etherwarpsEnumToggle", SRMConfig.etherwarpsEnumToggle);
             defaultColors.put("etherwarpsWaypointColorIndex", SRMConfig.etherwarpsWaypointColorIndex);
             defaultColors.put("etherwarpsTextSize", SRMConfig.etherwarpsTextSize);
             defaultColors.put("minesTextToggle", SRMConfig.minesTextToggle);
+            defaultColors.put("minesEnumToggle", SRMConfig.minesEnumToggle);
             defaultColors.put("minesWaypointColorIndex", SRMConfig.minesWaypointColorIndex);
             defaultColors.put("minesTextSize", SRMConfig.minesTextSize);
             defaultColors.put("interactsTextToggle", SRMConfig.interactsTextToggle);
+            defaultColors.put("interactsEnumToggle", SRMConfig.interactsEnumToggle);
             defaultColors.put("interactsWaypointColorIndex", SRMConfig.interactsWaypointColorIndex);
             defaultColors.put("interactsTextSize", SRMConfig.interactsTextSize);
             defaultColors.put("superboomsTextToggle", SRMConfig.superboomsTextToggle);
+            defaultColors.put("superboomsEnumToggle", SRMConfig.superboomsEnumToggle);
             defaultColors.put("superboomsWaypointColorIndex", SRMConfig.superboomsWaypointColorIndex);
             defaultColors.put("superboomsTextSize", SRMConfig.superboomsTextSize);
             defaultColors.put("enderpearlTextToggle", SRMConfig.enderpearlTextToggle);
+            defaultColors.put("enderpearlEnumToggle", SRMConfig.enderpearlEnumToggle);
             defaultColors.put("enderpearlWaypointColorIndex", SRMConfig.enderpearlWaypointColorIndex);
             defaultColors.put("enderpearlTextSize", SRMConfig.enderpearlTextSize);
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -273,18 +291,23 @@ public class Main {
             SRMConfig.batWaypointColorIndex = data.get("batWaypointColorIndex").getAsInt();
             SRMConfig.batTextSize = data.get("batTextSize").getAsFloat();
             SRMConfig.etherwarpsTextToggle =  data.get("etherwarpsTextToggle").getAsBoolean();
+            SRMConfig.etherwarpsEnumToggle =  data.get("etherwarpsEnumToggle").getAsBoolean();
             SRMConfig.etherwarpsWaypointColorIndex = data.get("etherwarpsWaypointColorIndex").getAsInt();
             SRMConfig.etherwarpsTextSize = data.get("etherwarpsTextSize").getAsFloat();
             SRMConfig.minesTextToggle =  data.get("minesTextToggle").getAsBoolean();
+            SRMConfig.minesEnumToggle =  data.get("minesEnumToggle").getAsBoolean();
             SRMConfig.minesWaypointColorIndex = data.get("minesWaypointColorIndex").getAsInt();
             SRMConfig.minesTextSize = data.get("minesTextSize").getAsFloat();
             SRMConfig.interactsTextToggle =  data.get("interactsTextToggle").getAsBoolean();
+            SRMConfig.interactsEnumToggle =  data.get("interactsEnumToggle").getAsBoolean();
             SRMConfig.interactsWaypointColorIndex = data.get("interactsWaypointColorIndex").getAsInt();
             SRMConfig.interactsTextSize = data.get("interactsTextSize").getAsFloat();
             SRMConfig.superboomsTextToggle =  data.get("superboomsTextToggle").getAsBoolean();
+            SRMConfig.superboomsEnumToggle =  data.get("superboomsEnumToggle").getAsBoolean();
             SRMConfig.superboomsWaypointColorIndex = data.get("superboomsWaypointColorIndex").getAsInt();
             SRMConfig.superboomsTextSize = data.get("superboomsTextSize").getAsFloat();
             SRMConfig.enderpearlTextToggle =  data.get("enderpearlTextToggle").getAsBoolean();
+            SRMConfig.enderpearlEnumToggle =  data.get("enderpearlEnumToggle").getAsBoolean();
             SRMConfig.enderpearlWaypointColorIndex = data.get("enderpearlWaypointColorIndex").getAsInt();
             SRMConfig.enderpearlTextSize = data.get("enderpearlTextSize").getAsFloat();
 
@@ -307,8 +330,12 @@ public class Main {
             }
 
             File configFile = new File(filePath);
+            File configFilePearl = new File(ROUTES_PATH+File.separator+ "pearlroutes.json");
             if (!configFile.exists()) {
                 updateRoutes(configFile);
+            }
+            if(!configFilePearl.exists()){
+                updatePearlRoutes();
             }
         } catch(Exception e) {
             LogUtils.error(e);
@@ -416,4 +443,6 @@ public class Main {
         int chromaSpeed = jsonObject.get("dataBit").getAsInt();
         return new OneColor(hue, saturation, brightness, alpha, chromaSpeed);
     }
+
+
 }

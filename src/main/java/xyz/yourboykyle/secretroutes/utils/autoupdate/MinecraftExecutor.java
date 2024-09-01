@@ -17,7 +17,7 @@
  * along with NotEnoughUpdates. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.yourboykyle.secretroutes.utils.AutoUpdate;
+package xyz.yourboykyle.secretroutes.utils.autoupdate;
 import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.Executor;
