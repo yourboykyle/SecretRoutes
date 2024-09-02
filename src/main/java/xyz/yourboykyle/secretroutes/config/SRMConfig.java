@@ -862,7 +862,7 @@ public class SRMConfig extends Config {
             category = "General",
             subcategory = "Sound"
     )
-    public static int customSecretSoundIndex = 0;
+    public static int customSecretSoundIndex = 6;
 
     @Slider(
             name = "Custom Secret Sound Volume",
