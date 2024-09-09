@@ -847,6 +847,15 @@ public class SRMConfig extends Config {
     )
     public static OneKeyBind lastSecret = new OneKeyBind(UKeyboard.KEY_LBRACKET);
 
+    @KeyBind(
+            name = "Toggle Secret rendering",
+            description = "Toggles the rendering of secrets",
+            category = "Keybinds",
+            subcategory = "Secrets",
+            size = OptionSize.DUAL
+    )
+    public static OneKeyBind toggleSecrets = new OneKeyBind(UKeyboard.KEY_BACKSLASH);
+
     @Switch(
             name = "Custom Secret Sound",
             description = "Plays a custom sound when a secret is found",
@@ -969,6 +978,7 @@ public class SRMConfig extends Config {
 
             registerKeyBind(lastSecret, () -> { if(Utils.inCatacombs) { Main.currentRoom.lastSecretKeybind(); } else { sendChatMessage("§cYou are not in a dungeon!"); }});
             registerKeyBind(nextSecret, () -> { if(Utils.inCatacombs) { Main.currentRoom.nextSecretKeybind(); } else { sendChatMessage("§cYou are not in a dungeon!"); }});
+            registerKeyBind(toggleSecrets, () -> { if(Utils.inCatacombs) { Main.toggleSecretsKeybind(); } else { sendChatMessage("§cYou are not in a dungeon!"); }});
 
 
 
