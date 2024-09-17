@@ -214,6 +214,9 @@ public class Main {
             defaultColors.put("startTextToggle", SRMConfig.startTextToggle);
             defaultColors.put("startWaypointColorIndex", SRMConfig.startWaypointColorIndex);
             defaultColors.put("startTextSize", SRMConfig.startTextSize);
+            defaultColors.put("exitTextToggle", SRMConfig.exitTextToggle);
+            defaultColors.put("exitWaypointColorIndex", SRMConfig.exitWaypointColorIndex);
+            defaultColors.put("exitTextSize", SRMConfig.exitTextSize);
             defaultColors.put("interactTextToggle", SRMConfig.interactTextToggle);
             defaultColors.put("interactTextSize", SRMConfig.interactTextSize);
             defaultColors.put("interactWaypointColorIndex", SRMConfig.interactWaypointColorIndex);
@@ -281,6 +284,9 @@ public class Main {
             SRMConfig.startTextToggle = data.get("startTextToggle").getAsBoolean();
             SRMConfig.startWaypointColorIndex = data.get("startWaypointColorIndex").getAsInt();
             SRMConfig.startTextSize = data.get("startTextSize").getAsFloat();
+            SRMConfig.exitTextToggle = data.get("exitTextToggle").getAsBoolean();
+            SRMConfig.exitWaypointColorIndex = data.get("exitWaypointColorIndex").getAsInt();
+            SRMConfig.exitTextSize = data.get("exitTextSize").getAsFloat();
             SRMConfig.interactTextToggle =  data.get("interactTextToggle").getAsBoolean();
             SRMConfig.interactWaypointColorIndex = data.get("interactWaypointColorIndex").getAsInt();
             SRMConfig.interactTextSize = data.get("interactTextSize").getAsFloat();
