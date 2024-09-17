@@ -56,7 +56,11 @@ public class OnPlayerTick {
             }
         }
 
-        if(Main.currentRoom.getSecretType() == Room.SECRET_TYPES.ITEM) {
+        /* This has been commented out because it is causing it to log the secret multiple times if there are 2 secrets in a row in the route.
+        This was originally added because in a specific room, you cannot get the item secret if it spawns and the velocity pushes the item away from you.
+        But you can still get the secret if you walk over to the item secret, or just press the next secret keybind if you're lazy.
+        */
+        /*if(Main.currentRoom.getSecretType() == Room.SECRET_TYPES.ITEM) {
             BlockPos pos = e.player.getPosition();
             BlockPos itemPos = Main.currentRoom.getSecretLocation();
 
@@ -74,7 +78,7 @@ public class OnPlayerTick {
                     }
                 }).start();
             }
-        }
+        }*/
 
 
         // Route Recording
