@@ -6,12 +6,10 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
-
-import java.io.File;
 
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 
@@ -62,6 +60,7 @@ public class Recording extends CommandBase {
                 Main.routeRecording.newSecret();
                 Main.routeRecording.stopRecording(); // Exiting the route, it should be stopped
                 Main.routeRecording.setRecordingMessage("Added route exit waypoint & stopped recording.");
+                LogUtils.info("Added route exit waypoint & stopped recording.");
             } else {
                 sendChatMessage(EnumChatFormatting.RED+"Route recording is not enabled. Run /recording start");
             }

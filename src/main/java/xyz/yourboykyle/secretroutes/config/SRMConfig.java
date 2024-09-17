@@ -221,6 +221,7 @@ public class SRMConfig extends Config {
                 Main.routeRecording.newSecret();
                 Main.routeRecording.stopRecording(); // Exiting the route, it should be stopped
                 Main.routeRecording.setRecordingMessage("Added route exit waypoint & stopped recording.");
+                LogUtils.info("Added route exit waypoint & stopped recording.");
             } else {
                 sendChatMessage(EnumChatFormatting.RED+"Route recording is not enabled. Press the start recording button to begin.");
             }
