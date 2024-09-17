@@ -204,6 +204,31 @@ public class SRMConfig extends Config {
     };
 
     @Button(
+            name = "Set Exit Waypoint",
+            text = "Set Exit Waypoint",
+            description = "Set an exit waypoint to at the end of your route",
+            size = 2,
+            category = "Route Recording"
+    )
+    Runnable runnable16 = () -> {
+        new Thread(() -> {
+            if(Main.routeRecording.recording) {
+                BlockPos playerPos = Minecraft.getMinecraft().thePlayer.getPosition();
+                BlockPos targetPos = new BlockPos(playerPos.getX(), playerPos.getY(), playerPos.getZ());
+                targetPos = targetPos.add(-1, 0, -1); // The -1 on X and Z have to be like that, trust the process
+
+                Main.routeRecording.addWaypoint(Room.SECRET_TYPES.EXITROUTE, targetPos);
+                Main.routeRecording.newSecret();
+                Main.routeRecording.stopRecording(); // Exiting the route, it should be stopped
+                Main.routeRecording.setRecordingMessage("Added route exit waypoint & stopped recording.");
+                LogUtils.info("Added route exit waypoint & stopped recording.");
+            } else {
+                sendChatMessage(EnumChatFormatting.RED+"Route recording is not enabled. Press the start recording button to begin.");
+            }
+        }).start();
+    };
+
+    @Button(
             name = "Stop recording",
             text = "Stop recording",
             description = "Stop recording your secret route",
@@ -456,6 +481,33 @@ public class SRMConfig extends Config {
             category = "Rendering"
     )
     public static float startTextSize = 3;
+
+    // Exit route waypoints
+    @Switch(
+            name = "Exit text toggle",
+            size =  OptionSize.DUAL,
+            subcategory = "Waypoint Text Rendering",
+            category = "Rendering"
+    )
+    public static boolean exitTextToggle = true;
+
+    @Dropdown(
+            name = "Exit waypoint text color",
+            options = {"Black", "Dark blue", "Dark green", "Dark aqua", "Dark red", "Dark purple", "Gold", "Gray", "Dark gray", "Blue", "Green", "Aqua", "Red", "Light purple", "Yellow", "White"},
+            size = OptionSize.DUAL,
+            subcategory = "Waypoint Text Rendering",
+            category = "Rendering"
+    )
+    public static int exitWaypointColorIndex = 12;
+
+    @Slider(
+            name = "Exit waypoint text size",
+            min = 1,
+            max = 10,
+            subcategory = "Waypoint Text Rendering",
+            category = "Rendering"
+    )
+    public static float exitTextSize = 3;
 
     // Interact waypoints
     @Switch(
@@ -725,6 +777,9 @@ public class SRMConfig extends Config {
         startTextToggle = true;
         startWaypointColorIndex = 12;
         startTextSize = 3;
+        exitTextToggle = true;
+        exitWaypointColorIndex = 12;
+        exitTextSize = 3;
         interactTextToggle = true;
         interactTextSize = 3;
         interactWaypointColorIndex = 10;
@@ -939,6 +994,8 @@ public class SRMConfig extends Config {
 
             optionNames.get("startWaypointColorIndex").addHideCondition(() -> !lambda("startTextToggle"));
             optionNames.get("startTextSize").addHideCondition(() -> !lambda("startTextToggle"));
+            optionNames.get("exitWaypointColorIndex").addHideCondition(() -> !lambda("exitTextToggle"));
+            optionNames.get("exitTextSize").addHideCondition(() -> !lambda("exitTextToggle"));
             optionNames.get("interactWaypointColorIndex").addHideCondition(() -> !lambda("interactTextToggle"));
             optionNames.get("interactTextSize").addHideCondition(() -> !lambda("interactTextToggle"));
             optionNames.get("itemWaypointColorIndex").addHideCondition(() -> !lambda("itemTextToggle"));

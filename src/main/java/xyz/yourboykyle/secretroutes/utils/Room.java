@@ -46,7 +46,8 @@ public class Room {
     public enum SECRET_TYPES {
         INTERACT,
         ITEM,
-        BAT
+        BAT,
+        EXITROUTE
     };
     public String name;
     public JsonArray currentSecretRoute;
@@ -154,6 +155,8 @@ public class Room {
                 return SECRET_TYPES.ITEM;
             } else if(type.equals("bat")) {
                 return SECRET_TYPES.BAT;
+            } else if(type.equals("exitroute")) {
+                return SECRET_TYPES.EXITROUTE;
             }
         }
 
