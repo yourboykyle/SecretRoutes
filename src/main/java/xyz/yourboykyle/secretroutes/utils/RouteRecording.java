@@ -345,6 +345,8 @@ public class RouteRecording {
             secret.add("type", new JsonPrimitive("item"));
         } else if(type == SECRET_TYPES.BAT) {
             secret.add("type", new JsonPrimitive("bat"));
+        } else if(type == SECRET_TYPES.EXITROUTE) {
+            secret.add("type", new JsonPrimitive("exitroute"));
         }
 
         // Make sure the secret hasn't already been recorded
