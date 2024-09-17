@@ -443,6 +443,15 @@ public class Main {
         int chromaSpeed = jsonObject.get("dataBit").getAsInt();
         return new OneColor(hue, saturation, brightness, alpha, chromaSpeed);
     }
+    public static void toggleSecretsKeybind(){
+        if(SRMConfig.modEnabled) {
+            SRMConfig.modEnabled = false;
+            sendChatMessage(EnumChatFormatting.RED + "Secret Routes Mod secret rendering has been disabled.");
+        }else{
+            SRMConfig.modEnabled = true;
+            sendChatMessage(EnumChatFormatting.GREEN + "Secret Routes Mod secret rendering has been enabled.");
+        }
+    }
 
 
 }
