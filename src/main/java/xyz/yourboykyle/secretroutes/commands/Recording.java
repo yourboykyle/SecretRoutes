@@ -60,7 +60,8 @@ public class Recording extends CommandBase {
 
                 Main.routeRecording.addWaypoint(Room.SECRET_TYPES.EXITROUTE, targetPos);
                 Main.routeRecording.newSecret();
-                Main.routeRecording.setRecordingMessage("Added route exit waypoint.");
+                Main.routeRecording.stopRecording(); // Exiting the route, it should be stopped
+                Main.routeRecording.setRecordingMessage("Added route exit waypoint & stopped recording.");
             } else {
                 sendChatMessage(EnumChatFormatting.RED+"Route recording is not enabled. Run /recording start");
             }
