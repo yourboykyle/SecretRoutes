@@ -23,7 +23,7 @@ public class Recording extends CommandBase {
 
     @Override
     public String getCommandUsage(ICommandSender sender) {
-        return "/recording start|stop|export|getroom|setbat|import <filename.json>";
+        return "/recording start|stop|export|getroom|setbat|setexit|import <filename.json>";
     }
 
     @Override
@@ -52,7 +52,19 @@ public class Recording extends CommandBase {
             } else {
                 sendChatMessage(EnumChatFormatting.RED+"Route recording is not enabled. Run /recording start");
             }
-        }  else if(args[0].equalsIgnoreCase("import")) {
+        } else if(args[0].equalsIgnoreCase("setexit")) {
+            if(Main.routeRecording.recording) {
+                BlockPos playerPos = Minecraft.getMinecraft().thePlayer.getPosition();
+                BlockPos targetPos = new BlockPos(playerPos.getX(), playerPos.getY(), playerPos.getZ());
+                targetPos = targetPos.add(-1, 0, -1); // The -1 on X and Z have to be like that, trust the process
+
+                Main.routeRecording.addWaypoint(Room.SECRET_TYPES.EXITROUTE, targetPos);
+                Main.routeRecording.newSecret();
+                Main.routeRecording.setRecordingMessage("Added route exit waypoint.");
+            } else {
+                sendChatMessage(EnumChatFormatting.RED+"Route recording is not enabled. Run /recording start");
+            }
+        } else if(args[0].equalsIgnoreCase("import")) {
             if(args.length != 2) {
               sendChatMessage(EnumChatFormatting.RED+"Usage: /recording import <filename.json>");
             } else {

@@ -278,6 +278,8 @@ public class OnWorldRender {
                 //GlStateManager.disableTexture2D();
                 if(SRMConfig.startTextToggle) {
                     SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.startWaypointColorIndex) + "Start", SRMConfig.startTextSize, event.partialTicks);
+                } else if(SRMConfig.exitTextToggle) {
+                    SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.exitWaypointColorIndex) + "Exit", SRMConfig.exitTextSize, event.partialTicks);
                 }
                 //GlStateManager.enableTexture2D();
             }
