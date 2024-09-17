@@ -14,6 +14,7 @@ public class SecretSounds {
     private static String[] defaultSounds = new String[]{"mob.blaze.hit", "fire.ignite", "random.orb", "random.break", "mob.guardian.land.hit", "note.pling", "secretroutesmod:zyra.meow0"};
 
     public static void secretChime(Boolean bypass) {
+        Utils.checkForCatacombs();
         if(!bypass && SRMConfig.customSecretSound && ((System.currentTimeMillis() - lastPlayed <= 10) || !Utils.inCatacombs)){return;}
 
         if(SRMConfig.customSecretSoundIndex == 6){
