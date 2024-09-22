@@ -24,6 +24,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
+import xyz.yourboykyle.secretroutes.config.SRMConfig;
 
 public class SecretRoutesRenderUtils {
     public static void drawBoxAtBlock(double worldX, double worldY, double worldZ, OneColor color) {
@@ -100,8 +101,23 @@ public class SecretRoutesRenderUtils {
         double y = worldY - playerY;
         double z = worldZ - playerZ;
 
-        WaypointUtils.drawFilledBoundingBox(new AxisAlignedBB(x - 0.01, y - 0.01, z - 0.01, x + width + 0.01, y + height + 0.01, z + width + 0.01), color, 0);
+        WaypointUtils.drawFilledBoundingBox(new AxisAlignedBB(x - 0.01, y - 0.01, z - 0.01, x + width + 0.01, y + height + 0.01, z + width + 0.01), color, SRMConfig.alphaMultiplier);
     }
+    public static void drawFilledBoxAtBlock(double worldX, double worldY, double worldZ, OneColor color, float width, float height) {
+        Minecraft mc = Minecraft.getMinecraft();
+        double playerX = mc.getRenderManager().viewerPosX;
+        double playerY = mc.getRenderManager().viewerPosY;
+        double playerZ = mc.getRenderManager().viewerPosZ;
+
+        double x = worldX - playerX;
+        double y = worldY - playerY;
+        double z = worldZ - playerZ;
+
+        WaypointUtils.drawFilledBoundingBox(new AxisAlignedBB(x - 0.01, y - 0.01, z - 0.01, x + width + 0.01, y + height + 0.01, z + width + 0.01), color, SRMConfig.alphaMultiplier);
+    }
+
+
+
     public static void drawFilledBoxAtBlock(double worldX, double worldY, double worldZ, OneColor color, int width, int height, float alpha) {
         Minecraft mc = Minecraft.getMinecraft();
         double playerX = mc.getRenderManager().viewerPosX;
@@ -144,6 +160,8 @@ public class SecretRoutesRenderUtils {
 
         WaypointUtils.renderWaypointText(text, pos, partialTicks, size);
     }
+
+
 
     public static String getTextColor(int index) {
         switch (index) {

@@ -91,7 +91,8 @@ public class Updater {
                             shellWriter.write("rm "+currentJar+"\n");
                             shellWriter.write("exit \n");
                         }
-
+                        shellFile.setExecutable(true);
+                        Runtime.getRuntime().exec("/bin/bash -c "+shellFile.getAbsolutePath());
                     }
 
                     writeInfo(String.valueOf(System.currentTimeMillis()), logFile);
