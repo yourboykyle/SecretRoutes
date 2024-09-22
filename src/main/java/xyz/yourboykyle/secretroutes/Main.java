@@ -25,13 +25,11 @@ import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
 import io.github.quantizr.dungeonrooms.handlers.PacketHandler;
 import io.github.quantizr.dungeonrooms.utils.Utils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.sound.SoundEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -39,7 +37,6 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import org.apache.commons.io.IOUtils;
-import org.lwjgl.input.Keyboard;
 import xyz.yourboykyle.secretroutes.commands.*;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.events.*;
@@ -200,16 +197,25 @@ public class Main {
                 path += ".json";
             }
             Map<String, Object> defaultColors = new HashMap<>();
+            defaultColors.put("alpha", SRMConfig.alphaMultiplier);
             defaultColors.put("lineColor", SRMConfig.lineColor);
             defaultColors.put("pearlLineColor", SRMConfig.pearlLineColor);
             defaultColors.put("etherWarp", SRMConfig.etherWarp);
+            defaultColors.put("etherwarpFullBlock", SRMConfig.etherwarpFullBlock);
             defaultColors.put("mine", SRMConfig.mine);
+            defaultColors.put("mineFullBlock", SRMConfig.mineFullBlock);
             defaultColors.put("interacts", SRMConfig.interacts);
+            defaultColors.put("interactsFullBlock", SRMConfig.interactsFullBlock);
             defaultColors.put("superbooms", SRMConfig.superbooms);
+            defaultColors.put("superboomsFullBlock", SRMConfig.superboomsFullBlock);
             defaultColors.put("enderpearls", SRMConfig.enderpearls);
+            defaultColors.put("enderpearlFullBlock", SRMConfig.enderPearlFullBlock);
             defaultColors.put("secretsItem", SRMConfig.secretsItem);
+            defaultColors.put("secretsItemFullBlock", SRMConfig.secretsItemFullBlock);
             defaultColors.put("secretsInteract", SRMConfig.secretsInteract);
+            defaultColors.put("secretsInteractFullBlock", SRMConfig.secretsInteractFullBlock);
             defaultColors.put("secretsBat", SRMConfig.secretsBat);
+            defaultColors.put("secretsBatFullBlock", SRMConfig.secretsBatFullBlock);
 
             defaultColors.put("startTextToggle", SRMConfig.startTextToggle);
             defaultColors.put("startWaypointColorIndex", SRMConfig.startWaypointColorIndex);
@@ -270,16 +276,25 @@ public class Main {
             FileReader reader = new FileReader(finalPath);
             JsonObject data = gson.fromJson(reader, JsonObject.class);
 
+            SRMConfig.alphaMultiplier = data.get("alphaMultiplier").getAsFloat();
             SRMConfig.lineColor = parseOneColor(data.get("lineColor"));
             SRMConfig.pearlLineColor = parseOneColor(data.get("pearlLineColor"));
             SRMConfig.etherWarp = parseOneColor(data.get("etherWarp"));
+            SRMConfig.etherwarpFullBlock = data.get("etherwarpFullBlock").getAsBoolean();
             SRMConfig.mine = parseOneColor(data.get("mine"));
+            SRMConfig.mineFullBlock = data.get("mineFullBlock").getAsBoolean();
             SRMConfig.interacts = parseOneColor(data.get("interacts"));
+            SRMConfig.interactsFullBlock = data.get("interactsFullBlock").getAsBoolean();
             SRMConfig.superbooms = parseOneColor(data.get("superbooms"));
+            SRMConfig.superboomsFullBlock = data.get("superboomsFullBlock").getAsBoolean();
             SRMConfig.enderpearls = parseOneColor(data.get("enderpearls"));
+            SRMConfig.enderPearlFullBlock = data.get("enderpearlFullBlock").getAsBoolean();
             SRMConfig.secretsItem = parseOneColor(data.get("secretsItem"));
+            SRMConfig.secretsItemFullBlock = data.get("secretsItemFullBlock").getAsBoolean();
             SRMConfig.secretsInteract = parseOneColor(data.get("secretsInteract"));
+            SRMConfig.secretsInteractFullBlock = data.get("secretsInteractFullBlock").getAsBoolean();
             SRMConfig.secretsBat = parseOneColor(data.get("secretsBat"));
+            SRMConfig.secretsBatFullBlock = data.get("secretsBatFullBlock").getAsBoolean();
 
             SRMConfig.startTextToggle = data.get("startTextToggle").getAsBoolean();
             SRMConfig.startWaypointColorIndex = data.get("startWaypointColorIndex").getAsInt();
@@ -319,7 +334,7 @@ public class Main {
 
             return true;
         } catch (Exception e) {
-            LogUtils.error(e);
+            sendChatMessage("[ERROR] Invalid color profile format.", EnumChatFormatting.RED);
         }
         return false;
     }

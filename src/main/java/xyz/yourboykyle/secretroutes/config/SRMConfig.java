@@ -363,6 +363,16 @@ public class SRMConfig extends Config {
     };
 
     // Rendering
+    @Slider(
+            name = "Alpha multiplier",
+            description = "Default opacity multiplier. ONLY HAS AN EFFECT ON THE FULL BLOCK",
+            min = 0f, max = 1f,
+            category = "Rendering",
+            subcategory = "Waypoint Colors"
+    )
+    public static float alphaMultiplier = 0.5f;
+
+
     @Color(
             name="Line color",
             subcategory = "Waypoint Colors",
@@ -384,12 +394,26 @@ public class SRMConfig extends Config {
     )
     public static OneColor etherWarp = new OneColor(128, 0, 128);
 
+    @Switch(
+            name = "Full block",
+            subcategory = "Waypoint Colors",
+            category = "Rendering"
+    )
+    public static boolean etherwarpFullBlock = false;
+
     @Color(
             name = "Mine",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
     public static OneColor mine = new OneColor(255, 255, 0);
+
+    @Switch(
+            name = "Full block",
+            subcategory = "Waypoint Colors",
+            category = "Rendering"
+    )
+    public static boolean mineFullBlock = false;
 
     @Color(
             name ="Interacts",
@@ -398,12 +422,26 @@ public class SRMConfig extends Config {
     )
     public static OneColor interacts = new OneColor(0, 0, 255);
 
+    @Switch(
+            name = "Full block",
+            subcategory = "Waypoint Colors",
+            category = "Rendering"
+    )
+    public static boolean interactsFullBlock = false;
+
     @Color(
             name="superbooms",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
     public static OneColor superbooms = new OneColor(255, 0, 0);
+
+    @Switch(
+            name = "Full block",
+            subcategory = "Waypoint Colors",
+            category = "Rendering"
+    )
+    public static boolean superboomsFullBlock = false;
 
     @Color(
             name="enderpearls",
@@ -412,12 +450,26 @@ public class SRMConfig extends Config {
     )
     public static OneColor enderpearls = new OneColor(0, 255, 255);
 
+    @Switch(
+            name = "Full block",
+            subcategory = "Waypoint Colors",
+            category = "Rendering"
+    )
+    public static boolean enderPearlFullBlock = false;
+
     @Color(
             name = "Secrets - item",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
     public static OneColor secretsItem = new OneColor(0, 255, 255);
+
+    @Switch(
+            name = "Full block",
+            subcategory = "Waypoint Colors",
+            category = "Rendering"
+    )
+    public static boolean secretsItemFullBlock = false;
 
     @Color(
             name = "Secrets - interact",
@@ -426,12 +478,26 @@ public class SRMConfig extends Config {
     )
     public static OneColor secretsInteract = new OneColor(0, 0, 255);
 
+    @Switch(
+            name = "Full block",
+            subcategory = "Waypoint Colors",
+            category = "Rendering"
+    )
+    public static boolean secretsInteractFullBlock = false;
+
     @Color(
             name = "Secrets - bat",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
     public static OneColor secretsBat = new OneColor(0, 255, 0);
+
+    @Switch(
+            name = "Full block",
+            subcategory = "Waypoint Colors",
+            category = "Rendering"
+    )
+    public static boolean secretsBatFullBlock = false;
 
     @Button(
             name = "Reset to default colors",
@@ -441,16 +507,25 @@ public class SRMConfig extends Config {
             category = "Rendering"
     )
     Runnable runnable7 = () -> {
+        alphaMultiplier = 0.5f;
         lineColor = new OneColor(255, 0, 0);
         pearlLineColor = new OneColor(0, 255, 255);
         etherWarp = new OneColor(128, 0, 128);
+        etherwarpFullBlock = false;
         mine = new OneColor(255, 255, 0);
+        mineFullBlock = false;
         interacts = new OneColor(0, 0, 255);
+        interactsFullBlock = false;
         superbooms = new OneColor(255, 0, 0);
+        superboomsFullBlock = false;
         enderpearls = new OneColor(0, 255, 255);
+        enderPearlFullBlock = false;
         secretsItem = new OneColor(0, 255, 255);
+        secretsItemFullBlock = false;
         secretsInteract = new OneColor(0, 0, 255);
+        secretsInteractFullBlock = false;
         secretsBat = new OneColor(0, 255, 0);
+        secretsBatFullBlock = false;
     };
 
 

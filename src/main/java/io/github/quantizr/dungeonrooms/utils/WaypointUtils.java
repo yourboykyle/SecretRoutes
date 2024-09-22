@@ -114,6 +114,7 @@ public class WaypointUtils {
     }
 
     public static void drawFilledBoundingBox(AxisAlignedBB aabb, OneColor c, float alphaMultiplier) {
+        GlStateManager.pushMatrix();
         GlStateManager.enableBlend();
         GlStateManager.disableLighting();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
@@ -121,9 +122,7 @@ public class WaypointUtils {
 
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-
         GlStateManager.color(c.getRed()/255f, c.getGreen()/255f, c.getBlue()/255f, c.getAlpha()/255f*alphaMultiplier);
-
         //vertical
         worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
         worldrenderer.pos(aabb.minX, aabb.minY, aabb.minZ).endVertex();
@@ -140,7 +139,6 @@ public class WaypointUtils {
 
 
         GlStateManager.color(c.getRed()/255f*0.8f, c.getGreen()/255f*0.8f, c.getBlue()/255f*0.8f, c.getAlpha()/255f*alphaMultiplier);
-
         //x
         worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
         worldrenderer.pos(aabb.minX, aabb.minY, aabb.maxZ).endVertex();
@@ -172,6 +170,8 @@ public class WaypointUtils {
         tessellator.draw();
         GlStateManager.enableTexture2D();
         GlStateManager.disableBlend();
+        GlStateManager.popMatrix();
+
     }
 
     public static void renderWaypointText(String str, BlockPos loc, float partialTicks, float size) {
