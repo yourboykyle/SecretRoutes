@@ -60,25 +60,27 @@ public class OnPlayerTick {
         This was originally added because in a specific room, you cannot get the item secret if it spawns and the velocity pushes the item away from you.
         But you can still get the secret if you walk over to the item secret, or just press the next secret keybind if you're lazy.
         */
-        /*if(Main.currentRoom.getSecretType() == Room.SECRET_TYPES.ITEM) {
+        if(Main.currentRoom.getSecretType() == Room.SECRET_TYPES.ITEM) {
             BlockPos pos = e.player.getPosition();
             BlockPos itemPos = Main.currentRoom.getSecretLocation();
 
             if (pos.getX() >= itemPos.getX() - 2 && pos.getX() <= itemPos.getX() + 2 && pos.getY() >= itemPos.getY() - 2 && pos.getY() <= itemPos.getY() + 2 && pos.getZ() >= itemPos.getZ() - 2 && pos.getZ() <= itemPos.getZ() + 2) {
                 new Thread(() -> {
                     try {
+
                         Thread.sleep(1500);
-                        if (Main.currentRoom.getSecretType() == Room.SECRET_TYPES.ITEM) {
+                        if (Main.currentRoom.getSecretType() == Room.SECRET_TYPES.ITEM && itemPos.getX() == Main.currentRoom.getSecretLocation().getX() && itemPos.getY() == Main.currentRoom.getSecretLocation().getY() && itemPos.getZ() == Main.currentRoom.getSecretLocation().getZ()) {
+
                             SecretSounds.secretChime();
                             Main.currentRoom.nextSecret();
-                            LogUtils.info("Picked up item at " + itemPos);
+                            LogUtils.info("Picked up item at " + itemPos + " (Auto)");
                         }
                     } catch (InterruptedException e1) {
                         LogUtils.error(e1);
                     }
                 }).start();
             }
-        }*/
+        }
 
 
         // Route Recording
