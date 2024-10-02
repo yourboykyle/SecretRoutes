@@ -36,7 +36,7 @@ public class RouteRecording {
     private static int locationwaypoints = 0;
     private static int enderPearlWaypoints = 0;
     private static int enderPearlAngleWaypoints = 0;
-
+    public static boolean malformed = false;
     // Each waypoint on the locations will be added based on how far the player is from the previous waypoint, this will be used to keep track of said previous waypoint
     public BlockPos previousLocation;
 
@@ -152,6 +152,10 @@ public class RouteRecording {
                 allSecretRoutes = gson.fromJson(reader, JsonObject.class);
             } catch (IOException e) {
                 LogUtils.error(e);
+            }catch (JsonSyntaxException e) {
+                LogUtils.error(e);
+                malformed = true;
+
             }
         }
     }
