@@ -452,6 +452,10 @@ public class Main {
                 }
 
             }).start();
+
+            if(RouteRecording.malformed){
+                sendChatMessage("[ERROR] The JSON file in downloads is malformed. Check the file or delete it.", EnumChatFormatting.RED);
+            }
         }
     }
     public static OneColor parseOneColor(JsonElement json){

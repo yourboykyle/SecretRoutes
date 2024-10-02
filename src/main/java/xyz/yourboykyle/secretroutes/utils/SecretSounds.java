@@ -15,7 +15,7 @@ public class SecretSounds {
 
     public static void secretChime(Boolean bypass) {
         Utils.checkForCatacombs();
-        if(!bypass && SRMConfig.customSecretSound && ((System.currentTimeMillis() - lastPlayed <= 10) || !Utils.inCatacombs)){return;}
+        if(!bypass &&(!SRMConfig.customSecretSound || ((System.currentTimeMillis() - lastPlayed <= 10) || !Utils.inCatacombs))){return;}
 
         if(SRMConfig.customSecretSoundIndex == 6){
             long test = System.currentTimeMillis()%9;
