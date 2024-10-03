@@ -81,7 +81,6 @@ public class PotentialUpdate {
         }
 
          */
-        SSLUtils.disableSSLCertificateChecking();
         ChatUtils.sendVerboseMessage("§eDownloading updater.jar from " + update.getDownloadAsURL(), verboseTag);
         ChatUtils.sendVerboseMessage("§eTo: " + getFile("updater.jar"), verboseTag);
         InputStream inputStream = new URL("http://raw.githubusercontent.com/yourboykyle/SecretRoutes/main/updater.jar").openStream();
@@ -92,7 +91,6 @@ public class PotentialUpdate {
         outputStream.close();
         inputStream.close();
         ChatUtils.sendVerboseMessage("§eStreams closed", verboseTag);
-        SSLUtils.enableSSLCertificateChecking();
     }
 
     /**
@@ -114,7 +112,6 @@ public class PotentialUpdate {
             }
         }
          */
-        SSLUtils.disableSSLCertificateChecking();
         ChatUtils.sendVerboseMessage("§eDownloading update from " + update.getDownloadAsURL(), verboseTag);
         ChatUtils.sendVerboseMessage("§eTo: " + getUpdateJarStorage());
         InputStream inputStream = update.getDownloadAsURL().openStream();
@@ -125,7 +122,6 @@ public class PotentialUpdate {
         outputStream.close();
         inputStream.close();
         ChatUtils.sendVerboseMessage("§eStreams closed", verboseTag);
-        SSLUtils.enableSSLCertificateChecking();
     }
 
     /**
