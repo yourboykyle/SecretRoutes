@@ -17,6 +17,7 @@
 ## Credits:
 - @yourboykyle (me) - developer
 - @wyannnnn - developer
+- @mrfast - help with various things
 - @zzyyrraa - recorded routes + meows for custom secret noises
 - https://github.com/Quantizr/DungeonRoomsMod - code for room detection
 - https://github.com/Soopyboo32/SoopyV2 - code for some rendering functions (translated from JS to java)
