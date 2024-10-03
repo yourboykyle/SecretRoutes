@@ -109,7 +109,6 @@ public class UpdateManager {
             return;
         }
 
-        SSLUtils.disableSSLCertificateChecking();
         updateState = UpdateState.QUEUED;
         setActivePromise(CompletableFuture.supplyAsync((Supplier<Void>) () -> {
             LogUtils.info("Update download started");
@@ -126,7 +125,6 @@ public class UpdateManager {
             ChatUtils.sendChatMessage("§eDownload of update complete.");
             ChatUtils.sendChatMessage("§aThe update will be installed after your next restart.");
         }, MinecraftExecutor.INSTANCE));
-        SSLUtils.enableSSLCertificateChecking();
     }
 
     private static final UpdateContext context = new UpdateContext(

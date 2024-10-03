@@ -1,6 +1,12 @@
 package xyz.yourboykyle.secretroutes.utils;
 
+import net.minecraft.util.EnumChatFormatting;
+import org.apache.commons.lang3.exception.ExceptionContext;
+
 import javax.net.ssl.*;
+import java.io.InputStream;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 
@@ -49,4 +55,40 @@ public class SSLUtils {
             LogUtils.error(e);
         }
     }
+
+    public static void setSSlCertificate(){
+        try {
+            KeyStore keyStore = null;
+            try {
+                keyStore = KeyStore.getInstance("JKS");
+            } catch (KeyStoreException e) {
+                LogUtils.error(e);
+            }
+            if(keyStore != null){
+                keyStore.load(SSLUtils.class.getResourceAsStream("/mykeystore.jks"), "changeit".toCharArray());
+            }else{
+                ChatUtils.sendChatMessage("[§3SRM§f] §cSomething went wrong wth ssl. Send the log file in the §1#support§f channel in the discord with a screenshot of this message.");
+            }
+
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            kmf.init(keyStore, null);
+            tmf.init(keyStore);
+            SSLContext ctx = SSLContext.getInstance("TLS");
+            ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+
+            HttpsURLConnection.setDefaultSSLSocketFactory(ctx.getSocketFactory());
+
+        }catch(Exception e){
+            ChatUtils.sendChatMessage("[§3SRM§f] §cSomething went wrong wth ssl. Send the log file in the §1#support§f channel in the discord with a screenshot of this message.");
+            LogUtils.error(e);
+        }
+
+    }
+
+
+
+
+
+
 }
