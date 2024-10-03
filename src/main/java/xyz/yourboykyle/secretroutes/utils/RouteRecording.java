@@ -150,6 +150,7 @@ public class RouteRecording {
                 FileReader reader = new FileReader(filePath);
 
                 allSecretRoutes = gson.fromJson(reader, JsonObject.class);
+                throw new JsonSyntaxException("This is a test");
             } catch (IOException e) {
                 LogUtils.error(e);
             }catch (JsonSyntaxException e) {
