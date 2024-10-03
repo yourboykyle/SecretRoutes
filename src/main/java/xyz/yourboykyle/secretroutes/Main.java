@@ -47,11 +47,13 @@ import xyz.yourboykyle.secretroutes.utils.autoupdate.UpdateManager;
 import java.awt.*;
 import java.io.*;
 import java.net.URL;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
+import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
 
 @Mod(modid = Main.MODID, name = Main.NAME, version = Main.VERSION)
 public class Main {
@@ -68,7 +70,7 @@ public class Main {
     public static SoundEvent customSound;
 
     public static Room currentRoom = new Room(null);
-    public static RouteRecording routeRecording = new RouteRecording();
+    public static RouteRecording routeRecording = null;
     public static UpdateManager updateManager = new UpdateManager();
     private static DungeonRooms dungeonRooms = new DungeonRooms();
 
@@ -119,6 +121,7 @@ public class Main {
         if(shellFile.exists()){
             shellFile.delete();
         }
+        routeRecording = new RouteRecording();
 
 
         // Set up Config
@@ -366,7 +369,6 @@ public class Main {
     public static void updateRoutes(File configFile) {
         try {
             LogUtils.info("Downloading routes.json...");
-            SSLUtils.disableSSLCertificateChecking();
 
             InputStream inputStream = new URL("https://raw.githubusercontent.com/yourboykyle/SecretRoutes/main/routes.json").openStream();
             OutputStream outputStream = new FileOutputStream(configFile);
@@ -374,7 +376,6 @@ public class Main {
             outputStream.close();
             inputStream.close();
 
-            SSLUtils.enableSSLCertificateChecking();
         }catch(Exception e){
             LogUtils.error(e);
         }
@@ -384,15 +385,13 @@ public class Main {
         File configFile = new File(ROUTES_PATH + File.separator + "routes.json");
         try {
             LogUtils.info("Downloading routes.json...");
-            SSLUtils.disableSSLCertificateChecking();
 
             InputStream inputStream = new URL("https://raw.githubusercontent.com/yourboykyle/SecretRoutes/main/routes.json").openStream();
-            OutputStream outputStream = new FileOutputStream(configFile);
+            OutputStream outputStream = Files.newOutputStream(configFile.toPath());
             IOUtils.copy(inputStream, outputStream);
             outputStream.close();
             inputStream.close();
 
-            SSLUtils.enableSSLCertificateChecking();
         } catch (Exception e){
             LogUtils.error(e);
         }
@@ -401,15 +400,11 @@ public class Main {
         File configFile = new File(ROUTES_PATH + File.separator + "pearlroutes.json");
         try {
             LogUtils.info("Downloading routes.json...");
-            SSLUtils.disableSSLCertificateChecking();
-
             InputStream inputStream = new URL("https://raw.githubusercontent.com/yourboykyle/SecretRoutes/main/pearlroutes.json").openStream();
             OutputStream outputStream = new FileOutputStream(configFile);
             IOUtils.copy(inputStream, outputStream);
             outputStream.close();
             inputStream.close();
-
-            SSLUtils.enableSSLCertificateChecking();
         } catch (Exception e){
             LogUtils.error(e);
         }
@@ -417,6 +412,13 @@ public class Main {
 
     @SubscribeEvent
     public void onServerConnect(FMLNetworkEvent.ClientConnectedToServerEvent event) {
+        try{
+            Thread.sleep(3000);
+        }catch(Exception e){
+            //nothign needed, literally just waiting
+        }
+        sendVerboseMessage("§bSetting ssl certificate", "Info");
+        SSLUtils.setSSlCertificate();
         Minecraft mc = Minecraft.getMinecraft();
         if (mc.getCurrentServerData() == null) return;
         if (mc.getCurrentServerData().serverIP.toLowerCase().contains("hypixel.")) {
@@ -452,6 +454,10 @@ public class Main {
                 }
 
             }).start();
+            LogUtils.info("RouteRecording json status: " + RouteRecording.malformed);
+            if(RouteRecording.malformed){
+                sendChatMessage("[ERROR] The JSON file in downloads is malformed. Check the file or delete it.", EnumChatFormatting.RED);
+            }
         }
     }
     public static OneColor parseOneColor(JsonElement json){
