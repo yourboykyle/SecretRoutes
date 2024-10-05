@@ -18,7 +18,7 @@ public class OnMouseInput {
         boolean action = Mouse.getEventButtonState();
 
         try {
-            if(button == 1 && action){
+            if(action){
                 EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
                 if(player == null){
                     return;
@@ -28,13 +28,18 @@ public class OnMouseInput {
                 if(item == null) {
                     return;
                 }
-                if(item.getDisplayName().toLowerCase().contains("ender pearl")){
+                if(item.getDisplayName().toLowerCase().contains("ender pearl") && button == 1){
                     LogUtils.info("§bPlayer is holding an ender pearl");
                     if(Main.routeRecording.recording) {
                         Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.ENDERPEARLS, player);
                     }
                 }
-
+                if(item.getDisplayName().toLowerCase().contains("boom") && button == 0){
+                    LogUtils.info("§bPlayer is holding a superboom");
+                    if(Main.routeRecording.recording) {
+                        Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.TNTS, player);
+                    }
+                }
 
             }
         } catch(Exception ex) {

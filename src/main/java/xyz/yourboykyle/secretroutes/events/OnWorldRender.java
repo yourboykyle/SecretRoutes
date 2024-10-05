@@ -46,6 +46,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
 
 public class OnWorldRender {
@@ -59,7 +61,7 @@ public class OnWorldRender {
             if (!Utils.inCatacombs || DungeonManager.gameStage != 2 || !SRMConfig.modEnabled) {
                 return;
             }
-            if(OnChatReceive.isAllFound() && SRMConfig.renderComplete){
+            if(OnChatReceive.isAllFound() && !SRMConfig.renderComplete){
                 return;
             }
 
@@ -90,13 +92,13 @@ public class OnWorldRender {
         ArrayList<Triple<Double, Double, Double>> enderpearlPositons = new ArrayList<>();
         ArrayList<Tuple<Float, Float>> enderpearlAngles = new ArrayList<>();
 
-        //GlStateManager.enableLighting();
         GlStateManager.disableDepth();
         GlStateManager.disableCull();
+        GlStateManager.disableBlend();
 
 
         // Render the etherwarps
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("etherwarps") != null && (!SRMConfig.allSecrets || SRMConfig.renderComplete)) {
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("etherwarps") != null && (!SRMConfig.allSecrets || SRMConfig.allSteps || index2 == Main.currentRoom.currentSecretIndex)) {
             JsonArray etherwarpLocations = currentSecretWaypoints.get("etherwarps").getAsJsonArray();
             for (JsonElement etherwarpLocationElement : etherwarpLocations) {
                 JsonArray etherwarpLocation = etherwarpLocationElement.getAsJsonArray();
@@ -114,7 +116,7 @@ public class OnWorldRender {
         }
 
         // Render the mines
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("mines") != null && (!SRMConfig.allSecrets || SRMConfig.renderComplete)) {
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("mines") != null && (!SRMConfig.allSecrets || SRMConfig.allSteps || index2 == Main.currentRoom.currentSecretIndex)) {
             JsonArray mineLocations = currentSecretWaypoints.get("mines").getAsJsonArray();
             for (JsonElement mineLocationElement : mineLocations) {
                 JsonArray mineLocation = mineLocationElement.getAsJsonArray();
@@ -131,7 +133,7 @@ public class OnWorldRender {
         }
 
         // Render the interacts
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("interacts") != null && (!SRMConfig.allSecrets || SRMConfig.renderComplete)) {
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("interacts") != null && (!SRMConfig.allSecrets || SRMConfig.allSteps || index2 == Main.currentRoom.currentSecretIndex)) {
             JsonArray interactLocations = currentSecretWaypoints.get("interacts").getAsJsonArray();
             for (JsonElement interactLocationElement : interactLocations) {
                 JsonArray interactLocation = interactLocationElement.getAsJsonArray();
@@ -148,7 +150,7 @@ public class OnWorldRender {
         }
 
         // Render the tnts
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("tnts") != null && (!SRMConfig.allSecrets || SRMConfig.renderComplete)) {
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("tnts") != null && (!SRMConfig.allSecrets || SRMConfig.allSteps || index2 == Main.currentRoom.currentSecretIndex)) {
             JsonArray tntLocations = currentSecretWaypoints.get("tnts").getAsJsonArray();
             for (JsonElement tntLocationElement : tntLocations) {
                 JsonArray tntLocation = tntLocationElement.getAsJsonArray();
@@ -164,7 +166,8 @@ public class OnWorldRender {
             }
         }
         // Render normal lines if config says so
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("locations") != null && SRMConfig.lineType == 1) {
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("locations") != null && SRMConfig.lineType == 1  && (!SRMConfig.allSecrets || SRMConfig.allSteps || index2 == Main.currentRoom.currentSecretIndex)) {
+            GlStateManager.enableDepth();
             List<Triple<Double, Double, Double>> lines = new LinkedList<>();
 
             JsonArray lineLocations = currentSecretWaypoints.get("locations").getAsJsonArray();
@@ -182,10 +185,11 @@ public class OnWorldRender {
             if (SRMConfig.modEnabled) {
                 RenderUtils.drawMultipleNormalLines(lines, event.partialTicks, SRMConfig.lineColor, SRMConfig.width);
             }
+            GlStateManager.disableDepth();
         }
 
         // Render the ender pearls
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("enderpearls") != null && (!SRMConfig.allSecrets || SRMConfig.renderComplete)) {
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("enderpearls") != null && (!SRMConfig.allSecrets || SRMConfig.allSteps || index2 == Main.currentRoom.currentSecretIndex)) {
             JsonArray enderpearlAnglesArray = currentSecretWaypoints.get("enderpearlangles").getAsJsonArray();
             for (JsonElement pearlAngleElement : enderpearlAnglesArray) {
                 JsonArray pearlAngle = pearlAngleElement.getAsJsonArray();
@@ -250,8 +254,6 @@ public class OnWorldRender {
 
             Main.checkRoomData();
             BlockPos pos = MapUtils.relativeToActual(new BlockPos(location.get(0).getAsInt(), location.get(1).getAsInt(), location.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
-
-            GlStateManager.disableTexture2D();
 
 
 
@@ -319,7 +321,6 @@ public class OnWorldRender {
                     SecretRoutesRenderUtils.drawText(enderpearlPos.getOne(), enderpearlPos.getTwo(), enderpearlPos.getThree(), SecretRoutesRenderUtils.getTextColor(SRMConfig.enderpearlWaypointColorIndex) + text, SRMConfig.enderpearlTextSize, event.partialTicks);
                 }
             }
-            GlStateManager.enableTexture2D();
         }
 
         // Render the secret
@@ -335,11 +336,9 @@ public class OnWorldRender {
                 BlockPos pos = MapUtils.relativeToActual(new BlockPos(startCoords.get(0).getAsInt(), startCoords.get(1).getAsInt(), startCoords.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
 
                 // Render the text
-                //GlStateManager.disableTexture2D();
                 if (SRMConfig.startTextToggle) {
                     SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.startWaypointColorIndex) + "Start", SRMConfig.startTextSize, event.partialTicks);
                 }
-                //GlStateManager.enableTexture2D();
             }
             if (index2 == Main.currentRoom.currentSecretRoute.getAsJsonArray().size() - 1) {
                 JsonObject secret = currentSecretWaypoints.get("secret").getAsJsonObject();
@@ -350,17 +349,14 @@ public class OnWorldRender {
                 BlockPos pos = MapUtils.relativeToActual(new BlockPos(location.get(0).getAsInt(), location.get(1).getAsInt(), location.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
 
                 // Render the text
-                //GlStateManager.disableTexture2D();
                 if (SRMConfig.exitTextToggle && type.equals("exitroute")) {
                     SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.exitWaypointColorIndex) + "Exit", SRMConfig.exitTextSize, event.partialTicks);
                 }
-                //GlStateManager.enableTexture2D();
             }
         }
-
-        GlStateManager.disableLighting();
-        GlStateManager.enableDepth();
+        GlStateManager.enableBlend();
         GlStateManager.enableCull();
+        GlStateManager.enableDepth();
     }
 
 }
