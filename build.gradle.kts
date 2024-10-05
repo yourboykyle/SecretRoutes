@@ -174,6 +174,9 @@ tasks {
     remapJar {
         inputFile.set(shadowJar.get().archiveFile)
         archiveClassifier.set("")
+        if (project.hasProperty("toModsFolder")) {
+            destinationDirectory.set(file("${System.getenv("APPDATA")}\\.minecraft\\mods"))
+        }
     }
 
     jar {
@@ -191,4 +194,15 @@ tasks {
         archiveClassifier.set("")
         enabled = false
     }
+}
+
+if (project.hasProperty("toModsFolder")) {
+    tasks.register("finalize") {
+        doLast {
+            project.exec {
+                commandLine("cmd", "/c", "start", "finish.bat")
+            }
+        }
+    }
+    tasks.assemble.get().dependsOn(tasks.getByName("finalize"))
 }

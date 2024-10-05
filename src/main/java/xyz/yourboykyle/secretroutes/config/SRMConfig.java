@@ -107,9 +107,9 @@ public class SRMConfig extends Config {
     )
     Runnable runnable = () -> {
         new Thread(() -> {
-            if(pearls){
+            if (pearls) {
                 Main.updatePearlRoutes();
-            }else{
+            } else {
                 Main.updateRoutes();
             }
         }).start();
@@ -126,7 +126,7 @@ public class SRMConfig extends Config {
         new Thread(() -> {
             try {
                 File file = FileUtils.promptUserForFile();
-                if(file != null) {
+                if (file != null) {
                     FileUtils.copyFileToDirectory(file, Main.ROUTES_PATH);
                 }
             } catch (Exception e) {
@@ -176,16 +176,16 @@ public class SRMConfig extends Config {
     )
     Runnable runnable3 = () -> {
         new Thread(() -> {
-            if(Main.routeRecording.recording) {
+            if (Main.routeRecording.recording) {
                 BlockPos playerPos = Minecraft.getMinecraft().thePlayer.getPosition();
                 BlockPos targetPos = new BlockPos(playerPos.getX(), playerPos.getY(), playerPos.getZ());
                 targetPos = targetPos.add(-1, 2, -1); // Block above the player, the -1 on X and Z have to be like that, trust the process
 
                 Main.routeRecording.addWaypoint(Room.SECRET_TYPES.BAT, targetPos);
                 Main.routeRecording.newSecret();
-                Main.routeRecording.setRecordingMessage(EnumChatFormatting.YELLOW+"Added bat secret waypoint.");
+                Main.routeRecording.setRecordingMessage(EnumChatFormatting.YELLOW + "Added bat secret waypoint.");
             } else {
-                sendChatMessage(EnumChatFormatting.RED+"Route recording is not enabled. Press the start recording button to begin.");
+                sendChatMessage(EnumChatFormatting.RED + "Route recording is not enabled. Press the start recording button to begin.");
             }
         }).start();
     };
@@ -212,7 +212,7 @@ public class SRMConfig extends Config {
     )
     Runnable runnable16 = () -> {
         new Thread(() -> {
-            if(Main.routeRecording.recording) {
+            if (Main.routeRecording.recording) {
                 BlockPos playerPos = Minecraft.getMinecraft().thePlayer.getPosition();
                 BlockPos targetPos = new BlockPos(playerPos.getX(), playerPos.getY(), playerPos.getZ());
                 targetPos = targetPos.add(-1, 0, -1); // The -1 on X and Z have to be like that, trust the process
@@ -223,7 +223,7 @@ public class SRMConfig extends Config {
                 Main.routeRecording.setRecordingMessage("Added route exit waypoint & stopped recording.");
                 LogUtils.info("Added route exit waypoint & stopped recording.");
             } else {
-                sendChatMessage(EnumChatFormatting.RED+"Route recording is not enabled. Press the start recording button to begin.");
+                sendChatMessage(EnumChatFormatting.RED + "Route recording is not enabled. Press the start recording button to begin.");
             }
         }).start();
     };
@@ -279,6 +279,29 @@ public class SRMConfig extends Config {
     )
     public static CurrentRoomHUD currentRoomHUD = new CurrentRoomHUD();
 
+    @Switch(
+            name = "All secrets",
+            description = "Render all secrets",
+            subcategory = "WIP",
+            category = "Rendering"
+    )
+    public static boolean allSecrets = false;
+
+    @Switch(
+            name = "Render secrets when room is completed",
+            description = "Renders secrets even if the room is completed",
+            subcategory = "WIP",
+            category = "Rendering"
+    )
+    public static boolean renderComplete = false;
+
+    @Switch(
+            name = "Render steps",
+            description = "Renders the entire path to the secret instead of just the secret",
+            subcategory = "WIP",
+            category = "Rendering"
+    )
+    public static boolean allSteps = false;
 
     //Color profile saving and loading
     @Text(
@@ -320,8 +343,8 @@ public class SRMConfig extends Config {
     )
     Runnable runnable11 = () -> {
         new Thread(() -> {
-            if(Main.loadColorConfig(colorProfileName.isEmpty() ? "default.json" : colorProfileName)){
-                sendChatMessage(EnumChatFormatting.DARK_GREEN + "Loaded "+ EnumChatFormatting.GREEN + colorProfileName + EnumChatFormatting.DARK_GREEN + " as color profile");
+            if (Main.loadColorConfig(colorProfileName.isEmpty() ? "default.json" : colorProfileName)) {
+                sendChatMessage(EnumChatFormatting.DARK_GREEN + "Loaded " + EnumChatFormatting.GREEN + colorProfileName + EnumChatFormatting.DARK_GREEN + " as color profile");
             }
         }).start();
     };
@@ -336,8 +359,8 @@ public class SRMConfig extends Config {
     Runnable runnable12 = () -> {
         new Thread(() -> {
             sendChatMessage("Color Profiles:", EnumChatFormatting.DARK_AQUA);
-            for(String name :FileUtils.getFileNames(Main.COLOR_PROFILE_PATH)){
-                sendChatMessage(" - "+name, EnumChatFormatting.AQUA);
+            for (String name : FileUtils.getFileNames(Main.COLOR_PROFILE_PATH)) {
+                sendChatMessage(" - " + name, EnumChatFormatting.AQUA);
             }
         }).start();
     };
@@ -353,7 +376,7 @@ public class SRMConfig extends Config {
         new Thread(() -> {
             try {
                 File file = FileUtils.promptUserForFile();
-                if(file != null) {
+                if (file != null) {
                     FileUtils.copyFileToDirectory(file, Main.COLOR_PROFILE_PATH);
                 }
             } catch (Exception e) {
@@ -374,7 +397,7 @@ public class SRMConfig extends Config {
 
 
     @Color(
-            name="Line color",
+            name = "Line color",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
@@ -388,7 +411,7 @@ public class SRMConfig extends Config {
     public static OneColor pearlLineColor = new OneColor(0, 255, 255);
 
     @Color(
-            name="EtherWarp",
+            name = "EtherWarp",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
@@ -416,7 +439,7 @@ public class SRMConfig extends Config {
     public static boolean mineFullBlock = false;
 
     @Color(
-            name ="Interacts",
+            name = "Interacts",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
@@ -430,7 +453,7 @@ public class SRMConfig extends Config {
     public static boolean interactsFullBlock = false;
 
     @Color(
-            name="superbooms",
+            name = "superbooms",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
@@ -444,7 +467,7 @@ public class SRMConfig extends Config {
     public static boolean superboomsFullBlock = false;
 
     @Color(
-            name="enderpearls",
+            name = "enderpearls",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
@@ -529,11 +552,10 @@ public class SRMConfig extends Config {
     };
 
 
-
     // Start waypoints
     @Switch(
             name = "Start text toggle",
-            size =  OptionSize.DUAL,
+            size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
     )
@@ -560,7 +582,7 @@ public class SRMConfig extends Config {
     // Exit route waypoints
     @Switch(
             name = "Exit text toggle",
-            size =  OptionSize.DUAL,
+            size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
     )
@@ -587,7 +609,7 @@ public class SRMConfig extends Config {
     // Interact waypoints
     @Switch(
             name = "Interact text toggle",
-            size =  OptionSize.DUAL,
+            size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
     )
@@ -614,7 +636,7 @@ public class SRMConfig extends Config {
     // Item waypoints
     @Switch(
             name = "Item text toggle",
-            size =  OptionSize.DUAL,
+            size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
     )
@@ -641,7 +663,7 @@ public class SRMConfig extends Config {
     // Bat waypoints
     @Switch(
             name = "Bat text toggle",
-            size =  OptionSize.DUAL,
+            size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
     )
@@ -702,7 +724,7 @@ public class SRMConfig extends Config {
     // Mines waypoints
     @Switch(
             name = "Stonk text toggle",
-            size =  OptionSize.DUAL,
+            size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
     )
@@ -844,7 +866,7 @@ public class SRMConfig extends Config {
             name = "Reset to text defaults",
             text = "Reset",
             description = "Resets all the text options to their default values",
-            size =  OptionSize.DUAL,
+            size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
     )
@@ -896,7 +918,7 @@ public class SRMConfig extends Config {
     public static String devPassword = "";
 
     @Switch(
-            name= "Verbose logging",
+            name = "Verbose logging",
             description = "Adds more detailed logging, useful for debugging",
             subcategory = "Chat logging",
             category = "Dev",
@@ -905,7 +927,7 @@ public class SRMConfig extends Config {
     public static boolean verboseLogging = false;
 
     @Switch(
-            name= "Better recording",
+            name = "Better recording",
             description = "Adds more detailed logging for recording, useful for debugging",
             subcategory = "Chat logging",
             category = "Dev"
@@ -913,7 +935,7 @@ public class SRMConfig extends Config {
     public static boolean verboseRecording = true;
     //More verbose logging options will come in future releases
     @Switch(
-            name= "Better updating",
+            name = "Better updating",
             description = "adds more detailed logging for updating, useful for debugging",
             subcategory = "Chat logging",
             category = "Dev"
@@ -921,7 +943,7 @@ public class SRMConfig extends Config {
     public static boolean verboseUpdating = true;
 
     @Switch(
-            name= "Better info",
+            name = "Better info",
             description = "adds more detailed logging for info, useful for debugging",
             subcategory = "Chat logging",
             category = "Dev"
@@ -929,7 +951,7 @@ public class SRMConfig extends Config {
     public static boolean verboseInfo = false;
 
     @Switch(
-            name= "Better rendering",
+            name = "Better rendering",
             description = "adds more detailed logging rendering, useful for debugging",
             subcategory = "Chat logging",
             category = "Dev"
@@ -937,7 +959,15 @@ public class SRMConfig extends Config {
     public static boolean verboseRendering = false;
 
     @Switch(
-            name= "Force outdated",
+            name = "ActionBar info",
+            description = "Send the actionbar in chat for debugging purposes",
+            subcategory = "Chat logging",
+            category = "Dev"
+    )
+    public static boolean actionbarInfo = false;
+
+    @Switch(
+            name = "Force outdated",
             description = "Forces the version to be outdated, useful for testing the auto updater",
             subcategory = "General",
             category = "Dev"
@@ -953,7 +983,7 @@ public class SRMConfig extends Config {
     public static boolean c;
 
     @Dropdown(
-            name = "Custom Pearl Orientation",
+            name = "Custom Pearl Orientation (Unused)",
             options = {"Default", "SW", "NW", "NE", "SE"},
             category = "Dev"
     )
@@ -1029,13 +1059,9 @@ public class SRMConfig extends Config {
             subcategory = "Sound",
             size = 2
     )
-    public static Runnable runnable15 = ()->{
+    public static Runnable runnable15 = () -> {
         SecretSounds.secretChime(true);
     };
-
-
-
-
 
 
     public Boolean lambda(String dependentOption) {
@@ -1059,11 +1085,13 @@ public class SRMConfig extends Config {
             optionNames.get("runnable").addHideCondition(() -> !lambda("modEnabled"));
             optionNames.get("runnable9").addHideCondition(() -> !lambda("modEnabled"));
             optionNames.get("runnable14").addHideCondition(() -> !lambda("modEnabled"));
-            optionNames.get("particles").addHideCondition(() -> !isEqualTo(lineType,0));
+            optionNames.get("particles").addHideCondition(() -> !isEqualTo(lineType, 0));
             optionNames.get("particles").addHideCondition(() -> !lambda("modEnabled"));
-            optionNames.get("tickInterval").addHideCondition(() -> !isEqualTo(lineType,0));
+            optionNames.get("tickInterval").addHideCondition(() -> !isEqualTo(lineType, 0));
             optionNames.get("tickInterval").addHideCondition(() -> !lambda("modEnabled"));
             optionNames.get("pearlLineWidth").addHideCondition(() -> !lambda("modEnabled"));
+            optionNames.get("pearls").addHideCondition(() -> !lambda("modEnabled"));
+            optionNames.get("pearlRoutesFileName").addHideCondition(() -> !lambda("modEnabled"));
 
             optionNames.get("autoDownload").addHideCondition(() -> !lambda("autoCheckUpdates"));
 
@@ -1101,6 +1129,7 @@ public class SRMConfig extends Config {
             optionNames.get("verboseUpdating").addHideCondition(() -> !lambda("verboseLogging"));
             optionNames.get("verboseInfo").addHideCondition(() -> !lambda("verboseLogging"));
             optionNames.get("verboseRendering").addHideCondition(() -> !lambda("verboseLogging"));
+            optionNames.get("actionbarInfo").addHideCondition(() -> !lambda("verboseLogging"));
 
 
             optionNames.get("customSecretSoundIndex").addHideCondition(() -> !lambda("customSecretSound"));
@@ -1108,25 +1137,44 @@ public class SRMConfig extends Config {
             optionNames.get("customSecretSoundPitch").addHideCondition(() -> !lambda("customSecretSound"));
             optionNames.get("runnable15").addHideCondition(() -> !lambda("customSecretSound"));
 
-            registerKeyBind(lastSecret, () -> { if(Utils.inCatacombs) { Main.currentRoom.lastSecretKeybind(); } else { sendChatMessage("§cYou are not in a dungeon!"); }});
-            registerKeyBind(nextSecret, () -> { if(Utils.inCatacombs) { Main.currentRoom.nextSecretKeybind(); } else { sendChatMessage("§cYou are not in a dungeon!"); }});
-            registerKeyBind(toggleSecrets, () -> { if(Utils.inCatacombs) { Main.toggleSecretsKeybind(); } else { sendChatMessage("§cYou are not in a dungeon!"); }});
-
+            registerKeyBind(lastSecret, () -> {
+                if (Utils.inCatacombs) {
+                    Main.currentRoom.lastSecretKeybind();
+                } else {
+                    sendChatMessage("§cYou are not in a dungeon!");
+                }
+            });
+            registerKeyBind(nextSecret, () -> {
+                if (Utils.inCatacombs) {
+                    Main.currentRoom.nextSecretKeybind();
+                } else {
+                    sendChatMessage("§cYou are not in a dungeon!");
+                }
+            });
+            registerKeyBind(toggleSecrets, () -> {
+                if (Utils.inCatacombs) {
+                    Main.toggleSecretsKeybind();
+                } else {
+                    sendChatMessage("§cYou are not in a dungeon!");
+                }
+            });
 
 
         } catch (Exception e) {
             LogUtils.error(e);
         }
     }
-    public boolean isDevPasswordNotCorrect(){
-        if(devPassword.equals("KyleIsMyDaddy")) {
+
+    public boolean isDevPasswordNotCorrect() {
+        if (devPassword.equals("KyleIsMyDaddy")) {
             return false;
         }
         verboseLogging = false;
         forceUpdateDEBUG = false;
         return true;
     }
-    public boolean isEqualTo(Object a, Object b){
+
+    public boolean isEqualTo(Object a, Object b) {
         return a.equals(b);
     }
 }
