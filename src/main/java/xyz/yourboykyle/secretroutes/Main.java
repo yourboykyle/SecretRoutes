@@ -145,6 +145,7 @@ public class Main {
         MinecraftForge.EVENT_BUS.register(new OnRecievePacket());
         MinecraftForge.EVENT_BUS.register(new OnWorldRender());
         MinecraftForge.EVENT_BUS.register(new OnMouseInput());
+        MinecraftForge.EVENT_BUS.register(new OnChatReceive());
 
         MinecraftForge.EVENT_BUS.register(this);
 
@@ -417,8 +418,7 @@ public class Main {
         }catch(Exception e){
             //nothign needed, literally just waiting
         }
-        sendVerboseMessage("§bSetting ssl certificate", "Info");
-        SSLUtils.setSSlCertificate();
+
         Minecraft mc = Minecraft.getMinecraft();
         if (mc.getCurrentServerData() == null) return;
         if (mc.getCurrentServerData().serverIP.toLowerCase().contains("hypixel.")) {
@@ -431,8 +431,8 @@ public class Main {
                     }
                 }).start();
             }
-
-
+            LogUtils.info("§bSetting ssl certificate");
+            SSLUtils.setSSlCertificate();
 
 
             //Packets are used in this mod solely to detect when the player picks up an item. No packets are modified or created.
