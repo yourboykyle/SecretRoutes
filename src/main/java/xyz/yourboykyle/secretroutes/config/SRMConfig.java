@@ -26,15 +26,48 @@ import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
 public class SRMConfig extends Config {
     @Switch(
             name = "Render Routes",
-            size = OptionSize.DUAL,
+            description = "Main toggle",
             subcategory = "General"
     )
     public static boolean modEnabled = true;
 
+    @Switch(
+            name = "Render secrets when room is completed",
+            description = "Renders secrets even if the room is completed",
+            subcategory = "General"
+    )
+    public static boolean renderComplete = false;
+
+
+    @Switch(
+            name = "All secrets",
+            description = "Render all secrets",
+            subcategory = "General"
+    )
+    public static boolean allSecrets = false;
+
+
+    @Switch(
+            name = "Render steps",
+            description = "Renders the entire path to the secret instead of just the secret",
+            subcategory = "General"
+    )
+    public static boolean allSteps = false;
+
+    @Info(
+            text = "Does not display all secrets in room, only route",
+            subcategory = "General",
+            size = 2,
+            type = InfoType.WARNING
+    )
+    public static boolean ignored;
+
+
     @Dropdown(
             name = "Line Type",
             options = {"Particles", "Lines", "None"},
-            subcategory = "General"
+            subcategory = "General",
+            size = OptionSize.DUAL
     )
     public static int lineType = 0;
 
@@ -160,7 +193,7 @@ public class SRMConfig extends Config {
     )
     Runnable runnable14 = () -> {
         new Thread(() -> {
-            ChatUtils.sendChatMessage("Checking for updates, please wait a few seconds...");
+            sendChatMessage("Checking for updates, please wait a few seconds...");
             Main.updateManager.checkUpdate(true);
         }).start();
     };
@@ -278,30 +311,6 @@ public class SRMConfig extends Config {
             category = "HUD"
     )
     public static CurrentRoomHUD currentRoomHUD = new CurrentRoomHUD();
-
-    @Switch(
-            name = "All secrets",
-            description = "Render all secrets",
-            subcategory = "WIP",
-            category = "Rendering"
-    )
-    public static boolean allSecrets = false;
-
-    @Switch(
-            name = "Render secrets when room is completed",
-            description = "Renders secrets even if the room is completed",
-            subcategory = "WIP",
-            category = "Rendering"
-    )
-    public static boolean renderComplete = false;
-
-    @Switch(
-            name = "Render steps",
-            description = "Renders the entire path to the secret instead of just the secret",
-            subcategory = "WIP",
-            category = "Rendering"
-    )
-    public static boolean allSteps = false;
 
     //Color profile saving and loading
     @Text(
@@ -1092,6 +1101,11 @@ public class SRMConfig extends Config {
             optionNames.get("pearlLineWidth").addHideCondition(() -> !lambda("modEnabled"));
             optionNames.get("pearls").addHideCondition(() -> !lambda("modEnabled"));
             optionNames.get("pearlRoutesFileName").addHideCondition(() -> !lambda("modEnabled"));
+            optionNames.get("allSecrets").addHideCondition(() -> !lambda("modEnabled"));
+            optionNames.get("renderComplete").addHideCondition(() -> !lambda("modEnabled"));
+            optionNames.get("allSteps").addHideCondition(() -> !lambda("modEnabled"));
+            optionNames.get("allSteps").addHideCondition(() -> !lambda("allSecrets"));
+            optionNames.get("ignored").addHideCondition(() -> !lambda("modEnabled"));
 
             optionNames.get("autoDownload").addHideCondition(() -> !lambda("autoCheckUpdates"));
 
