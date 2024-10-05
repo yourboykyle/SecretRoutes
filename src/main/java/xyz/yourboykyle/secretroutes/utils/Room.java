@@ -146,6 +146,9 @@ public class Room {
         }
     }
 
+
+
+
     public SECRET_TYPES getSecretType() {
         if(currentSecretWaypoints != null && currentSecretWaypoints.get("secret") != null && currentSecretWaypoints.get("secret").getAsJsonObject().get("type") != null) {
             String type = currentSecretWaypoints.get("secret").getAsJsonObject().get("type").getAsString();

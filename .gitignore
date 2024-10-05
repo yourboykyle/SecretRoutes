@@ -5,6 +5,8 @@ bin
 .metadata
 .classpath
 .project
+*.bat
+!gradlew.bat
 
 # idea
 out

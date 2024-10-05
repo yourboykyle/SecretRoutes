@@ -60,6 +60,12 @@ public class ChatUtils {
                     return true;
                 }
                 return false;
+            case "Actionbar":
+                if(SRMConfig.actionbarInfo){
+                    sendVerboseMessage("§3[ActionBar] §a "+message);
+                    return true;
+                }
+                return false;
             default:
                 sendChatMessage("§d[" + TAG + "] " + message);
                 return true;
