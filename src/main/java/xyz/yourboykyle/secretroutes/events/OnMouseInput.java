@@ -34,7 +34,7 @@ public class OnMouseInput {
                         Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.ENDERPEARLS, player);
                     }
                 }
-                if(item.getDisplayName().toLowerCase().contains("boom") && button == 0){
+                if(item.getDisplayName().toLowerCase().contains("boom")){
                     LogUtils.info("§bPlayer is holding a superboom");
                     if(Main.routeRecording.recording) {
                         Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.TNTS, player);
