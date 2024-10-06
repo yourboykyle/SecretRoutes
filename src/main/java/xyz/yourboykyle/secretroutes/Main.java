@@ -121,6 +121,10 @@ public class Main {
         if(shellFile.exists()){
             shellFile.delete();
         }
+        LogUtils.info("§bSetting ssl certificate");
+        SSLUtils.setSSlCertificate();
+
+
         routeRecording = new RouteRecording();
 
 
@@ -431,8 +435,7 @@ public class Main {
                     }
                 }).start();
             }
-            LogUtils.info("§bSetting ssl certificate");
-            SSLUtils.setSSlCertificate();
+
 
 
             //Packets are used in this mod solely to detect when the player picks up an item. No packets are modified or created.
