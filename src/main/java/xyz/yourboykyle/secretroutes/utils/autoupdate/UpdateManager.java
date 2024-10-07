@@ -7,7 +7,6 @@ import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.ChatUtils;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
-import xyz.yourboykyle.secretroutes.utils.SSLUtils;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
@@ -36,12 +35,6 @@ public class UpdateManager {
     public static String getNextVersion() {
         return potentialUpdate != null ? potentialUpdate.getUpdate().getVersionNumber().getAsString() : null;
     }
-/*
-    public void injectConfigProcessor(MoulConfigProcessor<?> processor) {
-        processor.registerConfigEditor(ConfigVersionDisplay.class, (option, _unused) -> new GuiOptionEditorUpdateCheck(option));
-    }
-
-     */
 
     public void reset() {
         updateState = UpdateState.NONE;
@@ -50,20 +43,22 @@ public class UpdateManager {
         LogUtils.info("Reset update state");
     }
 
-    public void checkUpdate(boolean forceCheck) {
-        if (updateState != UpdateState.NONE) {
+    public void checkUpdate() {
+        if (updateState == UpdateState.DOWNLOADED) {
+            LogUtils.info("The latest version has already been downloaded in this session. Please restart to apply the changes.");
+            return;
+        }
+        if (updateState == UpdateState.QUEUED) {
             LogUtils.info("Trying to perform update check while another update is already in progress");
             return;
+        }
+        if (updateState == UpdateState.AVAILABLE) {
+            LogUtils.info("This appears to be the second update check. Assuming user checking manually");
         }
 
         setActivePromise(context.checkUpdate("full")
                 .thenAcceptAsync(update -> {
                     LogUtils.info("Update check completed");
-
-                    if (updateState != UpdateState.NONE) {
-                        LogUtils.info("This appears to be the second update check. Ignoring this one");
-                        return;
-                    }
 
                     potentialUpdate = update;
 
@@ -75,32 +70,20 @@ public class UpdateManager {
                         updateState = UpdateState.AVAILABLE;
                         LogUtils.info("Update available");
 
-                        if (forceCheck) {
-                            LogUtils.info("Update available, forceCheck is enabled");
-                            ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "Secret Routes Mod found a new update: " + update.getUpdate().getVersionName() + ". Download at https://github.com/yourboykyle/SecretRoutes/releases/latest");
+                        ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "Secret Routes Mod found a new update: " + update.getUpdate().getVersionName());
+                        if (SRMConfig.autoDownload) {
+                            LogUtils.info("Update available, autoUpdate is enabled");
+                            ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "Automatically downloading new Secret Routes Mod update, since AutoDownload is true...");
+                            queueUpdate();
                         } else {
-                            LogUtils.info("Update available, forceCheck is disabled");
-                            ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "Secret Routes Mod found a new update: " + update.getUpdate().getVersionName());
-                            if(SRMConfig.autoDownload || SRMConfig.forceUpdateDEBUG){
-                                LogUtils.info("Update available, autoUpdate is enabled");
-                                ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "Automatically downloading new Secret Routes Mod update, since AutoDownload is true...");
-                                queueUpdate();
-                            }else if(SRMConfig.autoCheckUpdates){
-                                ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "New update found: visit https://github.com/yourboykyle/SecretRoutes/releases/latest to download the new version.");
-                            }
+                            ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "Download at https://github.com/yourboykyle/SecretRoutes/releases/latest");
                         }
-                    } else if (forceCheck) {
-                        LogUtils.info("No update available, forceCheck is enabled");
-                        ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "Secret Routes Mod didn't find a new update.");
                     } else {
+                        ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "Secret Routes Mod didn't find a new update.");
                         LogUtils.info("No update available.");
                     }
                 }, MinecraftExecutor.INSTANCE)
         );
-    }
-
-    public void checkUpdate() {
-        checkUpdate(false);
     }
 
     public void queueUpdate() {
@@ -160,11 +143,6 @@ public class UpdateManager {
 
     static {
         context.cleanup();
-        //UpdateUtils.patchConnection(connection -> {
-            //if (connection instanceof HttpURLConnection) {
-                //ApiUtil.patchHttpsRequest((HttpURLConnection) connection);
-            //}
-        //});
     }
 
     public enum UpdateState {
@@ -174,18 +152,18 @@ public class UpdateManager {
         NONE
     }
 
-    public boolean checkVersion(PotentialUpdate update){
+    public boolean checkVersion(PotentialUpdate update) {
         String[] currentV = Main.VERSION.split("\\.");
-        String[] nextV =  update.getUpdate().getVersionName().substring(1).split("\\.");
+        String[] nextV = update.getUpdate().getVersionName().substring(1).split("\\.");
 
-        for(int i = 0; i < currentV.length && i< nextV.length; i++){
-            if(Integer.parseInt(currentV[i]) < Integer.parseInt(nextV[i])){
+        for (int i = 0; i < currentV.length && i < nextV.length; i++) {
+            if (Integer.parseInt(currentV[i]) < Integer.parseInt(nextV[i])) {
                 return true;
-            }else if(Integer.parseInt(currentV[i]) > Integer.parseInt(nextV[i])){
+            } else if (Integer.parseInt(currentV[i]) > Integer.parseInt(nextV[i])) {
                 return false;
             }
         }
-        if(currentV.length < nextV.length){
+        if (currentV.length < nextV.length) {
             return true;
         }
         return false;
