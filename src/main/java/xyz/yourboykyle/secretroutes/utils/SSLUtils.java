@@ -4,10 +4,12 @@ import javax.net.ssl.*;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 
+import moe.nea.libautoupdate.UpdateUtils;
+
 
 public class SSLUtils {
 
-    public static void setSSlCertificate(){
+    public static void setSSlCertificate() {
         try {
             KeyStore keyStore = null;
             try {
@@ -15,9 +17,9 @@ public class SSLUtils {
             } catch (KeyStoreException e) {
                 LogUtils.error(e);
             }
-            if(keyStore != null){
-                keyStore.load(SSLUtils.class.getResourceAsStream("/mykeystore.jks"), "changeit".toCharArray());
-            }else{
+            if (keyStore != null) {
+                keyStore.load(SSLUtils.class.getResourceAsStream("/srmkeystore.jks"), "changeit".toCharArray());
+            } else {
                 ChatUtils.sendChatMessage("[§3SRM§f] §cSomething went wrong wth ssl. Send the log file in the §1#support§f channel in the discord with a screenshot of this message.");
             }
 
@@ -30,16 +32,16 @@ public class SSLUtils {
 
             HttpsURLConnection.setDefaultSSLSocketFactory(ctx.getSocketFactory());
 
-        }catch(Exception e){
+            UpdateUtils.patchConnection(connection -> {
+                if (connection instanceof HttpsURLConnection)
+                    ((HttpsURLConnection) connection).setSSLSocketFactory(ctx.getSocketFactory());
+            });
+        } catch (Exception e) {
             ChatUtils.sendChatMessage("[§3SRM§f] §cSomething went wrong wth ssl. Send the log file in the §1#support§f channel in the discord with a screenshot of this message.");
             LogUtils.error(e);
         }
 
     }
-
-
-
-
 
 
 }
