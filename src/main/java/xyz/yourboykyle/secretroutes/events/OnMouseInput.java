@@ -3,10 +3,12 @@ package xyz.yourboykyle.secretroutes.events;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import org.lwjgl.input.Mouse;
 import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
 
@@ -39,6 +41,34 @@ public class OnMouseInput {
                     if(Main.routeRecording.recording) {
                         Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.TNTS, player);
                     }
+                }
+                if(item.getDisplayName().toLowerCase().contains("aspect of the void") && button == 1 && player.isSneaking()){
+                    LogUtils.info("§bPlayer is holding an aspect of the void");
+                    if(Main.routeRecording.recording) {
+                        new Thread(()->{
+                            try {
+                                BlockPos pos = new BlockPos(player.posX, player.posY, player.posZ);
+                                try{
+                                    Thread.sleep(SRMConfig.etherwarpPing);
+                                } catch (InterruptedException ex) {
+                                    LogUtils.error(ex);
+                                }
+                                BlockPos pos2 = new BlockPos(player.posX, player.posY, player.posZ);
+
+                                if(!pos.toString().equals(pos2.toString())){
+                                    LogUtils.info("§bPlayer teleported and moved");
+                                    Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.ETHERWARPS, pos2);
+                                }else{
+                                    LogUtils.info("§bPlayer teleported and did not move");
+                                }
+                            } catch (Exception ex) {
+                                LogUtils.error(ex);
+                            }
+                        }).start();
+                    }
+
+
+
                 }
 
             }
