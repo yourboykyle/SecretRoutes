@@ -37,17 +37,12 @@ import xyz.yourboykyle.secretroutes.utils.RenderUtils;
 import xyz.yourboykyle.secretroutes.utils.RotationUtils;
 import xyz.yourboykyle.secretroutes.utils.SecretRoutesRenderUtils;
 import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
-import xyz.yourboykyle.secretroutes.events.OnChatReceive;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
 
 public class OnWorldRender {
@@ -98,7 +93,7 @@ public class OnWorldRender {
 
 
         // Render the etherwarps
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("etherwarps") != null && (!SRMConfig.allSecrets || SRMConfig.allSteps || index2 == Main.currentRoom.currentSecretIndex)) {
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("etherwarps") != null && (!SRMConfig.allSecrets || SRMConfig.allSteps || index2 == Main.currentRoom.currentSecretIndex) && SRMConfig.renderEtherwarps) {
             JsonArray etherwarpLocations = currentSecretWaypoints.get("etherwarps").getAsJsonArray();
             for (JsonElement etherwarpLocationElement : etherwarpLocations) {
                 JsonArray etherwarpLocation = etherwarpLocationElement.getAsJsonArray();
@@ -116,7 +111,7 @@ public class OnWorldRender {
         }
 
         // Render the mines
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("mines") != null && (!SRMConfig.allSecrets || SRMConfig.allSteps || index2 == Main.currentRoom.currentSecretIndex)) {
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("mines") != null && (!SRMConfig.allSecrets || SRMConfig.allSteps || index2 == Main.currentRoom.currentSecretIndex) && SRMConfig.renderMines) {
             JsonArray mineLocations = currentSecretWaypoints.get("mines").getAsJsonArray();
             for (JsonElement mineLocationElement : mineLocations) {
                 JsonArray mineLocation = mineLocationElement.getAsJsonArray();
@@ -133,7 +128,7 @@ public class OnWorldRender {
         }
 
         // Render the interacts
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("interacts") != null && (!SRMConfig.allSecrets || SRMConfig.allSteps || index2 == Main.currentRoom.currentSecretIndex)) {
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("interacts") != null && (!SRMConfig.allSecrets || SRMConfig.allSteps || index2 == Main.currentRoom.currentSecretIndex) && SRMConfig.renderInteracts) {
             JsonArray interactLocations = currentSecretWaypoints.get("interacts").getAsJsonArray();
             for (JsonElement interactLocationElement : interactLocations) {
                 JsonArray interactLocation = interactLocationElement.getAsJsonArray();
@@ -150,7 +145,7 @@ public class OnWorldRender {
         }
 
         // Render the tnts
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("tnts") != null && (!SRMConfig.allSecrets || SRMConfig.allSteps || index2 == Main.currentRoom.currentSecretIndex)) {
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("tnts") != null && (!SRMConfig.allSecrets || SRMConfig.allSteps || index2 == Main.currentRoom.currentSecretIndex) && SRMConfig.renderSuperboom) {
             JsonArray tntLocations = currentSecretWaypoints.get("tnts").getAsJsonArray();
             for (JsonElement tntLocationElement : tntLocations) {
                 JsonArray tntLocation = tntLocationElement.getAsJsonArray();
@@ -189,7 +184,7 @@ public class OnWorldRender {
         }
 
         // Render the ender pearls
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("enderpearls") != null && (!SRMConfig.allSecrets || SRMConfig.allSteps || index2 == Main.currentRoom.currentSecretIndex)) {
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("enderpearls") != null && (!SRMConfig.allSecrets || SRMConfig.allSteps || index2 == Main.currentRoom.currentSecretIndex) && SRMConfig.renderEnderpearls) {
             JsonArray enderpearlAnglesArray = currentSecretWaypoints.get("enderpearlangles").getAsJsonArray();
             for (JsonElement pearlAngleElement : enderpearlAnglesArray) {
                 JsonArray pearlAngle = pearlAngleElement.getAsJsonArray();
@@ -213,7 +208,7 @@ public class OnWorldRender {
                 posX = positions.getOne() - 0.25;
                 posY = positions.getTwo();
                 posZ = positions.getThree() - 0.25;
-                if(SRMConfig.enderPearlFullBlock){
+                if(SRMConfig.enderpearlFullBlock){
                     SecretRoutesRenderUtils.drawFilledBoxAtBlock(posX, posY, posZ, SRMConfig.enderpearls, 0.5f, 0);
 
                 }else {
@@ -258,32 +253,38 @@ public class OnWorldRender {
 
 
             if (type.equals("interact")) {
-                if(SRMConfig.secretsInteractFullBlock){
-                    SecretRoutesRenderUtils.drawFilledBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsInteract, 1, 1);
-                }else{
-                    SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsInteract, 1, 1);
-                }
-                if (SRMConfig.interactTextToggle) {
-                    SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.interactWaypointColorIndex) + "Interact", SRMConfig.interactTextSize, event.partialTicks);
+                if(SRMConfig.renderSecretIteract) {
+                    if (SRMConfig.secretsInteractFullBlock) {
+                        SecretRoutesRenderUtils.drawFilledBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsInteract, 1, 1);
+                    } else {
+                        SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsInteract, 1, 1);
+                    }
+                    if (SRMConfig.interactTextToggle) {
+                        SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.interactWaypointColorIndex) + "Interact", SRMConfig.interactTextSize, event.partialTicks);
+                    }
                 }
             } else if (type.equals("item")) {
-                if(SRMConfig.secretsItemFullBlock){
-                    SecretRoutesRenderUtils.drawFilledBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsItem, 1, 1);
-                }else{
-                    SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsItem, 1, 1);
-                }
+                if (SRMConfig.renderSecretsItem) {
+                    if(SRMConfig.secretsItemFullBlock){
+                        SecretRoutesRenderUtils.drawFilledBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsItem, 1, 1);
+                    }else{
+                        SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsItem, 1, 1);
+                    }
 
-                if (SRMConfig.itemTextToggle) {
-                    SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.itemWaypointColorIndex) + "Item", SRMConfig.itemTextSize, event.partialTicks);
+                    if (SRMConfig.itemTextToggle) {
+                        SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.itemWaypointColorIndex) + "Item", SRMConfig.itemTextSize, event.partialTicks);
+                    }
                 }
             } else if (type.equals("bat")) {
-                if(SRMConfig.secretsInteractFullBlock){
-                    SecretRoutesRenderUtils.drawFilledBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsBat, 1, 1);
-                }else{
-                    SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsBat, 1, 1);
-                }
-                if (SRMConfig.batTextToggle) {
-                    SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.batWaypointColorIndex) + "Bat", SRMConfig.batTextSize, event.partialTicks);
+                if (SRMConfig.renderSecretBat) {
+                    if(SRMConfig.secretsBatFullBlock){
+                        SecretRoutesRenderUtils.drawFilledBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsBat, 1, 1);
+                    }else{
+                        SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsBat, 1, 1);
+                    }
+                    if (SRMConfig.batTextToggle) {
+                        SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.batWaypointColorIndex) + "Bat", SRMConfig.batTextSize, event.partialTicks);
+                    }
                 }
             }
             if (SRMConfig.etherwarpsTextToggle) {

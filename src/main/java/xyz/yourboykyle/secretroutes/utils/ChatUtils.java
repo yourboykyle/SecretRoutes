@@ -11,15 +11,18 @@ public class ChatUtils {
         if(Minecraft.getMinecraft().thePlayer == null){
             return;
         }
-        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("[§3SRM§f]  "+message).setChatStyle(new ChatStyle().setColor(color)));
+        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(message).setChatStyle(new ChatStyle().setColor(color)));
         LogUtils.info("Sent chat message: " + message);
     }
     public static void sendChatMessage(String message) {
         if(Minecraft.getMinecraft().thePlayer == null){
             return;
         }
-        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("[§3SRM§f]  "+message));
+        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(message));
+
         LogUtils.info("Sent chat message: " + message);
+
+
     }
 
     public static void sendVerboseMessage(String message){
