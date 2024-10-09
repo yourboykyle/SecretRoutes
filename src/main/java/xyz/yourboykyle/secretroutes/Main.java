@@ -224,7 +224,7 @@ public class Main {
     public static void updateRoutes(File configFile) {
         try {
             LogUtils.info("Downloading routes.json...");
-            URL url = new URL("https://raw.githubusercontent.com/yourboykyle/SecretRoutes/main/routes.json")
+            URL url = new URL("https://raw.githubusercontent.com/yourboykyle/SecretRoutes/main/routes.json");
             downloadFile(configFile, url);
 
         }catch(Exception e){
