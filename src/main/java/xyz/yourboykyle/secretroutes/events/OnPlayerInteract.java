@@ -65,7 +65,6 @@ public class OnPlayerInteract {
 
                         // Stuff so items from chests don't count as secrets (because they're not)
                         OnItemPickedUp.itemSecretOnCooldown = true;
-
                         new Thread(() -> {
                             try {
                                 Thread.sleep(2000);

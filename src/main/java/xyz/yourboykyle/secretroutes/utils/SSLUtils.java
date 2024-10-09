@@ -6,9 +6,12 @@ import javax.net.ssl.*;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 
+import moe.nea.libautoupdate.UpdateUtils;
+
 
 public class SSLUtils {
     static SSLContext context = null;
+
 
     public static void makeSSLCertificate(){
         try{
@@ -33,9 +36,9 @@ public class SSLUtils {
                 ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
                 context = ctx;
                 //HttpsURLConnection.setDefaultSSLSocketFactory(ctx.getSocketFactory());
-
             }
         }catch(Exception e){
+
             LogUtils.error(e);
         }
     }
@@ -59,10 +62,6 @@ public class SSLUtils {
         }
         return context.getSocketFactory();
     }
-
-
-
-
 
 
 }
