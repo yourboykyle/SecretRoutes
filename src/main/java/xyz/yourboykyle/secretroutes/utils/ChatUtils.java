@@ -12,18 +12,26 @@ public class ChatUtils {
             return;
         }
         Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(message).setChatStyle(new ChatStyle().setColor(color)));
+<<<<<<< Updated upstream
         //if(!SRMConfig.verboseInfo){
            // LogUtils.info("Sent chat message: " + message);
         //}
+=======
+        LogUtils.info("Sent chat message: " + message);
+>>>>>>> Stashed changes
     }
     public static void sendChatMessage(String message) {
         if(Minecraft.getMinecraft().thePlayer == null){
             return;
         }
         Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(message));
+<<<<<<< Updated upstream
         //if(!SRMConfig.verboseInfo){
             LogUtils.info("Sent chat message: " + message);
         //}
+=======
+        LogUtils.info("Sent chat message: " + message);
+>>>>>>> Stashed changes
     }
 
     public static void sendVerboseMessage(String message){

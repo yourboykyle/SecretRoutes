@@ -346,7 +346,7 @@ public class SRMConfig extends Config {
     )
     Runnable runnable10 = () -> {
         new Thread(() -> {
-            Main.writeColorConfig(colorProfileName);
+            ConfigUtils.writeColorConfig(colorProfileName);
         }).start();
     };
 
@@ -359,7 +359,7 @@ public class SRMConfig extends Config {
     )
     Runnable runnable11 = () -> {
         new Thread(() -> {
-            if (Main.loadColorConfig(colorProfileName.isEmpty() ? "default.json" : colorProfileName)) {
+            if (ConfigUtils.loadColorConfig(colorProfileName.isEmpty() ? "default.json" : colorProfileName)) {
                 sendChatMessage(EnumChatFormatting.DARK_GREEN + "Loaded " + EnumChatFormatting.GREEN + colorProfileName + EnumChatFormatting.DARK_GREEN + " as color profile");
             }
         }).start();
@@ -433,26 +433,12 @@ public class SRMConfig extends Config {
     )
     public static OneColor etherWarp = new OneColor(128, 0, 128);
 
-    @Switch(
-            name = "Full block",
-            subcategory = "Waypoint Colors",
-            category = "Rendering"
-    )
-    public static boolean etherwarpFullBlock = false;
-
     @Color(
             name = "Mine",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
     public static OneColor mine = new OneColor(255, 255, 0);
-
-    @Switch(
-            name = "Full block",
-            subcategory = "Waypoint Colors",
-            category = "Rendering"
-    )
-    public static boolean mineFullBlock = false;
 
     @Color(
             name = "Interacts",
@@ -461,26 +447,12 @@ public class SRMConfig extends Config {
     )
     public static OneColor interacts = new OneColor(0, 0, 255);
 
-    @Switch(
-            name = "Full block",
-            subcategory = "Waypoint Colors",
-            category = "Rendering"
-    )
-    public static boolean interactsFullBlock = false;
-
     @Color(
             name = "superbooms",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
     public static OneColor superbooms = new OneColor(255, 0, 0);
-
-    @Switch(
-            name = "Full block",
-            subcategory = "Waypoint Colors",
-            category = "Rendering"
-    )
-    public static boolean superboomsFullBlock = false;
 
     @Color(
             name = "enderpearls",
@@ -489,12 +461,6 @@ public class SRMConfig extends Config {
     )
     public static OneColor enderpearls = new OneColor(0, 255, 255);
 
-    @Switch(
-            name = "Full block",
-            subcategory = "Waypoint Colors",
-            category = "Rendering"
-    )
-    public static boolean enderPearlFullBlock = false;
 
     @Color(
             name = "Secrets - item",
@@ -503,13 +469,6 @@ public class SRMConfig extends Config {
     )
     public static OneColor secretsItem = new OneColor(0, 255, 255);
 
-    @Switch(
-            name = "Full block",
-            subcategory = "Waypoint Colors",
-            category = "Rendering"
-    )
-    public static boolean secretsItemFullBlock = false;
-
     @Color(
             name = "Secrets - interact",
             subcategory = "Waypoint Colors",
@@ -517,26 +476,12 @@ public class SRMConfig extends Config {
     )
     public static OneColor secretsInteract = new OneColor(0, 0, 255);
 
-    @Switch(
-            name = "Full block",
-            subcategory = "Waypoint Colors",
-            category = "Rendering"
-    )
-    public static boolean secretsInteractFullBlock = false;
-
     @Color(
             name = "Secrets - bat",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
     public static OneColor secretsBat = new OneColor(0, 255, 0);
-
-    @Switch(
-            name = "Full block",
-            subcategory = "Waypoint Colors",
-            category = "Rendering"
-    )
-    public static boolean secretsBatFullBlock = false;
 
     @Button(
             name = "Reset to default colors",
@@ -550,22 +495,159 @@ public class SRMConfig extends Config {
         lineColor = new OneColor(255, 0, 0);
         pearlLineColor = new OneColor(0, 255, 255);
         etherWarp = new OneColor(128, 0, 128);
-        etherwarpFullBlock = false;
         mine = new OneColor(255, 255, 0);
-        mineFullBlock = false;
         interacts = new OneColor(0, 0, 255);
-        interactsFullBlock = false;
         superbooms = new OneColor(255, 0, 0);
-        superboomsFullBlock = false;
         enderpearls = new OneColor(0, 255, 255);
-        enderPearlFullBlock = false;
         secretsItem = new OneColor(0, 255, 255);
-        secretsItemFullBlock = false;
         secretsInteract = new OneColor(0, 0, 255);
-        secretsInteractFullBlock = false;
         secretsBat = new OneColor(0, 255, 0);
-        secretsBatFullBlock = false;
     };
+    @Switch(
+            name = "Render etherwarps",
+            subcategory = "Render Options",
+            category =  "Rendering",
+            description = "Toggles the rendering of etherwarp waypoints"
+    )
+    public static boolean renderEtherwarps = true;
+
+    @Switch(
+            name = "Full block",
+            subcategory = "Render Options",
+            category = "Rendering"
+    )
+    public static boolean etherwarpFullBlock = false;
+
+    @Switch(
+            name = "Render mines",
+            subcategory = "Render Options",
+            category =  "Rendering",
+            description = "Toggles the rendering of mines waypoints"
+    )
+    public static boolean renderMines = true;
+
+    @Switch(
+            name = "Full block",
+            subcategory = "Render Options",
+            category = "Rendering"
+    )
+    public static boolean mineFullBlock = false;
+
+    @Switch(
+            name = "Render interacts",
+            subcategory = "Render Options",
+            category =  "Rendering",
+            description = "Toggles the rendering of interact waypoints"
+    )
+    public static boolean renderInteracts = true;
+
+    @Switch(
+            name = "Full block",
+            subcategory = "Render Options",
+            category = "Rendering"
+    )
+    public static boolean interactsFullBlock = false;
+
+    @Switch(
+            name = "Render superbooms",
+            subcategory = "Render Options",
+            category =  "Rendering",
+            description = "Toggles the rendering of superbooms waypoints"
+    )
+    public static boolean renderSuperboom = true;
+
+    @Switch(
+            name = "Full block",
+            subcategory = "Render Options",
+            category = "Rendering"
+    )
+    public static boolean superboomsFullBlock = false;
+
+    @Switch(
+            name = "Render enderpearls",
+            subcategory = "Render Options",
+            category =  "Rendering",
+            description = "Toggles the rendering of enderpearls waypoints"
+    )
+    public static boolean renderEnderpearls = true;
+
+    @Switch(
+            name = "Full block",
+            subcategory = "Render Options",
+            category = "Rendering"
+    )
+    public static boolean enderpearlFullBlock = false;
+
+    @Switch(
+            name = "Render item secrets",
+            subcategory = "Render Options",
+            category =  "Rendering",
+            description = "Toggles the rendering of item secret waypoints"
+    )
+    public static boolean renderSecretsItem = true;
+
+    @Switch(
+            name = "Full block",
+            subcategory = "Render Options",
+            category = "Rendering"
+    )
+    public static boolean secretsItemFullBlock = false;
+
+    @Switch(
+            name = "Render interact secrets",
+            subcategory = "Render Options",
+            category =  "Rendering",
+            description = "Toggles the rendering of interact secrets waypoints"
+    )
+    public static boolean renderSecretIteract = true;
+
+    @Switch(
+            name = "Full block",
+            subcategory = "Render Options",
+            category = "Rendering"
+    )
+    public static boolean secretsInteractFullBlock = false;
+
+    @Switch(
+            name = "Render bat secrets",
+            subcategory = "Render Options",
+            category =  "Rendering",
+            description = "Toggles the rendering of bat secrets waypoints"
+    )
+    public static boolean renderSecretBat = true;
+
+    @Switch(
+            name = "Full block",
+            subcategory = "Render Options",
+            category = "Rendering"
+    )
+    public static boolean secretsBatFullBlock = false;
+
+    @Button(
+            name = "Reset default options",
+            text = "reset",
+            category = "Rendering",
+            subcategory = "Render Options",
+            size = OptionSize.DUAL
+    )
+    Runnable runnable17 = () ->{
+       renderEtherwarps = true;
+       etherwarpFullBlock = false;
+       renderMines = true;
+       mineFullBlock = false;
+       renderInteracts = true;
+       interactsFullBlock = false;
+       renderSuperboom = true;
+       superboomsFullBlock = false;
+       renderEnderpearls = true;
+       enderpearlFullBlock = false;
+       renderSecretsItem = true;
+       secretsItemFullBlock = false;
+       renderSecretIteract = true;
+       secretsInteractFullBlock = false;
+       renderSecretBat = true;
+       secretsBatFullBlock = false;
+    } ;
 
 
     // Start waypoints
