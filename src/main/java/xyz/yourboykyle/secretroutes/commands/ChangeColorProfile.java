@@ -5,6 +5,7 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.EnumChatFormatting;
 import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.utils.ConfigUtils;
 import xyz.yourboykyle.secretroutes.utils.FileUtils;
 
 import java.util.ArrayList;
@@ -50,13 +51,13 @@ public class ChangeColorProfile extends CommandBase {
 
        } else if (args.length == 2) {
            if(args[0].equals("load")){
-                 if(Main.loadColorConfig(args[1])){
+                 if(ConfigUtils.loadColorConfig(args[1])){
                      sendChatMessage(EnumChatFormatting.DARK_GREEN+"Loaded "+EnumChatFormatting.GREEN+args[1]+EnumChatFormatting.DARK_GREEN+" as color profile");
                  }
 
 
            }else if(args[0].equals("save")){
-                Main.writeColorConfig(args[1]);
+                ConfigUtils.writeColorConfig(args[1]);
            }else{
                sendChatMessage(EnumChatFormatting.RED+"Incorrect usage: /changecolorprofile [list|load|save] [profile]");
            }
