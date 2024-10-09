@@ -22,6 +22,7 @@ public class ChatUtils {
 
         LogUtils.info("Sent chat message: " + message);
 
+
     }
 
     public static void sendVerboseMessage(String message){

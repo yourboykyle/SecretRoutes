@@ -194,7 +194,7 @@ public class SRMConfig extends Config {
     Runnable runnable14 = () -> {
         new Thread(() -> {
             sendChatMessage("Checking for updates, please wait a few seconds...");
-            Main.updateManager.checkUpdate(true);
+            Main.updateManager.checkUpdate();
         }).start();
     };
 
