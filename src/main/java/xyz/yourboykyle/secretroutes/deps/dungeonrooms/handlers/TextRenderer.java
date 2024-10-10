@@ -16,7 +16,7 @@
  * with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.quantizr.dungeonrooms.handlers;
+package xyz.yourboykyle.secretroutes.deps.dungeonrooms.handlers;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;

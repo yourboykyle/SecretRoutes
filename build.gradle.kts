@@ -100,12 +100,14 @@ dependencies {
     shade("moe.nea:libautoupdate:1.3.1")
 
     // If we are building for legacy forge, includes the launch wrapper with `shade` as we configured earlier, as well as mixin 0.7.11
-    shade("moe.nea:libautoupdate:1.3.1")
-
     if (platform.isLegacyForge) {
         compileOnly("org.spongepowered:mixin:0.7.11-SNAPSHOT")
         shade("cc.polyfrost:oneconfig-wrapper-launchwrapper:1.0.0-beta17")
     }
+}
+
+tasks.shadowJar{
+    relocate("moe.nea.libautoupdate", "xyz.yourboykyle.secretroutes.deps.libautoupdate")
 }
 
 tasks {

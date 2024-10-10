@@ -3,7 +3,7 @@ package xyz.yourboykyle.secretroutes.config.huds;
 import cc.polyfrost.oneconfig.config.annotations.Color;
 import cc.polyfrost.oneconfig.config.core.OneColor;
 import cc.polyfrost.oneconfig.hud.SingleTextHud;
-import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
 import xyz.yourboykyle.secretroutes.Main;
 
 public class CurrentRoomHUD extends SingleTextHud {

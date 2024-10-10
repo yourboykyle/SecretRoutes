@@ -21,10 +21,10 @@ package xyz.yourboykyle.secretroutes.events;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import io.github.quantizr.dungeonrooms.dungeons.catacombs.DungeonManager;
-import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
-import io.github.quantizr.dungeonrooms.utils.MapUtils;
-import io.github.quantizr.dungeonrooms.utils.Utils;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.DungeonManager;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.MapUtils;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Tuple;
@@ -32,10 +32,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
-import xyz.yourboykyle.secretroutes.utils.LogUtils;
-import xyz.yourboykyle.secretroutes.utils.RenderUtils;
-import xyz.yourboykyle.secretroutes.utils.RotationUtils;
-import xyz.yourboykyle.secretroutes.utils.SecretRoutesRenderUtils;
+import xyz.yourboykyle.secretroutes.utils.*;
 import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 
 import java.util.ArrayList;
@@ -80,6 +77,7 @@ public class OnWorldRender {
     }
 
     public void renderingCallback(JsonObject currentSecretWaypoints, RenderWorldLastEvent event, int index2){
+        //SecretUtils.renderSecrets(event);
         ArrayList<BlockPos> etherwarpPositions = new ArrayList<>();
         ArrayList<BlockPos> minesPositions = new ArrayList<>();
         ArrayList<BlockPos> interactsPositions = new ArrayList<>();
@@ -117,7 +115,7 @@ public class OnWorldRender {
                 JsonArray mineLocation = mineLocationElement.getAsJsonArray();
 
                 Main.checkRoomData();
-                BlockPos pos = MapUtils.relativeToActual(new BlockPos(mineLocation.get(0).getAsInt(), mineLocation.get(1).getAsInt(), mineLocation.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
+                BlockPos pos = MapUtils. relativeToActual(new BlockPos(mineLocation.get(0).getAsInt(), mineLocation.get(1).getAsInt(), mineLocation.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
                 minesPositions.add(pos);
                 if(SRMConfig.mineFullBlock){
                     SecretRoutesRenderUtils.drawFilledBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.mine, 1, 1);

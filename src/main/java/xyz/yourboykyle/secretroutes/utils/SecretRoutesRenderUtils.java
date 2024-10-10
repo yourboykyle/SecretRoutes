@@ -19,7 +19,7 @@
 package xyz.yourboykyle.secretroutes.utils;
 
 import cc.polyfrost.oneconfig.config.core.OneColor;
-import io.github.quantizr.dungeonrooms.utils.WaypointUtils;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.WaypointUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;

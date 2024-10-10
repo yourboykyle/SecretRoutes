@@ -16,16 +16,13 @@
  * with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.quantizr.dungeonrooms.dungeons.catacombs;
+package xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs;
 
-import io.github.quantizr.dungeonrooms.DungeonRooms;
-import io.github.quantizr.dungeonrooms.utils.MapUtils;
-import io.github.quantizr.dungeonrooms.utils.Utils;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.DungeonRooms;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.MapUtils;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.settings.GameSettings;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -34,8 +31,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class DungeonManager {
     Minecraft mc = Minecraft.getMinecraft();

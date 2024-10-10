@@ -16,11 +16,11 @@
  * with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.quantizr.dungeonrooms.handlers;
+package xyz.yourboykyle.secretroutes.deps.dungeonrooms.handlers;
 
-import io.github.quantizr.dungeonrooms.DungeonRooms;
-import io.github.quantizr.dungeonrooms.dungeons.catacombs.DungeonManager;
-import io.github.quantizr.dungeonrooms.dungeons.catacombs.Waypoints;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.DungeonRooms;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.DungeonManager;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.Waypoints;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 

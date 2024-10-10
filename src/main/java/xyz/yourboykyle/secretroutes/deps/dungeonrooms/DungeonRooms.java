@@ -16,16 +16,16 @@
  * with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.quantizr.dungeonrooms;
+package xyz.yourboykyle.secretroutes.deps.dungeonrooms;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import io.github.quantizr.dungeonrooms.dungeons.catacombs.DungeonManager;
-import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
-import io.github.quantizr.dungeonrooms.dungeons.catacombs.Waypoints;
-import io.github.quantizr.dungeonrooms.handlers.ConfigHandler;
-import io.github.quantizr.dungeonrooms.handlers.TextRenderer;
-import io.github.quantizr.dungeonrooms.utils.Utils;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.DungeonManager;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.Waypoints;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.handlers.ConfigHandler;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.handlers.TextRenderer;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;

@@ -18,10 +18,10 @@
 
 package xyz.yourboykyle.secretroutes;
 
-import io.github.quantizr.dungeonrooms.DungeonRooms;
-import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
-import io.github.quantizr.dungeonrooms.handlers.PacketHandler;
-import io.github.quantizr.dungeonrooms.utils.Utils;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.DungeonRooms;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.handlers.PacketHandler;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;

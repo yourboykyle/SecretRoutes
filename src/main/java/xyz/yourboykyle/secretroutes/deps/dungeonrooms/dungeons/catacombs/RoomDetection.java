@@ -16,12 +16,12 @@
  * with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.quantizr.dungeonrooms.dungeons.catacombs;
+package xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs;
 
-import io.github.quantizr.dungeonrooms.DungeonRooms;
-import io.github.quantizr.dungeonrooms.utils.MapUtils;
-import io.github.quantizr.dungeonrooms.utils.RoomDetectionUtils;
-import io.github.quantizr.dungeonrooms.utils.Utils;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.DungeonRooms;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.MapUtils;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.RoomDetectionUtils;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -42,7 +42,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import static io.github.quantizr.dungeonrooms.dungeons.catacombs.DungeonManager.*;
+import static xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.DungeonManager.*;
 
 public class RoomDetection {
     Minecraft mc = Minecraft.getMinecraft();

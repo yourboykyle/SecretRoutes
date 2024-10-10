@@ -1,6 +1,6 @@
 package xyz.yourboykyle.secretroutes.utils;
 
-import io.github.quantizr.dungeonrooms.utils.Utils;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Vec3;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;

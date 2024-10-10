@@ -16,7 +16,7 @@
  * with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.quantizr.dungeonrooms.events;
+package xyz.yourboykyle.secretroutes.deps.dungeonrooms.events;
 
 import net.minecraft.network.Packet;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;

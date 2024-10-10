@@ -16,10 +16,10 @@
  * with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.quantizr.dungeonrooms.utils;
+package xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils;
 
-import io.github.quantizr.dungeonrooms.DungeonRooms;
-import io.github.quantizr.dungeonrooms.handlers.ScoreboardHandler;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.DungeonRooms;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.handlers.ScoreboardHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.scoreboard.ScoreObjective;
 import org.apache.logging.log4j.Level;

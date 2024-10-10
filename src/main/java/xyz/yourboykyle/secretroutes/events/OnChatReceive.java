@@ -1,7 +1,6 @@
 package xyz.yourboykyle.secretroutes.events;
 
-import io.github.quantizr.dungeonrooms.utils.Utils;
-import lombok.Getter;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
