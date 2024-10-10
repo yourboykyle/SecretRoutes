@@ -1,8 +1,8 @@
 package xyz.yourboykyle.secretroutes.utils;
 
 import com.google.gson.*;
-import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
-import io.github.quantizr.dungeonrooms.utils.MapUtils;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.MapUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.BlockPos;
@@ -150,7 +150,6 @@ public class RouteRecording {
                 FileReader reader = new FileReader(filePath);
 
                 allSecretRoutes = gson.fromJson(reader, JsonObject.class);
-                throw new JsonSyntaxException("This is a test");
             } catch (IOException e) {
                 LogUtils.error(e);
             }catch (JsonSyntaxException e) {

@@ -16,9 +16,9 @@
  * with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.quantizr.dungeonrooms.handlers;
+package xyz.yourboykyle.secretroutes.deps.dungeonrooms.handlers;
 
-import io.github.quantizr.dungeonrooms.events.PacketEvent;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.events.PacketEvent;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;

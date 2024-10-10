@@ -2,8 +2,8 @@ package xyz.yourboykyle.secretroutes.events;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import io.github.quantizr.dungeonrooms.dungeons.catacombs.RoomDetection;
-import io.github.quantizr.dungeonrooms.utils.MapUtils;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.MapUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemPickaxe;
 import net.minecraft.item.ItemStack;
@@ -13,9 +13,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
-import xyz.yourboykyle.secretroutes.utils.RouteRecording;
-
-import java.io.FileWriter;
 
 public class OnBlockBreak {
     @SubscribeEvent

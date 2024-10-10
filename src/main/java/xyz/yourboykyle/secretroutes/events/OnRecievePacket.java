@@ -1,6 +1,6 @@
 package xyz.yourboykyle.secretroutes.events;
 
-import io.github.quantizr.dungeonrooms.events.PacketEvent;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.events.PacketEvent;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
