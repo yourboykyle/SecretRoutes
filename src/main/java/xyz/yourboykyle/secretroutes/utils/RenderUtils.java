@@ -33,7 +33,6 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
-import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 
 import java.util.List;
@@ -231,9 +230,9 @@ public class RenderUtils {
         GlStateManager.translate(0, player.getEyeHeight(), 0);
         GlStateManager.rotate(-rm.playerViewY, 0, 1, 0);
         GlStateManager.rotate(rm.playerViewX, 1, 0, 0);
-        GlStateManager.scale(-0.015*scale, -0.015*scale, -0.015*scale);
+        GlStateManager.scale(-Constants.baseScale*scale, -Constants.baseScale*scale, -Constants.baseScale*scale);
 
-        float constantScaleFactor = (float) (distance*0.08f);
+        float constantScaleFactor = (float) (distance*Constants.distanceScaleFactor);
         GlStateManager.scale(1+constantScaleFactor, 1+constantScaleFactor, 1+constantScaleFactor);
 
         GlStateManager.disableLighting();
