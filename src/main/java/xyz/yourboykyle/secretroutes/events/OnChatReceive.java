@@ -4,6 +4,7 @@ import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import xyz.yourboykyle.secretroutes.utils.LogUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,34 +26,38 @@ public class OnChatReceive {
         }
         String unformatted = e.message.getUnformattedText();
         String secrets = "";
-        if (e.type != 2) {
-            return;
-        }
-        sections = unformatted.split(" {5}");
-        for (String section : sections) {
-            if (section.contains("Secret")) {
-                secrets = section;
+        if (e.type == 2) {
+            sections = unformatted.split(" {5}");
+            for (String section : sections) {
+                if (section.contains("Secret")) {
+                    secrets = section;
+                }
+            }
+
+            Long currentTime = System.currentTimeMillis();
+            if (currentTime - lastSent > 10000) {
+                lastSent = currentTime;
+                sendVerboseMessage(unformatted, "Actionbar");
+            }
+
+            Matcher matcher = Pattern.compile("§7(?<roomCollectedSecrets>\\d+)/(?<roomTotalSecrets>\\d+) Secrets").matcher(unformatted);
+            if (matcher.find()) {
+                int roomSecrets = Integer.parseInt(matcher.group("roomTotalSecrets"));
+                int secretsFound = Integer.parseInt(matcher.group("roomCollectedSecrets"));
+                if (roomSecrets == secretsFound) {
+                    sendVerboseMessage("§aAll secrets found!", "Actionbar");
+                    allFound  = true;
+                } else {
+                    sendVerboseMessage("§9(" + secretsFound + "/" + roomSecrets + ")", "Actionbar");
+                    allFound = false;
+                }
+            }
+        }else{
+            if(e.message.getUnformattedText().contains("That chest is locked!")){
+                LogUtils.info("§aLocked chest detected!");
             }
         }
 
-        Long currentTime = System.currentTimeMillis();
-        if (currentTime - lastSent > 10000) {
-            lastSent = currentTime;
-            sendVerboseMessage(unformatted, "Actionbar");
-        }
-
-        Matcher matcher = Pattern.compile("§7(?<roomCollectedSecrets>\\d+)/(?<roomTotalSecrets>\\d+) Secrets").matcher(unformatted);
-        if (matcher.find()) {
-            int roomSecrets = Integer.parseInt(matcher.group("roomTotalSecrets"));
-            int secretsFound = Integer.parseInt(matcher.group("roomCollectedSecrets"));
-            if (roomSecrets == secretsFound) {
-                sendVerboseMessage("§aAll secrets found!", "Actionbar");
-                allFound  = true;
-            } else {
-                sendVerboseMessage("§9(" + secretsFound + "/" + roomSecrets + ")", "Actionbar");
-                allFound = false;
-            }
-        }
     }
     public static boolean isAllFound() {
         return allFound;

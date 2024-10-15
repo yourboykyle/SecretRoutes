@@ -20,9 +20,12 @@ package xyz.yourboykyle.secretroutes.utils;
 
 import cc.polyfrost.oneconfig.config.core.OneColor;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.BlockPos;
@@ -30,6 +33,7 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
+import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 
 import java.util.List;
@@ -141,51 +145,6 @@ public class RenderUtils {
         }
     }
 
-    public static void drawNormalLine(BlockPos pos1, BlockPos pos2, OneColor colour, float partialTicks, boolean depth, int width) {
-        Entity render = Minecraft.getMinecraft().getRenderViewEntity();
-        WorldRenderer worldRenderer = Tessellator.getInstance().getWorldRenderer();
-
-        double realX = render.lastTickPosX + (render.posX - render.lastTickPosX) * partialTicks;
-        double realY = render.lastTickPosY + (render.posY - render.lastTickPosY) * partialTicks;
-        double realZ = render.lastTickPosZ + (render.posZ - render.lastTickPosZ) * partialTicks;
-
-        GlStateManager.pushAttrib();
-
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(-realX, -realY, -realZ);
-        GlStateManager.disableTexture2D();
-        if (!depth) {
-            GlStateManager.disableDepth();
-            GlStateManager.depthMask(false);
-        }
-        GlStateManager.disableLighting();
-        GlStateManager.enableBlend();
-        GlStateManager.disableAlpha();
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-        GL11.glLineWidth(width);
-        GlStateManager.color(colour.getRed() / 255f, colour.getGreen() / 255f, colour.getBlue()/ 255f, colour.getAlpha() / 255f);
-        worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
-
-        worldRenderer.pos(pos1.getX(), pos1.getY(), pos1.getZ()).endVertex();
-        worldRenderer.pos(pos2.getX(), pos2.getY(), pos2.getZ()).endVertex();
-        Tessellator.getInstance().draw();
-
-        GlStateManager.translate(realX, realY, realZ);
-        GlStateManager.disableBlend();
-        if (!depth) {
-            GlStateManager.enableDepth();
-            GlStateManager.depthMask(true);
-        }
-        GlStateManager.enableAlpha();
-        GlStateManager.enableTexture2D();
-        GlStateManager.enableLighting();
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager.popMatrix();
-
-        GlStateManager.popAttrib();
-    }
-
-
     public static void drawMultipleNormalLines(List<Triple<Double, Double, Double>> locations, float partialTicks, OneColor color, int width) {
         if(locations == null) {
             return;
@@ -248,5 +207,54 @@ public class RenderUtils {
         GlStateManager.popAttrib();
     }
 
+
+
+    public static void drawText(String text, BlockPos pos, float partialTicks, Boolean depth, Boolean shadow, Float scale){
+
+        Minecraft mc = Minecraft.getMinecraft();
+        RenderManager rm = mc.getRenderManager();
+        FontRenderer fr = mc.fontRendererObj;
+        EntityPlayerSP player = mc.thePlayer;
+
+        double viewerPosX = player.lastTickPosX + (player.posX-player.lastTickPosX)*(double) partialTicks;
+        double viewerPosY = player.lastTickPosY + (player.posY-player.lastTickPosY)*(double) partialTicks;
+        double viewerPosZ = player.lastTickPosZ + (player.posZ-player.lastTickPosZ)*(double) partialTicks;
+
+        double posX = pos.getX() - viewerPosX + 0.5;
+        double posY = pos.getY() - viewerPosY - player.getEyeHeight();
+        double posZ = pos.getZ() - viewerPosZ + 0.5;
+
+        double distance = Math.sqrt(posX * posX + posY * posY + posZ * posZ);
+
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(posX, posY, posZ);
+        GlStateManager.translate(0, player.getEyeHeight(), 0);
+        GlStateManager.rotate(-rm.playerViewY, 0, 1, 0);
+        GlStateManager.rotate(rm.playerViewX, 1, 0, 0);
+        GlStateManager.scale(-0.015*scale, -0.015*scale, -0.015*scale);
+
+        float constantScaleFactor = (float) (distance*0.08f);
+        GlStateManager.scale(1+constantScaleFactor, 1+constantScaleFactor, 1+constantScaleFactor);
+
+        GlStateManager.disableLighting();
+        if(!depth){
+            GlStateManager.depthMask(false);
+            GlStateManager.disableDepth();
+        }
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(770, 771);
+        float width = fr.getStringWidth(text)/2.0f;
+        fr.drawString(text, -width, 0f, 0xFFFFFF, shadow);
+
+        if(!depth){
+            GlStateManager.enableDepth();
+            GlStateManager.depthMask(true);
+        }
+        GlStateManager.enableTexture2D();
+        GlStateManager.disableBlend();
+        GlStateManager.enableLighting();
+        GlStateManager.popMatrix();
+
+    }
 
 }

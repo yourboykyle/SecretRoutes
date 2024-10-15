@@ -87,7 +87,7 @@ public class OnWorldRender {
 
         GlStateManager.disableDepth();
         GlStateManager.disableCull();
-        GlStateManager.disableBlend();
+        ///GlStateManager.disableBlend();
 
 
         // Render the etherwarps
@@ -248,7 +248,7 @@ public class OnWorldRender {
             Main.checkRoomData();
             BlockPos pos = MapUtils.relativeToActual(new BlockPos(location.get(0).getAsInt(), location.get(1).getAsInt(), location.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
 
-
+           GlStateManager.disableTexture2D();
 
             if (type.equals("interact")) {
                 if(SRMConfig.renderSecretIteract) {
@@ -320,6 +320,7 @@ public class OnWorldRender {
                     SecretRoutesRenderUtils.drawText(enderpearlPos.getOne(), enderpearlPos.getTwo(), enderpearlPos.getThree(), SecretRoutesRenderUtils.getTextColor(SRMConfig.enderpearlWaypointColorIndex) + text, SRMConfig.enderpearlTextSize, event.partialTicks);
                 }
             }
+            GlStateManager.enableTexture2D();
         }
 
         // Render the secret
@@ -353,7 +354,7 @@ public class OnWorldRender {
                 }
             }
         }
-        GlStateManager.enableBlend();
+        //GlStateManager.enableBlend();
         GlStateManager.enableCull();
         GlStateManager.enableDepth();
     }

@@ -41,7 +41,7 @@ public class SecretUtils {
             LogUtils.error(e);
         }
 
-        if(secrets != null){
+        if(secrets != null && SRMConfig.allSecrets){
             for(JsonElement secret : secrets){
 
                 JsonObject secretInfos = secret.getAsJsonObject();
@@ -50,22 +50,29 @@ public class SecretUtils {
                     int xPos = secretInfos.get("x").getAsInt();
                     int yPos = secretInfos.get("y").getAsInt();
                     int zPos = secretInfos.get("z").getAsInt();
-
+                    Main.checkRoomData();
                     Triple<Double, Double, Double> abs = MapUtils.relativeToActual(xPos, yPos, zPos, RoomDetection.roomDirection, RoomDetection.roomCorner);
                     OneColor color = new OneColor(255, 255, 255);
-                    if(name.contains("Chest") || name.contains("Wither Essence")){
+                    if(name.contains("Chest") || name.contains("Wither Essence")) {
                         color = SRMConfig.secretsInteract;
-                        SecretRoutesRenderUtils.drawText(abs.getOne(), abs.getTwo(), abs.getThree(), SecretRoutesRenderUtils.getTextColor(SRMConfig.interactWaypointColorIndex)+"Interact", SRMConfig.interactTextSize, event.partialTicks);
+                        if(SRMConfig.interactTextToggle){
+                        SecretRoutesRenderUtils.drawText(abs.getOne(), abs.getTwo(), abs.getThree(), SecretRoutesRenderUtils.getTextColor(SRMConfig.interactWaypointColorIndex) + "Interact", SRMConfig.interactTextSize, event.partialTicks);
+                        }
                     }else if(name.contains("Bat")){
                         color = SRMConfig.secretsBat;
-                        SecretRoutesRenderUtils.drawText(abs.getOne(), abs.getTwo(), abs.getThree(), SecretRoutesRenderUtils.getTextColor(SRMConfig.batWaypointColorIndex)+"Bat", SRMConfig.batTextSize, event.partialTicks);
+                        if(SRMConfig.batTextToggle) {
+                            SecretRoutesRenderUtils.drawText(abs.getOne(), abs.getTwo(), abs.getThree(), SecretRoutesRenderUtils.getTextColor(SRMConfig.batWaypointColorIndex) + "Bat", SRMConfig.batTextSize, event.partialTicks);
+                        }
                     }else if (name.contains("Lever")){
                         color = SRMConfig.interacts;
-                        SecretRoutesRenderUtils.drawText(abs.getOne(), abs.getTwo(), abs.getThree(), SecretRoutesRenderUtils.getTextColor(SRMConfig.interactsWaypointColorIndex)+"Interact", SRMConfig.interactsTextSize, event.partialTicks);
+                        if(SRMConfig.interactsTextToggle){
+                            SecretRoutesRenderUtils.drawText(abs.getOne(), abs.getTwo(), abs.getThree(), SecretRoutesRenderUtils.getTextColor(SRMConfig.interactsWaypointColorIndex)+"Interact", SRMConfig.interactsTextSize, event.partialTicks);
+                        }
                     }else if (name.contains("Item")){
                         color = SRMConfig.secretsItem;
-                        SecretRoutesRenderUtils.drawText(abs.getOne(), abs.getTwo(), abs.getThree(), SecretRoutesRenderUtils.getTextColor(SRMConfig.itemWaypointColorIndex)+"Item", SRMConfig.itemTextSize, event.partialTicks);
-
+                        if(SRMConfig.itemTextToggle) {
+                            SecretRoutesRenderUtils.drawText(abs.getOne(), abs.getTwo(), abs.getThree(), SecretRoutesRenderUtils.getTextColor(SRMConfig.itemWaypointColorIndex) + "Item", SRMConfig.itemTextSize, event.partialTicks);
+                        }
                     }
                     SecretRoutesRenderUtils.drawBoxAtBlock(abs.getOne(), abs.getTwo(), abs.getThree(), color, 1, 1, 1);
                 }
@@ -77,6 +84,8 @@ public class SecretUtils {
 
         }
     }
+
+    public static void renderLever(RenderWorldLastEvent event){}
 
 
 
