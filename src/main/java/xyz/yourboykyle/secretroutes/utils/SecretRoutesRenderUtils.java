@@ -19,6 +19,7 @@
 package xyz.yourboykyle.secretroutes.utils;
 
 import cc.polyfrost.oneconfig.config.core.OneColor;
+import net.minecraft.client.renderer.GlStateManager;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.WaypointUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.AxisAlignedBB;
@@ -157,8 +158,10 @@ public class SecretRoutesRenderUtils {
         double z = worldZ - playerZ;
 
         text = EnumChatFormatting.BOLD + text;
-
-        WaypointUtils.renderWaypointText(text, pos, partialTicks, size);
+        //GlStateManager.disableTexture2D();
+        //WaypointUtils.renderWaypointText(text, pos, partialTicks, size);
+        RenderUtils.drawText(text, pos, partialTicks, false, false, size);
+        //GlStateManager.enableTexture2D();
     }
 
 

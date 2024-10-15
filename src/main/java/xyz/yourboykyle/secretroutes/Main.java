@@ -156,6 +156,7 @@ public class Main {
         ClientCommandHandler.instance.registerCommand(new SRM());
         ClientCommandHandler.instance.registerCommand(new ChangeRoute());
         ClientCommandHandler.instance.registerCommand(new ChangeColorProfile());
+        ClientCommandHandler.instance.registerCommand(new Debug());
 
 
 

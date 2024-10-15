@@ -177,11 +177,11 @@ public class WaypointUtils {
     public static void renderWaypointText(String str, BlockPos loc, float partialTicks, float size) {
 
         GlStateManager.alphaFunc(516, 0.1F);
-
         GlStateManager.pushMatrix();
-        GlStateManager.disableDepth();
-        GlStateManager.disableCull();
-        GlStateManager.disableBlend();
+        //GlStateManager.disableTexture2D();
+        //GlStateManager.disableDepth();
+        //GlStateManager.disableCull();
+        //GlStateManager.disableBlend();
 
         Entity viewer = Minecraft.getMinecraft().getRenderViewEntity();
         double viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks;
@@ -212,9 +212,10 @@ public class WaypointUtils {
 
         // Shows distance to waypoint
         //drawNametag(EnumChatFormatting.YELLOW.toString()+Math.round(dist)+"m");
-        GlStateManager.enableDepth();
-        GlStateManager.enableCull();
-        GlStateManager.enableBlend();
+        //GlStateManager.enableDepth();
+        //GlStateManager.enableCull();
+        //GlStateManager.enableBlend();
+        ///GlStateManager.enableTexture2D();
 
         GlStateManager.popMatrix();
         GlStateManager.disableLighting();

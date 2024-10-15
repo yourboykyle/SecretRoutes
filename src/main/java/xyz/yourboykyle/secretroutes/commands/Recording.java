@@ -77,7 +77,5 @@ public class Recording extends CommandBase {
     }
 
     @Override
-    public int getRequiredPermissionLevel() {
-        return 0;
-    }
+    public int getRequiredPermissionLevel() {return 0;}
 }
