@@ -251,7 +251,6 @@ public class RenderUtils {
         }
         GlStateManager.enableTexture2D();
         GlStateManager.disableBlend();
-        GlStateManager.enableLighting();
         GlStateManager.popMatrix();
 
     }

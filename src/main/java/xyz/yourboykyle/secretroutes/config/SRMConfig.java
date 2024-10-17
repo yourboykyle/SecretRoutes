@@ -1114,6 +1114,41 @@ public class SRMConfig extends Config {
     )
     public static OneKeyBind toggleSecrets = new OneKeyBind(UKeyboard.KEY_BACKSLASH);
 
+    @KeyBind(
+            name = "Start recording",
+            description = "Starts the recording process",
+            category = "Keybinds",
+            subcategory = "Recording"
+    )
+    public static OneKeyBind startRecording = new OneKeyBind();
+
+    @KeyBind(
+            name = "Stop recording",
+            description = "Stops the recording process and adds an exit waypoint",
+            subcategory = "Recording",
+            category = "Keybinds"
+    )
+    public static OneKeyBind stopRecording = new OneKeyBind();
+
+    @KeyBind(
+            name = "Set Bat Waypoint",
+            description = "Adds a bat waypoint on your current position",
+            category = "Keybinds",
+            subcategory = "Recording"
+    )
+    public static OneKeyBind setBatWaypoint = new OneKeyBind();
+
+    @KeyBind(
+            name = "Export Routes",
+            description = "Exports current routes to the routes.json in your downloads folder",
+            category = "Keybinds",
+            subcategory = "Recording"
+    )
+    public static OneKeyBind exportRoutes = new OneKeyBind();
+
+
+
+
     @Switch(
             name = "Custom Secret Sound",
             description = "Plays a custom sound when a secret is found",
@@ -1261,6 +1296,11 @@ public class SRMConfig extends Config {
                     sendChatMessage("§cYou are not in a dungeon!");
                 }
             });
+
+            registerKeyBind(startRecording, runnable2);
+            registerKeyBind(stopRecording, runnable16);
+            registerKeyBind(setBatWaypoint, runnable3);
+            registerKeyBind(exportRoutes, runnable5);
 
 
         } catch (Exception e) {

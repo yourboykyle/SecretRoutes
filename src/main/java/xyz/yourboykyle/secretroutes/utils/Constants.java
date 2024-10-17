@@ -5,8 +5,9 @@ public class Constants {
 
 
     //RenderUtils
-    static float distanceScaleFactor = 0.08f;
-    static float baseScale = 0.015f;
+    public static float distanceScaleFactor = 0.08f;
+    public static float baseScale = 0.012f;
+    public static boolean shadows = false;
 
 
 
