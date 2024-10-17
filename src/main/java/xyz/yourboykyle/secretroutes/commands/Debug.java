@@ -21,8 +21,6 @@ public class Debug extends CommandBase {
     public void processCommand(ICommandSender sender, String[] args) {
         if(!sender.getName().contains("_Wyan")){
             ChatUtils.sendChatMessage("§eAre you sure you want to do this?");
-        }else{
-            ChatUtils.sendChatMessage("§2This is Wyan!");
         }
 
         if(args.length == 0){
@@ -31,6 +29,7 @@ public class Debug extends CommandBase {
             try{
                 Field field = Constants.class.getDeclaredField(args[0]);
                 String type = field.getAnnotatedType().getType().getTypeName();
+                field.setAccessible(true);
                 Object currentValue = field.get(null);
                 if(args.length == 1){
                     ChatUtils.sendChatMessage("§b"+args[0]+": "+currentValue);
@@ -60,8 +59,10 @@ public class Debug extends CommandBase {
                 ChatUtils.sendChatMessage("§cInvalid argument: " + args[0]);
             }catch(IllegalAccessException e){
                 ChatUtils.sendChatMessage("§cIllegal access (Most likely private");
+                LogUtils.error(e);
             }catch(IllegalFormatException e ){
              ChatUtils.sendChatMessage("§cWrong type");
+             LogUtils.error(e);
             }catch(Exception e){
                 LogUtils.error(e);
                 if(args.length == 1){

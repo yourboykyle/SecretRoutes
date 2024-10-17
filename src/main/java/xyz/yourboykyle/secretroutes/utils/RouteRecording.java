@@ -51,6 +51,7 @@ public class RouteRecording {
         currentSecretWaypoints.add("enderpearlangles", new JsonArray());
 
         // Import all the current secret routes into the allSecretRoutes JsonObject
+
         importRoutes("routes.json");
 
         // Put stuff for testing in here
