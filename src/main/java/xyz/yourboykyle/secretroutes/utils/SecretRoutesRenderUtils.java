@@ -160,7 +160,7 @@ public class SecretRoutesRenderUtils {
         text = EnumChatFormatting.BOLD + text;
         //GlStateManager.disableTexture2D();
         //WaypointUtils.renderWaypointText(text, pos, partialTicks, size);
-        RenderUtils.drawText(text, pos, partialTicks, false, false, size);
+        RenderUtils.drawText(text, pos, partialTicks, false, Constants.shadows, size);
         //GlStateManager.enableTexture2D();
     }
 

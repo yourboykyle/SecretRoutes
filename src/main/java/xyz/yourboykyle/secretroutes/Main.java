@@ -63,8 +63,6 @@ public class Main {
     private final static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     public final static File logDir = new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "logs" + File.separator + "SecretRoutes");
     public static File outputLogs;
-    private static final ResourceLocation SOUND_EVENT = new ResourceLocation("secretroutesmod", "custom_sound");
-    public static SoundEvent customSound;
 
     public static Room currentRoom = new Room(null);
     public static RouteRecording routeRecording = null;
@@ -74,7 +72,6 @@ public class Main {
     public static Main instance = new Main();
     public static SRMConfig config;
 
-    public static String logFilePath = "";
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
