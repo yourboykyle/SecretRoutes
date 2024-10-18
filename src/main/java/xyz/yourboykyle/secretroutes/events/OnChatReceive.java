@@ -55,6 +55,7 @@ public class OnChatReceive {
         }else{
             if(e.message.getUnformattedText().contains("That chest is locked!")){
                 LogUtils.info("§aLocked chest detected!");
+                //Write code to get lever stuff
             }
         }
 

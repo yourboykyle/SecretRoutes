@@ -2,9 +2,8 @@ package xyz.yourboykyle.secretroutes.commands;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.util.ChatComponentText;
-import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.ChatUtils;
+import xyz.yourboykyle.secretroutes.utils.Constants;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 
 import java.lang.reflect.AnnotatedType;
@@ -22,44 +21,55 @@ public class Debug extends CommandBase {
     public void processCommand(ICommandSender sender, String[] args) {
         if(!sender.getName().contains("_Wyan")){
             ChatUtils.sendChatMessage("§eAre you sure you want to do this?");
-        }else{
-            ChatUtils.sendChatMessage("§2This is Wyan!");
         }
 
         if(args.length == 0){
             return;
-        } else if (args.length == 1) {
-            ChatUtils.sendChatMessage("§cPlease assign a value");
-
-        }else if(args.length == 2){
+        }else{
             try{
-                Field field = Main.class.getDeclaredField(args[0]);
+                Field field = Constants.class.getDeclaredField(args[0]);
                 String type = field.getAnnotatedType().getType().getTypeName();
+                field.setAccessible(true);
                 Object currentValue = field.get(null);
-                ChatUtils.sendChatMessage(type);
-                if(type.equals("int")){
-                    field.set(null, Integer.valueOf(args[1]));
-                }else if(type.equals("float")){
-                    field.set(null, Float.valueOf(args[1]));
-                }else if(type.equals("boolean")){
-                    field.set(null, Boolean.valueOf(args[1]));
-                }else if (type.equals("double")){
-                    field.set(null, Double.valueOf(args[1]));
-                }else if (type.equals("String")){
-                    field.set(null, args[1]);
+                if(args.length == 1){
+                    ChatUtils.sendChatMessage("§b"+args[0]+": "+currentValue);
+                }else{
+                    switch (type) {
+                        case "int":
+                            field.set(null, Integer.valueOf(args[1]));
+                            break;
+                        case "float":
+                            field.set(null, Float.valueOf(args[1]));
+                            break;
+                        case "boolean":
+                            field.set(null, Boolean.valueOf(args[1]));
+                            break;
+                        case "double":
+                            field.set(null, Double.valueOf(args[1]));
+                            break;
+                        case "String":
+                            field.set(null, args[1]);
+                            break;
+                    }
+                    ChatUtils.sendChatMessage("§bChanged ["+args[0]+"] from "+currentValue+" to "+args[1]);
                 }
-                ChatUtils.sendChatMessage("§bChanged ["+args[0]+"] from "+currentValue+" to "+args[1]);
 
 
             }catch(NoSuchFieldException e){
                 ChatUtils.sendChatMessage("§cInvalid argument: " + args[0]);
             }catch(IllegalAccessException e){
                 ChatUtils.sendChatMessage("§cIllegal access (Most likely private");
+                LogUtils.error(e);
             }catch(IllegalFormatException e ){
              ChatUtils.sendChatMessage("§cWrong type");
+             LogUtils.error(e);
             }catch(Exception e){
                 LogUtils.error(e);
-                ChatUtils.sendChatMessage("§cSomething went wrong... Command [/srmdebug "+args[0]+ " "+ args[1]+"]");
+                if(args.length == 1){
+                    ChatUtils.sendChatMessage("§cSomething went wrong... Command [/srmdebug "+args[0]+ "]");
+                }else{
+                    ChatUtils.sendChatMessage("§cSomething went wrong... Command [/srmdebug "+args[0]+ " "+ args[1]+"]");
+                }
             }
         }
     }

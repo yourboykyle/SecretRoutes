@@ -21,6 +21,7 @@ package xyz.yourboykyle.secretroutes.events;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.client.Minecraft;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.DungeonManager;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.MapUtils;
@@ -44,6 +45,7 @@ import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
 
 public class OnWorldRender {
     private final static String verboseTAG = "Rendering";
+    public static boolean playCompleteFirst = true;
 
     @SubscribeEvent
     public void onRenderWorld(RenderWorldLastEvent event) {
@@ -53,8 +55,26 @@ public class OnWorldRender {
             if (!Utils.inCatacombs || DungeonManager.gameStage != 2 || !SRMConfig.modEnabled) {
                 return;
             }
-            if(OnChatReceive.isAllFound() && !SRMConfig.renderComplete){
-                return;
+
+            if(OnChatReceive.isAllFound()){
+                if(playCompleteFirst){
+                    playCompleteFirst = false;
+                    new Thread( ()->{
+                        for(int i = 0; i<10; i++){
+                            SecretSounds.playLoudSound("note.pling", 1.0f, 1.0f, Minecraft.getMinecraft().thePlayer.getPositionVector());
+                            try{
+                                Thread.sleep(200);
+                            }catch (InterruptedException ignored){
+
+                            }
+                        }
+                    }).start();
+                }
+                if(!SRMConfig.renderComplete){
+                    return;
+                }
+            }else{
+                playCompleteFirst = true;
             }
 
 
