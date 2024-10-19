@@ -144,6 +144,7 @@ public class Main {
         MinecraftForge.EVENT_BUS.register(new OnWorldRender());
         MinecraftForge.EVENT_BUS.register(new OnMouseInput());
         MinecraftForge.EVENT_BUS.register(new OnChatReceive());
+        MinecraftForge.EVENT_BUS.register(new OnServerTick());
 
         MinecraftForge.EVENT_BUS.register(this);
 
