@@ -1,5 +1,8 @@
 package xyz.yourboykyle.secretroutes.events;
 
+import net.minecraft.network.play.server.S32PacketConfirmTransaction;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.events.PacketEvent;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -72,6 +75,8 @@ public class OnRecievePacket {
 
                 firstBlockBreakPacket = !firstBlockBreakPacket;
                 firstBlockPlacePacket = !firstBlockPlacePacket;
+            }else if(e.packet instanceof S32PacketConfirmTransaction){
+                //MinecraftForge.EVENT_BUS.post(new ServerTickEvent((S32PacketConfirmTransaction) e.packet, "secretroutesmod"));
             }
         } catch (Exception error) {
             LogUtils.error(error);
