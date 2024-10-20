@@ -57,6 +57,7 @@ public class OnWorldRender {
             }
 
             if(OnChatReceive.isAllFound()){
+                /*
                 if(playCompleteFirst){
                     playCompleteFirst = false;
                     new Thread( ()->{
@@ -70,6 +71,8 @@ public class OnWorldRender {
                         }
                     }).start();
                 }
+
+                 */
                 if(!SRMConfig.renderComplete){
                     return;
                 }
