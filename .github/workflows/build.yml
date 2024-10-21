@@ -30,8 +30,11 @@ jobs:
         run: chmod +x ./gradlew
       - name: Build with Gradle
         run: ./gradlew build -x test --stacktrace
+      - name: Extract version from Gradle
+        id: extract_version
+        run: echo "VERSION=$(./gradlew properties -q | grep "^version:" | awk '{print $2}')" >> $GITHUB_ENV
       - uses: actions/upload-artifact@v3
         name: Upload SRM
         with:
-          name: "SRM Build"
+          name: "SecretRoutes-${{ env.VERSION }}-DEV"
           path: versions/1.8.9-forge/build/libs/*.jar
