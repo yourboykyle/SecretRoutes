@@ -40,11 +40,11 @@ public class SRMConfig extends Config {
 
 
     @Switch(
-            name = "All secrets",
-            description = "Render all secrets",
+            name = "Full route",
+            description = "Render all secrets in the route",
             subcategory = "General"
     )
-    public static boolean allSecrets = false;
+    public static boolean wholeRoute = false;
 
 
     @Switch(
@@ -61,6 +61,13 @@ public class SRMConfig extends Config {
             type = InfoType.WARNING
     )
     public static boolean ignored;
+
+    @Switch(
+            name = "All secrects",
+            description = "Renders all secrets in the room",
+            subcategory = "General"
+    )
+    public static boolean allSecrets = false;
 
 
     @Dropdown(

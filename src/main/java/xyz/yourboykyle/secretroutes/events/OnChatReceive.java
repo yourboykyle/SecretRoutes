@@ -5,6 +5,7 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
+import xyz.yourboykyle.secretroutes.utils.SecretUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -55,7 +56,7 @@ public class OnChatReceive {
         }else{
             if(e.message.getUnformattedText().contains("That chest is locked!")){
                 LogUtils.info("§aLocked chest detected!");
-                //Write code to get lever stuff
+                SecretUtils.renderLever = true;
             }
         }
 
