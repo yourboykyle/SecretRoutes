@@ -32,7 +32,7 @@ jobs:
         run: ./gradlew build -x test --stacktrace
       - name: Extract version from Gradle
         id: extract_version
-        run: echo "VERSION=$(./gradlew properties -q | grep "^version:" | awk '{print $2}')" >> $GITHUB_ENV
+        run: echo "VERSION=$(./gradlew properties -q | grep "^mod_version:" | awk '{print $2}')" >> $GITHUB_ENV
       - uses: actions/upload-artifact@v3
         name: Upload SRM
         with:
