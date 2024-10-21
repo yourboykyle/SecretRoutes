@@ -15,7 +15,7 @@ permissions: write-all
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: "Build"
+    name: "Build and test"
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 17
@@ -43,3 +43,4 @@ jobs:
         with:
           name: "SecretRoutes-${{ env.VERSION }}"
           path: versions/1.8.9-forge/build/libs/SecretRoutes-${{ env.VERSION }}.jar
+          if-no-files-found: error
