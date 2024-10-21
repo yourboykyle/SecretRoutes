@@ -28,10 +28,12 @@ import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
 import xyz.yourboykyle.secretroutes.utils.SecretSounds;
+import xyz.yourboykyle.secretroutes.utils.SecretUtils;
 
 public class OnPlayerInteract {
     @SubscribeEvent
     public void onPlayerInteract(PlayerInteractEvent e) {
+
         if(e.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
             EntityPlayer p = e.entityPlayer;
             BlockPos pos = e.pos;
@@ -40,13 +42,17 @@ public class OnPlayerInteract {
             if(block != Blocks.chest && block != Blocks.trapped_chest && block != Blocks.lever && block != Blocks.skull) {
                 return;
             }
-            SecretSounds.secretChime();
+            SecretUtils.lastInteract = pos;
             if (Main.currentRoom.getSecretType() == Room.SECRET_TYPES.INTERACT) {
                 BlockPos interactPos = Main.currentRoom.getSecretLocation();
-
+                SecretSounds.secretChime();
                 if (pos.getX() == interactPos.getX() && pos.getY() == interactPos.getY() && pos.getZ() == interactPos.getZ()) {
                     Main.currentRoom.nextSecret();
                     LogUtils.info("Interacted with block at " + interactPos);
+
+                    SecretUtils.renderLever = false;
+                    SecretUtils.currentLeverPos = null;
+                    SecretUtils.first = true;
                 }
             }
 

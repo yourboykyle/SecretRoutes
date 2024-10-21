@@ -24,6 +24,7 @@ import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
+import xyz.yourboykyle.secretroutes.utils.SecretUtils;
 
 public class OnEnterNewRoom {
     public static void onEnterNewRoom(Room room) {
@@ -38,6 +39,8 @@ public class OnEnterNewRoom {
             LogUtils.info("Room direction: \"" + RoomDetection.roomDirection);
 
             Main.currentRoom = room;
+            SecretUtils.secrets = null;
+            SecretUtils.currentLeverPos = null;
         } catch(Exception e) {
             LogUtils.error(e);
         }
