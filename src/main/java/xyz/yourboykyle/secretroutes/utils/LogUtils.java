@@ -26,8 +26,7 @@ public class LogUtils {
 
         appendToFile("====================\n[ERROR] " + stackTrace);
         if(Minecraft.getMinecraft().thePlayer != null) {
-            sendChatMessage(EnumChatFormatting.DARK_RED+"Error caught by Secret Routes. Check latest logs at .minecraft/logs/SecretRoutes/LATEST-{date}.log. SEND THIS FILE IN #SUPPORT IN THE DISCORD FOR HELP");
-            sendChatMessage(EnumChatFormatting.DARK_RED+error.getLocalizedMessage());
+            sendChatMessage(EnumChatFormatting.DARK_RED+"Error caught by Secret Routes. Check latest logs at .minecraft/logs/SecretRoutes/LATEST-{date}.log. SEND THIS FILE IN #SUPPORT IN THE DISCORD FOR HELP. ("+ error.getLocalizedMessage()+")");
         }
     }
 
