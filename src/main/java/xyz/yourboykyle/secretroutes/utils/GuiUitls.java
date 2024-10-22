@@ -15,7 +15,7 @@ public class GuiUitls {
             int screenHeight = scaledResolution.getScaledHeight();
 
             int textWidth = fr.getStringWidth(text);
-            float x = screenWidth/2.0f-((textWidth*scale)/ 2.0f);
+            float x = (screenWidth/2.0f-((textWidth*scale)/ 2.0f))+posx;
             float y = screenHeight/2.0f+posy;
 
             GlStateManager.pushMatrix();

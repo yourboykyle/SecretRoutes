@@ -41,7 +41,7 @@ group = "xyz.yourboykyle"
 // Sets the name of the output jar (the one you put in your mods folder and send to other people)
 // It outputs all versions of the mod into the `versions/{mcVersion}/build` directory.
 base {
-    archivesName.set("$mod_archives_name-$platform")
+    archivesName.set("$mod_archives_name")
 }
 
 // Configures Polyfrost Loom, our plugin fork to easily set up the programming environment.
