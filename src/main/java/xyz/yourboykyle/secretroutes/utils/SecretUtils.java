@@ -9,7 +9,6 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-import tv.twitch.chat.Chat;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
@@ -35,6 +34,7 @@ public class SecretUtils {
     public static String chestName = null;
     public static String leverName = null;
     public static String leverNumber = null;
+    public static ArrayList<String> secretLocations = new ArrayList<>();
 
     public static void renderingCallback(JsonObject currentSecretWaypoints, RenderWorldLastEvent event, int index2){
         ArrayList<BlockPos> etherwarpPositions = new ArrayList<>();
@@ -328,12 +328,14 @@ public class SecretUtils {
                 String name = secretInfos.get("secretName").getAsString();
                 String type = secretInfos.get("category").getAsString();
                 if(name.contains("Chest") || name.contains("Bat") || name.contains("Wither Essence") || name.contains("Lever") || name.contains("Item")){
+
                     int xPos = secretInfos.get("x").getAsInt();
                     int yPos = secretInfos.get("y").getAsInt();
                     int zPos = secretInfos.get("z").getAsInt();
                     Main.checkRoomData();
                     Triple<Double, Double, Double> abs = MapUtils.relativeToActual(xPos, yPos, zPos, RoomDetection.roomDirection, RoomDetection.roomCorner);
                     OneColor color = new OneColor(255, 255, 255);
+                    if(secretLocations.contains(BlockUtils.blockPos(new BlockPos(xPos, yPos, zPos)))){continue;}
                     if(name.contains("Chest") || name.contains("Wither Essence")) {
                         color = SRMConfig.secretsInteract;
                         if(SRMConfig.interactTextToggle){
@@ -384,7 +386,7 @@ public class SecretUtils {
                     BlockPos pos = new BlockPos(abs.getOne(), abs.getTwo(), abs.getThree());
                     //ChatUtils.sendChatMessage(Utils.blockPos(pos));
                     //ChatUtils.sendChatMessage(Utils.blockPos(lastInteract));
-                    if(Utils.blockPos(pos).equals(Utils.blockPos(lastInteract))){
+                    if(BlockUtils.blockPos(pos).equals(BlockUtils.blockPos(lastInteract))){
                         leverNum = name.split(" ")[0];
                         leverNumber = leverNum;
                         chestName = name;

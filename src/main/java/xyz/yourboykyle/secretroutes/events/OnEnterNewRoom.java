@@ -26,6 +26,8 @@ import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
 import xyz.yourboykyle.secretroutes.utils.SecretUtils;
 
+import java.util.ArrayList;
+
 public class OnEnterNewRoom {
     public static void onEnterNewRoom(Room room) {
         try {
@@ -40,6 +42,7 @@ public class OnEnterNewRoom {
 
             Main.currentRoom = room;
             SecretUtils.secrets = null;
+            SecretUtils.secretLocations = new ArrayList<>();
             SecretUtils.resetValues();
 
         } catch(Exception e) {
