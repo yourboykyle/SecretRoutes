@@ -9,12 +9,10 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-import org.apache.commons.lang3.CharUtils;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.MapUtils;
-import xyz.yourboykyle.secretroutes.events.OnPlayerInteract;
 import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 
 import java.io.InputStreamReader;
@@ -450,7 +448,7 @@ public class SecretUtils {
                         try{
                             Thread.sleep(5000);
                             removeBannerTime = null;
-                        }catch (InterruptedException ingored){
+                        }catch (InterruptedException ignored){
 
                         }
 
