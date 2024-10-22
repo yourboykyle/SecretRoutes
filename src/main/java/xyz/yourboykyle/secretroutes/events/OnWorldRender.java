@@ -79,8 +79,9 @@ public class OnWorldRender {
                 playCompleteFirst = true;
             }
 
-
-            if(SRMConfig.wholeRoute){
+            if(SRMConfig.allSecrets){
+                SecretUtils.renderSecrets(event);
+            }else if(SRMConfig.wholeRoute){
                 JsonArray csr = Main.currentRoom.currentSecretRoute;
                 if(csr != null){
                     for(int i = Main.currentRoom.currentSecretIndex; i<csr.size(); i++){
@@ -90,6 +91,9 @@ public class OnWorldRender {
 
             }else{
                 SecretUtils.renderingCallback(Main.currentRoom.currentSecretWaypoints, event, Main.currentRoom.currentSecretIndex);
+            }
+            if(SecretUtils.renderLever){
+                SecretUtils.renderLever(event);
             }
 
 

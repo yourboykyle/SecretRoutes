@@ -33,17 +33,6 @@ public class SecretUtils {
     public static boolean first = true;
 
     public static void renderingCallback(JsonObject currentSecretWaypoints, RenderWorldLastEvent event, int index2){
-        if(renderLever){
-            renderLever(event);
-        }else{
-            currentLeverPos = null;
-        }
-
-
-        if(SRMConfig.allSecrets){
-            SecretUtils.renderSecrets(event);
-            return;
-        }
         ArrayList<BlockPos> etherwarpPositions = new ArrayList<>();
         ArrayList<BlockPos> minesPositions = new ArrayList<>();
         ArrayList<BlockPos> interactsPositions = new ArrayList<>();
@@ -334,10 +323,11 @@ public class SecretUtils {
         secrets = getSecrets();
 
 
-        if(secrets != null && SRMConfig.wholeRoute){
+        if(secrets != null){
             for(JsonElement secret : secrets){
                 JsonObject secretInfos = secret.getAsJsonObject();
                 String name = secretInfos.get("secretName").getAsString();
+                String type = secretInfos.get("category").getAsString();
                 if(name.contains("Chest") || name.contains("Bat") || name.contains("Wither Essence") || name.contains("Lever") || name.contains("Item")){
                     int xPos = secretInfos.get("x").getAsInt();
                     int yPos = secretInfos.get("y").getAsInt();
@@ -348,7 +338,7 @@ public class SecretUtils {
                     if(name.contains("Chest") || name.contains("Wither Essence")) {
                         color = SRMConfig.secretsInteract;
                         if(SRMConfig.interactTextToggle){
-                        SecretRoutesRenderUtils.drawText(abs.getOne(), abs.getTwo(), abs.getThree(), SecretRoutesRenderUtils.getTextColor(SRMConfig.interactWaypointColorIndex) + "Interact", SRMConfig.interactTextSize, event.partialTicks);
+                            SecretRoutesRenderUtils.drawText(abs.getOne(), abs.getTwo(), abs.getThree(), SecretRoutesRenderUtils.getTextColor(SRMConfig.interactWaypointColorIndex) + "Interact", SRMConfig.interactTextSize, event.partialTicks);
                         }
                     }else if(name.contains("Bat")){
                         color = SRMConfig.secretsBat;
@@ -385,7 +375,8 @@ public class SecretUtils {
             for(JsonElement secret : csr){
                 JsonObject secretInfos = secret.getAsJsonObject();
                 String name = secretInfos.get("secretName").getAsString();
-                if(name.contains("Chest") && leverNum == null){
+                String category = secretInfos.get("category").getAsString();
+                if(category.equals("chest") && leverNum == null){
                     int x = secretInfos.get("x").getAsInt();
                     int y = secretInfos.get("y").getAsInt();
                     int z = secretInfos.get("z").getAsInt();
@@ -399,7 +390,7 @@ public class SecretUtils {
                         //ChatUtils.sendChatMessage("Found lever, defined num");
                     }
                 }
-                if(name.contains("Lever")){
+                if(category.equals("lever")){
                     if(leverNum == null){
                         levers.add(secret);
                         //ChatUtils.sendChatMessage("Adding lever to lists");
