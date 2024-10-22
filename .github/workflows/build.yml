@@ -35,7 +35,7 @@ jobs:
         run: echo "VERSION=$(./gradlew properties -q | grep "^mod_version:" | awk '{print $2}')" >> $GITHUB_ENV
       - name: Find and rename JAR
         run: |
-          JAR_FILE=$(find versions/1.8.9-forge/build/libs/ -name "*forge-${{ env.VERSION }}.jar" -not -name "*-dev.jar")
+          JAR_FILE=$(find versions/1.8.9-forge/build/libs/ -name "*${{ env.VERSION }}.jar" -not -name "*-dev.jar")
           echo "JAR_FILE=${JAR_FILE}" >> $GITHUB_ENV
           mv $JAR_FILE versions/1.8.9-forge/build/libs/SecretRoutes-${{ env.VERSION }}-DEV.jar
       - uses: actions/upload-artifact@v3

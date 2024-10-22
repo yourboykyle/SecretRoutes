@@ -5,6 +5,7 @@ import net.minecraft.command.ICommandSender;
 import xyz.yourboykyle.secretroutes.utils.ChatUtils;
 import xyz.yourboykyle.secretroutes.utils.Constants;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
+import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 
 import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Field;
@@ -26,6 +27,16 @@ public class Debug extends CommandBase {
         if(args.length == 0){
             return;
         }else{
+            if(args[1].equals("lever")){
+
+            }
+
+
+
+
+
+
+
             try{
                 Field field = Constants.class.getDeclaredField(args[0]);
                 String type = field.getAnnotatedType().getType().getTypeName();
@@ -56,19 +67,19 @@ public class Debug extends CommandBase {
 
 
             }catch(NoSuchFieldException e){
-                ChatUtils.sendChatMessage("§cInvalid argument: " + args[0]);
+                sendChatMessage("§cInvalid argument: " + args[0]);
             }catch(IllegalAccessException e){
-                ChatUtils.sendChatMessage("§cIllegal access (Most likely private");
+                sendChatMessage("§cIllegal access (Most likely private");
                 LogUtils.error(e);
             }catch(IllegalFormatException e ){
-             ChatUtils.sendChatMessage("§cWrong type");
+             sendChatMessage("§cWrong type");
              LogUtils.error(e);
             }catch(Exception e){
                 LogUtils.error(e);
                 if(args.length == 1){
                     ChatUtils.sendChatMessage("§cSomething went wrong... Command [/srmdebug "+args[0]+ "]");
                 }else{
-                    ChatUtils.sendChatMessage("§cSomething went wrong... Command [/srmdebug "+args[0]+ " "+ args[1]+"]");
+                    sendChatMessage("§cSomething went wrong... Command [/srmdebug "+args[0]+ " "+ args[1]+"]");
                 }
             }
         }
