@@ -18,67 +18,97 @@
 
 package xyz.yourboykyle.secretroutes.events;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 import xyz.yourboykyle.secretroutes.Main;
-import xyz.yourboykyle.secretroutes.utils.LogUtils;
-import xyz.yourboykyle.secretroutes.utils.Room;
-import xyz.yourboykyle.secretroutes.utils.SecretSounds;
-import xyz.yourboykyle.secretroutes.utils.SecretUtils;
+import xyz.yourboykyle.secretroutes.config.SRMConfig;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.MapUtils;
+import xyz.yourboykyle.secretroutes.utils.*;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 
 public class OnPlayerInteract {
     @SubscribeEvent
     public void onPlayerInteract(PlayerInteractEvent e) {
 
-        if(e.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
-            EntityPlayer p = e.entityPlayer;
-            BlockPos pos = e.pos;
-            Block block = e.world.getBlockState(e.pos).getBlock();
-
-            if(block != Blocks.chest && block != Blocks.trapped_chest && block != Blocks.lever && block != Blocks.skull) {
-                return;
-            }
-            SecretUtils.lastInteract = pos;
-            if (Main.currentRoom.getSecretType() == Room.SECRET_TYPES.INTERACT) {
-                BlockPos interactPos = Main.currentRoom.getSecretLocation();
-                SecretSounds.secretChime();
-                if (pos.getX() == interactPos.getX() && pos.getY() == interactPos.getY() && pos.getZ() == interactPos.getZ()) {
-                    Main.currentRoom.nextSecret();
-                    LogUtils.info("Interacted with block at " + interactPos);
-                    SecretUtils.resetValues();
+        try {
+            if(e.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
+                EntityPlayer p = e.entityPlayer;
+                BlockPos pos = e.pos;
+                Block block = e.world.getBlockState(e.pos).getBlock();
+                Utils.checkForCatacombs();
+                if(!Utils.inCatacombs){
+                    return;
                 }
-            }
 
-            // Route Recording
-            if(Main.routeRecording.recording) {
-                if (block == Blocks.lever) {
-                    // If the block is a lever, then it is a waypoint on the route, going to a secret
-                    Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.INTERACTS, e.pos);
-                    Main.routeRecording.setRecordingMessage("Added interact waypoint.");
-                } else if (block == Blocks.skull || block == Blocks.chest || block == Blocks.trapped_chest) {
-                    // If the block is a chest, trapped chest (mimic chest), or skull (essence), then it is a waypoint for a secret, so start a new secret waypoint list
-                    boolean created = Main.routeRecording.addWaypoint(Room.SECRET_TYPES.INTERACT, e.pos);
-                    if(created) {
-                        Main.routeRecording.newSecret();
-                        Main.routeRecording.setRecordingMessage("Added interact secret waypoint.");
-
-                        // Stuff so items from chests don't count as secrets (because they're not)
-                        OnItemPickedUp.itemSecretOnCooldown = true;
-                        new Thread(() -> {
-                            try {
-                                Thread.sleep(2000);
-                                OnItemPickedUp.itemSecretOnCooldown = false;
-                            } catch (InterruptedException ex) {
-                                LogUtils.error(ex);
+                if(block != Blocks.chest && block != Blocks.trapped_chest && block != Blocks.lever && block != Blocks.skull) {
+                    return;
+                }
+                SecretUtils.lastInteract = pos;
+                if(SRMConfig.allSecrets){
+                    for(JsonElement secret : SecretUtils.secrets){
+                        try{
+                            JsonObject json = secret.getAsJsonObject();
+                            BlockPos spos = new BlockPos(json.get("x").getAsInt(), json.get("y").getAsInt(), json.get("z").getAsInt());
+                            BlockPos rel = MapUtils.actualToRelative(pos, RoomDetection.roomDirection, RoomDetection.roomCorner);
+                            if(BlockUtils.blockPos(spos).equals(BlockUtils.blockPos(rel))){
+                                if(!SecretUtils.secretLocations.contains(BlockUtils.blockPos(spos))){
+                                    SecretUtils.secretLocations.add(BlockUtils.blockPos(spos));
+                                }
                             }
-                        }).start();
+                        }catch(Exception ex){
+                            LogUtils.error(ex);
+                        }
+
+                    }
+                }
+
+                if (Main.currentRoom.getSecretType() == Room.SECRET_TYPES.INTERACT) {
+                    BlockPos interactPos = Main.currentRoom.getSecretLocation();
+                    SecretSounds.secretChime();
+                    if (pos.getX() == interactPos.getX() && pos.getY() == interactPos.getY() && pos.getZ() == interactPos.getZ()) {
+                        Main.currentRoom.nextSecret();
+                        LogUtils.info("Interacted with block at " + interactPos);
+                        SecretUtils.resetValues();
+                    }
+                }
+
+                // Route Recording
+                if(Main.routeRecording.recording) {
+                    if (block == Blocks.lever) {
+                        // If the block is a lever, then it is a waypoint on the route, going to a secret
+                        Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.INTERACTS, e.pos);
+                        Main.routeRecording.setRecordingMessage("Added interact waypoint.");
+                    } else if (block == Blocks.skull || block == Blocks.chest || block == Blocks.trapped_chest) {
+                        // If the block is a chest, trapped chest (mimic chest), or skull (essence), then it is a waypoint for a secret, so start a new secret waypoint list
+                        boolean created = Main.routeRecording.addWaypoint(Room.SECRET_TYPES.INTERACT, e.pos);
+                        if(created) {
+                            Main.routeRecording.newSecret();
+                            Main.routeRecording.setRecordingMessage("Added interact secret waypoint.");
+
+                            // Stuff so items from chests don't count as secrets (because they're not)
+                            OnItemPickedUp.itemSecretOnCooldown = true;
+                            new Thread(() -> {
+                                try {
+                                    Thread.sleep(2000);
+                                    OnItemPickedUp.itemSecretOnCooldown = false;
+                                } catch (InterruptedException ex) {
+                                    LogUtils.error(ex);
+                                }
+                            }).start();
+                        }
                     }
                 }
             }
+        } catch (Exception ex) {
+            LogUtils.error(ex);
         }
     }
 }

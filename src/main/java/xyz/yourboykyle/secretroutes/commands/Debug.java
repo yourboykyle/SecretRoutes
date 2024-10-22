@@ -5,15 +5,12 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.BlockPos;
-import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.MapUtils;
 import xyz.yourboykyle.secretroutes.utils.*;
-import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 
-import java.lang.reflect.AnnotatedType;
 import java.lang.reflect.Field;
 import java.util.IllegalFormatException;
 
@@ -35,9 +32,9 @@ public class Debug extends CommandBase {
         }else{
             try{
                 if(args[0].equals("lever")){
-                    sendChatMessage("Relative :" + Utils.blockPos(SecretUtils.currentLeverPos));
+                    sendChatMessage("Relative :" + BlockUtils.blockPos(SecretUtils.currentLeverPos));
                     BlockPos abs = MapUtils.relativeToActual(SecretUtils.currentLeverPos, RoomDetection.roomDirection, RoomDetection.roomCorner);
-                    sendChatMessage("Abs: " + Utils.blockPos(abs));
+                    sendChatMessage("Abs: " + BlockUtils.blockPos(abs));
                     sendChatMessage("Chest: " + SecretUtils.chestName);
                     sendChatMessage("Lever: " + SecretUtils.leverName);
                     sendChatMessage("Num: " + SecretUtils.leverNumber);
@@ -45,7 +42,7 @@ public class Debug extends CommandBase {
                 }else if(args[0].equals("pos")){
                      EntityPlayerSP p= Minecraft.getMinecraft().thePlayer;
                     sendChatMessage("Relative: "+p.getPosition());
-                     sendChatMessage("Abs: "+Utils.blockPos(p.getPosition()));
+                     sendChatMessage("Abs: "+ BlockUtils.blockPos(p.getPosition()));
 
 
                 }
