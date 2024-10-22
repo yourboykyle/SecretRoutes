@@ -110,7 +110,7 @@ public class Room {
     }
 
     public void lastSecretKeybind() {
-
+        SecretUtils.resetValues();
         if(currentSecretIndex > 0) {
             currentSecretIndex--;
         }
@@ -123,10 +123,7 @@ public class Room {
     }
 
     public void nextSecret() {
-        SecretUtils.secrets = null;
-        SecretUtils.currentLeverPos = null;
-        SecretUtils.renderLever = false;
-        SecretUtils.first = true;
+        SecretUtils.resetValues();
 
 
         currentSecretIndex++;
@@ -139,10 +136,7 @@ public class Room {
     }
 
     public void nextSecretKeybind() {
-        SecretUtils.secrets = null;
-        SecretUtils.currentLeverPos = null;
-        SecretUtils.renderLever = false;
-        SecretUtils.first = true;
+        SecretUtils.resetValues();
         if(currentSecretRoute != null) {
             if(currentSecretIndex < currentSecretRoute.size() - 1) {
                 currentSecretIndex++;

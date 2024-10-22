@@ -1,10 +1,16 @@
 package xyz.yourboykyle.secretroutes.commands;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
-import xyz.yourboykyle.secretroutes.utils.ChatUtils;
-import xyz.yourboykyle.secretroutes.utils.Constants;
-import xyz.yourboykyle.secretroutes.utils.LogUtils;
+import net.minecraft.util.BlockPos;
+import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.MapUtils;
+import xyz.yourboykyle.secretroutes.utils.*;
+import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
+
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 
 import java.lang.reflect.AnnotatedType;
@@ -27,9 +33,26 @@ public class Debug extends CommandBase {
         if(args.length == 0){
             return;
         }else{
-            if(args[1].equals("lever")){
+            try{
+                if(args[0].equals("lever")){
+                    sendChatMessage("Relative :" + Utils.blockPos(SecretUtils.currentLeverPos));
+                    BlockPos abs = MapUtils.relativeToActual(SecretUtils.currentLeverPos, RoomDetection.roomDirection, RoomDetection.roomCorner);
+                    sendChatMessage("Abs: " + Utils.blockPos(abs));
+                    sendChatMessage("Chest: " + SecretUtils.chestName);
+                    sendChatMessage("Lever: " + SecretUtils.leverName);
+                    sendChatMessage("Num: " + SecretUtils.leverNumber);
+                    return;
+                }else if(args[0].equals("pos")){
+                     EntityPlayerSP p= Minecraft.getMinecraft().thePlayer;
+                    sendChatMessage("Relative: "+p.getPosition());
+                     sendChatMessage("Abs: "+Utils.blockPos(p.getPosition()));
 
+
+                }
+            }catch(Exception e){
+                LogUtils.error(e);
             }
+
 
 
 

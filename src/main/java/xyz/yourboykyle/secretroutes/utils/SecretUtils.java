@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import tv.twitch.chat.Chat;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
@@ -31,6 +32,9 @@ public class SecretUtils {
     public static BlockPos lastInteract;
     public static Long removeBannerTime = null;
     public static boolean first = true;
+    public static String chestName = null;
+    public static String leverName = null;
+    public static String leverNumber = null;
 
     public static void renderingCallback(JsonObject currentSecretWaypoints, RenderWorldLastEvent event, int index2){
         ArrayList<BlockPos> etherwarpPositions = new ArrayList<>();
@@ -313,11 +317,6 @@ public class SecretUtils {
         GlStateManager.enableDepth();
     }
 
-
-
-
-
-
     public static void renderSecrets(RenderWorldLastEvent event){
 
         secrets = getSecrets();
@@ -386,7 +385,9 @@ public class SecretUtils {
                     //ChatUtils.sendChatMessage(Utils.blockPos(pos));
                     //ChatUtils.sendChatMessage(Utils.blockPos(lastInteract));
                     if(Utils.blockPos(pos).equals(Utils.blockPos(lastInteract))){
-                        leverNum = name.split(" ")[1];
+                        leverNum = name.split(" ")[0];
+                        leverNumber = leverNum;
+                        chestName = name;
                         //ChatUtils.sendChatMessage("Found lever, defined num");
                     }
                 }
@@ -400,6 +401,7 @@ public class SecretUtils {
                             if(name.contains(num)){
                                 //ChatUtils.sendChatMessage("Found right lever. Setting pos");
                                 currentLeverPos = new BlockPos(secretInfos.get("x").getAsInt(), secretInfos.get("y").getAsInt(), secretInfos.get("z").getAsInt());
+                                leverName = name;
                             }
                         }
 
@@ -415,11 +417,12 @@ public class SecretUtils {
                 for(JsonElement secret : levers){
                     JsonObject secretInfos = secret.getAsJsonObject();
                     String name = secretInfos.get("secretName").getAsString();
-                    String[] nums = name.split("/");
+                    String[] nums = leverNum.split("/");
                     for(String num : nums){
                         if(name.contains(num)){
                             //ChatUtils.sendChatMessage("Found right lever (iteration). Setting pos");
                             currentLeverPos = new BlockPos(secretInfos.get("x").getAsInt(), secretInfos.get("y").getAsInt(), secretInfos.get("z").getAsInt());
+                            leverName = name;
                         }
                     }
                 }
@@ -484,6 +487,15 @@ public class SecretUtils {
             return secrets;
         }
 
+    }
+    public static void resetValues(){
+        renderLever = false;
+        currentLeverPos = null;
+        removeBannerTime = null;
+        first = true;
+        chestName = null;
+        leverName = null;
+        leverNumber = null;
     }
 
 }
