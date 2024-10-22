@@ -31,6 +31,7 @@ public class SecretUtils {
     public static PrintingUtils zPrinter = new PrintingUtils();
     public static BlockPos currentLeverPos = null;
     public static BlockPos lastInteract;
+    public static Long removeBannerTime = null;
     public static boolean first = true;
 
     public static void renderingCallback(JsonObject currentSecretWaypoints, RenderWorldLastEvent event, int index2){
@@ -381,7 +382,7 @@ public class SecretUtils {
     public static void renderLever(RenderWorldLastEvent e){
         ArrayList<JsonElement> levers = new ArrayList<>();
         JsonArray csr = getSecrets();
-        String leverNum= null;
+        String leverNum = null;
         if(currentLeverPos == null){
             for(JsonElement secret : csr){
                 JsonObject secretInfos = secret.getAsJsonObject();
@@ -393,10 +394,10 @@ public class SecretUtils {
 
                     Triple<Double, Double, Double> abs = MapUtils.relativeToActual(x, y, z, RoomDetection.roomDirection, RoomDetection.roomCorner);
                     BlockPos pos = new BlockPos(abs.getOne(), abs.getTwo(), abs.getThree());
-                    ChatUtils.sendChatMessage(Utils.blockPos(pos));
-                    ChatUtils.sendChatMessage(Utils.blockPos(lastInteract));
+                    //ChatUtils.sendChatMessage(Utils.blockPos(pos));
+                    //ChatUtils.sendChatMessage(Utils.blockPos(lastInteract));
                     if(Utils.blockPos(pos).equals(Utils.blockPos(lastInteract))){
-                        leverNum = name.substring(0,1);
+                        leverNum = name.split(" ")[1];
                         //ChatUtils.sendChatMessage("Found lever, defined num");
                     }
                 }
@@ -405,10 +406,14 @@ public class SecretUtils {
                         levers.add(secret);
                         //ChatUtils.sendChatMessage("Adding lever to lists");
                     }else{
-                        if(name.startsWith(leverNum)){
-                            //ChatUtils.sendChatMessage("Found right lever. Setting pos");
-                            currentLeverPos = new BlockPos(secretInfos.get("x").getAsInt(), secretInfos.get("y").getAsInt(), secretInfos.get("z").getAsInt());
+                        String[] nums = leverNum.split("/");
+                        for(String num : nums){
+                            if(name.contains(num)){
+                                //ChatUtils.sendChatMessage("Found right lever. Setting pos");
+                                currentLeverPos = new BlockPos(secretInfos.get("x").getAsInt(), secretInfos.get("y").getAsInt(), secretInfos.get("z").getAsInt());
+                            }
                         }
+
                     }
                 }
 
@@ -421,9 +426,12 @@ public class SecretUtils {
                 for(JsonElement secret : levers){
                     JsonObject secretInfos = secret.getAsJsonObject();
                     String name = secretInfos.get("secretName").getAsString();
-                    if(name.startsWith(leverNum)){
-                        //ChatUtils.sendChatMessage("Found right lever (iteration). Setting pos");
-                        currentLeverPos = new BlockPos(secretInfos.get("x").getAsInt(), secretInfos.get("y").getAsInt(), secretInfos.get("z").getAsInt());
+                    String[] nums = name.split("/");
+                    for(String num : nums){
+                        if(name.contains(num)){
+                            //ChatUtils.sendChatMessage("Found right lever (iteration). Setting pos");
+                            currentLeverPos = new BlockPos(secretInfos.get("x").getAsInt(), secretInfos.get("y").getAsInt(), secretInfos.get("z").getAsInt());
+                        }
                     }
                 }
             }
@@ -437,9 +445,22 @@ public class SecretUtils {
                 }
                 SecretRoutesRenderUtils.drawText(abs.getOne(), abs.getTwo(), abs.getThree(), SecretRoutesRenderUtils.getTextColor(SRMConfig.interactsWaypointColorIndex) + "Locked chest lever", SRMConfig.interactsTextSize, e.partialTicks);
                 if(first){
-                    ChatUtils.sendChatMessage("§aLocked chest detected. Set waypoint at location");
-                    //TODO: make banner appear with info
+                    removeBannerTime = System.currentTimeMillis() + 5000;
+                    new Thread(()-> {
+                        try{
+                            Thread.sleep(5000);
+                            removeBannerTime = null;
+                        }catch (InterruptedException ingored){
+
+                        }
+
+
+                    }).start();
+                    first = false;
                 }
+
+
+
             }
 
         }else{

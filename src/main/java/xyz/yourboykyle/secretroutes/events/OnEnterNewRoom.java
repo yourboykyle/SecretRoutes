@@ -41,6 +41,9 @@ public class OnEnterNewRoom {
             Main.currentRoom = room;
             SecretUtils.secrets = null;
             SecretUtils.currentLeverPos = null;
+            SecretUtils.renderLever = false;
+            SecretUtils.first = true;
+
         } catch(Exception e) {
             LogUtils.error(e);
         }
