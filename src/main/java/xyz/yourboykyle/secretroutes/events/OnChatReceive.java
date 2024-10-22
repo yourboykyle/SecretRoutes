@@ -28,19 +28,6 @@ public class OnChatReceive {
         String unformatted = e.message.getUnformattedText();
         String secrets = "";
         if (e.type == 2) {
-            sections = unformatted.split(" {5}");
-            for (String section : sections) {
-                if (section.contains("Secret")) {
-                    secrets = section;
-                }
-            }
-
-            Long currentTime = System.currentTimeMillis();
-            if (currentTime - lastSent > 10000) {
-                lastSent = currentTime;
-                sendVerboseMessage(unformatted, "Actionbar");
-            }
-
             Matcher matcher = Pattern.compile("§7(?<roomCollectedSecrets>\\d+)/(?<roomTotalSecrets>\\d+) Secrets").matcher(unformatted);
             if (matcher.find()) {
                 int roomSecrets = Integer.parseInt(matcher.group("roomTotalSecrets"));

@@ -49,10 +49,7 @@ public class OnPlayerInteract {
                 if (pos.getX() == interactPos.getX() && pos.getY() == interactPos.getY() && pos.getZ() == interactPos.getZ()) {
                     Main.currentRoom.nextSecret();
                     LogUtils.info("Interacted with block at " + interactPos);
-
-                    SecretUtils.renderLever = false;
-                    SecretUtils.currentLeverPos = null;
-                    SecretUtils.first = true;
+                    SecretUtils.resetValues();
                 }
             }
 
