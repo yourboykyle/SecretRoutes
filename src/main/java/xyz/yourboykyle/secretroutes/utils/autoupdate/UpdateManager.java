@@ -13,9 +13,9 @@ import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
-/*
+/**
  * This class is a taken from SkyHanni, translated from Kotlin to Java
- * https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/misc/update/UpdateManager.kt
+ * <a href="https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/misc/update/UpdateManager.kt">...</a>
  * All credit to them
  */
 
