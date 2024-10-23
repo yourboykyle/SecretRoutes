@@ -1203,6 +1203,15 @@ public class SRMConfig extends Config {
         SecretSounds.secretChime(true);
     };
 
+    @Switch(
+            name = "Hide boss messages",
+            description = "Hides boss messages without impacting other mods",
+            category = "General",
+            subcategory = "Other",
+            size = 2
+    )
+    public static boolean hideBossMessages = false;
+
 
     public Boolean lambda(String dependentOption) {
         try {
