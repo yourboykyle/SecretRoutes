@@ -53,20 +53,22 @@ public class OnPlayerInteract {
                 }
                 SecretUtils.lastInteract = pos;
                 if(SRMConfig.allSecrets){
-                    for(JsonElement secret : SecretUtils.secrets){
-                        try{
-                            JsonObject json = secret.getAsJsonObject();
-                            BlockPos spos = new BlockPos(json.get("x").getAsInt(), json.get("y").getAsInt(), json.get("z").getAsInt());
-                            BlockPos rel = MapUtils.actualToRelative(pos, RoomDetection.roomDirection, RoomDetection.roomCorner);
-                            if(BlockUtils.blockPos(spos).equals(BlockUtils.blockPos(rel))){
-                                if(!SecretUtils.secretLocations.contains(BlockUtils.blockPos(spos))){
-                                    SecretUtils.secretLocations.add(BlockUtils.blockPos(spos));
+                    if(SecretUtils.secrets != null){
+                        for(JsonElement secret : SecretUtils.secrets){
+                            try{
+                                JsonObject json = secret.getAsJsonObject();
+                                BlockPos spos = new BlockPos(json.get("x").getAsInt(), json.get("y").getAsInt(), json.get("z").getAsInt());
+                                BlockPos rel = MapUtils.actualToRelative(pos, RoomDetection.roomDirection, RoomDetection.roomCorner);
+                                if(BlockUtils.blockPos(spos).equals(BlockUtils.blockPos(rel))){
+                                    if(!SecretUtils.secretLocations.contains(BlockUtils.blockPos(spos))){
+                                        SecretUtils.secretLocations.add(BlockUtils.blockPos(spos));
+                                    }
                                 }
+                            }catch(Exception ex){
+                                LogUtils.error(ex);
                             }
-                        }catch(Exception ex){
-                            LogUtils.error(ex);
-                        }
 
+                        }
                     }
                 }
 
