@@ -20,9 +20,7 @@ package xyz.yourboykyle.secretroutes.events;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import xyz.yourboykyle.secretroutes.Main;
@@ -50,7 +48,10 @@ public class OnItemPickedUp {
     public void onPickupItem(PlayerEvent.ItemPickupEvent e) {
         Utils.checkForCatacombs();
         if(!Utils.inCatacombs){return;}
+        if(!isSecretItem(e.pickedUp.getEntityItem().getDisplayName())){return;}
+
         if(SRMConfig.allSecrets){
+            if(SecretUtils.secrets == null){return;}
             for(JsonElement obj : SecretUtils.secrets){
                 try{
                     JsonObject secret = obj.getAsJsonObject();
@@ -83,14 +84,14 @@ public class OnItemPickedUp {
         // Route Recording
         if(Main.routeRecording.recording) {
             String itemName = e.pickedUp.getEntityItem().getDisplayName();
-            if (!itemSecretOnCooldown && isChestItem(itemName)) {
+            if (!itemSecretOnCooldown && isSecretItem(itemName)) {
                 Main.routeRecording.addWaypoint(Room.SECRET_TYPES.ITEM, e.player.getPosition());
                 Main.routeRecording.newSecret();
                 Main.routeRecording.setRecordingMessage("Added item secret waypoint.");
             }
         }
     }
-    public static boolean isChestItem(String itemName){
+    public static boolean isSecretItem(String itemName){
         return Arrays.asList(validItems).contains(itemName);
     }
 }
