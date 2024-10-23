@@ -1,9 +1,11 @@
 package xyz.yourboykyle.secretroutes.events;
 
+import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import xyz.yourboykyle.secretroutes.utils.BlockUtils;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.SecretUtils;
 
@@ -43,6 +45,12 @@ public class OnChatReceive {
         }else{
             if(e.message.getUnformattedText().contains("That chest is locked!")){
                 LogUtils.info("§aLocked chest detected!");
+                new Thread(() ->{
+                    try{
+                        Thread.sleep(100);
+                    }catch (InterruptedException ignored){}
+                    SecretUtils.secretLocations.remove(BlockUtils.blockPos(SecretUtils.lastInteract));
+                }).start();
                 SecretUtils.renderLever = true;
             }
         }
@@ -50,6 +58,15 @@ public class OnChatReceive {
     }
     public static boolean isAllFound() {
         return allFound;
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void hideBossMessages(ClientChatReceivedEvent e) {
+        if(SRMConfig.hideBossMessages){
+            if(e.message.getFormattedText().startsWith("§r§4[BOSS]") || e.message.getFormattedText().startsWith("§r§c[BOSS]")){
+                e.setCanceled(true);
+            }
+        }
     }
 
 
