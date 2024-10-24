@@ -22,6 +22,7 @@ package xyz.yourboykyle.secretroutes.commands;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.ConfigUtils;
@@ -97,6 +98,33 @@ public class ChangeColorProfile extends CommandBase {
         aliases.add("changeclrp");
         aliases.add("changecolourprofile");
         return aliases;
+    }
+
+    @Override
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
+        List<String> completions = new ArrayList<>();
+        List<String> basicOptions = new ArrayList<>();
+        basicOptions.add("list");
+        basicOptions.add("load");
+        basicOptions.add("save");
+        switch (args.length) {
+            case 0:
+                completions.addAll(basicOptions);
+            case 1:
+                completions.addAll(basicOptions);
+                completions.removeIf(completion -> !(completion.toLowerCase().startsWith(args[0].toLowerCase())));
+            case 2:
+                if(args[0].equalsIgnoreCase("load")) {
+                    completions.addAll(FileUtils.getFileNames(Main.COLOR_PROFILE_PATH));
+                }
+            case 3:
+                if(args[0].equalsIgnoreCase("load")) {
+                    completions.addAll(FileUtils.getFileNames(Main.COLOR_PROFILE_PATH));
+                    completions.removeIf(completion -> !(completion.toLowerCase().startsWith(args[1].toLowerCase())));
+                }
+        }
+
+        return completions;
     }
 
 }

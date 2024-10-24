@@ -21,11 +21,12 @@ package xyz.yourboykyle.secretroutes.commands;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.util.BlockPos;
 import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.utils.ChatUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class SRM extends CommandBase {
     @Override
@@ -55,5 +56,19 @@ public class SRM extends CommandBase {
         aliases.add("secretroutes");
         aliases.add("secretroutesmod");
         return aliases;
+    }
+
+    @Override
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
+        List<String> completions = new ArrayList<>();
+        completions.add("General");
+        completions.add("RouteRecording");
+        completions.add("HUD");
+        completions.add("Rendering");
+        completions.add("Dev");
+        completions.add("Keybinds");
+        completions.removeIf(completion -> args.length > 0 && !(completion.toLowerCase().startsWith(args[0].toLowerCase())));
+
+        return completions;
     }
 }

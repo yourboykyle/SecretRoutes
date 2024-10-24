@@ -1,4 +1,6 @@
 {
+	"#origin": "Secret Routes Mod: https://github.com/yourboykyle/SecretRoutes/tree/main",
+	"#copyright": "Copyright 2024 yourboykyle, wyannnnn, zzyyrraa",
 	"Tombstone-2": [{"locations":[[13,69,5],[14,73,20],[16,70,24]],"etherwarps":[[15,72,21]],"mines":[],"interacts":[],"tnts":[],"secret":{"type":"interact","location":[15,70,26]}},{"locations":[[15,73,20],[14,70,16],[24,77,12]],"etherwarps":[[25,76,13]],"mines":[],"interacts":[],"tnts":[],"secret":{"type":"interact","location":[27,76,16]}}],
 	"Stone-Window-2": [{"locations":[[14,69,4],[19,69,4],[24,69,6],[25,69,11]],"etherwarps":[],"mines":[],"interacts":[],"tnts":[],"secret":{"type":"bat","location":[26,77,10]}},{"locations":[[21,70,15],[17,73,15],[12,74,13],[9,73,9],[8,70,5],[3,69,5],[3,69,10],[3,69,15]],"etherwarps":[],"mines":[],"interacts":[],"tnts":[[4,69,13]],"secret":{"type":"bat","location":[3,72,19]}}],
 	"Arrow-Trap-1": [{"locations":[[16,69,18],[15,69,13],[15,69,8]],"etherwarps":[],"mines":[[15,70,22]],"interacts":[[15,70,23]],"tnts":[[15,69,18]],"secret":{"type":"interact","location":[14,69,4]}}],

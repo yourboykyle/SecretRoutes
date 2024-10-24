@@ -28,7 +28,10 @@ import cc.polyfrost.oneconfig.config.data.InfoType;
 import cc.polyfrost.oneconfig.config.data.Mod;
 import cc.polyfrost.oneconfig.config.data.ModType;
 import cc.polyfrost.oneconfig.config.data.OptionSize;
+import cc.polyfrost.oneconfig.gui.OneConfigGui;
+import cc.polyfrost.oneconfig.gui.pages.ModConfigPage;
 import cc.polyfrost.oneconfig.libs.universal.UKeyboard;
+import cc.polyfrost.oneconfig.utils.gui.GuiUtils;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
@@ -1264,7 +1267,7 @@ public class SRMConfig extends Config {
             optionNames.get("allSecrets").addHideCondition(() -> !lambda("modEnabled"));
             optionNames.get("renderComplete").addHideCondition(() -> !lambda("modEnabled"));
             optionNames.get("allSteps").addHideCondition(() -> !lambda("modEnabled"));
-            optionNames.get("allSteps").addHideCondition(() -> !lambda("allSecrets"));
+            optionNames.get("allSteps").addHideCondition(() -> !lambda("wholeRoute"));
             optionNames.get("ignored").addHideCondition(() -> !lambda("modEnabled"));
 
             optionNames.get("autoDownload").addHideCondition(() -> !lambda("autoCheckUpdates"));
@@ -1355,5 +1358,9 @@ public class SRMConfig extends Config {
 
     public boolean isEqualTo(Object a, Object b) {
         return a.equals(b);
+    }
+
+    public void openGui(String page){
+        ModConfigPage test = new ModConfigPage(Main.config.mod.defaultPage);
     }
 }
