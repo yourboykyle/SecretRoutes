@@ -25,6 +25,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Tuple;
@@ -67,7 +68,12 @@ public class SecretUtils {
         GlStateManager.disableDepth();
         GlStateManager.disableCull();
         ///GlStateManager.disableBlend();
-
+        if(SRMConfig.playerWaypointLine){
+            BlockPos nextSecret = Main.currentRoom.getSecretLocation();
+            if(nextSecret!=null){
+                RenderUtils.drawFromPlayer(Minecraft.getMinecraft().thePlayer, nextSecret.getX(), nextSecret.getY(), nextSecret.getZ(), SRMConfig.lineColor, event.partialTicks, SRMConfig.width );
+            }
+        }
 
         // Render the etherwarps
         if (currentSecretWaypoints != null && currentSecretWaypoints.get("etherwarps") != null && (!SRMConfig.wholeRoute || SRMConfig.allSteps || index2 == Main.currentRoom.currentSecretIndex) && SRMConfig.renderEtherwarps) {

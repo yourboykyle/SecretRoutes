@@ -19,6 +19,7 @@
 package xyz.yourboykyle.secretroutes.utils;
 
 import cc.polyfrost.oneconfig.config.core.OneColor;
+import com.jcraft.jorbis.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
@@ -206,6 +207,10 @@ public class RenderUtils {
         GlStateManager.popAttrib();
     }
 
+    public static void drawNormalLine(BlockPos pos1, BlockPos pos2, OneColor color, float partialTicks, boolean depth, int width){
+        drawNormalLine(pos1.getX(), pos1.getY(), pos1.getZ(), pos2.getX(), pos2.getY(), pos2.getZ(), color, partialTicks, depth, width);
+    }
+
 
 
     public static void drawText(String text, BlockPos pos, float partialTicks, Boolean depth, Boolean shadow, Float scale){
@@ -253,6 +258,17 @@ public class RenderUtils {
         GlStateManager.disableBlend();
         GlStateManager.popMatrix();
 
+    }
+
+    public static void drawFromPlayer(EntityPlayerSP p, double x, double y, double z, OneColor color, float partialticks, int width){
+
+        double px = p.prevPosX + (p.posX - p.prevPosX)*partialticks;
+        double py = p.prevPosY + (p.posY - p.prevPosY)*partialticks;
+        double pz = p.prevPosZ + (p.posZ - p.prevPosZ)*partialticks;
+
+
+
+        drawNormalLine(px, py+p.getEyeHeight(), pz, x+0.5, y, z+0.5, color, partialticks, false, width);
     }
 
 }

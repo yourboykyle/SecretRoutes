@@ -18,9 +18,11 @@
 
 package xyz.yourboykyle.secretroutes.events;
 
+import cc.polyfrost.oneconfig.config.core.OneColor;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.client.Minecraft;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.DungeonManager;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.MapUtils;
@@ -49,6 +51,8 @@ public class OnWorldRender {
     @SubscribeEvent
     public void onRenderWorld(RenderWorldLastEvent event) {
         try {
+
+
             // Make sure the player is actually in a dungeon
             Utils.checkForCatacombs();
             if (!Utils.inCatacombs || DungeonManager.gameStage != 2 || !SRMConfig.modEnabled) {

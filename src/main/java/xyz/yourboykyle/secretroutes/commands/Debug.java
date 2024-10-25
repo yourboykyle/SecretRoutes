@@ -68,36 +68,36 @@ public class Debug extends CommandBase {
                         break;
                     case "var":
                         try {
-                            Field field = Constants.class.getDeclaredField(args[0]);
+                            Field field = Constants.class.getDeclaredField(args[1]);
                             String type = field.getAnnotatedType().getType().getTypeName();
                             field.setAccessible(true);
                             Object currentValue = field.get(null);
                             if (args.length == 1) {
-                                ChatUtils.sendChatMessage("§b" + args[0] + ": " + currentValue);
+                                ChatUtils.sendChatMessage("§b" + args[1] + ": " + currentValue);
                             } else {
                                 switch (type) {
                                     case "int":
-                                        field.set(null, Integer.valueOf(args[1]));
+                                        field.set(null, Integer.valueOf(args[2]));
                                         break;
                                     case "float":
-                                        field.set(null, Float.valueOf(args[1]));
+                                        field.set(null, Float.valueOf(args[2]));
                                         break;
                                     case "boolean":
-                                        field.set(null, Boolean.valueOf(args[1]));
+                                        field.set(null, Boolean.valueOf(args[2]));
                                         break;
                                     case "double":
-                                        field.set(null, Double.valueOf(args[1]));
+                                        field.set(null, Double.valueOf(args[2]));
                                         break;
                                     case "String":
-                                        field.set(null, args[1]);
+                                        field.set(null, args[2]);
                                         break;
                                 }
-                                ChatUtils.sendChatMessage("§bChanged [" + args[0] + "] from " + currentValue + " to " + args[1]);
+                                ChatUtils.sendChatMessage("§bChanged [" + args[1] + "] from " + currentValue + " to " + args[2]);
                             }
 
 
                         } catch (NoSuchFieldException e) {
-                            sendChatMessage("§cInvalid argument: " + args[0]);
+                            sendChatMessage("§cInvalid argument: " + args[1]);
                         } catch (IllegalAccessException e) {
                             sendChatMessage("§cIllegal access (Most likely private");
                             LogUtils.error(e);
@@ -109,7 +109,7 @@ public class Debug extends CommandBase {
                             if (args.length == 1) {
                                 ChatUtils.sendChatMessage("§cSomething went wrong... Command [/srmdebug " + args[0] + "]");
                             } else {
-                                sendChatMessage("§cSomething went wrong... Command [/srmdebug " + args[0] + " " + args[1] + "]");
+                                sendChatMessage("§cSomething went wrong... Command [/srmdebug " + args[1] + " " + args[2] + "]");
                             }
                         }
                         break;

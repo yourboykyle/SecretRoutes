@@ -1235,6 +1235,14 @@ public class SRMConfig extends Config {
     )
     public static boolean hideBossMessages = false;
 
+    @Switch(
+            name = "Player to next waypoint",
+            category = "Dev",
+            subcategory = "WIP",
+            size = 2
+    )
+    public static boolean playerWaypointLine = true;
+
 
     public Boolean lambda(String dependentOption) {
         try {
@@ -1362,5 +1370,7 @@ public class SRMConfig extends Config {
 
     public void openGui(String page){
         ModConfigPage test = new ModConfigPage(Main.config.mod.defaultPage);
+        test.getPage().categories.get("add").subcategories.get(1);
+
     }
 }
