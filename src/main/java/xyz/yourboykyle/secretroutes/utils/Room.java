@@ -171,6 +171,7 @@ public class Room {
     }
 
     public BlockPos getSecretLocation() {
+        if(currentSecretWaypoints == null){return null;}
         if(currentSecretWaypoints.get("secret") != null && currentSecretWaypoints.get("secret").getAsJsonObject().get("location") != null) {
             JsonArray location = currentSecretWaypoints.get("secret").getAsJsonObject().get("location").getAsJsonArray();
 
