@@ -67,12 +67,15 @@ public class Debug extends CommandBase {
 
                         break;
                     case "var":
+                        if(args.length == 1){
+                            sendChatMessage("Missing argument after \"var\"");
+                        }
                         try {
                             Field field = Constants.class.getDeclaredField(args[1]);
                             String type = field.getAnnotatedType().getType().getTypeName();
                             field.setAccessible(true);
                             Object currentValue = field.get(null);
-                            if (args.length == 1) {
+                            if (args.length == 2) {
                                 ChatUtils.sendChatMessage("§b" + args[1] + ": " + currentValue);
                             } else {
                                 switch (type) {
@@ -142,17 +145,25 @@ public class Debug extends CommandBase {
                 completions.addAll(basicOptions);
                 completions.removeIf(completion -> !(completion.toLowerCase().startsWith(args[0].toLowerCase())));
            case 2:
-                switch(args[0].toLowerCase()){
-                    case "lever":
-                    case "pos": break;
-                    case "var":
-                        Field[] fields = Constants.class.getDeclaredFields();
-                        for (Field field : fields) {
-                            if(field.getName().toLowerCase().startsWith(args[1].toLowerCase())){
-                                completions.add(field.getName());
-                            }
-                        }
-                }
+               try {
+                   switch (args[0].toLowerCase()) {
+                       case "lever":
+                       case "pos":
+                           break;
+                       case "var":
+                           if(args.length == 1){return completions;}
+                           Field[] fields = Constants.class.getDeclaredFields();
+
+                           for (Field field : fields) {
+                               if (field.getName().toLowerCase().startsWith(args[1].toLowerCase())) {
+                                   completions.add(field.getName());
+                               }
+                           }
+                   }
+               }catch (Exception e){
+                   ChatUtils.sendChatMessage("Error happened again");
+                   e.printStackTrace();
+               }
         }
 
         return completions;
