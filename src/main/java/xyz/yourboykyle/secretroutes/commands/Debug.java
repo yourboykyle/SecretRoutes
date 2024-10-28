@@ -2,6 +2,8 @@
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2024 yourboykyle & R-aMcC
  *
+ * <DO NOT REMOVE THIS COPYRIGHT NOTICE>
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -69,53 +71,51 @@ public class Debug extends CommandBase {
                     case "var":
                         if(args.length == 1){
                             sendChatMessage("Missing argument after \"var\"");
-                        }
-                        try {
-                            Field field = Constants.class.getDeclaredField(args[1]);
-                            String type = field.getAnnotatedType().getType().getTypeName();
-                            field.setAccessible(true);
-                            Object currentValue = field.get(null);
-                            if (args.length == 2) {
-                                ChatUtils.sendChatMessage("§b" + args[1] + ": " + currentValue);
-                            } else {
-                                switch (type) {
-                                    case "int":
-                                        field.set(null, Integer.valueOf(args[2]));
-                                        break;
-                                    case "float":
-                                        field.set(null, Float.valueOf(args[2]));
-                                        break;
-                                    case "boolean":
-                                        field.set(null, Boolean.valueOf(args[2]));
-                                        break;
-                                    case "double":
-                                        field.set(null, Double.valueOf(args[2]));
-                                        break;
-                                    case "String":
-                                        field.set(null, args[2]);
-                                        break;
+                        }else{
+                            try {
+                                Field field = Constants.class.getDeclaredField(args[1]);
+                                String type = field.getAnnotatedType().getType().getTypeName();
+                                field.setAccessible(true);
+                                Object currentValue = field.get(null);
+                                if (args.length == 2) {
+                                    ChatUtils.sendChatMessage("§b" + args[1] + ": " + currentValue);
+                                } else {
+                                    switch (type) {
+                                        case "int":
+                                            field.set(null, Integer.valueOf(args[2]));
+                                            break;
+                                        case "float":
+                                            field.set(null, Float.valueOf(args[2]));
+                                            break;
+                                        case "boolean":
+                                            field.set(null, Boolean.valueOf(args[2]));
+                                            break;
+                                        case "double":
+                                            field.set(null, Double.valueOf(args[2]));
+                                            break;
+                                        case "String":
+                                            field.set(null, args[2]);
+                                            break;
+                                    }
+                                    ChatUtils.sendChatMessage("§bChanged [" + args[1] + "] from " + currentValue + " to " + args[2]);
                                 }
-                                ChatUtils.sendChatMessage("§bChanged [" + args[1] + "] from " + currentValue + " to " + args[2]);
-                            }
 
 
-                        } catch (NoSuchFieldException e) {
-                            sendChatMessage("§cInvalid argument: " + args[1]);
-                        } catch (IllegalAccessException e) {
-                            sendChatMessage("§cIllegal access (Most likely private");
-                            LogUtils.error(e);
-                        } catch (IllegalFormatException e) {
-                            sendChatMessage("§cWrong type");
-                            LogUtils.error(e);
-                        } catch (Exception e) {
-                            LogUtils.error(e);
-                            if (args.length == 1) {
-                                ChatUtils.sendChatMessage("§cSomething went wrong... Command [/srmdebug " + args[0] + "]");
-                            } else {
+                            } catch (NoSuchFieldException e) {
+                                sendChatMessage("§cInvalid argument: " + args[1]);
+                            } catch (IllegalAccessException e) {
+                                sendChatMessage("§cIllegal access (Most likely private");
+                                LogUtils.error(e);
+                            } catch (IllegalFormatException e) {
+                                sendChatMessage("§cWrong type");
+                                LogUtils.error(e);
+                            } catch (Exception e) {
+                                LogUtils.error(e);
                                 sendChatMessage("§cSomething went wrong... Command [/srmdebug " + args[1] + " " + args[2] + "]");
                             }
+                            break;
                         }
-                        break;
+
                 }
             }catch(Exception e){
                 LogUtils.error(e);
@@ -151,7 +151,9 @@ public class Debug extends CommandBase {
                        case "pos":
                            break;
                        case "var":
-                           if(args.length == 1){return completions;}
+                           //Idk why this can happen, but it does... There goes 3 hrs of my time
+                           if(args.length == 1) return completions;
+                           // In this one line. Right here. Checking a value after JUST CHECKING IT
                            Field[] fields = Constants.class.getDeclaredFields();
 
                            for (Field field : fields) {
