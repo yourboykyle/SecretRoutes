@@ -2,6 +2,10 @@
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2024 yourboykyle & R-aMcC
  *
+ * <DO NOT REMOVE THIS COPYRIGHT NOTICE>
+ *
+ *<DO NOT REMOVE THIS COPYRIGHT NOTICE>
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -28,24 +32,13 @@ import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 
 public class OnServerTick {
     public static int ticks = 0;
-    public static long time = -1;
-    public static ArrayList<Integer> times = new ArrayList<>();
-    public static int seconds = 0;
+
 
     @SubscribeEvent
     public void onServerTick(ServerTickEvent event) {
         if(!event.modid.equals(Main.MODID)){return;}
-
         ticks++;
+        if(ticks )
 
-        int timeSince = (int) (System.currentTimeMillis()-time);
-        seconds += timeSince;
-
-        //sendChatMessage("Tick received: " + (ticks++) +" at: " + timeSince + " ms");
-        if(ticks%20==0){
-            sendChatMessage("20 ticks received, Time : "+seconds);
-            seconds = 0;
-        }
-        time = System.currentTimeMillis();
     }
 }

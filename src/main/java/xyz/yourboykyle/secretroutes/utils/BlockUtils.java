@@ -2,6 +2,8 @@
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2024 yourboykyle & R-aMcC
  *
+ * <DO NOT REMOVE THIS COPYRIGHT NOTICE>
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -24,5 +26,10 @@ public class BlockUtils {
 
     public static String blockPos(BlockPos pos) {
         return pos.getX() + ":" + pos.getY() + ":" + pos.getZ();
+    }
+
+
+    public static boolean compareBlocks(BlockPos pos1, BlockPos pos2, int dist) {
+        return pos1.getX() >= pos2.getX() - dist && pos1.getX() <= pos2.getX() + dist && pos1.getY() >= pos2.getY() - dist && pos1.getY() <= pos2.getY() + dist && pos1.getZ() >= pos2.getZ() - dist && pos1.getZ() <= pos2.getZ() + dist;
     }
 }
