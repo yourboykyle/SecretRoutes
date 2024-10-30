@@ -24,6 +24,7 @@ package xyz.yourboykyle.secretroutes.config;
 
 import cc.polyfrost.oneconfig.config.Config;
 import cc.polyfrost.oneconfig.config.annotations.*;
+import cc.polyfrost.oneconfig.config.annotations.Number;
 import cc.polyfrost.oneconfig.config.core.OneColor;
 import cc.polyfrost.oneconfig.config.core.OneKeyBind;
 import cc.polyfrost.oneconfig.config.data.InfoType;
@@ -1232,10 +1233,109 @@ public class SRMConfig extends Config {
             name = "Hide boss messages",
             description = "Hides boss messages without impacting other mods",
             category = "General",
-            subcategory = "Other",
-            size = 2
+            size = OptionSize.DUAL,
+            subcategory = "Messages"
     )
     public static boolean hideBossMessages = false;
+
+    @Checkbox(
+            name = "Hide watcher",
+            description = "Hides watcher messages",
+            category = "General",
+            subcategory = "Messages"
+    )
+    public static boolean hideWatcher = true;
+
+    @Checkbox(
+            name = "Hide Bonzo",
+            description = "Hides Bonzo messages",
+            category = "General",
+            subcategory = "Messages"
+    )
+    public static boolean hideBonzo = true;
+
+    @Checkbox(
+            name = "Hide Scarf",
+            description = "Hides Scarf messages (f2/m2)",
+            category = "General",
+            subcategory = "Messages"
+    )
+    public static boolean hideScarf = true;
+
+    @Checkbox(
+            name = "Hide Professor",
+            description = "Hides Professor messages (f3/m3)",
+            category = "General",
+            subcategory = "Messages"
+    )
+    public static boolean hideProfessor = true;
+
+    @Checkbox(
+            name = "Hide Thorn",
+            description = "Hides Thron messages (f4/m4)",
+            category = "General",
+            subcategory = "Messages"
+    )
+    public static boolean hideThorn = true;
+
+    @Checkbox(
+            name = "Hide Livid",
+            description = "Hides Livid messages (f5/m5)",
+            category = "General",
+            subcategory = "Messages"
+    )
+    public static boolean hideLivid = true;
+
+    @Checkbox(
+            name = "Hide Sadan",
+            description = "Hides Sadan messages (f6/m6)",
+            category = "General",
+            subcategory = "Messages"
+    )
+    public static boolean hideSadan = true;
+
+    @Checkbox(
+            name = "Hide Wither lords",
+            description = "Hides wither lords messages (f7/m7)",
+            category = "General",
+            subcategory = "Messages"
+    )
+    public static boolean hideWitherLords = false;
+
+    @Switch(
+            name = "Blood spawned notification",
+            description = "Notifies when blood is fully spawned",
+            category = "General",
+            subcategory = "Messages",
+            size = 2
+
+    )
+    public static boolean bloodNotif = false;
+
+    @Text(
+            name = "Blood ready text",
+            description = "Text to show when blood is fully spawned",
+            subcategory = "Messages",
+            size = 1
+    )
+    public static String bloodReadyText = "Blood Ready";
+
+    @Dropdown(
+            name = "Color",
+            description = "Color of the message",
+            options = {"Black", "Dark blue", "Dark green", "Dark aqua", "Dark red", "Dark purple", "Gold", "Gray", "Dark gray", "Blue", "Green", "Aqua", "Red", "Light purple", "Yellow", "White"},
+            subcategory = "Messages"
+    )
+    public static int bloodReadyColor = 6;
+
+    @Number(
+            name = "Duration",
+            description = "Duration of the banner",
+            max = 15000, min =1,
+            subcategory = "Messages"
+    )
+    public static int bloodBannerDuration = 3000;
+
 
     @Switch(
             name = "Player to next waypoint",
@@ -1244,6 +1344,8 @@ public class SRMConfig extends Config {
             size = 2
     )
     public static boolean playerWaypointLine = true;
+
+
 
 
     public Boolean lambda(String dependentOption) {
@@ -1323,6 +1425,21 @@ public class SRMConfig extends Config {
             optionNames.get("customSecretSoundVolume").addHideCondition(() -> !lambda("customSecretSound"));
             optionNames.get("customSecretSoundPitch").addHideCondition(() -> !lambda("customSecretSound"));
             optionNames.get("runnable15").addHideCondition(() -> !lambda("customSecretSound"));
+
+            optionNames.get("hideWatcher").addHideCondition(()-> !lambda("hideBossMessages"));
+            optionNames.get("hideBonzo").addHideCondition(()-> !lambda("hideBossMessages"));
+            optionNames.get("hideScarf").addHideCondition(()-> !lambda("hideBossMessages"));
+            optionNames.get("hideProfessor").addHideCondition(()-> !lambda("hideBossMessages"));
+            optionNames.get("hideThorn").addHideCondition(()-> !lambda("hideBossMessages"));
+            optionNames.get("hideLivid").addHideCondition(()-> !lambda("hideBossMessages"));
+            optionNames.get("hideSadan").addHideCondition(()-> !lambda("hideBossMessages"));
+            optionNames.get("hideWitherLords").addHideCondition(()-> !lambda("hideBossMessages"));
+
+            optionNames.get("bloodReadyText").addHideCondition(()-> !lambda("bloodNotif"));
+            optionNames.get("bloodReadyColor").addHideCondition(()-> !lambda("bloodNotif"));
+            optionNames.get("bloodBannerDuration").addHideCondition(()-> !lambda("bloodNotif"));
+
+
 
             registerKeyBind(lastSecret, () -> {
                 if (Utils.inCatacombs) {

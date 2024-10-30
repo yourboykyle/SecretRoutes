@@ -38,7 +38,6 @@ public class OnServerTick {
     public void onServerTick(ServerTickEvent event) {
         if(!event.modid.equals(Main.MODID)){return;}
         ticks++;
-        if(ticks )
 
     }
 }
