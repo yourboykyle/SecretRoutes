@@ -29,6 +29,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.util.BlockPos;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.MapUtils;
+import xyz.yourboykyle.secretroutes.events.OnGuiRender;
 import xyz.yourboykyle.secretroutes.utils.*;
 
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
@@ -66,6 +67,16 @@ public class Debug extends CommandBase {
                         EntityPlayerSP p = Minecraft.getMinecraft().thePlayer;
                         sendChatMessage("Relative: " + p.getPosition());
                         sendChatMessage("Abs: " + BlockUtils.blockPos(p.getPosition()));
+                    case "bloodTime":
+                        if(args.length >= 2){
+                            try {
+                                OnGuiRender.spawnNotifTime = System.currentTimeMillis()+Long.parseLong(args[1]);
+                            }catch (NumberFormatException e){
+                                ChatUtils.sendChatMessage("Please make sure the value is a number");
+                            }
+                        }else{
+                            OnGuiRender.spawnNotifTime = System.currentTimeMillis()+3000;
+                        }
 
                         break;
                     case "var":
@@ -137,6 +148,7 @@ public class Debug extends CommandBase {
         basicOptions.add("lever");
         basicOptions.add("pos");
         basicOptions.add("var");
+        basicOptions.add("bloodTime");
 
        switch (args.length) {
            case 0:
@@ -149,6 +161,7 @@ public class Debug extends CommandBase {
                    switch (args[0].toLowerCase()) {
                        case "lever":
                        case "pos":
+                       case "bloodtime":
                            break;
                        case "var":
                            //Idk why this can happen, but it does... There goes 3 hrs of my time
