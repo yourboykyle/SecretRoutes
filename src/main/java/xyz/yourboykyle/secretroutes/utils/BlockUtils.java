@@ -25,6 +25,7 @@ import net.minecraft.util.BlockPos;
 public class BlockUtils {
 
     public static String blockPos(BlockPos pos) {
+        if(pos == null){return ":::";}
         return pos.getX() + ":" + pos.getY() + ":" + pos.getZ();
     }
 

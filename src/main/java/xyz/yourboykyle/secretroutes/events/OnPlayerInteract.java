@@ -53,6 +53,9 @@ public class OnPlayerInteract {
                 if(block != Blocks.chest && block != Blocks.trapped_chest && block != Blocks.lever && block != Blocks.skull) {
                     return;
                 }
+                if(BlockUtils.blockPos(MapUtils.actualToRelative(pos, RoomDetection.roomDirection, RoomDetection.roomCorner)).equals(BlockUtils.blockPos(SecretUtils.currentLeverPos))){
+                    SecretUtils.resetValues();
+                }
                 SecretUtils.lastInteract = pos;
                 if(SRMConfig.allSecrets){
                     if(SecretUtils.secrets != null){
@@ -80,7 +83,6 @@ public class OnPlayerInteract {
                     if (pos.getX() == interactPos.getX() && pos.getY() == interactPos.getY() && pos.getZ() == interactPos.getZ()) {
                         Main.currentRoom.nextSecret();
                         LogUtils.info("Interacted with block at " + interactPos);
-                        SecretUtils.resetValues();
                     }
                 }
 
