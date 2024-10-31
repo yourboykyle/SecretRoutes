@@ -1,0 +1,85 @@
+blank_issues_enabled: false
+templates:
+  - title: "Bug Report"
+    description: "Report a bug or unexpected behavior."
+    body:
+      - type: markdown
+        attributes:
+          value: |
+            Please fill out the following details to help us understand the issue.
+      - type: input
+        id: expected_behavior
+        attributes:
+          label: "Expected Behavior"
+          description: "What did you expect to happen?"
+          placeholder: "Describe the expected behavior"
+      - type: input
+        id: actual_behavior
+        attributes:
+          label: "Actual Behavior"
+          description: "What actually happened?"
+          placeholder: "Describe the actual behavior"
+      - type: textarea
+        id: steps_to_reproduce
+        attributes:
+          label: "Steps to Reproduce"
+          description: "List the steps to reproduce the issue."
+          placeholder: "1. Step one\n2. Step two\n3. Step three"
+      - type: input
+        id: environment
+        attributes:
+          label: "Environment"
+          description: "Your operating system, browser, or device information."
+          placeholder: "e.g. Windows 10, Chrome 94"
+      - type: textarea
+        id: additional_info
+        attributes:
+          label: "Additional Information"
+          description: "Any other information that might help us understand the issue."
+          placeholder: "Include logs, screenshots, etc."
+
+  - title: "Feature Request"
+    description: "Suggest a new feature or enhancement."
+    body:
+      - type: markdown
+        attributes:
+          value: |
+            Please describe the feature you would like to see implemented.
+      - type: input
+        id: feature_title
+        attributes:
+          label: "Feature Title"
+          description: "A short title for the feature request."
+          placeholder: "e.g. Dark Mode"
+      - type: textarea
+        id: feature_description
+        attributes:
+          label: "Feature Description"
+          description: "Describe the feature in detail and its benefits."
+          placeholder: "Explain why this feature is needed."
+      - type: input
+        id: priority_level
+        attributes:
+          label: "Priority Level"
+          description: "How important is this feature?"
+          placeholder: "High, Medium, Low"
+
+  - title: "Question"
+    description: "Ask a general question about the project."
+    body:
+      - type: markdown
+        attributes:
+          value: |
+            Please provide your question below.
+      - type: input
+        id: question_title
+        attributes:
+          label: "Question Title"
+          description: "A short title for your question."
+          placeholder: "e.g. How to contribute?"
+      - type: textarea
+        id: question_description
+        attributes:
+          label: "Question Description"
+          description: "Describe your question and provide any relevant context."
+          placeholder: "Please provide details for your question."
