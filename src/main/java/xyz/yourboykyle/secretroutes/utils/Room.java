@@ -112,7 +112,6 @@ public class Room {
     }
 
     public void lastSecretKeybind() {
-        SecretUtils.resetValues();
         if(currentSecretIndex > 0) {
             currentSecretIndex--;
         }
@@ -125,8 +124,6 @@ public class Room {
     }
 
     public void nextSecret() {
-        SecretUtils.resetValues();
-
 
         currentSecretIndex++;
 
@@ -138,7 +135,6 @@ public class Room {
     }
 
     public void nextSecretKeybind() {
-        SecretUtils.resetValues();
         if(currentSecretRoute != null) {
             if(currentSecretIndex < currentSecretRoute.size() - 1) {
                 currentSecretIndex++;
