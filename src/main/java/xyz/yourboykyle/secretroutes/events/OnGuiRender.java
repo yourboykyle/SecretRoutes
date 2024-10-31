@@ -39,9 +39,9 @@ public class OnGuiRender {
             GuiUitls.displayText("§bSet waypoint at lever", 0, -100, 2);
         }
 
-        if(spawnNotifTime != null){
-            if(System.currentTimeMillis()<spawnNotifTime){
-                GuiUitls.displayText(SecretRoutesRenderUtils.getTextColor(SRMConfig.bloodReadyColor)+SRMConfig.bloodReadyText, 0, -100, 2);
+        if(spawnNotifTime != null || SRMConfig.renderBlood){
+            if(SRMConfig.renderBlood || System.currentTimeMillis()<spawnNotifTime){
+                GuiUitls.displayText(SecretRoutesRenderUtils.getTextColor(SRMConfig.bloodReadyColor)+SRMConfig.bloodReadyText, SRMConfig.bloodX, SRMConfig.bloodY, SRMConfig.bloodScale);
             }else{
                 spawnNotifTime = null;
             }

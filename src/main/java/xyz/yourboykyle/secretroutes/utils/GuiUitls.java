@@ -24,6 +24,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
+import xyz.yourboykyle.secretroutes.config.SRMConfig;
 
 public class GuiUitls {
     public static void displayText(String text, float posx, float posy, float scale) {
@@ -43,7 +44,7 @@ public class GuiUitls {
             GlStateManager.enableBlend();
             GlStateManager.disableDepth();
 
-            GlStateManager.translate(x, y, 10);
+            GlStateManager.translate(x, y, Constants.zPos);
             GlStateManager.scale(scale, scale, 1f);
 
 
