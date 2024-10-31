@@ -1336,6 +1336,37 @@ public class SRMConfig extends Config {
     )
     public static int bloodBannerDuration = 3000;
 
+    @Number(
+            name = "Scale",
+            description = "Scale of the text",
+            min = 1, max = 10,
+            size = 1,
+            subcategory = "Messages"
+    )
+    public static int bloodScale = 2;
+
+    @Slider(
+            name = "X Offset",
+            description = "X Offset for the message. (POSITIVE TO THE RIGHT)",
+            subcategory = "Messages",
+            min = -1000, max = 1000
+    )
+    public static int bloodX = 0;
+
+    @Slider(
+            name = "Y Offset",
+            description = "Y Offset for the message. (POSITIVE TO THE BOTTOM)",
+            subcategory = "Messages",
+            min = -1000, max = 1000)
+    public static int bloodY = -100;
+
+    @Checkbox(
+            name = "Render Test message",
+            description = "Renders a test message with the paramaters to change position. (Untick when done)",
+            subcategory = "Messages"
+    )
+    public static Boolean renderBlood = false;
+
 
     @Switch(
             name = "Player to next waypoint",
@@ -1438,6 +1469,11 @@ public class SRMConfig extends Config {
             optionNames.get("bloodReadyText").addHideCondition(()-> !lambda("bloodNotif"));
             optionNames.get("bloodReadyColor").addHideCondition(()-> !lambda("bloodNotif"));
             optionNames.get("bloodBannerDuration").addHideCondition(()-> !lambda("bloodNotif"));
+            optionNames.get("bloodScale").addHideCondition(()-> !lambda("bloodNotif"));
+            optionNames.get("bloodX").addHideCondition(()-> !lambda("bloodNotif"));
+            optionNames.get("bloodY").addHideCondition(()-> !lambda("bloodNotif"));
+            optionNames.get("renderBlood").addHideCondition(()-> !lambda("bloodNotif"));
+
 
 
 

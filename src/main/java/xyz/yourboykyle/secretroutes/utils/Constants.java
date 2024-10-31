@@ -30,6 +30,9 @@ public class Constants {
     public static boolean shadows = false;
 
 
+    //GUI render utils
+    public static int zPos = 1000;
+
 
 
 
