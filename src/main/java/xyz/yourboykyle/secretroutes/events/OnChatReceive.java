@@ -98,7 +98,7 @@ public class OnChatReceive {
                 msgMap.put("§r§c[BOSS] The Watcher", "hideWatcher");
                 msgMap.put("§r§c[BOSS] Bonzo", "hideBonzo");
                 msgMap.put("§r§c[BOSS] Scarf", "hideScarf");
-                msgMap.put("§r§c[BOSS] Professor", "hideProfessor");
+                msgMap.put("§r§c[BOSS] The Professor", "hideProfessor");
                 msgMap.put("§r§c[BOSS] Thorn", "hideThorn");
                 msgMap.put("§r§c[BOSS] Livid", "hideLivid");
                 msgMap.put("§r§c[BOSS] Sadan", "hideSadan");

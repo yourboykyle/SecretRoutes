@@ -9,26 +9,26 @@
 </div>
 
 ---
-## Features
+### Features
 <details>
     <summary><strong>Dungeon Routes</strong></summary>
     <ul>
-        <li> Some of the best routes on the internet for secrets </li>
-        <li> Tracking line made by particles or OpenGL Render lines </li>
-        <li> AOTV waypoints </li>
-        <li> Interact waypoints</li>
-        <li> Superboom waypoints</li>
-        <li> Stonk waypoints</li>
-        <li> Ender pearl waypoints/ Pearl launch angle lines </li>
-        <li> Render entire route (instead of just one secret at a time)</li>
-        <li> Render all secrets (Renders all secrets and levers in the room) </li>
+        <li>Some of the best routes on the internet for secrets </li>
+        <li>Tracking line made by particles or OpenGL Render lines </li>
+        <li>AOTV waypoints </li>
+        <li>Interact waypoints</li>
+        <li>Superboom waypoints</li>
+        <li>Stonk waypoints</li>
+        <li>Ender pearl waypoints/ Pearl launch angle lines </li>
+        <li>Render entire route (instead of just one secret at a time)</li>
+        <li>Render all secrets (Renders all secrets and levers in the room) </li>
         <li> 
             <details>
                 <summary><strong>Custom Routes</strong></summary>
                 <ul>
-                    <li> Record your own custom routes mostly automatically</li>
-                    <li> Easy HUD display for some recording information</li>
-                    <li> Easily import routes created by others</li>
+                    <li>Record your own custom routes mostly automatically</li>
+                    <li>Easy HUD display for some recording information</li>
+                    <li>Easily import routes created by others</li>
                 </ul>
             </details>
         </li>
@@ -36,12 +36,12 @@
             <details>
                 <summary><strong>Customizable</strong></summary>
                 <ul>
-                    <li> Recolor every single OpenGL rendering item</li>
-                    <li> Toggle on/off all waypoint types individually</li>
-                    <li> Recolor all text boxes to any of Minecraft's 16 colors</li>
-                    <li> Change between particle lines, OpenGL rendered line, or no lines</li>
-                    <li> Save and load different color profiles</li>
-                    <li> Import profiles from others easily</li>
+                    <li>Recolor every single OpenGL rendering item</li>
+                    <li>Toggle on/off all waypoint types individually</li>
+                    <li>Recolor all text boxes to any of Minecraft's 16 colors</li>
+                    <li>Change between particle lines, OpenGL rendered line, or no lines</li>
+                    <li>Save and load different color profiles</li>
+                    <li>Import profiles from others easily</li>
                 </ul>
             </details>
         </li>
@@ -87,10 +87,10 @@
 </details>
 --->
 
-### More to come...
+#### More to come...
 
 ---
-## Commands
+### Commands
 <ul>
     <li><strong>/srm</strong> -> Opens main config menu</li>
     <li><strong>/loadroute</strong> -> Loads the current route from the downloads folder</li>
@@ -141,13 +141,13 @@
 </ul>
 
 ---
-## Instructions:
+### Instructions:
 - Download the latest release: https://github.com/yourboykyle/SecretRoutes/releases/latest
 - Put the .jar in your `.minecraft/mods` folder
 - Watch the video for instructions: https://youtu.be/p3-KPTbXWFw
 - If you have any questions, join the discord: https://discord.gg/secretroutes
 ---
-## Credits:
+### Credits:
 - @yourboykyle (me) - developer
 - @wyannnnn - developer
 - @mrfast - help with various things
