@@ -62,7 +62,6 @@
         <li>Auto download new updates (Toggled off by default)</li>
     </ul>
 </details>
-<!---
 <details>
     <summary><strong>Messages</strong></summary>
     <ul>
@@ -85,7 +84,7 @@
         </details>
     </ul>
 </details>
---->
+
 
 #### More to come...
 
