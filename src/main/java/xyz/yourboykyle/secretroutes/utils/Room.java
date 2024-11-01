@@ -30,6 +30,7 @@ import net.minecraft.util.EnumParticleTypes;
 
 import java.io.File;
 import java.io.FileReader;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -157,17 +158,17 @@ public class Room {
     public SECRET_TYPES getSecretType() {
         if(currentSecretWaypoints != null && currentSecretWaypoints.get("secret") != null && currentSecretWaypoints.get("secret").getAsJsonObject().get("type") != null) {
             String type = currentSecretWaypoints.get("secret").getAsJsonObject().get("type").getAsString();
-            if(type.equals("interact")) {
-                return SECRET_TYPES.INTERACT;
-            } else if(type.equals("item")) {
-                return SECRET_TYPES.ITEM;
-            } else if(type.equals("bat")) {
-                return SECRET_TYPES.BAT;
-            } else if(type.equals("exitroute")) {
-                return SECRET_TYPES.EXITROUTE;
+            switch (type) {
+                case "interact":
+                    return SECRET_TYPES.INTERACT;
+                case "item":
+                    return SECRET_TYPES.ITEM;
+                case "bat":
+                    return SECRET_TYPES.BAT;
+                case "exitroute":
+                    return SECRET_TYPES.EXITROUTE;
             }
         }
-
         return null;
     }
 
@@ -224,12 +225,58 @@ public class Room {
 
                 JsonObject data = gson.fromJson(reader, JsonObject.class);
                 tests = data.get("test-1").getAsJsonArray();
-
+                sendChatMessage("Got test data");
+                for (JsonElement testElement : tests) {
+                    try{
+                        JsonObject testObj = testElement.getAsJsonObject();
+                        String first = testObj.get("first").getAsString();
+                        sendChatMessage("§2Got first location of new test data: "+first);
+                    }catch (Exception e){
+                        LogUtils.error(e);
+                    }
+                }
             }catch (Exception e) {
                 sendChatMessage("Something went wront you idiot");
                 LogUtils.error(e);
             }
 
         }
+        if(SRMConfig.debug){
+            try{
+                JsonArray array = new JsonArray();
+                HashMap<String, Integer> map = new HashMap<>();
+                String filePath = Main.ROUTES_PATH + File.separator + (!SRMConfig.pearlRoutesFileName.equals("") ? SRMConfig.pearlRoutesFileName : "pearlroutes.json");
+                Gson gson = new GsonBuilder().create();
+                FileReader reader = new FileReader(filePath);
+                JsonObject data = gson.fromJson(reader, JsonObject.class);
+                for(int i = 0; i<10; i++){
+                    if(i == 0){
+                        if(data.get(name).isJsonNull()){
+                            sendChatMessage("Unknown room");
+                            break;
+                        }
+                        array.add(data.get(name).getAsJsonArray());
+                    }else{
+                        try{
+                            JsonElement tempObj = data.get(name+":"+i);
+                            if(tempObj.isJsonNull()){
+                                break;
+                            }else{
+                                array.add(tempObj.getAsJsonArray());
+                            }
+                        }catch (Exception e){
+                            LogUtils.error(e);
+                        }
+                    }
+                }
+
+            }catch (Exception e){
+                LogUtils.error(e);
+            }
+        }
+
+
+
+
     }
 }
