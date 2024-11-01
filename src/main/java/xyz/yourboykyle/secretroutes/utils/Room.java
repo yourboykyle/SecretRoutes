@@ -33,6 +33,7 @@ import java.io.FileReader;
 import java.util.LinkedList;
 import java.util.List;
 
+import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
 
 public class Room {
@@ -55,6 +56,8 @@ public class Room {
     public JsonArray currentSecretRoute;
     public int currentSecretIndex = 0;
     public JsonObject currentSecretWaypoints;
+    public JsonArray tests;
+
 
     public Room(String roomName) {
         currentSecretIndex = 0;
@@ -210,6 +213,23 @@ public class Room {
                     LogUtils.error(e);
                 }
             }
+        }
+    }
+    public void getTest(){
+        if (name != null) {
+            try{
+                String filePath = Main.ROUTES_PATH + File.separator + (!SRMConfig.pearlRoutesFileName.equals("") ? SRMConfig.pearlRoutesFileName : "pearlroutes.json");
+                Gson gson = new GsonBuilder().create();
+                FileReader reader = new FileReader(filePath);
+
+                JsonObject data = gson.fromJson(reader, JsonObject.class);
+                tests = data.get("test-1").getAsJsonArray();
+
+            }catch (Exception e) {
+                sendChatMessage("Something went wront you idiot");
+                LogUtils.error(e);
+            }
+
         }
     }
 }
