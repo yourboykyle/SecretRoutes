@@ -1374,7 +1374,7 @@ public class SRMConfig extends Config {
             subcategory = "WIP",
             size = 2
     )
-    public static boolean playerWaypointLine = true;
+    public static boolean playerWaypointLine = false;
 
 
 
