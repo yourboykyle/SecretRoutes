@@ -54,7 +54,7 @@ public class Debug extends CommandBase {
 
         if(args.length != 0){
             try{
-                switch (args[0]) {
+                switch (args[0].toLowerCase()) {
                     case "lever":
                         sendChatMessage("Relative :" + BlockUtils.blockPos(SecretUtils.currentLeverPos));
                         BlockPos abs = MapUtils.relativeToActual(SecretUtils.currentLeverPos, RoomDetection.roomDirection, RoomDetection.roomCorner);
@@ -67,7 +67,7 @@ public class Debug extends CommandBase {
                         EntityPlayerSP p = Minecraft.getMinecraft().thePlayer;
                         sendChatMessage("Relative: " + p.getPosition());
                         sendChatMessage("Abs: " + BlockUtils.blockPos(p.getPosition()));
-                    case "bloodTime":
+                    case "bloodtime":
                         if(args.length >= 2){
                             try {
                                 OnGuiRender.spawnNotifTime = System.currentTimeMillis()+Long.parseLong(args[1]);
