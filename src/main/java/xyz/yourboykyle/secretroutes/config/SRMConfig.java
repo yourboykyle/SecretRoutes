@@ -1376,6 +1376,14 @@ public class SRMConfig extends Config {
     )
     public static boolean playerWaypointLine = false;
 
+    @Checkbox(
+            name = "debug",
+            category = "Dev",
+            subcategory = "WIP",
+            size = 2
+    )
+    public static boolean debug = false;
+
 
 
 
@@ -1445,6 +1453,7 @@ public class SRMConfig extends Config {
             optionNames.get("forceUpdateDEBUG").addHideCondition(() -> isDevPasswordNotCorrect());
             optionNames.get("verboseLogging").addHideCondition(() -> isDevPasswordNotCorrect());
             optionNames.get("c").addHideCondition(() -> isDevPasswordNotCorrect());
+            optionNames.get("debug").addHideCondition(() -> isDevPasswordNotCorrect());
             optionNames.get("verboseRecording").addHideCondition(() -> !lambda("verboseLogging"));
             optionNames.get("verboseUpdating").addHideCondition(() -> !lambda("verboseLogging"));
             optionNames.get("verboseInfo").addHideCondition(() -> !lambda("verboseLogging"));

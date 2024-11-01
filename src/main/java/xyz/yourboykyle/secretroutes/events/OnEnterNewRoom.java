@@ -20,6 +20,7 @@
 
 package xyz.yourboykyle.secretroutes.events;
 
+import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.DungeonManager;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
@@ -46,9 +47,12 @@ public class OnEnterNewRoom {
             SecretUtils.secrets = null;
             SecretUtils.secretLocations = new ArrayList<>();
             SecretUtils.resetValues();
-
         } catch(Exception e) {
             LogUtils.error(e);
+        }
+        if(SRMConfig.debug){
+            //Send chat message with index of closest point just to test things
+
         }
     }
 }
