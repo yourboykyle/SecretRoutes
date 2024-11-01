@@ -52,6 +52,7 @@ public class OnEnterNewRoom {
         }
         if(SRMConfig.debug){
             //Send chat message with index of closest point just to test things
+            room.getTest();
 
         }
     }
