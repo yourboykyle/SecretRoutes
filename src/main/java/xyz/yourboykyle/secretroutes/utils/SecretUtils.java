@@ -400,7 +400,7 @@ public class SecretUtils {
         ArrayList<JsonElement> levers = new ArrayList<>();
         JsonArray csr = getSecrets();
         String leverNum = null;
-        if(currentLeverPos == null){
+        if(currentLeverPos == null && csr != null){
             for(JsonElement secret : csr){
                 JsonObject secretInfos = secret.getAsJsonObject();
                 String name = secretInfos.get("secretName").getAsString();
