@@ -171,12 +171,11 @@ public class RouteRecording {
                 FileReader reader = new FileReader(filePath);
 
                 allSecretRoutes = gson.fromJson(reader, JsonObject.class);
-            } catch (IOException e) {
-                LogUtils.error(e);
-            }catch (JsonSyntaxException e) {
+            } catch (JsonSyntaxException e) {
                 LogUtils.error(e);
                 malformed = true;
-
+            } catch (Exception e) {
+                LogUtils.error(e);
             }
         }
     }
