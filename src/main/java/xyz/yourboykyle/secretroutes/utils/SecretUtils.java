@@ -400,6 +400,9 @@ public class SecretUtils {
         ArrayList<JsonElement> levers = new ArrayList<>();
         JsonArray csr = getSecrets();
         String leverNum = null;
+        if(csr == null){
+            SecretUtils.renderLever = false;
+        }
         if(currentLeverPos == null && csr != null){
             for(JsonElement secret : csr){
                 JsonObject secretInfos = secret.getAsJsonObject();
