@@ -22,9 +22,8 @@ package xyz.yourboykyle.secretroutes.utils;
 
 public class PrintingUtils {
     public long lastPrinted;
-    public PrintingUtils PrintingUtils(){
+    public PrintingUtils(){
         lastPrinted = System.currentTimeMillis();
-        return new PrintingUtils();
     }
     public void print(String message, int delay){
         long currentTime = System.currentTimeMillis();

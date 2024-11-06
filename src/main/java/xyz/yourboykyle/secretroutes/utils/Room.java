@@ -21,18 +21,22 @@
 package xyz.yourboykyle.secretroutes.utils;
 
 import com.google.gson.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.MapUtils;
 import net.minecraft.util.BlockPos;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import net.minecraft.util.EnumParticleTypes;
+import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 
 import java.io.File;
 import java.io.FileReader;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
@@ -58,6 +62,9 @@ public class Room {
     public int currentSecretIndex = 0;
     public JsonObject currentSecretWaypoints;
     public JsonArray tests;
+    public HashMap<String, Integer> map = new HashMap<>();
+    public PrintingUtils printer = new PrintingUtils();
+
 
 
     public Room(String roomName) {
@@ -217,66 +224,62 @@ public class Room {
         }
     }
     public void getTest(){
-        if (name != null) {
-            try{
-                String filePath = Main.ROUTES_PATH + File.separator + (!SRMConfig.pearlRoutesFileName.equals("") ? SRMConfig.pearlRoutesFileName : "pearlroutes.json");
-                Gson gson = new GsonBuilder().create();
-                FileReader reader = new FileReader(filePath);
-
-                JsonObject data = gson.fromJson(reader, JsonObject.class);
-                tests = data.get("test-1").getAsJsonArray();
-                sendChatMessage("Got test data");
-                for (JsonElement testElement : tests) {
-                    try{
-                        JsonObject testObj = testElement.getAsJsonObject();
-                        String first = testObj.get("first").getAsString();
-                        sendChatMessage("§2Got first location of new test data: "+first);
-                    }catch (Exception e){
-                        LogUtils.error(e);
-                    }
-                }
-            }catch (Exception e) {
-                sendChatMessage("Something went wront you idiot");
-                LogUtils.error(e);
-            }
-
-        }
-        if(SRMConfig.debug){
-            try{
-                JsonArray array = new JsonArray();
+        if(SRMConfig.debug) {
+            new Thread( () ->{
                 HashMap<String, Integer> map = new HashMap<>();
-                String filePath = Main.ROUTES_PATH + File.separator + (!SRMConfig.pearlRoutesFileName.equals("") ? SRMConfig.pearlRoutesFileName : "pearlroutes.json");
-                Gson gson = new GsonBuilder().create();
-                FileReader reader = new FileReader(filePath);
-                JsonObject data = gson.fromJson(reader, JsonObject.class);
-                for(int i = 0; i<10; i++){
-                    if(i == 0){
-                        if(data.get(name).isJsonNull()){
-                            sendChatMessage("Unknown room");
+                try {
+                    JsonArray array = new JsonArray();
+                    String filePath = Main.ROUTES_PATH + File.separator + (!SRMConfig.pearlRoutesFileName.equals("") ? SRMConfig.pearlRoutesFileName : "pearlroutes.json");
+                    Gson gson = new GsonBuilder().create();
+                    FileReader reader = new FileReader(filePath);
+                    JsonObject data = gson.fromJson(reader, JsonObject.class);
+                    String name1 = "test-1";
+                    for (int i = 0; i < 10; i++) {
+                        String path = name1;
+                        if (i == 0) {
+                            if (data.get(name1).isJsonNull()) {
+                                sendChatMessage("Unknown room");
+                                break;
+                            }
+                        } else {
+                            path = name1 + ":" + i;
+                        }
+                        if (data.get(path) == null || data.get(path).isJsonNull()) {
                             break;
                         }
-                        array.add(data.get(name).getAsJsonArray());
-                    }else{
-                        try{
-                            JsonElement tempObj = data.get(name+":"+i);
-                            if(tempObj.isJsonNull()){
-                                break;
-                            }else{
-                                array.add(tempObj.getAsJsonArray());
-                            }
-                        }catch (Exception e){
-                            LogUtils.error(e);
-                        }
+                        JsonArray route = data.get(path).getAsJsonArray();
+
+                        array.add(route);
+                        JsonArray starPoseArray = route.get(0).getAsJsonObject().get("locations").getAsJsonArray().get(0).getAsJsonArray();
+                        BlockPos startPos = new BlockPos(starPoseArray.get(0).getAsInt(), starPoseArray.get(1).getAsInt(), starPoseArray.get(2).getAsInt());
+                        map.put(BlockUtils.blockPos(startPos), i);
                     }
+
+                    Triple<String, Integer, Double> closest = null;
+                    for (Map.Entry<String, Integer> entry : map.entrySet()) {
+                        EntityPlayerSP p = Minecraft.getMinecraft().thePlayer;
+                        BlockPos pPos = new BlockPos(p.posX, p.posY, p.posZ);
+                        double dist1 = BlockUtils.blockDistance(pPos, entry.getKey());
+
+                        if(closest != null){
+                            double dist2 = closest.getThree();
+                            if(dist1 > dist2) {
+                                continue;
+                            }
+                        }
+
+                        closest = new Triple<>(entry.getKey(), entry.getValue(), dist1);
+
+                    }
+                    if(closest != null) {
+                        sendChatMessage(closest.getOne() + "is the closest at "+closest.getThree() +" blocks away");
+                    }
+
+                } catch (Exception e) {
+                    LogUtils.error(e);
                 }
+            }).start();
 
-            }catch (Exception e){
-                LogUtils.error(e);
-            }
         }
-
-
-
-
     }
 }
