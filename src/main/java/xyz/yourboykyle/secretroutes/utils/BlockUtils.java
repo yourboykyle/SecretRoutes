@@ -44,7 +44,6 @@ public class BlockUtils {
     }
     public static double blockDistance(BlockPos pos1, BlockPos pos2) {
         if(pos1 == null || pos2 == null){
-            ChatUtils.sendChatMessage("Returning on line 48 because pos1 is null? "+(pos1 == null) + " or pos2 is null" + (pos2 == null));
             return Integer.MAX_VALUE;}
         float xdiff = Math.abs(pos1.getX() - pos2.getX());
         float ydiff = Math.abs(pos1.getY() - pos2.getY());
@@ -54,7 +53,6 @@ public class BlockUtils {
     public static double blockDistance(BlockPos pos1, String pos2) {
         BlockPos pos2Block = blockPos(pos2);
         if(pos2Block == null){return Integer.MAX_VALUE;}
-        ChatUtils.sendChatMessage("pos1: "+pos1 + ", pos2: "+pos2Block);
         return blockDistance(pos1, pos2Block);
     }
 }

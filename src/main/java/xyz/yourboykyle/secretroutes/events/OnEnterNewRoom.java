@@ -50,10 +50,5 @@ public class OnEnterNewRoom {
         } catch(Exception e) {
             LogUtils.error(e);
         }
-        if(SRMConfig.debug){
-            //Send chat message with index of closest point just to test things
-            room.getTest();
-
-        }
     }
 }
