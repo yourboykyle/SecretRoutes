@@ -27,6 +27,7 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.BlockPos;
+import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.MapUtils;
 import xyz.yourboykyle.secretroutes.events.OnGuiRender;
@@ -78,6 +79,18 @@ public class Debug extends CommandBase {
                             OnGuiRender.spawnNotifTime = System.currentTimeMillis()+3000;
                         }
 
+                        break;
+                    case "cr":
+                        if(args.length >= 2){
+                            switch (args[1].toLowerCase()){
+                                case "f":
+
+                                    Main.currentRoom.currentSecretRoute = Main.currentRoom.arrays.get(Main.currentRoom.closest.getTwo()+1);
+                                case "b":
+                                    Main.currentRoom.currentSecretRoute = Main.currentRoom.arrays.get(Main.currentRoom.closest.getTwo()-1);
+                            }
+                        }
+                        sendChatMessage("Current index: " + Main.currentRoom.closest.getTwo());
                         break;
                     case "var":
                         if(args.length == 1){
@@ -149,6 +162,7 @@ public class Debug extends CommandBase {
         basicOptions.add("pos");
         basicOptions.add("var");
         basicOptions.add("bloodTime");
+        basicOptions.add("cr");
 
        switch (args.length) {
            case 0:
@@ -162,6 +176,7 @@ public class Debug extends CommandBase {
                        case "lever":
                        case "pos":
                        case "bloodtime":
+                       case "cr":
                            break;
                        case "var":
                            //Idk why this can happen, but it does... There goes 3 hrs of my time

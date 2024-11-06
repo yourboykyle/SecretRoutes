@@ -33,10 +33,7 @@ import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 
 import java.io.File;
 import java.io.FileReader;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
@@ -59,11 +56,14 @@ public class Room {
     };
     public String name;
     public JsonArray currentSecretRoute;
+    public JsonArray currentSecretRoute2;
     public int currentSecretIndex = 0;
     public JsonObject currentSecretWaypoints;
     public JsonArray tests;
     public HashMap<String, Integer> map = new HashMap<>();
     public PrintingUtils printer = new PrintingUtils();
+    public ArrayList<JsonArray> arrays = new ArrayList<>();
+    public Triple<String, Integer, Double> closest = null;
 
 
 
@@ -80,16 +80,7 @@ public class Room {
                 }else{
                     filePath = Main.ROUTES_PATH + File.separator + (!SRMConfig.routesFileName.equals("") ? SRMConfig.routesFileName  : "pearlroutes.json");
                 }
-
-                Gson gson = new GsonBuilder().create();
-                FileReader reader = new FileReader(filePath);
-
-                JsonObject data = gson.fromJson(reader, JsonObject.class);
-
-                if(data != null && data.get(name) != null) {
-                    currentSecretRoute = data.get(name).getAsJsonArray();
-                    currentSecretWaypoints = currentSecretRoute.get(currentSecretIndex).getAsJsonObject();
-                }
+                getData(filePath);
             } else {
                 currentSecretRoute = null;
             }
@@ -103,19 +94,8 @@ public class Room {
 
         try {
             name = roomName;
-
             if (roomName != null) {
-                Gson gson = new GsonBuilder().create();
-                FileReader reader = new FileReader(filePath);
-
-                JsonObject data = gson.fromJson(reader, JsonObject.class);
-
-                if(data != null && data.get(name) != null) {
-                    currentSecretRoute = data.get(name).getAsJsonArray();
-                    currentSecretWaypoints = currentSecretRoute.get(currentSecretIndex).getAsJsonObject();
-                }
-            } else {
-                currentSecretRoute = null;
+                getData(filePath);
             }
         } catch(Exception e) {
             LogUtils.error(e);
@@ -223,63 +203,61 @@ public class Room {
             }
         }
     }
-    public void getTest(){
-        if(SRMConfig.debug) {
-            new Thread( () ->{
-                HashMap<String, Integer> map = new HashMap<>();
-                try {
-                    JsonArray array = new JsonArray();
-                    String filePath = Main.ROUTES_PATH + File.separator + (!SRMConfig.pearlRoutesFileName.equals("") ? SRMConfig.pearlRoutesFileName : "pearlroutes.json");
-                    Gson gson = new GsonBuilder().create();
-                    FileReader reader = new FileReader(filePath);
-                    JsonObject data = gson.fromJson(reader, JsonObject.class);
-                    String name1 = "test-1";
-                    for (int i = 0; i < 10; i++) {
-                        String path = name1;
-                        if (i == 0) {
-                            if (data.get(name1).isJsonNull()) {
-                                sendChatMessage("Unknown room");
-                                break;
-                            }
-                        } else {
-                            path = name1 + ":" + i;
-                        }
-                        if (data.get(path) == null || data.get(path).isJsonNull()) {
+    public void getData(String filePath){
+        new Thread( () ->{
+            HashMap<String, Integer> map = new HashMap<>();
+            try {
+                Gson gson = new GsonBuilder().create();
+                FileReader reader = new FileReader(filePath);
+                JsonObject data = gson.fromJson(reader, JsonObject.class);
+                String name1 = "test-1";
+                for (int i = 0; i < 10; i++) {
+                    String path = name1;
+                    if (i == 0) {
+                        if (data.get(name1).isJsonNull()) {
+                            sendChatMessage("Unknown room");
                             break;
                         }
-                        JsonArray route = data.get(path).getAsJsonArray();
-
-                        array.add(route);
-                        JsonArray starPoseArray = route.get(0).getAsJsonObject().get("locations").getAsJsonArray().get(0).getAsJsonArray();
-                        BlockPos startPos = new BlockPos(starPoseArray.get(0).getAsInt(), starPoseArray.get(1).getAsInt(), starPoseArray.get(2).getAsInt());
-                        map.put(BlockUtils.blockPos(startPos), i);
+                    } else {
+                        path = name1 + ":" + i;
                     }
-
-                    Triple<String, Integer, Double> closest = null;
-                    for (Map.Entry<String, Integer> entry : map.entrySet()) {
-                        EntityPlayerSP p = Minecraft.getMinecraft().thePlayer;
-                        BlockPos pPos = new BlockPos(p.posX, p.posY, p.posZ);
-                        double dist1 = BlockUtils.blockDistance(pPos, entry.getKey());
-
-                        if(closest != null){
-                            double dist2 = closest.getThree();
-                            if(dist1 > dist2) {
-                                continue;
-                            }
-                        }
-
-                        closest = new Triple<>(entry.getKey(), entry.getValue(), dist1);
-
+                    if (data.get(path) == null || data.get(path).isJsonNull()) {
+                        break;
                     }
-                    if(closest != null) {
-                        sendChatMessage(closest.getOne() + "is the closest at "+closest.getThree() +" blocks away");
-                    }
+                    JsonArray route = data.get(path).getAsJsonArray();
 
-                } catch (Exception e) {
-                    LogUtils.error(e);
+                    arrays.add(route);
+                    JsonArray starPoseArray = route.get(0).getAsJsonObject().get("locations").getAsJsonArray().get(0).getAsJsonArray();
+                    BlockPos startPos = new BlockPos(starPoseArray.get(0).getAsInt(), starPoseArray.get(1).getAsInt(), starPoseArray.get(2).getAsInt());
+                    map.put(BlockUtils.blockPos(startPos), i);
                 }
-            }).start();
 
-        }
+                for (Map.Entry<String, Integer> entry : map.entrySet()) {
+                    EntityPlayerSP p = Minecraft.getMinecraft().thePlayer;
+                    BlockPos pPos = new BlockPos(p.posX, p.posY, p.posZ);
+                    BlockPos relPos = MapUtils.actualToRelative(pPos, RoomDetection.roomDirection, RoomDetection.roomCorner);
+                    double dist1 = BlockUtils.blockDistance(relPos, entry.getKey());
+
+                    if(closest != null){
+                        double dist2 = closest.getThree();
+                        if(dist1 > dist2) {
+                            continue;
+                        }
+                    }
+
+                    closest = new Triple<>(entry.getKey(), entry.getValue(), dist1);
+
+                }
+                if(closest != null) {
+                    sendChatMessage(closest.getOne() + "is the closest at "+closest.getThree() +" blocks away");
+                    currentSecretRoute = arrays.get(closest.getTwo());
+                    currentSecretWaypoints = currentSecretRoute.get(currentSecretIndex).getAsJsonObject();
+                }
+
+            } catch (Exception e) {
+                LogUtils.error(e);
+            }
+        }).start();
+
     }
 }
