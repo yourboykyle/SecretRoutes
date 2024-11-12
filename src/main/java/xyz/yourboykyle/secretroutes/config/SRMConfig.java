@@ -1384,6 +1384,14 @@ public class SRMConfig extends Config {
     )
     public static boolean debug = false;
 
+    @Switch(
+            name = "Bridge",
+            category = "Guild",
+            subcategory = "WIP",
+            size = 2
+    )
+    public static boolean bridge = false;
+
 
 
 
