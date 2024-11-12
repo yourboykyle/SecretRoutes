@@ -210,16 +210,15 @@ public class Room {
                 Gson gson = new GsonBuilder().create();
                 FileReader reader = new FileReader(filePath);
                 JsonObject data = gson.fromJson(reader, JsonObject.class);
-                String name1 = "test-1";
                 for (int i = 0; i < 10; i++) {
-                    String path = name1;
+                    String path = name;
                     if (i == 0) {
-                        if (data.get(name1).isJsonNull()) {
-                            sendChatMessage("Unknown room");
+                        if (data.get(name) == null || data.get(name).isJsonNull()) {
+                            currentSecretRoute = null;
                             break;
                         }
                     } else {
-                        path = name1 + ":" + i;
+                        path = name + ":" + i;
                     }
                     if (data.get(path) == null || data.get(path).isJsonNull()) {
                         break;
@@ -249,7 +248,6 @@ public class Room {
 
                 }
                 if(closest != null) {
-                    sendChatMessage(closest.getOne() + "is the closest at "+closest.getThree() +" blocks away");
                     currentSecretRoute = arrays.get(closest.getTwo());
                     currentSecretWaypoints = currentSecretRoute.get(currentSecretIndex).getAsJsonObject();
                 }

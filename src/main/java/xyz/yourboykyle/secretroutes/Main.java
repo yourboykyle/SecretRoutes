@@ -149,6 +149,7 @@ public class Main {
         MinecraftForge.EVENT_BUS.register(new OnChatReceive());
         MinecraftForge.EVENT_BUS.register(new OnGuiRender());
         //MinecraftForge.EVENT_BUS.register(new OnServerTick());
+        MinecraftForge.EVENT_BUS.register(new GuildEvents());
 
         MinecraftForge.EVENT_BUS.register(this);
 
