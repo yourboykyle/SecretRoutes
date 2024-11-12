@@ -236,40 +236,44 @@ public class SecretUtils {
 
             GlStateManager.disableTexture2D();
 
-            if (type.equals("interact")) {
-                if(SRMConfig.renderSecretIteract) {
-                    if (SRMConfig.secretsInteractFullBlock) {
-                        SecretRoutesRenderUtils.drawFilledBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsInteract, 1, 1);
-                    } else {
-                        SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsInteract, 1, 1);
+            switch (type) {
+                case "interact":
+                    if (SRMConfig.renderSecretIteract) {
+                        if (SRMConfig.secretsInteractFullBlock) {
+                            SecretRoutesRenderUtils.drawFilledBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsInteract, 1, 1);
+                        } else {
+                            SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsInteract, 1, 1);
+                        }
+                        if (SRMConfig.interactTextToggle) {
+                            SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.interactWaypointColorIndex) + "Interact", SRMConfig.interactTextSize, event.partialTicks);
+                        }
                     }
-                    if (SRMConfig.interactTextToggle) {
-                        SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.interactWaypointColorIndex) + "Interact", SRMConfig.interactTextSize, event.partialTicks);
-                    }
-                }
-            } else if (type.equals("item")) {
-                if (SRMConfig.renderSecretsItem) {
-                    if(SRMConfig.secretsItemFullBlock){
-                        SecretRoutesRenderUtils.drawFilledBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsItem, 1, 1);
-                    }else{
-                        SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsItem, 1, 1);
-                    }
+                    break;
+                case "item":
+                    if (SRMConfig.renderSecretsItem) {
+                        if (SRMConfig.secretsItemFullBlock) {
+                            SecretRoutesRenderUtils.drawFilledBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsItem, 1, 1);
+                        } else {
+                            SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsItem, 1, 1);
+                        }
 
-                    if (SRMConfig.itemTextToggle) {
-                        SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.itemWaypointColorIndex) + "Item", SRMConfig.itemTextSize, event.partialTicks);
+                        if (SRMConfig.itemTextToggle) {
+                            SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.itemWaypointColorIndex) + "Item", SRMConfig.itemTextSize, event.partialTicks);
+                        }
                     }
-                }
-            } else if (type.equals("bat")) {
-                if (SRMConfig.renderSecretBat) {
-                    if(SRMConfig.secretsBatFullBlock){
-                        SecretRoutesRenderUtils.drawFilledBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsBat, 1, 1);
-                    }else{
-                        SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsBat, 1, 1);
+                    break;
+                case "bat":
+                    if (SRMConfig.renderSecretBat) {
+                        if (SRMConfig.secretsBatFullBlock) {
+                            SecretRoutesRenderUtils.drawFilledBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsBat, 1, 1);
+                        } else {
+                            SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsBat, 1, 1);
+                        }
+                        if (SRMConfig.batTextToggle) {
+                            SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.batWaypointColorIndex) + "Bat", SRMConfig.batTextSize, event.partialTicks);
+                        }
                     }
-                    if (SRMConfig.batTextToggle) {
-                        SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.batWaypointColorIndex) + "Bat", SRMConfig.batTextSize, event.partialTicks);
-                    }
-                }
+                    break;
             }
             if (SRMConfig.etherwarpsTextToggle) {
                 int iEtherwarp = 1;
