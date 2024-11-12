@@ -215,7 +215,6 @@ public class Room {
                     if (i == 0) {
                         if (data.get(name) == null || data.get(name).isJsonNull()) {
                             currentSecretRoute = null;
-                            break;
                         }
                     } else {
                         path = name + ":" + i;
