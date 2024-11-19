@@ -81,16 +81,16 @@ public class SRMConfig extends Config {
     public static boolean allSteps = false;
 
     @Info(
-            text = "Does not display all secrets in room, only route",
+            text = "All secrets displays all secrets, but not the path...",
             subcategory = "General",
-            size = 2,
+            size = 1,
             type = InfoType.WARNING
     )
     public static boolean ignored;
 
     @Switch(
             name = "All secrects",
-            description = "Renders all secrets in the room",
+            description = "Renders all secrets in the room (DOES NOT RENDER STEPS)",
             subcategory = "General"
     )
     public static boolean allSecrets = false;

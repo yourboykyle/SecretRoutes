@@ -28,7 +28,7 @@ public class GuildEvents {
             String tmp = message.split(":")[1];
             String sec1 = tmp.substring(0, tmp.indexOf("»") - 1).replaceFirst("»", ":");
             String sec2 = tmp.substring(tmp.indexOf("»") + 1);
-            ChatUtils.sendChatMessage("§2Bridge > §b" + sec1 + "§r:" + sec2);
+            ChatUtils.sendChatMessage("§2Bridge >§b" + sec1 + "§r:" + sec2);
             e.setCanceled(true);
         }
     }
