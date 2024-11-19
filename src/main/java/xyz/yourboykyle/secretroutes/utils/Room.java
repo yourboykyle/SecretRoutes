@@ -21,18 +21,21 @@
 package xyz.yourboykyle.secretroutes.utils;
 
 import com.google.gson.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.MapUtils;
 import net.minecraft.util.BlockPos;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import net.minecraft.util.EnumParticleTypes;
+import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 
 import java.io.File;
 import java.io.FileReader;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
+import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
 
 public class Room {
@@ -53,8 +56,16 @@ public class Room {
     };
     public String name;
     public JsonArray currentSecretRoute;
+    public JsonArray currentSecretRoute2;
     public int currentSecretIndex = 0;
     public JsonObject currentSecretWaypoints;
+    public JsonArray tests;
+    public HashMap<String, Integer> map = new HashMap<>();
+    public PrintingUtils printer = new PrintingUtils();
+    public ArrayList<JsonArray> arrays = new ArrayList<>();
+    public Triple<String, Integer, Double> closest = null;
+
+
 
     public Room(String roomName) {
         currentSecretIndex = 0;
@@ -69,16 +80,7 @@ public class Room {
                 }else{
                     filePath = Main.ROUTES_PATH + File.separator + (!SRMConfig.routesFileName.equals("") ? SRMConfig.routesFileName  : "pearlroutes.json");
                 }
-
-                Gson gson = new GsonBuilder().create();
-                FileReader reader = new FileReader(filePath);
-
-                JsonObject data = gson.fromJson(reader, JsonObject.class);
-
-                if(data != null && data.get(name) != null) {
-                    currentSecretRoute = data.get(name).getAsJsonArray();
-                    currentSecretWaypoints = currentSecretRoute.get(currentSecretIndex).getAsJsonObject();
-                }
+                getData(filePath);
             } else {
                 currentSecretRoute = null;
             }
@@ -92,19 +94,8 @@ public class Room {
 
         try {
             name = roomName;
-
             if (roomName != null) {
-                Gson gson = new GsonBuilder().create();
-                FileReader reader = new FileReader(filePath);
-
-                JsonObject data = gson.fromJson(reader, JsonObject.class);
-
-                if(data != null && data.get(name) != null) {
-                    currentSecretRoute = data.get(name).getAsJsonArray();
-                    currentSecretWaypoints = currentSecretRoute.get(currentSecretIndex).getAsJsonObject();
-                }
-            } else {
-                currentSecretRoute = null;
+                getData(filePath);
             }
         } catch(Exception e) {
             LogUtils.error(e);
@@ -154,17 +145,17 @@ public class Room {
     public SECRET_TYPES getSecretType() {
         if(currentSecretWaypoints != null && currentSecretWaypoints.get("secret") != null && currentSecretWaypoints.get("secret").getAsJsonObject().get("type") != null) {
             String type = currentSecretWaypoints.get("secret").getAsJsonObject().get("type").getAsString();
-            if(type.equals("interact")) {
-                return SECRET_TYPES.INTERACT;
-            } else if(type.equals("item")) {
-                return SECRET_TYPES.ITEM;
-            } else if(type.equals("bat")) {
-                return SECRET_TYPES.BAT;
-            } else if(type.equals("exitroute")) {
-                return SECRET_TYPES.EXITROUTE;
+            switch (type) {
+                case "interact":
+                    return SECRET_TYPES.INTERACT;
+                case "item":
+                    return SECRET_TYPES.ITEM;
+                case "bat":
+                    return SECRET_TYPES.BAT;
+                case "exitroute":
+                    return SECRET_TYPES.EXITROUTE;
             }
         }
-
         return null;
     }
 
@@ -211,5 +202,59 @@ public class Room {
                 }
             }
         }
+    }
+    public void getData(String filePath){
+        new Thread( () ->{
+            HashMap<String, Integer> map = new HashMap<>();
+            try {
+                Gson gson = new GsonBuilder().create();
+                FileReader reader = new FileReader(filePath);
+                JsonObject data = gson.fromJson(reader, JsonObject.class);
+                for (int i = 0; i < 10; i++) {
+                    String path = name;
+                    if (i == 0) {
+                        if (data.get(name) == null || data.get(name).isJsonNull()) {
+                            currentSecretRoute = null;
+                        }
+                    } else {
+                        path = name + ":" + i;
+                    }
+                    if (data.get(path) == null || data.get(path).isJsonNull()) {
+                        break;
+                    }
+                    JsonArray route = data.get(path).getAsJsonArray();
+
+                    arrays.add(route);
+                    JsonArray starPoseArray = route.get(0).getAsJsonObject().get("locations").getAsJsonArray().get(0).getAsJsonArray();
+                    BlockPos startPos = new BlockPos(starPoseArray.get(0).getAsInt(), starPoseArray.get(1).getAsInt(), starPoseArray.get(2).getAsInt());
+                    map.put(BlockUtils.blockPos(startPos), i);
+                }
+
+                for (Map.Entry<String, Integer> entry : map.entrySet()) {
+                    EntityPlayerSP p = Minecraft.getMinecraft().thePlayer;
+                    BlockPos pPos = new BlockPos(p.posX, p.posY, p.posZ);
+                    BlockPos relPos = MapUtils.actualToRelative(pPos, RoomDetection.roomDirection, RoomDetection.roomCorner);
+                    double dist1 = BlockUtils.blockDistance(relPos, entry.getKey());
+
+                    if(closest != null){
+                        double dist2 = closest.getThree();
+                        if(dist1 > dist2) {
+                            continue;
+                        }
+                    }
+
+                    closest = new Triple<>(entry.getKey(), entry.getValue(), dist1);
+
+                }
+                if(closest != null) {
+                    currentSecretRoute = arrays.get(closest.getTwo());
+                    currentSecretWaypoints = currentSecretRoute.get(currentSecretIndex).getAsJsonObject();
+                }
+
+            } catch (Exception e) {
+                LogUtils.error(e);
+            }
+        }).start();
+
     }
 }

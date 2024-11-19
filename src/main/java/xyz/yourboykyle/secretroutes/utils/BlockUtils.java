@@ -28,9 +28,31 @@ public class BlockUtils {
         if(pos == null){return ":::";}
         return pos.getX() + ":" + pos.getY() + ":" + pos.getZ();
     }
+    public static BlockPos blockPos(String pos) {
+        try{
+            String[] parts = pos.split(":");
+            return new BlockPos(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+        }catch(NumberFormatException e){
+            ChatUtils.sendChatMessage("NMumber format exception, null.");
+            return null;
+        }
+    }
 
 
     public static boolean compareBlocks(BlockPos pos1, BlockPos pos2, int dist) {
         return pos1.getX() >= pos2.getX() - dist && pos1.getX() <= pos2.getX() + dist && pos1.getY() >= pos2.getY() - dist && pos1.getY() <= pos2.getY() + dist && pos1.getZ() >= pos2.getZ() - dist && pos1.getZ() <= pos2.getZ() + dist;
+    }
+    public static double blockDistance(BlockPos pos1, BlockPos pos2) {
+        if(pos1 == null || pos2 == null){
+            return Integer.MAX_VALUE;}
+        float xdiff = Math.abs(pos1.getX() - pos2.getX());
+        float ydiff = Math.abs(pos1.getY() - pos2.getY());
+        float zdiff = Math.abs(pos1.getZ() - pos2.getZ());
+        return Math.pow((Math.pow(xdiff, 2)+Math.pow(ydiff, 2)+Math.pow(zdiff, 2)), 0.5);
+    }
+    public static double blockDistance(BlockPos pos1, String pos2) {
+        BlockPos pos2Block = blockPos(pos2);
+        if(pos2Block == null){return Integer.MAX_VALUE;}
+        return blockDistance(pos1, pos2Block);
     }
 }
