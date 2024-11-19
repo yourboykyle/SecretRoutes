@@ -22,15 +22,22 @@
 
 package xyz.yourboykyle.secretroutes.events;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import net.minecraft.util.BlockPos;
 import scala.runtime.BooleanRef;
+import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.commands.SRM;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.MapUtils;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import xyz.yourboykyle.secretroutes.utils.BlockUtils;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
+import xyz.yourboykyle.secretroutes.utils.RouteRecording;
 import xyz.yourboykyle.secretroutes.utils.SecretUtils;
 
 import java.lang.reflect.Field;
@@ -73,7 +80,7 @@ public class OnChatReceive {
                 }
             }
         }else{
-            if(e.message.getUnformattedText().contains("That chest is locked!")){
+            if(e.message.getFormattedText().startsWith("§r§cThat chest is locked")){
                 LogUtils.info("§aLocked chest detected!");
                 new Thread(() ->{
                     try{
@@ -82,6 +89,15 @@ public class OnChatReceive {
                     SecretUtils.secretLocations.remove(BlockUtils.blockPos(SecretUtils.lastInteract));
                 }).start();
                 SecretUtils.renderLever = true;
+                JsonObject route = Main.currentRoom.currentSecretRoute.get(Main.currentRoom.currentSecretIndex-1).getAsJsonObject().get("secret").getAsJsonObject();
+                JsonArray loc = route.get("location").getAsJsonArray();
+                BlockPos pos = new BlockPos(loc.get(0).getAsInt(), loc.get(1).getAsInt(), loc.get(2).getAsInt());
+                if(route.get("type").getAsString().equals("interact")){
+                    if(BlockUtils.compareBlocks(MapUtils.actualToRelative(SecretUtils.lastInteract, RoomDetection.roomDirection, RoomDetection.roomCorner), pos, 0)){
+                        Main.currentRoom.lastSecretKeybind();
+                    }
+                    sendChatMessage("Distance : "+BlockUtils.blockDistance(MapUtils.actualToRelative(SecretUtils.lastInteract, RoomDetection.roomDirection, RoomDetection.roomCorner), pos));
+                }
             }
         }
 

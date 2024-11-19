@@ -81,16 +81,16 @@ public class SRMConfig extends Config {
     public static boolean allSteps = false;
 
     @Info(
-            text = "Does not display all secrets in room, only route",
+            text = "All secrets displays all secrets, but not the path...",
             subcategory = "General",
-            size = 2,
+            size = 1,
             type = InfoType.WARNING
     )
     public static boolean ignored;
 
     @Switch(
             name = "All secrects",
-            description = "Renders all secrets in the room",
+            description = "Renders all secrets in the room (DOES NOT RENDER STEPS)",
             subcategory = "General"
     )
     public static boolean allSecrets = false;
@@ -1376,6 +1376,21 @@ public class SRMConfig extends Config {
     )
     public static boolean playerWaypointLine = false;
 
+    @Checkbox(
+            name = "debug",
+            category = "Dev",
+            subcategory = "WIP",
+            size = 2
+    )
+    public static boolean debug = false;
+
+    @Switch(
+            name = "Bridge",
+            category = "Guild",
+            subcategory = "WIP",
+            size = 2
+    )
+    public static boolean bridge = false;
 
 
 
@@ -1445,6 +1460,7 @@ public class SRMConfig extends Config {
             optionNames.get("forceUpdateDEBUG").addHideCondition(() -> isDevPasswordNotCorrect());
             optionNames.get("verboseLogging").addHideCondition(() -> isDevPasswordNotCorrect());
             optionNames.get("c").addHideCondition(() -> isDevPasswordNotCorrect());
+            optionNames.get("debug").addHideCondition(() -> isDevPasswordNotCorrect());
             optionNames.get("verboseRecording").addHideCondition(() -> !lambda("verboseLogging"));
             optionNames.get("verboseUpdating").addHideCondition(() -> !lambda("verboseLogging"));
             optionNames.get("verboseInfo").addHideCondition(() -> !lambda("verboseLogging"));

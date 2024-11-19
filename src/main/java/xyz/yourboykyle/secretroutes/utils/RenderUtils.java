@@ -81,6 +81,7 @@ public class RenderUtils {
         GlStateManager.enableDepth();
         GlStateManager.enableTexture2D();
         GL11.glDisable(GL11.GL_BLEND);
+        GL11.glColor4f(1, 1, 1, 0);
         GL11.glPopMatrix();
     }
 
@@ -174,7 +175,6 @@ public class RenderUtils {
         double realY = render.lastTickPosY + (render.posY - render.lastTickPosY) * partialTicks;
         double realZ = render.lastTickPosZ + (render.posZ - render.lastTickPosZ) * partialTicks;
 
-        GlStateManager.pushAttrib();
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(-realX, -realY, -realZ);
@@ -206,7 +206,6 @@ public class RenderUtils {
         GlStateManager.enableLighting();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.popMatrix();
-        GlStateManager.popAttrib();
     }
 
     public static void drawNormalLine(BlockPos pos1, BlockPos pos2, OneColor color, float partialTicks, boolean depth, int width){
