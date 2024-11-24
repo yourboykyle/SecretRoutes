@@ -81,9 +81,9 @@ public class SRMConfig extends Config {
     public static boolean allSteps = false;
 
     @Info(
-            text = "All secrets displays all secrets, but not the path...",
+            text = "Full Route - Renders the Entire route (only secrets unless All Steps is enabled)",
             subcategory = "General",
-            size = 1,
+            size = 2,
             type = InfoType.WARNING
     )
     public static boolean ignored;
@@ -95,6 +95,13 @@ public class SRMConfig extends Config {
     )
     public static boolean allSecrets = false;
 
+    @Info(
+            text = "All secrets displays all secrets, but not the path...",
+            subcategory = "General",
+            size = 2,
+            type = InfoType.WARNING
+    )
+    public static boolean ignored2;
 
     @Dropdown(
             name = "Line Type",
