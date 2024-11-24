@@ -22,6 +22,7 @@
         <li>Ender pearl waypoints/ Pearl launch angle lines </li>
         <li>Render entire route (instead of just one secret at a time)</li>
         <li>Render all secrets (Renders all secrets and levers in the room) </li>
+        <li><strong><em>(NEW)</em></strong> Supports multiple routes in the same room (picks closest one)</li>
         <li> 
             <details>
                 <summary><strong>Custom Routes</strong></summary>
@@ -82,6 +83,13 @@
                 <li>Custom text</li>
             </ul>
         </details>
+    </ul>
+</details>
+
+<details>
+    <summary><strong><em>(NEW)</em></strong> <strong>Bridge</strong></summary>
+    <ul>
+        <li>Make bridge bot messages look nicer in SRM Guild <em>(/g join srm)</em></li>
     </ul>
 </details>
 
