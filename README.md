@@ -154,6 +154,14 @@
 - Watch the video for instructions: https://youtu.be/p3-KPTbXWFw
 - If you have any questions, join the discord: https://discord.gg/secretroutes
 ---
+### Links:
+
+Modrinth: https://modrinth.com/mod/secret-routes-mod
+
+Discord: [discord.gg/secretroutes](https://discord.com/channels/1111306530357256262/1111670971485663271)
+
+---
+
 ### Credits:
 - @yourboykyle (me) - developer
 - @wyannnnn - developer
