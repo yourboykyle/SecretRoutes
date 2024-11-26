@@ -6,6 +6,8 @@
 
 [![Discord](https://img.shields.io/discord/1111306530357256262?label=discord&color=9089DA&logo=discord&style=for-the-badge)](https://discord.gg/secretroutes)
 [![Total Downloads](https://img.shields.io/github/downloads/yourboykyle/SecretRoutes/total?label=downloads&color=208a19&logo=github&style=for-the-badge)](https://github.com/yourboykyle/SecretRoutes/releases)
+[![Modrinth Downloads](https://img.shields.io/modrinth/dt/secret-routes-mod?label=downloads&color=208a19&logo=modrinth&style=for-the-badge)](https://modrinth.com/mod/secret-routes-mod)
+
 </div>
 
 ---
@@ -154,6 +156,14 @@
 - Watch the video for instructions: https://youtu.be/p3-KPTbXWFw
 - If you have any questions, join the discord: https://discord.gg/secretroutes
 ---
+### Links:
+
+Modrinth: https://modrinth.com/mod/secret-routes-mod
+
+Discord: [discord.gg/secretroutes](https://discord.com/channels/1111306530357256262/1111670971485663271)
+
+---
+
 ### Credits:
 - @yourboykyle (me) - developer
 - @wyannnnn - developer
