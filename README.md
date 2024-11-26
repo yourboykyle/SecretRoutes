@@ -12,9 +12,13 @@
 </div>
 
 ---
-[![Modrinth](https://img.shields.io/static/v1?label=Modrinth&message=download%20on%20modrinth&logo=modrinth&style=for-the-badge&color=208a19)](https://modrinth.com/mod/secret-routes-mod)
+<div align="center">
+  
+  [![Modrinth](https://img.shields.io/static/v1?label=Modrinth&message=download%20on%20modrinth&logo=modrinth&style=for-the-badge&color=208a19)](https://modrinth.com/mod/secret-routes-mod)
+</div>
 
 ---
+
 ### Features
 <details>
     <summary><strong>Dungeon Routes</strong></summary>
