@@ -281,6 +281,7 @@ public class Main {
         Minecraft mc = Minecraft.getMinecraft();
         if (mc.getCurrentServerData() == null) return;
         if (mc.getCurrentServerData().serverIP.toLowerCase().contains("hypixel.")) {
+
             if(SRMConfig.autoCheckUpdates) {
                 new Thread(() -> {
                     try {
@@ -290,6 +291,17 @@ public class Main {
                     }
                 }).start();
             }
+
+            new Thread(()->{
+                try{
+                    Thread.sleep(3000);
+                }catch (Exception ignored){
+                }
+                byte res = APIUtils.addMember();
+                if(res == 1){
+                    sendChatMessage("§aFirst logon detected... things work");
+                }
+            }).start();
 
 
 
