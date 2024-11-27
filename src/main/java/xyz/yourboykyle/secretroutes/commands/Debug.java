@@ -92,6 +92,9 @@ public class Debug extends CommandBase {
                         }
                         sendChatMessage("Current index: " + Main.currentRoom.closest.getTwo());
                         break;
+                    case "apicall":
+                        APIUtils.addMember();
+                        break;
                     case "var":
                         if(args.length == 1){
                             sendChatMessage("Missing argument after \"var\"");
