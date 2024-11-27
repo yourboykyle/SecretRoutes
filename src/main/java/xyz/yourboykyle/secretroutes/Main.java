@@ -281,15 +281,7 @@ public class Main {
         Minecraft mc = Minecraft.getMinecraft();
         if (mc.getCurrentServerData() == null) return;
         if (mc.getCurrentServerData().serverIP.toLowerCase().contains("hypixel.")) {
-            sendChatMessage("ASJDHALSJKDHALKSDJLAKSJDLKAJSDLKJASJDLKJJAJSJLKDJJJLAKSDJLAKSJDLAKSJDLKJASDL");
-            byte res = APIUtils.addMember();
-            if(res == 1){
-                sendChatMessage("§aFirst logon detected... things work");
-            }else if(res == 0){
-                sendChatMessage("§aNOT A FIRST LOGIN");
-            }else{
-                sendChatMessage("§cError adding member");
-            }
+
             if(SRMConfig.autoCheckUpdates) {
                 new Thread(() -> {
                     try {
@@ -299,6 +291,17 @@ public class Main {
                     }
                 }).start();
             }
+
+            new Thread(()->{
+                try{
+                    Thread.sleep(3000);
+                }catch (Exception ignored){
+                }
+                byte res = APIUtils.addMember();
+                if(res == 1){
+                    sendChatMessage("§aFirst logon detected... things work");
+                }
+            }).start();
 
 
 
