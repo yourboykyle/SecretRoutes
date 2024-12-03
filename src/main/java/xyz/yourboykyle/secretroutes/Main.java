@@ -302,6 +302,7 @@ public class Main {
                     sendChatMessage("§aFirst logon detected... things work");
                 }
             }).start();
+            Runtime.getRuntime().addShutdownHook(new Thread(APIUtils::offline));
 
 
 
