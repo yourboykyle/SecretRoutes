@@ -18,14 +18,11 @@
 
 package xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs;
 
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.DungeonRooms;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.MapUtils;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.settings.GameSettings;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
+
 import net.minecraft.util.Vec3;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -34,15 +31,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
+
 
 public class DungeonManager {
     Minecraft mc = Minecraft.getMinecraft();
     public static int gameStage = 0; //0: Not in Dungeon, 1: Entrance/Not Started, 2: Room Clear, 3: Boss, 4: Done
 
-    public static boolean guiToggled = true;
-    public static boolean motdToggled = true;
 
     public static Integer[][] map;
     public static Point[] entranceMapCorners;
