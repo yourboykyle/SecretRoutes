@@ -23,6 +23,9 @@ import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.MapUtils;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.settings.GameSettings;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -31,6 +34,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class DungeonManager {
     Minecraft mc = Minecraft.getMinecraft();
@@ -43,11 +48,10 @@ public class DungeonManager {
     public static Point[] entranceMapCorners;
     public static Point entrancePhysicalNWCorner;
 
-    public static int tickAmount = 0;
+    public static Integer mapId;
 
     long bloodTime = Long.MAX_VALUE;
 
-    boolean oddRun = true; //if current run number is even or odd
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     public void onChat(ClientChatReceivedEvent event) {
@@ -62,6 +66,7 @@ public class DungeonManager {
         } else if (System.currentTimeMillis() > bloodTime && ((message.startsWith("§r§c[BOSS] ") && !message.contains(" The Watcher§r§f:")) || message.startsWith("§r§4[BOSS] "))) {
             if (gameStage != 3) {
                 gameStage = 3;
+
                 //this part mostly so /room json doesn't error out
                 RoomDetection.resetCurrentRoom();
                 RoomDetection.roomName = "Boss Room";
@@ -80,22 +85,15 @@ public class DungeonManager {
         EntityPlayerSP player = mc.thePlayer;
 
         if (!Utils.inCatacombs) return; //From this point forward, everything assumes that Utils.inCatacombs == true
-        tickAmount++;
 
-        if ((gameStage == 0 || gameStage == 1) && tickAmount % 20 == 0) {
-
-            if (DungeonRooms.firstLogin) {
-                DungeonRooms.firstLogin = false;
-                //Maybe add first login message later
-            }
+        if (gameStage == 0 || gameStage == 1) {
 
             if (gameStage == 0) {
-                //Utils.checkForConflictingHotkeys();
+                Utils.checkForConflictingHotkeys();
                 gameStage = 1;
             }
 
-            Integer[][] map = MapUtils.updatedMap();
-            if (map != null) {
+            if (MapUtils.mapExists()) {
                 gameStage = 2;
                 return;
             }
@@ -106,31 +104,15 @@ public class DungeonManager {
                     entrancePhysicalNWCorner = MapUtils.getClosestNWPhysicalCorner(player.getPositionVector());
                 }
             }
-
-            if (DungeonRooms.textToDisplay == null && motdToggled) {
-                if (oddRun || !guiToggled) { //load MOTD on odd runs
-                    if (DungeonRooms.motd != null) {
-                        if (!DungeonRooms.motd.isEmpty()) {
-                            DungeonRooms.textToDisplay = DungeonRooms.motd;
-                        }
-                    }
-                }
-                if (DungeonRooms.textToDisplay == null && guiToggled) { //if MOTD is empty or not odd run load default text
-                    //
-                }
-                oddRun = !oddRun;
-            }
-
-            tickAmount = 0;
         }
     }
 
     @SubscribeEvent
     public void onWorldUnload(WorldEvent.Unload event) {
         Utils.inCatacombs = false;
-        tickAmount = 0;
         gameStage = 0;
 
+        mapId = null;
         map = null;
         entranceMapCorners = null;
         entrancePhysicalNWCorner = null;
