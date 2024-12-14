@@ -18,21 +18,25 @@
 
 package xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs;
 
+import com.google.gson.JsonObject;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.DungeonRooms;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.MapUtils;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.RoomDetectionUtils;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import xyz.yourboykyle.secretroutes.events.OnEnterNewRoom;
 import xyz.yourboykyle.secretroutes.utils.Room;
+
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.settings.GameSettings;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.*;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.awt.*;
 import java.util.List;
@@ -60,7 +64,6 @@ public class RoomDetection {
     public static String roomDirection = "undefined";
     public static Point roomCorner;
 
-
     public static HashSet<BlockPos> currentScannedBlocks = new HashSet<>();
     public static HashMap<BlockPos, Integer> blocksToCheck = new HashMap<>();
     public static int totalBlocksAvailableToCheck = 0;
@@ -77,12 +80,14 @@ public class RoomDetection {
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.START) return;
-        EntityPlayerSP player = mc.thePlayer;
-
         if (!Utils.inCatacombs) return;
+        EntityPlayerSP player = mc.thePlayer;
 
         //From this point forward, everything assumes that Utils.inCatacombs == true
         if (gameStage == 2) { //Room clearing phase
+            if (mapId == null && extractMapId() == null)  // Extract the map id
+                return; //  If we failed to extract the map id, we cannot detect the dungeon room
+
             stage2Ticks++;
             if (stage2Ticks == 10) {
                 stage2Ticks = 0;
@@ -94,13 +99,10 @@ public class RoomDetection {
                 if (entranceMapCorners == null) {
                     map = MapUtils.updatedMap();
                     entranceMapCorners = MapUtils.entranceMapCorners(map);
-                } else if (entranceMapCorners[0] == null || entranceMapCorners[1] == null) { //prevent crashes if hotbar map bugged
+                } else if (entranceMapCorners[0] == null || entranceMapCorners[1] == null) { //prevent crashes if map data bugged
                     entranceMapNullCount++;
                     entranceMapCorners = null; //retry getting corners again next loop
-                    if (entranceMapNullCount == 8) {
-                        //Bugged hotbar map
-                        //gameStage = 4;
-                    }
+
                 } else if (entrancePhysicalNWCorner == null) {
                     //for when people dc and reconnect, or if initial check doesn't work
                     Point playerMarkerPos = MapUtils.playerMarkerPos();
@@ -110,8 +112,6 @@ public class RoomDetection {
                             if (!player.getPositionVector().equals(new Vec3(0.0D, 0.0D, 0.0D))) {
                                 entrancePhysicalNWCorner = MapUtils.getClosestNWPhysicalCorner(player.getPositionVector());
                             }
-                        } else {
-                            //Entrance room coordinates not found
                         }
                     }
                 } else {
@@ -130,9 +130,7 @@ public class RoomDetection {
 
                     if (currentPhysicalSegments == null || currentMapSegments == null || roomSize.equals("undefined") || roomColor.equals("undefined")) {
                         updateCurrentRoom();
-                        if (roomColor.equals("undefined")) {
-                            //Waiting for hotbar map to update
-                        } else {
+                        if (!roomColor.equals("undefined")) {
                             switch (roomColor) {
                                 case "brown":
                                 case "purple":
@@ -183,15 +181,17 @@ public class RoomDetection {
 
 
                     if (possibleRoomsSet.size() == 0) { //no match
-                       redoScan = System.currentTimeMillis() + 5000;
+                        redoScan = System.currentTimeMillis() + 5000;
 
                     } else if (possibleRoomsSet.size() == 1) { //room found
                         roomName =  possibleRoomsSet.first();
                         roomDirection = tempDirection;
                         roomCorner = MapUtils.getPhysicalCornerPos(roomDirection, currentPhysicalSegments);
+
                         newRoom();
 
                     } else { //too many matches
+
                         incompleteScan = System.currentTimeMillis() + 1000;
                     }
                 } catch (ExecutionException | InterruptedException e) {
@@ -200,7 +200,6 @@ public class RoomDetection {
             }
         }
     }
-
 
     void updateCurrentRoom() {
         EntityPlayerSP player = mc.thePlayer;
@@ -220,7 +219,6 @@ public class RoomDetection {
     }
 
     public static void resetCurrentRoom() {
-        DungeonRooms.textToDisplay = null;
         Waypoints.allFound = false;
 
         currentPhysicalSegments = null;
@@ -246,6 +244,14 @@ public class RoomDetection {
         Waypoints.secretNum = 0;
     }
 
+    public static Integer extractMapId() {
+        if (!MapUtils.mapExists())
+            return null;
+        ItemStack mapSlot = Minecraft.getMinecraft().thePlayer.inventory.getStackInSlot(8); //get map ItemStack
+        // MapUtils.updatedMap(mapSlot); // - Skip check
+        return mapId = mapSlot.getMetadata();
+    }
+
     public static void newRoom() {
         if (!roomName.equals("undefined") && !roomCategory.equals("undefined")) {
             //update Waypoints info
@@ -257,15 +263,8 @@ public class RoomDetection {
                 Waypoints.allSecretsMap.putIfAbsent(roomName, new ArrayList<>(Collections.nCopies(0, true)));
             }
             Waypoints.secretsList = Waypoints.allSecretsMap.get(roomName);
-
-            //update GUI text
-            if (guiToggled) {
-                //
-            }
-
-            OnEnterNewRoom.onEnterNewRoom(new Room(roomName));
-            System.out.println("Entered new room: " + roomName);
         }
+        OnEnterNewRoom.onEnterNewRoom(new Room(roomName));
     }
 
 
@@ -337,6 +336,7 @@ public class RoomDetection {
                 directionCorners.put(direction, MapUtils.getPhysicalCornerPos(direction, currentPhysicalSegments));
             }
 
+
             List<BlockPos> blocksChecked = new ArrayList<>();
             int doubleCheckedBlocks = 0;
 
@@ -362,6 +362,7 @@ public class RoomDetection {
                     //replace updatedPossibleRooms.get(direction) with the updated matchingRooms list
                     combinedMatchingRooms += matchingRooms.size();
                     updatedPossibleRooms.put(direction, matchingRooms);
+
                 }
                 blocksChecked.add(blockPos);
 
@@ -375,10 +376,10 @@ public class RoomDetection {
                     }
                     doubleCheckedBlocks++;
                 }
+
+
             }
 
-            if (blocksChecked.size() == blocksToCheck.size()) { //only print for this condition bc other conditions break to here
-            }
 
             blocksUsed.addAll(blocksChecked);
 
