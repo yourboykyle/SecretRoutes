@@ -280,7 +280,7 @@ public class Main {
             if(SRMConfig.autoCheckUpdates) {
                 new Thread(() -> {
                     try {
-                        Main.updateManager.checkUpdate();
+                        Main.updateManager.checkUpdate(false);
                     } catch (Exception e) {
                         LogUtils.error(e);
                     }
