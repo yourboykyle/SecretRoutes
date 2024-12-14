@@ -213,13 +213,13 @@ public class Room {
                 for (int i = 0; i < 10; i++) {
                     String path = name;
                     if (i == 0) {
-                        if (data.get(name) == null || data.get(name).isJsonNull()) {
+                        if (data == null || data.isJsonNull() || data.get(name) == null || data.get(name).isJsonNull()) {
                             currentSecretRoute = null;
                         }
                     } else {
                         path = name + ":" + i;
                     }
-                    if (data.get(path) == null || data.get(path).isJsonNull()) {
+                    if (data == null || data.isJsonNull() || data.get(path) == null || data.get(path).isJsonNull()) {
                         break;
                     }
                     JsonArray route = data.get(path).getAsJsonArray();
