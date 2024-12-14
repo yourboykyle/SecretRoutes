@@ -44,7 +44,7 @@ public class UpdateManager {
         LogUtils.info("Reset update state");
     }
 
-    public void checkUpdate() {
+    public void checkUpdate(Boolean button) {
         if (updateState == UpdateState.DOWNLOADED) {
             LogUtils.info("The latest version has already been downloaded in this session. Please restart to apply the changes.");
             return;
@@ -75,10 +75,12 @@ public class UpdateManager {
                             ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "Automatically downloading new Secret Routes Mod update, since AutoDownload is true...");
                             queueUpdate();
                         } else {
-                            ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "Download at https://github.com/yourboykyle/SecretRoutes/releases/latest");
+                            ChatUtils.sendClickableMessage(EnumChatFormatting.GREEN + "Download at https://github.com/yourboykyle/SecretRoutes/releases/latest", "https://github.com/yourboykyle/SecretRoutes/releases/latest");
                         }
                     } else {
-                        ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "Secret Routes Mod didn't find a new update.");
+                        if(button){
+                            ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "Secret Routes Mod is up to date!");
+                        }
                         LogUtils.info("No update available.");
                     }
                 }, MinecraftExecutor.INSTANCE)

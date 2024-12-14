@@ -168,12 +168,7 @@ public class Main {
         RoomDetection.roomCorner = new Point(0, 0);
         RoomDetection.roomDirection = "NW";
     }
-
-    @Mod.EventHandler
-    public void postInit(FMLPostInitializationEvent e) {
-        dungeonRooms.postInit(e);
-    }
-
+    
     public static void checkRoomData() {
         if(RoomDetection.roomName == null) {
             RoomDetection.roomName = "undefined";
@@ -285,7 +280,7 @@ public class Main {
             if(SRMConfig.autoCheckUpdates) {
                 new Thread(() -> {
                     try {
-                        Main.updateManager.checkUpdate();
+                        Main.updateManager.checkUpdate(false);
                     } catch (Exception e) {
                         LogUtils.error(e);
                     }
