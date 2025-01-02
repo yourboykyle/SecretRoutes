@@ -417,7 +417,7 @@ public class RouteRecording {
 
     public void newRoute() {
         // Start a new secret route recording
-        allSecretRoutes.add(RoomDetection.roomName, currentSecretRoute);
+        allSecretRoutes.add(SRMConfig.routeNumber != 0? RoomDetection.roomName+":"+SRMConfig.routeNumber : RoomDetection.roomName, currentSecretRoute);
         currentSecretRoute = new JsonArray();
 
         currentSecretWaypoints = new JsonObject();

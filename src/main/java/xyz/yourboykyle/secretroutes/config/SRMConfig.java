@@ -339,6 +339,16 @@ public class SRMConfig extends Config {
             Main.routeRecording.importRoutes("routes.json");
         }).start();
     };
+    @Number(
+            name = "Route number",
+            description = "Sets the number of the route you are currently recording (NOTE: the preceding number needs to be filled for this route to be checked)",
+            min = 0,
+            max = 10,
+            category = "Route Recording",
+            size = 2
+    )
+    public static int routeNumber = 0;
+
     @Slider(
             name = "Ping",
             description = "Amount of time to wait before checking pos again to determine etherwarp",
