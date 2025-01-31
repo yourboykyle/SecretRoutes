@@ -256,7 +256,7 @@ public class SRMConfig extends Config {
     Runnable runnable14 = () -> {
         new Thread(() -> {
             sendChatMessage("Checking for updates, please wait a few seconds...");
-            Main.updateManager.checkUpdate();
+            Main.updateManager.checkUpdate(true);
         }).start();
     };
 
@@ -1269,6 +1269,168 @@ public class SRMConfig extends Config {
         SecretSounds.secretChime(true);
     };
 
+    @Switch(
+            name = "Hide boss messages",
+            description = "Hides boss messages without impacting other mods",
+            category = "General",
+            size = OptionSize.DUAL,
+            subcategory = "Messages"
+    )
+    public static boolean hideBossMessages = false;
+
+    @Checkbox(
+            name = "Hide watcher",
+            description = "Hides watcher messages",
+            category = "General",
+            subcategory = "Messages"
+    )
+    public static boolean hideWatcher = true;
+
+    @Checkbox(
+            name = "Hide Bonzo",
+            description = "Hides Bonzo messages",
+            category = "General",
+            subcategory = "Messages"
+    )
+    public static boolean hideBonzo = true;
+
+    @Checkbox(
+            name = "Hide Scarf",
+            description = "Hides Scarf messages (f2/m2)",
+            category = "General",
+            subcategory = "Messages"
+    )
+    public static boolean hideScarf = true;
+
+    @Checkbox(
+            name = "Hide Professor",
+            description = "Hides Professor messages (f3/m3)",
+            category = "General",
+            subcategory = "Messages"
+    )
+    public static boolean hideProfessor = true;
+
+    @Checkbox(
+            name = "Hide Thorn",
+            description = "Hides Thron messages (f4/m4)",
+            category = "General",
+            subcategory = "Messages"
+    )
+    public static boolean hideThorn = true;
+
+    @Checkbox(
+            name = "Hide Livid",
+            description = "Hides Livid messages (f5/m5)",
+            category = "General",
+            subcategory = "Messages"
+    )
+    public static boolean hideLivid = true;
+
+    @Checkbox(
+            name = "Hide Sadan",
+            description = "Hides Sadan messages (f6/m6)",
+            category = "General",
+            subcategory = "Messages"
+    )
+    public static boolean hideSadan = true;
+
+    @Checkbox(
+            name = "Hide Wither lords",
+            description = "Hides wither lords messages (f7/m7)",
+            category = "General",
+            subcategory = "Messages"
+    )
+    public static boolean hideWitherLords = false;
+
+    @Switch(
+            name = "Blood spawned notification",
+            description = "Notifies when blood is fully spawned",
+            category = "General",
+            subcategory = "Messages",
+            size = 2
+
+    )
+    public static boolean bloodNotif = false;
+
+    @Text(
+            name = "Blood ready text",
+            description = "Text to show when blood is fully spawned",
+            subcategory = "Messages",
+            size = 1
+    )
+    public static String bloodReadyText = "Blood Ready";
+
+    @Dropdown(
+            name = "Color",
+            description = "Color of the message",
+            options = {"Black", "Dark blue", "Dark green", "Dark aqua", "Dark red", "Dark purple", "Gold", "Gray", "Dark gray", "Blue", "Green", "Aqua", "Red", "Light purple", "Yellow", "White"},
+            subcategory = "Messages"
+    )
+    public static int bloodReadyColor = 6;
+
+    @Number(
+            name = "Duration",
+            description = "Duration of the banner",
+            max = 15000, min =1,
+            subcategory = "Messages"
+    )
+    public static int bloodBannerDuration = 3000;
+
+    @Number(
+            name = "Scale",
+            description = "Scale of the text",
+            min = 1, max = 10,
+            size = 1,
+            subcategory = "Messages"
+    )
+    public static int bloodScale = 2;
+
+    @Slider(
+            name = "X Offset",
+            description = "X Offset for the message. (POSITIVE TO THE RIGHT)",
+            subcategory = "Messages",
+            min = -1000, max = 1000
+    )
+    public static int bloodX = 0;
+
+    @Slider(
+            name = "Y Offset",
+            description = "Y Offset for the message. (POSITIVE TO THE BOTTOM)",
+            subcategory = "Messages",
+            min = -1000, max = 1000)
+    public static int bloodY = -100;
+
+    @Checkbox(
+            name = "Render Test message",
+            description = "Renders a test message with the paramaters to change position. (Untick when done)",
+            subcategory = "Messages"
+    )
+    public static Boolean renderBlood = false;
+
+
+    @Switch(
+            name = "Player to next waypoint",
+            category = "Dev",
+            subcategory = "WIP",
+            size = 2
+    )
+    public static boolean playerWaypointLine = false;
+
+    @Checkbox(
+            name = "debug",
+            category = "Dev",
+            subcategory = "WIP",
+            size = 2
+    )
+    public static boolean debug = false;
+
+    @Switch(
+            name = "Bridge",
+            category = "Guild",
+            subcategory = "WIP",
+            size = 2
+    )
+    public static boolean bridge = false;
 
     public Boolean lambda(String dependentOption) {
         try {
