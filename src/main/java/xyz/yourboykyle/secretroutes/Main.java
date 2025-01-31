@@ -139,10 +139,11 @@ public class Main {
         // Register Events
         MinecraftForge.EVENT_BUS.register(new OnBlockPlace());
         MinecraftForge.EVENT_BUS.register(new OnItemPickedUp());
-        MinecraftForge.EVENT_BUS.register(new OnPlayerInteract());
+        //MinecraftForge.EVENT_BUS.register(new OnPlayerInteract());
         MinecraftForge.EVENT_BUS.register(new OnPlayerTick());
         MinecraftForge.EVENT_BUS.register(new OnPlaySound());
         MinecraftForge.EVENT_BUS.register(new OnRecievePacket());
+        MinecraftForge.EVENT_BUS.register(new OnSendPacket());
         MinecraftForge.EVENT_BUS.register(new OnWorldRender());
         MinecraftForge.EVENT_BUS.register(new OnMouseInput());
         MinecraftForge.EVENT_BUS.register(new OnChatReceive());

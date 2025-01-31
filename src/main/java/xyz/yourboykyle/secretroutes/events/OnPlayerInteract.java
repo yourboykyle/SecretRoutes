@@ -28,18 +28,16 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.MapUtils;
-import xyz.yourboykyle.secretroutes.utils.*;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
+import xyz.yourboykyle.secretroutes.utils.*;
 
 public class OnPlayerInteract {
     @SubscribeEvent
-    public void onPlayerInteract(PlayerInteractEvent e) {
-
+    public static void onPlayerInteract(PlayerInteractEvent e) {
         try {
             if(e.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
                 EntityPlayer p = e.entityPlayer;
