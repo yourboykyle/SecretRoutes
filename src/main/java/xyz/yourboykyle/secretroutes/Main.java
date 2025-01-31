@@ -18,15 +18,9 @@
 
 package xyz.yourboykyle.secretroutes;
 
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.DungeonRooms;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.handlers.PacketHandler;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.ClientCommandHandler;
-import net.minecraftforge.client.event.sound.SoundEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -37,8 +31,11 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import org.apache.commons.io.IOUtils;
 import xyz.yourboykyle.secretroutes.commands.*;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.DungeonRooms;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.handlers.PacketHandler;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import xyz.yourboykyle.secretroutes.events.*;
-import xyz.yourboykyle.secretroutes.events.OnMouseInput;
 import xyz.yourboykyle.secretroutes.utils.*;
 import xyz.yourboykyle.secretroutes.utils.autoupdate.UpdateManager;
 
@@ -50,13 +47,13 @@ import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
-import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
 
 @Mod(modid = Main.MODID, name = Main.NAME, version = Main.VERSION)
 public class Main {
     public static final String MODID = "@ID@";
     public static final String NAME = "@NAME@";
     public static final String VERSION = "@VER@";
+    public static final String CONFIG_FOLDER_PATH = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes";
     public static final String ROUTES_PATH = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes"+File.separator+"routes";
     public static final String COLOR_PROFILE_PATH = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes"+File.separator+"colorprofiles";
     public static final String tmpDir = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "SecretRoutes" + File.separator + "tmp";
@@ -133,6 +130,8 @@ public class Main {
         dungeonRooms.init(e);
         checkRoutesData();
         checkProfilesData();
+        checkPBData();
+        PBUtils.loadPBData();
 
         // Register Events
         MinecraftForge.EVENT_BUS.register(new OnBlockPlace());
@@ -214,6 +213,28 @@ public class Main {
             }
             if(!configFilePearl.exists()){
                 updatePearlRoutes();
+            }
+        } catch(Exception e) {
+            LogUtils.error(e);
+        }
+    }
+
+    public static void checkPBData() {
+        try {
+            String filePath = CONFIG_FOLDER_PATH + File.separator + "personal_bests.json";
+
+            // Check if the config directory exists
+            File configDir = new File(CONFIG_FOLDER_PATH);
+            if (!configDir.exists()) {
+                configDir.mkdirs();
+            }
+
+            File configFile = new File(filePath);
+            if (!configFile.exists()) {
+                configFile.createNewFile();
+                FileWriter pbWriter = new FileWriter(configFile);
+                pbWriter.write("{}");
+                pbWriter.close();
             }
         } catch(Exception e) {
             LogUtils.error(e);

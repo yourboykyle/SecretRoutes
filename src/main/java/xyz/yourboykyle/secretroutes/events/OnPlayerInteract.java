@@ -40,7 +40,11 @@ public class OnPlayerInteract {
             if(block != Blocks.chest && block != Blocks.trapped_chest && block != Blocks.lever && block != Blocks.skull) {
                 return;
             }
-            SecretSounds.secretChime();
+
+            if (block == Blocks.lever) {
+                SecretSounds.secretChime();
+            }
+
             if (Main.currentRoom.getSecretType() == Room.SECRET_TYPES.INTERACT) {
                 BlockPos interactPos = Main.currentRoom.getSecretLocation();
 

@@ -9,6 +9,7 @@ import cc.polyfrost.oneconfig.config.data.Mod;
 import cc.polyfrost.oneconfig.config.data.ModType;
 import cc.polyfrost.oneconfig.config.data.OptionSize;
 import cc.polyfrost.oneconfig.libs.universal.UKeyboard;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
@@ -165,6 +166,66 @@ public class SRMConfig extends Config {
             } catch (Exception e) {
                 LogUtils.error(e);
             }
+        }).start();
+    };
+
+    @Switch(
+            name = "Personal Best Tracking",
+            description = "Tracks your personal best time for completing the secrets in each room",
+            subcategory = "Personal Bests"
+    )
+    public static boolean trackPersonalBests = true;
+
+    @Switch(
+            name = "Send Chat Messages For New PBs",
+            description = "Sends chat messages when you beat your personal best",
+            subcategory = "Personal Bests"
+    )
+    public static boolean sendChatMessages = true;
+
+    // I don't know why I added this lol
+    /*@Button(
+            name = "Reload Personal Bests",
+            text = "Reload",
+            description = "Reloads the personal bests from the personal_bests.json file",
+            subcategory = "Personal Bests"
+    )
+    Runnable runnable18 = () -> {
+        new Thread(() -> {
+            if (PBUtils.loadPBData()) {
+                sendChatMessage(EnumChatFormatting.DARK_GREEN + "Reloaded personal bests");
+            }
+        }).start();
+    };*/
+
+    @Button(
+            name = "Get personal best (current room)",
+            text = "Get PB",
+            description = "Gets your personal best time for the current room",
+            subcategory = "Personal Bests"
+    )
+    Runnable runnable19 = () -> {
+        new Thread(() -> {
+            long pb = PBUtils.getPBForRoom(RoomDetection.roomName);
+            if (pb != -1) {
+                sendChatMessage("Personal best for " + RoomDetection.roomName + ": " + EnumChatFormatting.GREEN + PBUtils.formatTime(pb));
+            } else {
+                sendChatMessage(EnumChatFormatting.DARK_RED + "No personal best found for " + RoomDetection.roomName);
+            }
+        }).start();
+    };
+
+    @Button(
+            name = "Reset personal best (current room)",
+            text = "Reset PB",
+            description = "Reset your personal best time for the current room",
+            subcategory = "Personal Bests"
+    )
+    Runnable runnable20 = () -> {
+        new Thread(() -> {
+            // Remove the PB from the JSON
+            PBUtils.removePersonalBest(RoomDetection.roomName);
+            sendChatMessage("Reset personal best for " + RoomDetection.roomName);
         }).start();
     };
 
