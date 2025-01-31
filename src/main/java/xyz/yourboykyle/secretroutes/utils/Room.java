@@ -23,20 +23,18 @@ package xyz.yourboykyle.secretroutes.utils;
 import com.google.gson.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.MapUtils;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumParticleTypes;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
-import net.minecraft.util.EnumParticleTypes;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.MapUtils;
+import xyz.yourboykyle.secretroutes.events.OnSecretComplete;
 import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 
 import java.io.File;
 import java.io.FileReader;
 import java.util.*;
-
-import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
-import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
 
 public class Room {
     int c = 0;
@@ -103,6 +101,8 @@ public class Room {
     }
 
     public void lastSecretKeybind() {
+        PBUtils.pbIsValid = false;
+
         if(currentSecretIndex > 0) {
             currentSecretIndex--;
         }
@@ -115,6 +115,7 @@ public class Room {
     }
 
     public void nextSecret() {
+        OnSecretComplete.onSecretCompleteNoKeybind();
 
         currentSecretIndex++;
 
@@ -126,6 +127,8 @@ public class Room {
     }
 
     public void nextSecretKeybind() {
+        PBUtils.pbIsValid = false;
+
         if(currentSecretRoute != null) {
             if(currentSecretIndex < currentSecretRoute.size() - 1) {
                 currentSecretIndex++;
