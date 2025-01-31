@@ -1,6 +1,8 @@
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
- * Copyright 2023 yourboykyle
+ * Copyright 2024 yourboykyle & R-aMcC
+ *
+ * <DO NOT REMOVE THIS COPYRIGHT NOTICE>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +21,7 @@
 package xyz.yourboykyle.secretroutes.utils;
 
 import cc.polyfrost.oneconfig.config.core.OneColor;
+import com.jcraft.jorbis.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
@@ -78,6 +81,7 @@ public class RenderUtils {
         GlStateManager.enableDepth();
         GlStateManager.enableTexture2D();
         GL11.glDisable(GL11.GL_BLEND);
+        GL11.glColor4f(1, 1, 1, 0);
         GL11.glPopMatrix();
     }
 
@@ -171,7 +175,6 @@ public class RenderUtils {
         double realY = render.lastTickPosY + (render.posY - render.lastTickPosY) * partialTicks;
         double realZ = render.lastTickPosZ + (render.posZ - render.lastTickPosZ) * partialTicks;
 
-        GlStateManager.pushAttrib();
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(-realX, -realY, -realZ);
@@ -203,7 +206,10 @@ public class RenderUtils {
         GlStateManager.enableLighting();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.popMatrix();
-        GlStateManager.popAttrib();
+    }
+
+    public static void drawNormalLine(BlockPos pos1, BlockPos pos2, OneColor color, float partialTicks, boolean depth, int width){
+        drawNormalLine(pos1.getX(), pos1.getY(), pos1.getZ(), pos2.getX(), pos2.getY(), pos2.getZ(), color, partialTicks, depth, width);
     }
 
 
@@ -253,6 +259,17 @@ public class RenderUtils {
         GlStateManager.disableBlend();
         GlStateManager.popMatrix();
 
+    }
+
+    public static void drawFromPlayer(EntityPlayerSP p, double x, double y, double z, OneColor color, float partialticks, int width){
+
+        double px = p.prevPosX + (p.posX - p.prevPosX)*partialticks;
+        double py = p.prevPosY + (p.posY - p.prevPosY)*partialticks;
+        double pz = p.prevPosZ + (p.posZ - p.prevPosZ)*partialticks;
+
+
+
+        drawNormalLine(px, py+p.getEyeHeight(), pz, x+0.5, y, z+0.5, color, partialticks, false, width);
     }
 
 }

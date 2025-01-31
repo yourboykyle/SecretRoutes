@@ -1,6 +1,8 @@
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
- * Copyright 2023 yourboykyle
+ * Copyright 2024 yourboykyle & R-aMcC
+ *
+ * <DO NOT REMOVE THIS COPYRIGHT NOTICE>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,12 +20,16 @@
 
 package xyz.yourboykyle.secretroutes.events;
 
+import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.DungeonManager;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
+import xyz.yourboykyle.secretroutes.utils.SecretUtils;
+
+import java.util.ArrayList;
 
 public class OnEnterNewRoom {
     public static void onEnterNewRoom(Room room) {
@@ -38,6 +44,9 @@ public class OnEnterNewRoom {
             LogUtils.info("Room direction: \"" + RoomDetection.roomDirection);
 
             Main.currentRoom = room;
+            SecretUtils.secrets = null;
+            SecretUtils.secretLocations = new ArrayList<>();
+            SecretUtils.resetValues();
         } catch(Exception e) {
             LogUtils.error(e);
         }

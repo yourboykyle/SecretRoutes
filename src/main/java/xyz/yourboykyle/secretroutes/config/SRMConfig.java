@@ -1,6 +1,7 @@
 package xyz.yourboykyle.secretroutes.config;
 
 import cc.polyfrost.oneconfig.config.Config;
+import cc.polyfrost.oneconfig.config.annotations.Number;
 import cc.polyfrost.oneconfig.config.annotations.*;
 import cc.polyfrost.oneconfig.config.core.OneColor;
 import cc.polyfrost.oneconfig.config.core.OneKeyBind;
@@ -9,14 +10,14 @@ import cc.polyfrost.oneconfig.config.data.Mod;
 import cc.polyfrost.oneconfig.config.data.ModType;
 import cc.polyfrost.oneconfig.config.data.OptionSize;
 import cc.polyfrost.oneconfig.libs.universal.UKeyboard;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.huds.CurrentRoomHUD;
 import xyz.yourboykyle.secretroutes.config.huds.RecordingHUD;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import xyz.yourboykyle.secretroutes.utils.*;
 
 import java.io.File;
@@ -360,6 +361,17 @@ public class SRMConfig extends Config {
             Main.routeRecording.importRoutes("routes.json");
         }).start();
     };
+
+    @Number(
+            name = "Route number",
+            description = "Sets the number of the route you are currently recording (NOTE: the preceding number needs to be filled for this route to be checked)",
+            min = 0,
+            max = 10,
+            category = "Route Recording",
+            size = 2
+    )
+    public static int routeNumber = 0;
+
     @Slider(
             name = "Ping",
             description = "Amount of time to wait before checking pos again to determine etherwarp",
@@ -692,22 +704,22 @@ public class SRMConfig extends Config {
             size = OptionSize.DUAL
     )
     Runnable runnable17 = () ->{
-       renderEtherwarps = true;
-       etherwarpFullBlock = false;
-       renderMines = true;
-       mineFullBlock = false;
-       renderInteracts = true;
-       interactsFullBlock = false;
-       renderSuperboom = true;
-       superboomsFullBlock = false;
-       renderEnderpearls = true;
-       enderpearlFullBlock = false;
-       renderSecretsItem = true;
-       secretsItemFullBlock = false;
-       renderSecretIteract = true;
-       secretsInteractFullBlock = false;
-       renderSecretBat = true;
-       secretsBatFullBlock = false;
+        renderEtherwarps = true;
+        etherwarpFullBlock = false;
+        renderMines = true;
+        mineFullBlock = false;
+        renderInteracts = true;
+        interactsFullBlock = false;
+        renderSuperboom = true;
+        superboomsFullBlock = false;
+        renderEnderpearls = true;
+        enderpearlFullBlock = false;
+        renderSecretsItem = true;
+        secretsItemFullBlock = false;
+        renderSecretIteract = true;
+        secretsInteractFullBlock = false;
+        renderSecretBat = true;
+        secretsBatFullBlock = false;
     } ;
 
 

@@ -23,66 +23,68 @@ import com.google.gson.JsonObject;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.DungeonManager;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.Waypoints;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.handlers.ConfigHandler;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.handlers.TextRenderer;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.settings.GameSettings;
+import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.event.ClickEvent;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent;
+import net.minecraftforge.fml.common.versioning.DefaultArtifactVersion;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.lwjgl.input.Keyboard;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
-public class DungeonRooms {
-    public static final String VERSION = "1.0";
+public class DungeonRooms
+{
+
     Minecraft mc = Minecraft.getMinecraft();
 
     public static JsonObject roomsJson;
     public static JsonObject waypointsJson;
     public static HashMap<String,HashMap<String,long[]>> ROOM_DATA = new HashMap<>();
 
-    public static boolean usingSBPSecrets = false;
-    //public static KeyBinding[] keyBindings = new KeyBinding[3];
-    public static String imageHotkeyOpen = "gui";
     static int tickAmount = 1;
 
-    public static List<String> textToDisplay = null;
-    public static int textLocX = 50;
-    public static int textLocY = 5;
 
-    public static List<String> motd = null;
-    public static String configDir;
-    public static boolean firstLogin = false;
 
-    @EventHandler
     public void preInit(final FMLPreInitializationEvent event) {
-        configDir = event.getModConfigurationDirectory().toString();
+
+        //initialize logger
         Utils.setLogLevel(LogManager.getLogger(DungeonRooms.class), Level.INFO);
     }
 
     @EventHandler
     public void init(FMLInitializationEvent event) {
         long time1 = System.currentTimeMillis();
-
         //start room data loading executors first or else it will block later and slow down loading by ~200ms
         List<Path> paths = Utils.getAllPaths("catacombs");
         final ExecutorService executor = Executors.newFixedThreadPool(4); //don't need 8 threads cause it's just 1x1 that takes longest
@@ -102,13 +104,14 @@ public class DungeonRooms {
         MinecraftForge.EVENT_BUS.register(new Waypoints());
 
         //reload config
-        ConfigHandler.reloadConfig();
+
+
 
         //get room and waypoint info
         try (BufferedReader roomsReader = new BufferedReader(new InputStreamReader(mc.getResourceManager()
                 .getResource(new ResourceLocation("roomdetection", "dungeonrooms.json")).getInputStream()));
-            BufferedReader waypointsReader = new BufferedReader(new InputStreamReader(mc.getResourceManager()
-                .getResource(new ResourceLocation("roomdetection", "secretlocations.json")).getInputStream()))
+             BufferedReader waypointsReader = new BufferedReader(new InputStreamReader(mc.getResourceManager()
+                     .getResource(new ResourceLocation("roomdetection", "secretlocations.json")).getInputStream()))
         ) {
             Gson gson = new Gson();
             roomsJson = gson.fromJson(roomsReader, JsonObject.class);
@@ -138,11 +141,12 @@ public class DungeonRooms {
         executor.shutdown();
     }
 
-    @EventHandler
-    public void postInit(final FMLPostInitializationEvent event) {
-        usingSBPSecrets = false;
-    }
 
+    /**
+     * Modified from Danker's Skyblock Mod under the GNU General Public License v3.0
+     * https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
+     * @author bowser0000
+     */
     @SubscribeEvent
     public void onTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.START) return;
@@ -157,48 +161,4 @@ public class DungeonRooms {
             }
         }
     }
-
-    @SubscribeEvent
-    public void renderPlayerInfo(final RenderGameOverlayEvent.Post event) {
-        if (event.type != RenderGameOverlayEvent.ElementType.ALL) return;
-        if (Utils.inSkyblock) {
-            if (textToDisplay != null && !textToDisplay.isEmpty()) {
-                ScaledResolution scaledResolution = new ScaledResolution(mc);
-                int y = 0;
-                for (String line:textToDisplay) {
-                    int roomStringWidth = mc.fontRendererObj.getStringWidth(line);
-                    TextRenderer.drawText(mc, line, ((scaledResolution.getScaledWidth() * textLocX) / 100) - (roomStringWidth / 2),
-                            ((scaledResolution.getScaledHeight() * textLocY) / 100) + y, 1D, true);
-                    y += mc.fontRendererObj.FONT_HEIGHT;
-                }
-            }
-        }
-    }
-
-    /*@SubscribeEvent
-    public void onServerConnect(FMLNetworkEvent.ClientConnectedToServerEvent event) {
-        Minecraft mc = Minecraft.getMinecraft();
-        if (mc.getCurrentServerData() == null) return;
-        if (mc.getCurrentServerData().serverIP.toLowerCase().contains("hypixel.")) {
-            //Packets are used in this mod solely to detect when the player picks up an item. No packets are modified or created.
-            event.manager.channel().pipeline().addBefore("packet_handler", "secretroutes_packet_handler", new PacketHandler());
-
-            new Thread(() -> {
-                try {
-                    while (mc.thePlayer == null) {
-                        //Yes, I'm too lazy to code something proper so I'm busy-waiting, shut up. no :) -carmel
-                        //It usually waits for less than half a second
-                        Thread.sleep(100);
-                    }
-                    Thread.sleep(3000);
-                    if (mc.getCurrentServerData().serverIP.toLowerCase().contains("hypixel.")) {
-                        Utils.checkForConflictingHotkeys();
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-            }).start();
-        }
-    }*/
 }

@@ -1,8 +1,30 @@
+/*
+ * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
+ * Copyright 2024 yourboykyle & R-aMcC
+ *
+ * <DO NOT REMOVE THIS COPYRIGHT NOTICE>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+
 package xyz.yourboykyle.secretroutes.commands;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.ConfigUtils;
@@ -78,6 +100,33 @@ public class ChangeColorProfile extends CommandBase {
         aliases.add("changeclrp");
         aliases.add("changecolourprofile");
         return aliases;
+    }
+
+    @Override
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
+        List<String> completions = new ArrayList<>();
+        List<String> basicOptions = new ArrayList<>();
+        basicOptions.add("list");
+        basicOptions.add("load");
+        basicOptions.add("save");
+        switch (args.length) {
+            case 0:
+                completions.addAll(basicOptions);
+            case 1:
+                completions.addAll(basicOptions);
+                completions.removeIf(completion -> !(completion.toLowerCase().startsWith(args[0].toLowerCase())));
+            case 2:
+                if(args[0].equalsIgnoreCase("load")) {
+                    completions.addAll(FileUtils.getFileNames(Main.COLOR_PROFILE_PATH));
+                }
+            case 3:
+                if(args[0].equalsIgnoreCase("load")) {
+                    completions.addAll(FileUtils.getFileNames(Main.COLOR_PROFILE_PATH));
+                    completions.removeIf(completion -> !(completion.toLowerCase().startsWith(args[1].toLowerCase())));
+                }
+        }
+
+        return completions;
     }
 
 }
