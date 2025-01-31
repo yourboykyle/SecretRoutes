@@ -1,3 +1,23 @@
+/*
+ * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
+ * Copyright 2024 yourboykyle & R-aMcC
+ *
+ * <DO NOT REMOVE THIS COPYRIGHT NOTICE>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package xyz.yourboykyle.secretroutes.config;
 
 import cc.polyfrost.oneconfig.config.Config;
@@ -9,7 +29,11 @@ import cc.polyfrost.oneconfig.config.data.InfoType;
 import cc.polyfrost.oneconfig.config.data.Mod;
 import cc.polyfrost.oneconfig.config.data.ModType;
 import cc.polyfrost.oneconfig.config.data.OptionSize;
+import cc.polyfrost.oneconfig.gui.OneConfigGui;
+import cc.polyfrost.oneconfig.gui.pages.ModConfigPage;
 import cc.polyfrost.oneconfig.libs.universal.UKeyboard;
+import cc.polyfrost.oneconfig.utils.gui.GuiUtils;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
@@ -47,15 +71,6 @@ public class SRMConfig extends Config {
     )
     public static boolean wholeRoute = false;
 
-
-    @Switch(
-            name = "All secrets",
-            description = "Render all secrets",
-            subcategory = "General"
-    )
-    public static boolean allSecrets = false;
-
-
     @Switch(
             name = "Render steps",
             description = "Renders the entire path to the secret instead of just the secret",
@@ -64,13 +79,26 @@ public class SRMConfig extends Config {
     public static boolean allSteps = false;
 
     @Info(
-            text = "Does not display all secrets in room, only route",
+            text = "Full Route - Renders the Entire route (only secrets unless All Steps is enabled)",
             subcategory = "General",
             size = 2,
             type = InfoType.WARNING
     )
     public static boolean ignored;
 
+    @Switch(
+            name = "All secrets",
+            description = "Renders all secrets in the room (DOES NOT RENDER STEPS)",
+            subcategory = "General"
+    )
+    public static boolean allSecrets = false;
+    @Info(
+            text = "All secrets displays all secrets, but not the path...",
+            subcategory = "General",
+            size = 2,
+            type = InfoType.WARNING
+    )
+    public static boolean ignored2;
 
     @Dropdown(
             name = "Line Type",
@@ -1470,7 +1498,7 @@ public class SRMConfig extends Config {
             optionNames.get("allSecrets").addHideCondition(() -> !lambda("modEnabled"));
             optionNames.get("renderComplete").addHideCondition(() -> !lambda("modEnabled"));
             optionNames.get("allSteps").addHideCondition(() -> !lambda("modEnabled"));
-            optionNames.get("allSteps").addHideCondition(() -> !lambda("allSecrets"));
+            optionNames.get("allSteps").addHideCondition(() -> !lambda("wholeRoute"));
             optionNames.get("ignored").addHideCondition(() -> !lambda("modEnabled"));
 
             optionNames.get("autoDownload").addHideCondition(() -> !lambda("autoCheckUpdates"));
@@ -1505,6 +1533,7 @@ public class SRMConfig extends Config {
             optionNames.get("forceUpdateDEBUG").addHideCondition(() -> isDevPasswordNotCorrect());
             optionNames.get("verboseLogging").addHideCondition(() -> isDevPasswordNotCorrect());
             optionNames.get("c").addHideCondition(() -> isDevPasswordNotCorrect());
+            optionNames.get("debug").addHideCondition(() -> isDevPasswordNotCorrect());
             optionNames.get("verboseRecording").addHideCondition(() -> !lambda("verboseLogging"));
             optionNames.get("verboseUpdating").addHideCondition(() -> !lambda("verboseLogging"));
             optionNames.get("verboseInfo").addHideCondition(() -> !lambda("verboseLogging"));
@@ -1516,6 +1545,24 @@ public class SRMConfig extends Config {
             optionNames.get("customSecretSoundVolume").addHideCondition(() -> !lambda("customSecretSound"));
             optionNames.get("customSecretSoundPitch").addHideCondition(() -> !lambda("customSecretSound"));
             optionNames.get("runnable15").addHideCondition(() -> !lambda("customSecretSound"));
+
+
+            optionNames.get("hideWatcher").addHideCondition(()-> !lambda("hideBossMessages"));
+            optionNames.get("hideBonzo").addHideCondition(()-> !lambda("hideBossMessages"));
+            optionNames.get("hideScarf").addHideCondition(()-> !lambda("hideBossMessages"));
+            optionNames.get("hideProfessor").addHideCondition(()-> !lambda("hideBossMessages"));
+            optionNames.get("hideThorn").addHideCondition(()-> !lambda("hideBossMessages"));
+            optionNames.get("hideLivid").addHideCondition(()-> !lambda("hideBossMessages"));
+            optionNames.get("hideSadan").addHideCondition(()-> !lambda("hideBossMessages"));
+            optionNames.get("hideWitherLords").addHideCondition(()-> !lambda("hideBossMessages"));
+
+            optionNames.get("bloodReadyText").addHideCondition(()-> !lambda("bloodNotif"));
+            optionNames.get("bloodReadyColor").addHideCondition(()-> !lambda("bloodNotif"));
+            optionNames.get("bloodBannerDuration").addHideCondition(()-> !lambda("bloodNotif"));
+            optionNames.get("bloodScale").addHideCondition(()-> !lambda("bloodNotif"));
+            optionNames.get("bloodX").addHideCondition(()-> !lambda("bloodNotif"));
+            optionNames.get("bloodY").addHideCondition(()-> !lambda("bloodNotif"));
+            optionNames.get("renderBlood").addHideCondition(()-> !lambda("bloodNotif"));
 
             registerKeyBind(lastSecret, () -> {
                 if (Utils.inCatacombs) {
@@ -1561,5 +1608,10 @@ public class SRMConfig extends Config {
 
     public boolean isEqualTo(Object a, Object b) {
         return a.equals(b);
+    }
+
+    public void openGui(String page){
+        ModConfigPage test = new ModConfigPage(Main.config.mod.defaultPage);
+        test.getPage().categories.get("add").subcategories.get(1);
     }
 }
