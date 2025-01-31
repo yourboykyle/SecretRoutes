@@ -40,6 +40,13 @@ public class SRMConfig extends Config {
     )
     public static boolean renderComplete = false;
 
+    @Switch(
+            name = "Full route",
+            description = "Render all secrets in the route",
+            subcategory = "General"
+    )
+    public static boolean wholeRoute = false;
+
 
     @Switch(
             name = "All secrets",
