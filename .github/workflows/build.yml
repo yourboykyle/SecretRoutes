@@ -30,8 +30,16 @@ jobs:
         run: chmod +x ./gradlew
       - name: Build with Gradle
         run: ./gradlew build -x test --stacktrace
-      - uses: actions/upload-artifact@v3
+      - name: Extract version from Gradle
+        id: extract_version
+        run: echo "VERSION=$(./gradlew properties -q | grep "^mod_version:" | awk '{print $2}')" >> $GITHUB_ENV
+      - name: Find and rename JAR
+        run: |
+          JAR_FILE=$(find versions/1.8.9-forge/build/libs/ -name "*${{ env.VERSION }}.jar" -not -name "*-dev.jar")
+          echo "JAR_FILE=${JAR_FILE}" >> $GITHUB_ENV
+          mv $JAR_FILE versions/1.8.9-forge/build/libs/SecretRoutes-${{ env.VERSION }}-DEV.jar
+      - uses: actions/upload-artifact@v4
         name: Upload SRM
         with:
-          name: "SRM Build"
-          path: versions/1.8.9-forge/build/libs/*.jar
+          name: "SecretRoutes-${{ env.VERSION }}-DEV"
+          path: versions/1.8.9-forge/build/libs/SecretRoutes-${{ env.VERSION }}-DEV.jar

@@ -13,9 +13,9 @@ import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
-/*
+/**
  * This class is a taken from SkyHanni, translated from Kotlin to Java
- * https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/misc/update/UpdateManager.kt
+ * <a href="https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/misc/update/UpdateManager.kt">...</a>
  * All credit to them
  */
 
@@ -44,7 +44,7 @@ public class UpdateManager {
         LogUtils.info("Reset update state");
     }
 
-    public void checkUpdate() {
+    public void checkUpdate(Boolean button) {
         if (updateState == UpdateState.DOWNLOADED) {
             LogUtils.info("The latest version has already been downloaded in this session. Please restart to apply the changes.");
             return;
@@ -75,10 +75,12 @@ public class UpdateManager {
                             ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "Automatically downloading new Secret Routes Mod update, since AutoDownload is true...");
                             queueUpdate();
                         } else {
-                            ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "Download at https://github.com/yourboykyle/SecretRoutes/releases/latest");
+                            ChatUtils.sendClickableMessage(EnumChatFormatting.GREEN + "Download at https://github.com/yourboykyle/SecretRoutes/releases/latest", "https://github.com/yourboykyle/SecretRoutes/releases/latest");
                         }
                     } else {
-                        ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "Secret Routes Mod didn't find a new update.");
+                        if(button){
+                            ChatUtils.sendChatMessage(EnumChatFormatting.GREEN + "Secret Routes Mod is up to date!");
+                        }
                         LogUtils.info("No update available.");
                     }
                 }, MinecraftExecutor.INSTANCE)

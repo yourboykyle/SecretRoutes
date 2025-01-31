@@ -1,6 +1,8 @@
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
- * Copyright 2023 yourboykyle
+ * Copyright 2024 yourboykyle & R-aMcC
+ *
+ * <DO NOT REMOVE THIS COPYRIGHT NOTICE>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,6 +17,7 @@
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 
 package xyz.yourboykyle.secretroutes;
 
@@ -143,7 +146,9 @@ public class Main {
         MinecraftForge.EVENT_BUS.register(new OnWorldRender());
         MinecraftForge.EVENT_BUS.register(new OnMouseInput());
         MinecraftForge.EVENT_BUS.register(new OnChatReceive());
+        MinecraftForge.EVENT_BUS.register(new OnGuiRender());
         //MinecraftForge.EVENT_BUS.register(new OnServerTick());
+        MinecraftForge.EVENT_BUS.register(new GuildEvents());
 
         MinecraftForge.EVENT_BUS.register(this);
 
@@ -162,12 +167,7 @@ public class Main {
         RoomDetection.roomCorner = new Point(0, 0);
         RoomDetection.roomDirection = "NW";
     }
-
-    @Mod.EventHandler
-    public void postInit(FMLPostInitializationEvent e) {
-        dungeonRooms.postInit(e);
-    }
-
+    
     public static void checkRoomData() {
         if(RoomDetection.roomName == null) {
             RoomDetection.roomName = "undefined";
@@ -297,15 +297,28 @@ public class Main {
         Minecraft mc = Minecraft.getMinecraft();
         if (mc.getCurrentServerData() == null) return;
         if (mc.getCurrentServerData().serverIP.toLowerCase().contains("hypixel.")) {
+
             if(SRMConfig.autoCheckUpdates) {
                 new Thread(() -> {
                     try {
-                        Main.updateManager.checkUpdate();
+                        Main.updateManager.checkUpdate(false);
                     } catch (Exception e) {
                         LogUtils.error(e);
                     }
                 }).start();
             }
+
+            new Thread(()->{
+                try{
+                    Thread.sleep(3000);
+                }catch (Exception ignored){
+                }
+                byte res = APIUtils.addMember();
+                if(res == 1){
+                    sendChatMessage("§aFirst logon detected... things work");
+                }
+            }).start();
+            Runtime.getRuntime().addShutdownHook(new Thread(APIUtils::offline));
 
 
 
