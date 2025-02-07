@@ -1,6 +1,6 @@
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
- * Copyright 2024 yourboykyle & R-aMcC
+ * Copyright 2025 yourboykyle & R-aMcC
  *
  * <DO NOT REMOVE THIS COPYRIGHT NOTICE>
  *

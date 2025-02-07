@@ -1,6 +1,6 @@
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
- * Copyright 2024 yourboykyle & R-aMcC
+ * Copyright 2025 yourboykyle & R-aMcC
  *
  * <DO NOT REMOVE THIS COPYRIGHT NOTICE>
  *
@@ -39,15 +39,18 @@ public class LogUtils {
     }
 
     public static void error(Exception error) {
+        errorNoShout(error);
+        if(Minecraft.getMinecraft().thePlayer != null) {
+            sendChatMessage(EnumChatFormatting.DARK_RED+"Error caught by Secret Routes. Check latest logs at .minecraft/logs/SecretRoutes/LATEST-{date}.log. SEND THIS FILE IN #SUPPORT IN THE DISCORD FOR HELP. ("+ error.getLocalizedMessage()+")");
+        }
+    }
+    public static void errorNoShout(Exception error) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         error.printStackTrace(pw);
         String stackTrace = sw.toString();
 
         appendToFile("====================\n[ERROR] " + stackTrace);
-        if(Minecraft.getMinecraft().thePlayer != null) {
-            sendChatMessage(EnumChatFormatting.DARK_RED+"Error caught by Secret Routes. Check latest logs at .minecraft/logs/SecretRoutes/LATEST-{date}.log. SEND THIS FILE IN #SUPPORT IN THE DISCORD FOR HELP. ("+ error.getLocalizedMessage()+")");
-        }
     }
 
     public static void appendToFile(String msg) {
@@ -60,4 +63,6 @@ public class LogUtils {
             e.printStackTrace();
         }
     }
+
+
 }
