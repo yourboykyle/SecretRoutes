@@ -25,8 +25,8 @@ import java.nio.charset.StandardCharsets;
 
 
 public class APIUtils {
-    private static final String API_URL = "http://192.168.2.197:5000/аpi";
-    static CloseableHttpClient client = HttpClients.custom().setUserAgent("SRM").build();
+    private static final String API_URL = "https://srm.yourboykyle.xyz/аpi";
+    static CloseableHttpClient client = HttpClients.custom().setUserAgent("SRM").setSslcontext(SSLUtils.context).build();
 
     public static byte addMember(){
         try{
@@ -68,7 +68,7 @@ public class APIUtils {
         try {
             HttpPatch request = new HttpPatch(new URL(API_URL + "/users/offline").toURI());
             request.setProtocolVersion(HttpVersion.HTTP_1_1);
-            request.setHeader("x-uuid", Minecraft.getMinecraft().thePlayer.getUniqueID().toString());
+            request.setHeader("x-uuid", HashingUtils.getHashedUUID().toString());
             try (CloseableHttpResponse response = client.execute(request)) {
                 HttpEntity entity = response.getEntity();
                 int statusCode = response.getStatusLine().getStatusCode();
