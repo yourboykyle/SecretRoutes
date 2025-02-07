@@ -32,7 +32,7 @@ public class APIUtils {
         try{
             HttpPost request = new HttpPost(new URL(API_URL+"/users").toURI());
             request.setProtocolVersion(HttpVersion.HTTP_1_1);
-            request.setHeader("x-uuid", Minecraft.getMinecraft().thePlayer.getUniqueID().toString());
+            request.setHeader("x-uuid", HashingUtils.getHashedUUID().toString());
             request.setHeader("x-version", Main.VERSION);
             request.setHeader("x-timestamp", String.valueOf(System.currentTimeMillis()));
 
