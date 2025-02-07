@@ -317,6 +317,8 @@ public class Main {
                 byte res = APIUtils.addMember();
                 if(res == 1){
                     sendChatMessage("§aFirst logon detected... things work");
+                } else if (res == 0){
+                    sendChatMessage("§aWelcome back!");
                 }
             }).start();
             Runtime.getRuntime().addShutdownHook(new Thread(APIUtils::offline));
