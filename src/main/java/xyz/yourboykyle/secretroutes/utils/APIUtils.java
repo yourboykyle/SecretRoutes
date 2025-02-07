@@ -34,6 +34,7 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.config.SRMConfig;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -42,14 +43,21 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 
 public class APIUtils {
-    private static final String API_URL = "https://srm.yourboykyle.xyz/аpi";
+    private static String API_URL = "https://srm.yourboykyle.xyz/аpi";
     static CloseableHttpClient client = HttpClients.custom().setUserAgent("SRM").setSslcontext(SSLUtils.context).build();
 
     public static byte addMember(){
+        if(!SRMConfig.sendData){
+            return -1;
+        }
         try{
+            if(Minecraft.getMinecraft().thePlayer.getUniqueID() == UUID.fromString("79b13be71fa843378f488f95fec6f9ce") || Minecraft.getMinecraft().thePlayer.getUniqueID() == UUID.fromString("c61b3acf34c1414d930caf544998a4ae")){
+                API_URL = "https://192.168.2.21:5000/api";
+            }
             HttpPost request = new HttpPost(new URL(API_URL+"/users").toURI());
             request.setProtocolVersion(HttpVersion.HTTP_1_1);
             request.setHeader("x-uuid", HashingUtils.getHashedUUID().toString());
@@ -88,6 +96,9 @@ public class APIUtils {
         return -1;
     }
     public static byte offline() {
+        if(!SRMConfig.sendData){
+            return -1;
+        }
         try {
             HttpPatch request = new HttpPatch(new URL(API_URL + "/users/offline").toURI());
             request.setProtocolVersion(HttpVersion.HTTP_1_1);

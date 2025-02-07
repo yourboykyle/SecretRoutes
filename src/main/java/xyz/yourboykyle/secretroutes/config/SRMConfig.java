@@ -1467,6 +1467,15 @@ public class SRMConfig extends Config {
     )
     public static boolean bridge = false;
 
+    @Switch(
+            name = "Server Data",
+            subcategory = "Data Privacy",
+            description = "Sends data to the server (Masked UUID, Login Timestamp, Mod Version, Online Data)",
+            size = 2
+    )
+    public static boolean sendData = true;
+
+
     public Boolean lambda(String dependentOption) {
         try {
 
