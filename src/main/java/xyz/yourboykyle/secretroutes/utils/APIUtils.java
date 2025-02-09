@@ -39,10 +39,12 @@ import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.UUID;
 
 
@@ -55,9 +57,7 @@ public class APIUtils {
             return -1;
         }
         try{
-            if(Minecraft.getMinecraft().thePlayer.getUniqueID() == UUID.fromString("79b13be71fa843378f488f95fec6f9ce") || Minecraft.getMinecraft().thePlayer.getUniqueID() == UUID.fromString("c61b3acf34c1414d930caf544998a4ae")){
-                API_URL = "https://192.168.2.21:5000/api";
-            }
+            LogUtils.info("User: "+Minecraft.getMinecraft().thePlayer.getUniqueID());
             HttpPost request = new HttpPost(new URL(API_URL+"/users").toURI());
             request.setProtocolVersion(HttpVersion.HTTP_1_1);
             request.setHeader("x-uuid", HashingUtils.getHashedUUID().toString());
