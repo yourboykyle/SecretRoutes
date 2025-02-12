@@ -177,8 +177,15 @@ public class Room {
         if(currentSecretWaypoints != null && currentSecretWaypoints.get("locations") != null) {
             // Render the lines
             List<BlockPos> lines = new LinkedList<>();
+            JsonArray lineLocations = new JsonArray();
+            try{
+                lineLocations = currentSecretWaypoints.get("locations").getAsJsonArray();
 
-            JsonArray lineLocations = currentSecretWaypoints.get("locations").getAsJsonArray();
+            }catch(IllegalStateException e){
+                LogUtils.info(String.valueOf(currentSecretWaypoints.get("locations")));
+                LogUtils.error(e);
+                return;
+            }
             for (JsonElement lineLocationElement : lineLocations) {
                 JsonArray lineLocation = lineLocationElement.getAsJsonArray();
 
