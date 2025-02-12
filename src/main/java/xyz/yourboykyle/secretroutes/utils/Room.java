@@ -183,6 +183,7 @@ public class Room {
 
             }catch(IllegalStateException e){
                 LogUtils.info(String.valueOf(currentSecretWaypoints.get("locations")));
+                LogUtils.info(currentSecretWaypoints.get("locations").getClass().getName());
                 LogUtils.error(e);
                 return;
             }
