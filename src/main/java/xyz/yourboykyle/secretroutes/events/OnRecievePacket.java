@@ -40,6 +40,7 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.utils.ChatUtils;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 
 public class OnRecievePacket {
@@ -100,7 +101,7 @@ public class OnRecievePacket {
             }
         } catch (Exception error) {
             LogUtils.error(error);
-            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("There was an error with the " + Main.MODID + " mod."));
+            ChatUtils.sendChatMessage("There was an error with the " + Main.MODID + " mod.");
         }
     }
 }

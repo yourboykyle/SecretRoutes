@@ -51,6 +51,7 @@ import java.util.UUID;
 public class APIUtils {
     private static String API_URL = "https://srm.yourboykyle.xyz/аpi";
     static CloseableHttpClient client = HttpClients.custom().setUserAgent("SRM").setSslcontext(SSLUtils.context).build();
+    public static boolean apiQueued = false;
 
     public static byte addMember(){
         if(!SRMConfig.sendData){
