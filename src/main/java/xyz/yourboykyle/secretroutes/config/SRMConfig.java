@@ -204,6 +204,30 @@ public class SRMConfig extends Config {
             }
         }).start();
     };
+    @Text(
+            name = "Copy file name",
+            description = "This is the name of the file to copy the routes.json in your downloads to.",
+            subcategory = "General"
+    )
+    public static String copyFileName = "";
+
+
+    @Button(
+            name = "Copy routes",
+            text = "Copy routes",
+            description = "Copies the Downloads/routes.json to the routes directory under the name specified in the Copy file name field",
+            size = 2,
+            subcategory = "General"
+    )
+    Runnable runnable21 = () -> {
+        new Thread(() ->{
+            try{
+                FileUtils.copyFileToRoutesDirectory();
+            }catch (Exception e){
+                LogUtils.error(e);
+            }
+        }).start();
+    };
 
     @Switch(
             name = "Personal Best Tracking",

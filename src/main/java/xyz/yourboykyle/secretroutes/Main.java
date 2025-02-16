@@ -321,7 +321,10 @@ public class Main {
                     sendChatMessage("§aWelcome back!");
                 }
             }).start();
-            Runtime.getRuntime().addShutdownHook(new Thread(APIUtils::offline));
+            if(!APIUtils.apiQueued){
+                Runtime.getRuntime().addShutdownHook(new Thread(APIUtils::offline));
+                APIUtils.apiQueued = true;
+            }
 
 
 

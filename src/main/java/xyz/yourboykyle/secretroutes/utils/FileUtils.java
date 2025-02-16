@@ -21,6 +21,7 @@
 package xyz.yourboykyle.secretroutes.utils;
 
 import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.config.SRMConfig;
 
 import java.awt.*;
 import java.io.*;
@@ -86,6 +87,16 @@ public class FileUtils {
 
             Files.copy(sourceFile.toPath(), targetFilePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
+            LogUtils.error(e);
+        }
+    }
+
+    public static void copyFileToRoutesDirectory(){
+        try{
+            String filename = SRMConfig.copyFileName;
+            File file = new File(System.getProperty("user.home") + File.separator + "Downloads" + File.separator + "routes.json");
+            copyFileToDirectory(file, Main.ROUTES_PATH+File.separator+filename);
+        }catch (Exception e){
             LogUtils.error(e);
         }
     }
