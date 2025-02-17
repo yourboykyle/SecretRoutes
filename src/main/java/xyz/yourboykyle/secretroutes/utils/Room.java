@@ -146,19 +146,24 @@ public class Room {
 
 
     public SECRET_TYPES getSecretType() {
-        if(currentSecretWaypoints != null && currentSecretWaypoints.get("secret") != null && currentSecretWaypoints.get("secret").getAsJsonObject().get("type") != null) {
-            String type = currentSecretWaypoints.get("secret").getAsJsonObject().get("type").getAsString();
-            switch (type) {
-                case "interact":
-                    return SECRET_TYPES.INTERACT;
-                case "item":
-                    return SECRET_TYPES.ITEM;
-                case "bat":
-                    return SECRET_TYPES.BAT;
-                case "exitroute":
-                    return SECRET_TYPES.EXITROUTE;
+        try{
+            if(currentSecretWaypoints != null && currentSecretWaypoints.get("secret") != null && currentSecretWaypoints.get("secret").getAsJsonObject().get("type") != null) {
+                String type = currentSecretWaypoints.get("secret").getAsJsonObject().get("type").getAsString();
+                switch (type) {
+                    case "interact":
+                        return SECRET_TYPES.INTERACT;
+                    case "item":
+                        return SECRET_TYPES.ITEM;
+                    case "bat":
+                        return SECRET_TYPES.BAT;
+                    case "exitroute":
+                        return SECRET_TYPES.EXITROUTE;
+                }
             }
+        }catch (Exception e){
+            LogUtils.error(e);
         }
+
         return null;
     }
 
