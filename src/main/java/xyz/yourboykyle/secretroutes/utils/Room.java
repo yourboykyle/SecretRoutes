@@ -179,44 +179,48 @@ public class Room {
     }
 
     public void renderLines() {
-        if(currentSecretWaypoints != null && currentSecretWaypoints.get("locations") != null) {
-            // Render the lines
-            List<BlockPos> lines = new LinkedList<>();
-            JsonArray lineLocations = new JsonArray();
-            try{
-                lineLocations = currentSecretWaypoints.get("locations").getAsJsonArray();
+        try {
+            if (currentSecretWaypoints != null && currentSecretWaypoints.has("locations")) {
+                // Render the lines
+                List<BlockPos> lines = new LinkedList<>();
+                JsonArray lineLocations = new JsonArray();
+                try {
+                    lineLocations = currentSecretWaypoints.get("locations").getAsJsonArray();
 
-            }catch(IllegalStateException e){
-                LogUtils.info(String.valueOf(currentSecretWaypoints.get("locations")));
-                LogUtils.info(currentSecretWaypoints.get("locations").getClass().getName());
-                LogUtils.error(e);
-                return;
-            }
-            for (JsonElement lineLocationElement : lineLocations) {
-                JsonArray lineLocation = lineLocationElement.getAsJsonArray();
-
-                Main.checkRoomData();
-                lines.add(MapUtils.relativeToActual(new BlockPos(lineLocation.get(0).getAsInt(), lineLocation.get(1).getAsInt(), lineLocation.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner));
-            }
-
-            if(SRMConfig.lineType == 0) {
-                //Add tick delay
-                if(c<SRMConfig.tickInterval){
-                    c++;
+                } catch (IllegalStateException e) {
+                    LogUtils.info(String.valueOf(currentSecretWaypoints.get("locations")));
+                    LogUtils.info(currentSecretWaypoints.get("locations").getClass().getName());
+                    LogUtils.error(e);
                     return;
                 }
-                c = 0;
-                int particleType = SRMConfig.particles;
-                if(particleType >= 36) {
-                    particleType += 3;
+                for (JsonElement lineLocationElement : lineLocations) {
+                    JsonArray lineLocation = lineLocationElement.getAsJsonArray();
+
+                    Main.checkRoomData();
+                    lines.add(MapUtils.relativeToActual(new BlockPos(lineLocation.get(0).getAsInt(), lineLocation.get(1).getAsInt(), lineLocation.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner));
                 }
-                // Draw particles based on enum
-                try{
-                    RenderUtils.drawLineMultipleParticles(EnumParticleTypes.getParticleFromId(particleType), lines);
-                }catch(Exception e){
-                    LogUtils.error(e);
+
+                if (SRMConfig.lineType == 0) {
+                    //Add tick delay
+                    if (c < SRMConfig.tickInterval) {
+                        c++;
+                        return;
+                    }
+                    c = 0;
+                    int particleType = SRMConfig.particles;
+                    if (particleType >= 36) {
+                        particleType += 3;
+                    }
+                    // Draw particles based on enum
+                    try {
+                        RenderUtils.drawLineMultipleParticles(EnumParticleTypes.getParticleFromId(particleType), lines);
+                    } catch (Exception e) {
+                        LogUtils.error(e);
+                    }
                 }
             }
+        }catch (Exception e){
+            LogUtils.error(e);
         }
     }
     public void getData(String filePath){
