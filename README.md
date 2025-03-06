@@ -168,7 +168,9 @@
 
 Modrinth: https://modrinth.com/mod/secret-routes-mod
 
-Discord: [discord.gg/secretroutes](https://discord.com/channels/1111306530357256262/1111670971485663271)
+Discord: [discord.gg/secretroutes](https://discord.gg/secretroutes)
+
+**Support the mod**: https://buymeacoffe.com/SecretRoutes
 
 ---
 
