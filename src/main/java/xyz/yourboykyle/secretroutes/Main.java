@@ -161,7 +161,15 @@ public class Main {
         ClientCommandHandler.instance.registerCommand(new ChangeColorProfile());
         ClientCommandHandler.instance.registerCommand(new Debug());
 
-
+        if(SRMConfig.autoUpdateRoutes){
+            new Thread(()->{
+                try{
+                    RouteUtils.checkRoutesFiles();
+                }catch (Exception e1){
+                    LogUtils.error(e1);
+                }
+            }).start();
+        }
 
         // Make sure room data isn't null
         RoomDetection.roomName = "undefined";
@@ -210,10 +218,10 @@ public class Main {
             File configFile = new File(filePath);
             File configFilePearl = new File(ROUTES_PATH+File.separator+ "pearlroutes.json");
             if (!configFile.exists()) {
-                updateRoutes(configFile);
+                RouteUtils.updateRoutes(configFile);
             }
             if(!configFilePearl.exists()){
-                updatePearlRoutes();
+                RouteUtils.updatePearlRoutes();
             }
         } catch(Exception e) {
             LogUtils.error(e);
@@ -242,50 +250,9 @@ public class Main {
         }
     }
 
-    public static void updateRoutes(File configFile) {
-        try {
-            LogUtils.info("Downloading routes.json...");
-            URL url = new URL("https://raw.githubusercontent.com/yourboykyle/SecretRoutes/main/routes.json");
-            downloadFile(configFile, url);
 
-        }catch(Exception e){
-            LogUtils.error(e);
-        }
-    }
 
-    public static void updateRoutes() {
-        File configFile = new File(ROUTES_PATH + File.separator + "routes.json");
-        try {
-            LogUtils.info("Downloading routes.json...");
-            URL url = new URL("https://raw.githubusercontent.com/yourboykyle/SecretRoutes/main/routes.json");
-            downloadFile(configFile, url);
 
-        } catch (Exception e){
-            LogUtils.error(e);
-        }
-    }
-    public static void updatePearlRoutes() {
-        File configFile = new File(ROUTES_PATH + File.separator + "pearlroutes.json");
-        try {
-            LogUtils.info("Downloading routes.json...");
-            URL url = new URL("https://raw.githubusercontent.com/yourboykyle/SecretRoutes/main/pearlroutes.json");
-            downloadFile(configFile, url);
-        } catch (Exception e){
-            LogUtils.error(e);
-        }
-    }
-
-    private static void downloadFile(File outputFile, URL url) throws IOException {
-        HttpsURLConnection connection =  (HttpsURLConnection) url.openConnection();
-
-        connection.setSSLSocketFactory(SSLUtils.getSSLSocketFactory());
-
-        InputStream inputStream = connection.getInputStream();
-        OutputStream outputStream = Files.newOutputStream(outputFile.toPath());
-        IOUtils.copy(inputStream, outputStream);
-        outputStream.close();
-        inputStream.close();
-    }
 
     @SubscribeEvent
     public void onServerConnect(FMLNetworkEvent.ClientConnectedToServerEvent event) {

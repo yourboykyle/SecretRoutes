@@ -1,7 +1,7 @@
 {
 	"#origin": "Secret Routes Mod: https://github.com/yourboykyle/SecretRoutes",
-	"#copyright": "Copyright 2024 yourboykyle, wyannnnn, zzyyrraa",
-	"Version": "0.4.13",
+	"#copyright": "Copyright 2025 yourboykyle, wyannnnn (R-aMcC), zzyyrraa",
+	"Version": "0.4.15",
 
 	"Raccoon-4": [{"locations":[[14,69,13],[8,77,19]],"etherwarps":[[7,76,20]],"mines":[],"interacts":[],"tnts":[],"enderpearls":[],"enderpearlangles":[],"secret":{"type":"interact","location":[6,77,24]}},{"locations":[[18,83,15],[21,83,15],[22,83,12],[23,83,9]],"etherwarps":[[17,82,16]],"mines":[[18,83,16],[19,83,16],[19,84,16],[20,84,16],[20,83,16],[24,84,8],[25,84,8]],"interacts":[],"tnts":[],"enderpearls":[],"enderpearlangles":[],"secret":{"type":"interact","location":[26,84,8]}},{"locations":[[23,83,12],[23,83,15],[23,83,18],[25,75,19],[25,69,24]],"etherwarps":[[24,74,20],[24,68,25]],"mines":[],"interacts":[[24,70,28]],"tnts":[[24,75,21]],"enderpearls":[],"enderpearlangles":[],"secret":{"type":"interact","location":[27,69,24]}},{"locations":[],"etherwarps":[],"mines":[],"interacts":[],"tnts":[],"enderpearls":[],"enderpearlangles":[],"secret":{"type":"interact","location":[21,69,24]}}],
 	"Mural-1": [{"locations":[[9,69,15],[9,69,12],[9,69,9],[23,83,9]],"etherwarps":[[24,82,8]],"mines":[],"interacts":[],"tnts":[],"enderpearls":[],"enderpearlangles":[],"secret":{"type":"interact","location":[26,83,7]}}],

@@ -88,12 +88,12 @@ public class SRMConfig extends Config {
 
     @Switch(
             name = "All secrets",
-            description = "Renders all secrets in the room (DOES NOT RENDER STEPS)",
+            description = "Renders all secrets in the room (DOES NOT RENDER STEPS) - NO LINES",
             subcategory = "General"
     )
     public static boolean allSecrets = false;
     @Info(
-            text = "All secrets displays all secrets, but not the path...",
+            text = "All secrets displays all secrets, but not the route... (no lines)",
             subcategory = "General",
             size = 2,
             type = InfoType.WARNING
@@ -178,9 +178,9 @@ public class SRMConfig extends Config {
     Runnable runnable = () -> {
         new Thread(() -> {
             if (pearls) {
-                Main.updatePearlRoutes();
+                RouteUtils.updatePearlRoutes();
             } else {
-                Main.updateRoutes();
+                RouteUtils.updateRoutes();
             }
         }).start();
     };
@@ -318,6 +318,19 @@ public class SRMConfig extends Config {
             Main.updateManager.checkUpdate(true);
         }).start();
     };
+    @Switch(
+            name = "Auto update Routes",
+            description = "Automatically updates the routes.json file when it is out of date",
+            subcategory = "Updates",
+            size = 2
+    )
+    public static boolean autoUpdateRoutes = false;
+    @Info(
+            text = "THIS WILL OVERWRITE THE FILE. MAKE SURE YOUR CUSTOM ROUTES ARE NOT NAMED ROUTES.JSON OR PEARLROUTES.JSON",
+            subcategory = "Updates",
+            size = 2,
+            type = InfoType.WARNING
+    )
 
     // Recording
 
@@ -1278,6 +1291,15 @@ public class SRMConfig extends Config {
     )
     public static OneKeyBind exportRoutes = new OneKeyBind();
 
+    @Switch(
+            name = "Warn when keybinds used outside of dungeons",
+            description = "Sends a warning message when keybinds are used outside of dungeons",
+            size = 2,
+            category = "Keybinds",
+            subcategory = "General"
+    )
+    public static boolean warnKeybindsOutsideDungeon = true;
+
 
 
 
@@ -1601,21 +1623,27 @@ public class SRMConfig extends Config {
                 if (Utils.inCatacombs) {
                     Main.currentRoom.lastSecretKeybind();
                 } else {
-                    sendChatMessage("§cYou are not in a dungeon!");
+                    if(warnKeybindsOutsideDungeon){
+                        sendChatMessage("§cYou are not in a dungeon!");
+                    }
                 }
             });
             registerKeyBind(nextSecret, () -> {
                 if (Utils.inCatacombs) {
                     Main.currentRoom.nextSecretKeybind();
                 } else {
-                    sendChatMessage("§cYou are not in a dungeon!");
+                    if(warnKeybindsOutsideDungeon){
+                        sendChatMessage("§cYou are not in a dungeon!");
+                    }
                 }
             });
             registerKeyBind(toggleSecrets, () -> {
                 if (Utils.inCatacombs) {
                     Main.toggleSecretsKeybind();
                 } else {
-                    sendChatMessage("§cYou are not in a dungeon!");
+                    if(warnKeybindsOutsideDungeon){
+                        sendChatMessage("§cYou are not in a dungeon!");
+                    }
                 }
             });
 

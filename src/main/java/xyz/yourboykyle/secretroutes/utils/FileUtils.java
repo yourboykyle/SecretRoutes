@@ -20,13 +20,17 @@
 
 package xyz.yourboykyle.secretroutes.utils;
 
+import org.apache.commons.io.IOUtils;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 
+import javax.net.ssl.HttpsURLConnection;
 import java.awt.*;
 import java.io.*;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
@@ -94,10 +98,37 @@ public class FileUtils {
     public static void copyFileToRoutesDirectory(){
         try{
             String filename = SRMConfig.copyFileName;
-            File file = new File(System.getProperty("user.home") + File.separator + "Downloads" + File.separator + "routes.json");
-            copyFileToDirectory(file, Main.ROUTES_PATH+File.separator+filename);
+            copyAndRename(System.getProperty("user.home") + File.separator + "Downloads" + File.separator + "routes.json", Main.ROUTES_PATH, filename);
         }catch (Exception e){
             LogUtils.error(e);
         }
+    }
+
+    public static void copyAndRename(String sourceFile, String targetDirectoryPath, String targetFileName){
+        Path sourcePath = Paths.get(sourceFile);
+        Path destinationPath = Paths.get(targetDirectoryPath, targetFileName);
+
+        try {
+            // Create the destination directory if it doesn't exist
+            Files.createDirectories(destinationPath.getParent());
+
+            // Copy the target file to the new location with the given name
+            Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("File copied successfully to: " + destinationPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void downloadFile(File outputFile, URL url) throws IOException {
+        HttpsURLConnection connection =  (HttpsURLConnection) url.openConnection();
+
+        connection.setSSLSocketFactory(SSLUtils.getSSLSocketFactory());
+
+        InputStream inputStream = connection.getInputStream();
+        OutputStream outputStream = Files.newOutputStream(outputFile.toPath());
+        IOUtils.copy(inputStream, outputStream);
+        outputStream.close();
+        inputStream.close();
     }
 }
