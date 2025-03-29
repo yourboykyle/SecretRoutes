@@ -332,6 +332,7 @@ public class SRMConfig extends Config {
             type = InfoType.WARNING
     )
 
+
     // Recording
 
     @Button(
@@ -1496,6 +1497,15 @@ public class SRMConfig extends Config {
             size = 2
     )
     public static boolean playerWaypointLine = false;
+
+    @Switch(
+            name = "Player to Etherwarp",
+            description = "Draws a line to the next etherwarp location",
+            size = 2,
+            category = "Dev",
+            subcategory = "WIP"
+    )
+    public static boolean playerToEtherwarp = false;
 
     @Checkbox(
             name = "debug",

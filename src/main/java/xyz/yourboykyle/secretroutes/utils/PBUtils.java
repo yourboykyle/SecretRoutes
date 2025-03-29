@@ -39,7 +39,7 @@ public class PBUtils {
     public static String filePath = CONFIG_FOLDER_PATH + File.separator + "personal_bests.json";
 
     // Stuff for tracking personal bests
-    public static long startTime = 0;
+    public static long startTime = System.currentTimeMillis();
     public static boolean pbIsValid = false; // If a person uses one of the prev or next secret keybinds, its invalid. This it to prevent people from spamming the keybind until the last secret and clicking it legit for super fast PBs.
 
     // Load the PB data from the personal_bests.json file
@@ -104,7 +104,7 @@ public class PBUtils {
         if(!SRMConfig.trackPersonalBests) return;
 
         if(!pbIsValid) {
-            ChatUtils.sendVerboseMessage("PB is invalid, not saving.");
+            ChatUtils.sendVerboseMessage("PB is invalid, not saving.", "Personal Bests");
             return;
         }
 
@@ -112,7 +112,7 @@ public class PBUtils {
         startTime = 0;
         // Check if it's a PB
         long pbTime = getPBForRoom(RoomDetection.roomName);
-        ChatUtils.sendVerboseMessage("PB for " + RoomDetection.roomName + ": " + (pbTime == -1 ? "N/A" : formatTime(pbTime)));
+        ChatUtils.sendVerboseMessage("PB for " + RoomDetection.roomName + ": " + (pbTime == -1 ? "N/A" : formatTime(pbTime)), "Personal Bests");
         if (pbTime == -1 || time < pbTime) {
             // New PB
             if(SRMConfig.sendChatMessages) {
@@ -122,7 +122,7 @@ public class PBUtils {
         }
 
         PBUtils.pbIsValid = false;
-        ChatUtils.sendVerboseMessage("Time for " + RoomDetection.roomName + ": §a" + formatTime(time));
+        ChatUtils.sendVerboseMessage("Time for " + RoomDetection.roomName + ": §a" + formatTime(time), "Personal Bests");
     }
 
     public static String formatTime(long millis) {
@@ -149,7 +149,7 @@ public class PBUtils {
     }
 
     public static long parseTimeToMillis(String formattedTime) {
-        ChatUtils.sendVerboseMessage("Formatted PB time: " + formattedTime);
+        ChatUtils.sendVerboseMessage("Formatted PB time: " + formattedTime, "Personal Bests");
         long totalMillis = 0;
 
         // Regex pattern to match time components (e.g., "364d 1h 10m 30.524s")

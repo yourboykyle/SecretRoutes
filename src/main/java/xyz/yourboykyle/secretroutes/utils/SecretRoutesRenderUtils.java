@@ -22,6 +22,7 @@
 package xyz.yourboykyle.secretroutes.utils;
 
 import cc.polyfrost.oneconfig.config.core.OneColor;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.GlStateManager;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.WaypointUtils;
 import net.minecraft.client.Minecraft;
@@ -166,6 +167,7 @@ public class SecretRoutesRenderUtils {
         RenderUtils.drawText(text, pos, partialTicks, false, Constants.shadows, size);
         //GlStateManager.enableTexture2D();
     }
+
 
 
 
