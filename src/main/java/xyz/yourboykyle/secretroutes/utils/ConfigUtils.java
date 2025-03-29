@@ -48,7 +48,7 @@ public class ConfigUtils {
             "secretsItemFullBlock", "secretsInteractFullBlock", "secretsBatFullBlock", "interactsFullBlock",
             "lineColor", "etherWarp", "mine", "interacts", "superbooms", "enderpearls",
             "secretsItem", "secretsInteract", "secretsBat", "pearlLineColor",
-            "renderEtherwarps ", "renderMines", "renderInteracts", "renderSuperboom ", "renderEnderpearls",
+            "renderEtherwarps", "renderMines", "renderInteracts", "renderSuperboom", "renderEnderpearls",
             "renderSecretsItem", "renderSecretIteract", "renderSecretBat"
 };
 
