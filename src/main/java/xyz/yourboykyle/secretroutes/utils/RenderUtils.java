@@ -167,6 +167,9 @@ public class RenderUtils {
     }
 
     //
+    public static void drawNormalLine(double x1, double y1, double z1, BlockPos pos, OneColor color, float partialTicks, boolean depth, int width) {
+        drawNormalLine(x1, y1, z1, pos.getX(), pos.getY(), pos.getZ(), color, partialTicks, depth, width);
+    }
     public static void drawNormalLine(double x1, double y1, double z1, double x2, double y2, double z2, OneColor colour, float partialTicks, boolean depth, int width) {
         Entity render = Minecraft.getMinecraft().getRenderViewEntity();
         WorldRenderer worldRenderer = Tessellator.getInstance().getWorldRenderer();
@@ -259,6 +262,16 @@ public class RenderUtils {
         GlStateManager.disableBlend();
         GlStateManager.popMatrix();
 
+    }
+    public static void drawFromPlayer(EntityPlayerSP p, BlockPos pos, OneColor color, float partialticks, int width){
+
+        double px = p.prevPosX + (p.posX - p.prevPosX)*partialticks;
+        double py = p.prevPosY + (p.posY - p.prevPosY)*partialticks;
+        double pz = p.prevPosZ + (p.posZ - p.prevPosZ)*partialticks;
+
+
+
+        drawNormalLine(px, py+p.getEyeHeight(), pz, pos.getX()+0.5, pos.getY(), pos.getZ() +0.5, color, partialticks, false, width);
     }
 
     public static void drawFromPlayer(EntityPlayerSP p, double x, double y, double z, OneColor color, float partialticks, int width){

@@ -28,6 +28,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Tuple;
@@ -81,11 +82,15 @@ public class SecretUtils {
         if (currentSecretWaypoints != null && currentSecretWaypoints.get("etherwarps") != null && (!SRMConfig.wholeRoute || SRMConfig.allSteps || index2 == Main.currentRoom.currentSecretIndex) && SRMConfig.renderEtherwarps) {
             JsonArray etherwarpLocations = currentSecretWaypoints.get("etherwarps").getAsJsonArray();
             for (JsonElement etherwarpLocationElement : etherwarpLocations) {
+
                 JsonArray etherwarpLocation = etherwarpLocationElement.getAsJsonArray();
 
                 Main.checkRoomData();
                 BlockPos pos = MapUtils.relativeToActual(new BlockPos(etherwarpLocation.get(0).getAsInt(), etherwarpLocation.get(1).getAsInt(), etherwarpLocation.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
-
+                if(!SRMConfig.wholeRoute && etherwarpLocations.get(0) == etherwarpLocationElement && SRMConfig.playerToEtherwarp){
+                    EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+                    RenderUtils.drawFromPlayer(player, pos, new OneColor(0, 255, 255), event.partialTicks, 1);
+                }
                 etherwarpPositions.add(pos);
                 if(SRMConfig.etherwarpFullBlock){
                     SecretRoutesRenderUtils.drawFilledBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.etherWarp, 1, 1);
