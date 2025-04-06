@@ -230,7 +230,7 @@ public class Room {
                 Gson gson = new GsonBuilder().create();
                 FileReader reader = new FileReader(filePath);
                 JsonObject data = gson.fromJson(reader, JsonObject.class);
-                for (int i = 0; i < 10; i++) {
+                for (int i = 0; i <= 10; i++) {
                     String path = name;
                     if (i == 0) {
                         if (data == null || data.isJsonNull() || data.get(name) == null || data.get(name).isJsonNull()) {
@@ -240,7 +240,7 @@ public class Room {
                         path = name + ":" + i;
                     }
                     if (data == null || data.isJsonNull() || data.get(path) == null || data.get(path).isJsonNull()) {
-                        break;
+                        continue;
                     }
                     JsonArray route = data.get(path).getAsJsonArray();
 
@@ -249,7 +249,7 @@ public class Room {
                     BlockPos startPos = new BlockPos(starPoseArray.get(0).getAsInt(), starPoseArray.get(1).getAsInt(), starPoseArray.get(2).getAsInt());
                     map.put(BlockUtils.blockPos(startPos), i);
                 }
-
+                int i = 0;
                 for (Map.Entry<String, Integer> entry : map.entrySet()) {
                     EntityPlayerSP p = Minecraft.getMinecraft().thePlayer;
                     BlockPos pPos = new BlockPos(p.posX, p.posY, p.posZ);
@@ -263,8 +263,8 @@ public class Room {
                         }
                     }
 
-                    closest = new Triple<>(entry.getKey(), entry.getValue(), dist1);
-
+                    closest = new Triple<>(entry.getKey(), i, dist1);
+                    i++;
                 }
                 if(closest != null) {
                     currentSecretRoute = arrays.get(closest.getTwo());
