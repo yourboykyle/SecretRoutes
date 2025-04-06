@@ -97,7 +97,9 @@ dependencies {
     // Adds DevAuth, which we can use to log in to Minecraft in development.
     modRuntimeOnly("me.djtheredstoner:DevAuth-${if (platform.isFabric) "fabric" else if (platform.isLegacyForge) "forge-legacy" else "forge-latest"}:1.2.0")
 
-    shade("moe.nea:libautoupdate:1.3.1")
+    shade("moe.nea:libautoupdate:1.3.1"){
+        isTransitive = false
+    }
 
     // If we are building for legacy forge, includes the launch wrapper with `shade` as we configured earlier, as well as mixin 0.7.11
     if (platform.isLegacyForge) {
