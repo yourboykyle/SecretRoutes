@@ -62,7 +62,7 @@ public class OnMouseInput {
                         Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.TNTS, player);
                     }
                 }
-
+/*
                 if(item.getDisplayName().toLowerCase().contains("aspect of the void") && button == 1 && player.isSneaking()){
                     LogUtils.info("§bPlayer is holding an aspect of the void");
                     if(Main.routeRecording.recording) {
@@ -91,6 +91,8 @@ public class OnMouseInput {
 
 
                 }
+
+ */
 
 
 
