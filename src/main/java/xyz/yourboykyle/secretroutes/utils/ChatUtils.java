@@ -88,8 +88,10 @@ public class ChatUtils {
                 }
                 return false;
             default:
-                sendChatMessage("§d[" + TAG + "] " + message);
-                return true;
+                if(SRMConfig.verboseLogging){
+                    sendChatMessage("§d[" + TAG + "] " + message);
+                    return true;
+                }
         }
 
     }
