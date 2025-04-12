@@ -106,7 +106,7 @@ public class SRMConfig extends Config {
             subcategory = "General",
             size = OptionSize.DUAL
     )
-    public static int lineType = 0;
+    public static int lineType = 1;
 
     @Dropdown(
             name = "Particle Type",
