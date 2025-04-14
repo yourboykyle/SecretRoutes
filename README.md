@@ -97,7 +97,7 @@
 </details>
 
 <details>
-    <summary><strong><em>(NEW)</em></strong> <strong>Bridge</strong></summary>
+    <summary><strong>Bridge</strong></summary>
     <ul>
         <li>Make bridge bot messages look nicer in SRM Guild <em>(/g join srm)</em></li>
     </ul>
