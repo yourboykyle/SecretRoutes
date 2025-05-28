@@ -90,8 +90,8 @@ public class ChatUtils {
             default:
                 if(SRMConfig.verboseLogging){
                     sendChatMessage("§d[" + TAG + "] " + message);
-                    return true;
                 }
+                return true;
         }
 
     }

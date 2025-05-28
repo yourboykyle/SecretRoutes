@@ -55,6 +55,7 @@ public class SecretSounds {
 
 
     public static void playLoudSound(String sound, Float volume, Float pitch, Vec3 pos) {
+        //mc.getSoundHandler().sndRegistry;
         mc.addScheduledTask(() -> {
             shouldBypassVolume = true;
             mc.theWorld.playSound(pos.xCoord, pos.yCoord+1.62, pos.zCoord, sound, volume, pitch, false);
