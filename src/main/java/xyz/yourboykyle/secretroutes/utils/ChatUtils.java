@@ -96,10 +96,10 @@ public class ChatUtils {
             default:
                 if(SRMConfig.verboseLogging){
                     sendChatMessage("§d[" + TAG + "] " + message);
+                    return true;
                 }
-                return true;
+                return false;
         }
-        return false;
     }
     public static void sendClickableMessage(String text, String link){
         if(Minecraft.getMinecraft().thePlayer == null){
