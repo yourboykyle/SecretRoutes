@@ -87,13 +87,19 @@ public class ChatUtils {
                     return true;
                 }
                 return false;
+            case "Personal Bests":
+                if(SRMConfig.verbosePersonalBests){
+                    sendVerboseMessage("§d[Personal Bests] " + message);
+                    return true;
+                }
+                return false;
             default:
                 if(SRMConfig.verboseLogging){
                     sendChatMessage("§d[" + TAG + "] " + message);
                     return true;
                 }
         }
-
+        return false;
     }
     public static void sendClickableMessage(String text, String link){
         if(Minecraft.getMinecraft().thePlayer == null){
