@@ -21,6 +21,7 @@
 package xyz.yourboykyle.secretroutes.events;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -85,7 +86,9 @@ public class OnPlayerTick {
         // Route Recording
         if(Main.routeRecording.recording) {
             if (Main.routeRecording.previousLocation == null) {
-                Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.LOCATIONS, e.player.getPosition());
+                EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+                BlockPos targetPos = new BlockPos(Math.floor(player.posX), Math.floor(player.posY), Math.floor(player.posZ));
+                Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.LOCATIONS, targetPos); // Trust the process
                 Main.routeRecording.previousLocation = e.player.getPosition();
             } else {
                 BlockPos pos = e.player.getPosition();
@@ -95,7 +98,9 @@ public class OnPlayerTick {
 
                 // If the player has moved 5 blocks or more from the previous waypoint
                 if (distance >= 2.4) {
-                    Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.LOCATIONS, e.player.getPosition());
+                    EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+                    BlockPos targetPos = new BlockPos(Math.floor(player.posX), Math.floor(player.posY), Math.floor(player.posZ));
+                    Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.LOCATIONS, targetPos);
                     Main.routeRecording.previousLocation = e.player.getPosition();
                 }
             }
