@@ -21,7 +21,6 @@
 package xyz.yourboykyle.secretroutes.utils;
 
 import cc.polyfrost.oneconfig.config.core.OneColor;
-import com.jcraft.jorbis.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
@@ -47,9 +46,12 @@ public class RenderUtils {
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glLineWidth(3);
+        GlStateManager.pushAttrib();
+        GlStateManager.pushMatrix();
         GlStateManager.disableTexture2D();
         GlStateManager.disableDepth();
         GlStateManager.depthMask(false);
+        GlStateManager.disableLighting();
 
         GL11.glTranslated(x, y, z);
 
@@ -80,6 +82,9 @@ public class RenderUtils {
         GlStateManager.depthMask(true);
         GlStateManager.enableDepth();
         GlStateManager.enableTexture2D();
+        GlStateManager.enableLighting();
+        GlStateManager.popMatrix();
+        GlStateManager.popAttrib();
         GL11.glDisable(GL11.GL_BLEND);
         GL11.glColor4f(1, 1, 1, 0);
         GL11.glPopMatrix();
@@ -189,6 +194,7 @@ public class RenderUtils {
         GlStateManager.disableLighting();
         GlStateManager.enableBlend();
         GlStateManager.disableAlpha();
+        GlStateManager.enableDepth(); //
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         GL11.glLineWidth(width);
         GlStateManager.color(colour.getRed() / 255f, colour.getGreen() / 255f, colour.getBlue()/ 255f, colour.getAlpha() / 255f);
@@ -207,6 +213,7 @@ public class RenderUtils {
         GlStateManager.enableAlpha();
         GlStateManager.enableTexture2D();
         GlStateManager.enableLighting();
+        GlStateManager.disableDepth(); //
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.popMatrix();
     }
@@ -217,16 +224,15 @@ public class RenderUtils {
 
 
 
-    public static void drawText(String text, BlockPos pos, float partialTicks, Boolean depth, Boolean shadow, Float scale){
-
+    public static void drawText(String text, BlockPos pos, float partialTicks, Boolean depth, Boolean shadow, Float scale) {
         Minecraft mc = Minecraft.getMinecraft();
         RenderManager rm = mc.getRenderManager();
         FontRenderer fr = mc.fontRendererObj;
         EntityPlayerSP player = mc.thePlayer;
 
-        double viewerPosX = player.lastTickPosX + (player.posX-player.lastTickPosX)*(double) partialTicks;
-        double viewerPosY = player.lastTickPosY + (player.posY-player.lastTickPosY)*(double) partialTicks;
-        double viewerPosZ = player.lastTickPosZ + (player.posZ-player.lastTickPosZ)*(double) partialTicks;
+        double viewerPosX = player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTicks;
+        double viewerPosY = player.lastTickPosY + (player.posY - player.lastTickPosY) * partialTicks;
+        double viewerPosZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTicks;
 
         double posX = pos.getX() - viewerPosX + 0.5;
         double posY = pos.getY() - viewerPosY - player.getEyeHeight();
@@ -235,34 +241,35 @@ public class RenderUtils {
         double distance = Math.sqrt(posX * posX + posY * posY + posZ * posZ);
 
         GlStateManager.pushMatrix();
+        GlStateManager.enableTexture2D();
         GlStateManager.translate(posX, posY, posZ);
         GlStateManager.translate(0, player.getEyeHeight(), 0);
         GlStateManager.rotate(-rm.playerViewY, 0, 1, 0);
         GlStateManager.rotate(rm.playerViewX, 1, 0, 0);
-        GlStateManager.scale(-Constants.baseScale*scale, -Constants.baseScale*scale, -Constants.baseScale*scale);
+        GlStateManager.scale(-Constants.baseScale * scale, -Constants.baseScale * scale, -Constants.baseScale * scale);
 
-        float constantScaleFactor = (float) (distance*Constants.distanceScaleFactor);
-        GlStateManager.scale(1+constantScaleFactor, 1+constantScaleFactor, 1+constantScaleFactor);
+        float constantScaleFactor = (float) (distance * Constants.distanceScaleFactor);
+        GlStateManager.scale(1 + constantScaleFactor, 1 + constantScaleFactor, 1 + constantScaleFactor);
 
         GlStateManager.disableLighting();
-        if(!depth){
+        if (!depth) {
             GlStateManager.depthMask(false);
             GlStateManager.disableDepth();
         }
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(770, 771);
-        float width = fr.getStringWidth(text)/2.0f;
+        float width = fr.getStringWidth(text) / 2.0f;
         fr.drawString(text, -width, 0f, 0xFFFFFF, shadow);
 
-        if(!depth){
+        if (!depth) {
             GlStateManager.enableDepth();
             GlStateManager.depthMask(true);
         }
-        GlStateManager.enableTexture2D();
         GlStateManager.disableBlend();
+        GlStateManager.disableTexture2D();
         GlStateManager.popMatrix();
-
     }
+
     public static void drawFromPlayer(EntityPlayerSP p, BlockPos pos, OneColor color, float partialticks, int width){
 
         double px = p.prevPosX + (p.posX - p.prevPosX)*partialticks;

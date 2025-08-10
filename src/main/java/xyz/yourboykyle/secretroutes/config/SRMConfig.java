@@ -1201,6 +1201,13 @@ public class SRMConfig extends Config {
             category = "Dev"
     )
     public static boolean verboseRendering = false;
+    @Switch(
+            name = "Better personal bests",
+            description = "adds more detailed logging personal bests, useful for debugging",
+            subcategory = "Chat logging",
+            category = "Dev"
+    )
+    public static boolean verbosePersonalBests = false;
 
     @Switch(
             name = "ActionBar info",
