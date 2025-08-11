@@ -24,6 +24,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.config.SRMConfig;
+
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
 
@@ -40,8 +42,15 @@ public class LogUtils {
 
     public static void error(Exception error) {
         errorNoShout(error);
+
         if(Minecraft.getMinecraft().thePlayer != null) {
-            sendChatMessage(EnumChatFormatting.DARK_RED+"Error caught by Secret Routes. Check latest logs at .minecraft/logs/SecretRoutes/LATEST-{date}.log. SEND THIS FILE IN #SUPPORT IN THE DISCORD FOR HELP. ("+ error.getLocalizedMessage()+")");
+            switch(error.getClass().getTypeName()){
+                case "java.io.FileNotFoundException":
+                    sendChatMessage(EnumChatFormatting.DARK_RED+"The system cannot find the file specified. Please ensure that this is the correct file name §c\""+ (SRMConfig.pearls ? SRMConfig.pearlRoutesFileName : SRMConfig.routesFileName) + "\"§4 and that it exists in §c" + Main.ROUTES_PATH);
+                    break;
+                default:
+                    sendChatMessage(EnumChatFormatting.DARK_RED+"Error caught by Secret Routes. Check latest logs at .minecraft/logs/SecretRoutes/LATEST-{date}.log. SEND THIS FILE IN #SUPPORT IN THE DISCORD FOR HELP. ("+ error.getLocalizedMessage()+")");
+            }
         }
     }
     public static void errorNoShout(Exception error) {
