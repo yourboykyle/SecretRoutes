@@ -264,7 +264,8 @@ public class Main {
 
         Minecraft mc = Minecraft.getMinecraft();
         if (mc.getCurrentServerData() == null) return;
-        if (mc.getCurrentServerData().serverIP.toLowerCase().contains("hypixel.")) {
+        String serverName  = mc.getCurrentServerData().serverIP.toLowerCase()
+        if (serverName.contains("hypixel.") || serverName.contains("fakepixel.") {
 
             if(SRMConfig.autoCheckUpdates) {
                 new Thread(() -> {
