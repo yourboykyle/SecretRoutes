@@ -43,7 +43,6 @@ public class GuildEvents {
     public void OnChatReceived(ClientChatReceivedEvent e) {
         if (e.type == 2 || !SRMConfig.bridge) return;
         String message = e.message.getUnformattedText();
-        System.out.println("Message: " + message);
         if (message.contains(SEARCH)) {
             String tmp = message.split(":")[1];
             String sec1 = tmp.substring(0, tmp.indexOf("»") - 1).replaceFirst("»", ":");
