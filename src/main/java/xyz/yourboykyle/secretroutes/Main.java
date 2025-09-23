@@ -27,11 +27,9 @@ import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
-import org.apache.commons.io.IOUtils;
 import xyz.yourboykyle.secretroutes.commands.*;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.DungeonRooms;
@@ -42,11 +40,10 @@ import xyz.yourboykyle.secretroutes.events.*;
 import xyz.yourboykyle.secretroutes.utils.*;
 import xyz.yourboykyle.secretroutes.utils.autoupdate.UpdateManager;
 
-import javax.net.ssl.HttpsURLConnection;
 import java.awt.*;
-import java.io.*;
-import java.net.URL;
-import java.nio.file.Files;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
@@ -264,7 +261,8 @@ public class Main {
 
         Minecraft mc = Minecraft.getMinecraft();
         if (mc.getCurrentServerData() == null) return;
-        if (mc.getCurrentServerData().serverIP.toLowerCase().contains("hypixel.")) {
+        String serverName  = mc.getCurrentServerData().serverIP.toLowerCase();
+        if (serverName.contains("hypixel.") || serverName.contains("fakepixel.")) {
 
             if(SRMConfig.autoCheckUpdates) {
                 new Thread(() -> {
@@ -306,7 +304,7 @@ public class Main {
                         Thread.sleep(100);
                     }
                     Thread.sleep(3000);
-                    if (mc.getCurrentServerData().serverIP.toLowerCase().contains("hypixel.")) {
+                    if (serverName.contains("hypixel.") || serverName.contains("fakepixel.")) {
                         Utils.checkForConflictingHotkeys();
                     }
                 } catch (InterruptedException e) {

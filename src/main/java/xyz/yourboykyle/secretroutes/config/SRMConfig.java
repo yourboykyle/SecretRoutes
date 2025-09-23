@@ -21,19 +21,16 @@
 package xyz.yourboykyle.secretroutes.config;
 
 import cc.polyfrost.oneconfig.config.Config;
-import cc.polyfrost.oneconfig.config.annotations.Number;
 import cc.polyfrost.oneconfig.config.annotations.*;
+import cc.polyfrost.oneconfig.config.annotations.Number;
 import cc.polyfrost.oneconfig.config.core.OneColor;
 import cc.polyfrost.oneconfig.config.core.OneKeyBind;
 import cc.polyfrost.oneconfig.config.data.InfoType;
 import cc.polyfrost.oneconfig.config.data.Mod;
 import cc.polyfrost.oneconfig.config.data.ModType;
 import cc.polyfrost.oneconfig.config.data.OptionSize;
-import cc.polyfrost.oneconfig.gui.OneConfigGui;
 import cc.polyfrost.oneconfig.gui.pages.ModConfigPage;
 import cc.polyfrost.oneconfig.libs.universal.UKeyboard;
-import cc.polyfrost.oneconfig.utils.gui.GuiUtils;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
@@ -1541,7 +1538,6 @@ public class SRMConfig extends Config {
 
     public Boolean lambda(String dependentOption) {
         try {
-
             return (boolean) optionNames.get(dependentOption).get();
         } catch (IllegalAccessException ignored) {
             sendVerboseMessage("Error in lambda function");
