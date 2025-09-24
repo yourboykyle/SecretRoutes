@@ -1495,7 +1495,7 @@ public class SRMConfig extends Config {
 
 
     @Switch(
-            name = "Player to next waypoint",
+            name = "Player crosshair to next waypoint",
             category = "Dev",
             subcategory = "WIP",
             size = 2
