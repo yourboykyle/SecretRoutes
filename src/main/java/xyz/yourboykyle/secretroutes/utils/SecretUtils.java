@@ -37,6 +37,7 @@ import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.MapUtils;
+import xyz.yourboykyle.secretroutes.events.OnEtherwarp;
 import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 
 import java.io.InputStreamReader;
@@ -76,6 +77,9 @@ public class SecretUtils {
             if(nextSecret!=null){
                 RenderUtils.drawFromPlayer(Minecraft.getMinecraft().thePlayer, nextSecret.getX(), nextSecret.getY(), nextSecret.getZ(), SRMConfig.lineColor, event.partialTicks, SRMConfig.width );
             }
+        }
+        if(SRMConfig.nextEtherwarp && OnEtherwarp.etherwarpPosition != null){
+            RenderUtils.drawFromPlayer(Minecraft.getMinecraft().thePlayer, OnEtherwarp.etherwarpPosition, SRMConfig.lineColor, event.partialTicks, SRMConfig.width);
         }
 
         // Render the etherwarps

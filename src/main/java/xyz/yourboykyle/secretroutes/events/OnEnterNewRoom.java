@@ -20,11 +20,10 @@
 
 package xyz.yourboykyle.secretroutes.events;
 
-import xyz.yourboykyle.secretroutes.config.SRMConfig;
+import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.DungeonManager;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
-import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
 import xyz.yourboykyle.secretroutes.utils.SecretUtils;
@@ -47,6 +46,8 @@ public class OnEnterNewRoom {
             SecretUtils.secrets = null;
             SecretUtils.secretLocations = new ArrayList<>();
             SecretUtils.resetValues();
+
+            OnEtherwarp.resetValues();
         } catch(Exception e) {
             LogUtils.error(e);
         }

@@ -29,6 +29,7 @@ import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.MapUtils;
+import xyz.yourboykyle.secretroutes.events.OnEtherwarp;
 import xyz.yourboykyle.secretroutes.events.OnSecretComplete;
 import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 
@@ -116,8 +117,9 @@ public class Room {
 
     public void nextSecret() {
         OnSecretComplete.onSecretCompleteNoKeybind();
-
         currentSecretIndex++;
+        //Reset the etherwarp counter to 0
+        OnEtherwarp.etherwarp = 0;
 
         if(!(currentSecretIndex >= currentSecretRoute.size())) {
             currentSecretWaypoints = currentSecretRoute.get(currentSecretIndex).getAsJsonObject();

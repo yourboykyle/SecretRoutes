@@ -1535,6 +1535,13 @@ public class SRMConfig extends Config {
     )
     public static boolean sendData = true;
 
+    @Switch(
+            name = "Player to next etherwarp waypoint",
+            category = "Dev",
+            subcategory = "WIP"
+    )
+    public static boolean nextEtherwarp = false;
+
 
     public Boolean lambda(String dependentOption) {
         try {

@@ -35,7 +35,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
-import xyz.yourboykyle.secretroutes.utils.RouteRecording;
 
 public class OnPlaySound {
     @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
@@ -65,6 +64,9 @@ public class OnPlaySound {
                         }
                     }).start();
                 }
+
+                    // In here is where we can try to add some sort of functionality to discover num of etherwarps
+                OnEtherwarp.onEtherwarp();
             }
             String[] parts = sound.getSoundLocation().toString().split(":", 2);
             if (parts.length > 1) {
