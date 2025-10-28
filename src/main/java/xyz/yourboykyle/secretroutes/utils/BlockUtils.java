@@ -20,7 +20,9 @@
 
 package xyz.yourboykyle.secretroutes.utils;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
+import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 
 public class BlockUtils {
 
@@ -55,4 +57,18 @@ public class BlockUtils {
         if(pos2Block == null){return Integer.MAX_VALUE;}
         return blockDistance(pos1, pos2Block);
     }
+    public static BlockPos playerToWorld(BlockPos pos) {
+        Triple<Double, Double, Double> rel_pos = playerToWorld(pos.getX(), pos.getY(), pos.getZ());
+        return new BlockPos(rel_pos.getOne(), rel_pos.getTwo(), rel_pos.getThree());
+    }
+
+    public static Triple<Double, Double, Double> playerToWorld(double worldX, double worldY, double worldZ) {
+        Minecraft mc = Minecraft.getMinecraft();
+        double playerX = mc.getRenderManager().viewerPosX;
+        double playerY = mc.getRenderManager().viewerPosY;
+        double playerZ = mc.getRenderManager().viewerPosZ;
+
+        return new Triple<>( worldX-playerX, worldY-playerY, worldZ-playerZ);
+    }
+
 }

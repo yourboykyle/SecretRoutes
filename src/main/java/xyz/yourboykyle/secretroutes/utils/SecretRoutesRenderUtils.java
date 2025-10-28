@@ -22,145 +22,48 @@
 package xyz.yourboykyle.secretroutes.utils;
 
 import cc.polyfrost.oneconfig.config.core.OneColor;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.renderer.GlStateManager;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.WaypointUtils;
-import net.minecraft.client.Minecraft;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
+import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.WaypointUtils;
+import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 
 public class SecretRoutesRenderUtils {
     public static void drawBoxAtBlock(double worldX, double worldY, double worldZ, OneColor color) {
-        Minecraft mc = Minecraft.getMinecraft();
-        double playerX = mc.getRenderManager().viewerPosX;
-        double playerY = mc.getRenderManager().viewerPosY;
-        double playerZ = mc.getRenderManager().viewerPosZ;
-
-        double x = worldX - playerX;
-        double y = worldY - playerY;
-        double z = worldZ - playerZ;
-
-        RenderUtils.drawBoxAtBlock(x, y, z, color, 1, 1, 1);
+        drawBoxAtBlock(worldX, worldY, worldZ, color, 1, 1, 1);
     }
     public static void drawBoxAtBlock(double worldX, double worldY, double worldZ, OneColor color, int width, int height) {
-        Minecraft mc = Minecraft.getMinecraft();
-        double playerX = mc.getRenderManager().viewerPosX;
-        double playerY = mc.getRenderManager().viewerPosY;
-        double playerZ = mc.getRenderManager().viewerPosZ;
-
-        double x = worldX - playerX;
-        double y = worldY - playerY;
-        double z = worldZ - playerZ;
-
-        RenderUtils.drawBoxAtBlock(x, y, z, color, width, height, 1);
+        drawBoxAtBlock(worldX, worldY, worldZ, color, width, height, 1);
     }
     public static void drawBoxAtBlock(double worldX, double worldY, double worldZ, OneColor color, double width, double height) {
-        Minecraft mc = Minecraft.getMinecraft();
-        double playerX = mc.getRenderManager().viewerPosX;
-        double playerY = mc.getRenderManager().viewerPosY;
-        double playerZ = mc.getRenderManager().viewerPosZ;
-
-        double x = worldX - playerX;
-        double y = worldY - playerY;
-        double z = worldZ - playerZ;
-
-        RenderUtils.drawBoxAtBlock(x, y, z, color, width, height, 1);
+        drawBoxAtBlock(worldX, worldY, worldZ, color, width, height, 1);
     }
-    public static void drawBoxAtBlock(double worldX, double worldY, double worldZ, OneColor color, int width, int height, int alpha) {
-        Minecraft mc = Minecraft.getMinecraft();
-        double playerX = mc.getRenderManager().viewerPosX;
-        double playerY = mc.getRenderManager().viewerPosY;
-        double playerZ = mc.getRenderManager().viewerPosZ;
-
-        double x = worldX - playerX;
-        double y = worldY - playerY;
-        double z = worldZ - playerZ;
-
-        RenderUtils.drawBoxAtBlock(x, y, z,color, width, height, alpha);
+    public static void drawBoxAtBlock(double worldX, double worldY, double worldZ, OneColor color, double width, double height, int alpha) {
+        Triple<Double, Double, Double> pos = BlockUtils.playerToWorld(worldX, worldY, worldZ);
+        RenderUtils.drawBoxAtBlock(pos.getOne(), pos.getTwo(), pos.getThree(), color, width, height, alpha);
     }
 
     public static void drawFilledBoxAtBlock(double worldX, double worldY, double worldZ, OneColor color) {
-        Minecraft mc = Minecraft.getMinecraft();
-        double playerX = mc.getRenderManager().viewerPosX;
-        double playerY = mc.getRenderManager().viewerPosY;
-        double playerZ = mc.getRenderManager().viewerPosZ;
+        drawFilledBoxAtBlock(worldX, worldY, worldZ, color, 1, 1, SRMConfig.alphaMultiplier);
 
-        double x = worldX - playerX;
-        double y = worldY - playerY;
-        double z = worldZ - playerZ;
 
-        int width = 1;
-        int height = 1;
-
-        WaypointUtils.drawFilledBoundingBox(new AxisAlignedBB(x - 0.01, y - 0.01, z - 0.01, x + width + 0.01, y + height + 0.01, z + width + 0.01), color, 1);
-    }
-    public static void drawFilledBoxAtBlock(double worldX, double worldY, double worldZ, OneColor color, int width, int height) {
-        Minecraft mc = Minecraft.getMinecraft();
-        double playerX = mc.getRenderManager().viewerPosX;
-        double playerY = mc.getRenderManager().viewerPosY;
-        double playerZ = mc.getRenderManager().viewerPosZ;
-
-        double x = worldX - playerX;
-        double y = worldY - playerY;
-        double z = worldZ - playerZ;
-
-        WaypointUtils.drawFilledBoundingBox(new AxisAlignedBB(x - 0.01, y - 0.01, z - 0.01, x + width + 0.01, y + height + 0.01, z + width + 0.01), color, SRMConfig.alphaMultiplier);
     }
     public static void drawFilledBoxAtBlock(double worldX, double worldY, double worldZ, OneColor color, float width, float height) {
-        Minecraft mc = Minecraft.getMinecraft();
-        double playerX = mc.getRenderManager().viewerPosX;
-        double playerY = mc.getRenderManager().viewerPosY;
-        double playerZ = mc.getRenderManager().viewerPosZ;
-
-        double x = worldX - playerX;
-        double y = worldY - playerY;
-        double z = worldZ - playerZ;
-
-        WaypointUtils.drawFilledBoundingBox(new AxisAlignedBB(x - 0.01, y - 0.01, z - 0.01, x + width + 0.01, y + height + 0.01, z + width + 0.01), color, SRMConfig.alphaMultiplier);
+        drawFilledBoxAtBlock(worldX, worldY, worldZ, color, width, height, SRMConfig.alphaMultiplier);
     }
-
-
-
-    public static void drawFilledBoxAtBlock(double worldX, double worldY, double worldZ, OneColor color, int width, int height, float alpha) {
-        Minecraft mc = Minecraft.getMinecraft();
-        double playerX = mc.getRenderManager().viewerPosX;
-        double playerY = mc.getRenderManager().viewerPosY;
-        double playerZ = mc.getRenderManager().viewerPosZ;
-
-        double x = worldX - playerX;
-        double y = worldY - playerY;
-        double z = worldZ - playerZ;
-
-        WaypointUtils.drawFilledBoundingBox(new AxisAlignedBB(x - 0.01, y - 0.01, z - 0.01, x + width + 0.01, y + height + 0.01, z + width + 0.01), color, alpha);
+    public static void drawFilledBoxAtBlock(double worldX, double worldY, double worldZ, OneColor color, float width, float height, float alpha) {
+        Triple<Double, Double, Double> pos = BlockUtils.playerToWorld(worldX, worldY, worldZ);
+        WaypointUtils.drawFilledBoundingBox(new AxisAlignedBB(pos.getOne() - 0.01, pos.getTwo() - 0.01, pos.getThree() - 0.01, pos.getOne() + width + 0.01, pos.getTwo() + height + 0.01, pos.getThree() + width + 0.01), color, alpha);
     }
 
     public static void drawBeaconBeam(double worldX, double worldY, double worldZ, int RGB, float alpha) {
-        Minecraft mc = Minecraft.getMinecraft();
-        double playerX = mc.getRenderManager().viewerPosX;
-        double playerY = mc.getRenderManager().viewerPosY;
-        double playerZ = mc.getRenderManager().viewerPosZ;
-
-        double x = worldX - playerX;
-        double y = worldY - playerY;
-        double z = worldZ - playerZ;
-
-        WaypointUtils.renderBeaconBeam(x, y, z, RGB, alpha, 0);
+        Triple<Double, Double, Double> pos = BlockUtils.playerToWorld(worldX, worldY, worldZ);
+        WaypointUtils.renderBeaconBeam(pos.getOne(), pos.getTwo(), pos.getThree(), RGB, alpha, 0);
     }
 
     public static void drawText(double worldX, double worldY, double worldZ, String text, float size, float partialTicks) {
         BlockPos pos = new BlockPos(worldX, worldY, worldZ);
-
-        Minecraft mc = Minecraft.getMinecraft();
-        double playerX = mc.getRenderManager().viewerPosX;
-        double playerY = mc.getRenderManager().viewerPosY;
-        double playerZ = mc.getRenderManager().viewerPosZ;
-
-        double x = worldX - playerX;
-        double y = worldY - playerY;
-        double z = worldZ - playerZ;
-
         text = EnumChatFormatting.BOLD + text;
         //GlStateManager.disableTexture2D();
         //WaypointUtils.renderWaypointText(text, pos, partialTicks, size);
@@ -197,8 +100,6 @@ public class SecretRoutesRenderUtils {
                 return EnumChatFormatting.GREEN.toString();
             case 11:
                 return EnumChatFormatting.AQUA.toString();
-            case 12:
-                return EnumChatFormatting.RED.toString();
             case 13:
                 return EnumChatFormatting.LIGHT_PURPLE.toString();
             case 14:
