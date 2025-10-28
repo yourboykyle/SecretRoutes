@@ -1,0 +1,29 @@
+{
+  "zyra.meow0": {
+    "sounds": [{"name": "zyra/meow0", "steam":  true}], "category": "master"
+  },
+  "zyra.meow1": {
+    "sounds": [{"name": "zyra/meow1", "steam":  true}], "category": "master"
+  },
+  "zyra.meow2": {
+    "sounds": [{"name": "zyra/meow2", "steam":  true}], "category": "master"
+  },
+  "zyra.meow3": {
+    "sounds": [{"name": "zyra/meow3", "steam":  true}], "category": "master"
+  },
+  "zyra.meow4": {
+    "sounds": [{"name": "zyra/meow4", "steam":  true}], "category": "master"
+  },
+  "zyra.meow5": {
+    "sounds": [{"name": "zyra/meow5", "steam":  true}], "category": "master"
+  },
+  "zyra.meow6": {
+    "sounds": [{"name": "zyra/meow6", "steam":  true}], "category": "master"
+  },
+  "zyra.meow7": {
+    "sounds": [{"name": "zyra/meow7", "steam":  true}], "category": "master"
+  },
+  "zyra.meow8": {
+    "sounds": [{"name": "zyra/meow8", "steam":  true}], "category": "master"
+  }
+}
