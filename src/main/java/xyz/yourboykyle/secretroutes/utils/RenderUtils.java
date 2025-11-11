@@ -35,6 +35,7 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
+import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 
 import java.util.List;
@@ -165,7 +166,7 @@ public class RenderUtils {
                     continue;
                 }
 
-                drawNormalLine(lastLoc.getOne(), lastLoc.getTwo(), lastLoc.getThree(), loc.getOne(), loc.getTwo(), loc.getThree(), color, partialTicks, true, width);
+                drawNormalLine(lastLoc.getOne(), lastLoc.getTwo(), lastLoc.getThree(), loc.getOne(), loc.getTwo(), loc.getThree(), color, partialTicks, !SRMConfig.renderLinesThroughWalls, width);
                 lastLoc = loc;
             }
         }
@@ -278,7 +279,7 @@ public class RenderUtils {
 
 
 
-        drawNormalLine(px, py+p.getEyeHeight(), pz, pos.getX()+0.5, pos.getY(), pos.getZ() +0.5, color, partialticks, false, width);
+        drawNormalLine(px, py+p.getEyeHeight(), pz, pos.getX()+0.5, pos.getY(), pos.getZ() +0.5, color, partialticks, !SRMConfig.renderLinesThroughWalls, width);
     }
 
     public static void drawFromPlayer(EntityPlayerSP p, double x, double y, double z, OneColor color, float partialticks, int width){
@@ -289,7 +290,7 @@ public class RenderUtils {
 
 
 
-        drawNormalLine(px, py+p.getEyeHeight(), pz, x+0.5, y, z+0.5, color, partialticks, false, width);
+        drawNormalLine(px, py+p.getEyeHeight(), pz, x+0.5, y, z+0.5, color, partialticks, !SRMConfig.renderLinesThroughWalls, width);
     }
 
 }

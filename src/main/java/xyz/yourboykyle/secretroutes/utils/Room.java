@@ -270,7 +270,6 @@ public class Room {
                     currentSecretRoute = arrays.get(closest.getTwo());
                     currentSecretWaypoints = currentSecretRoute.get(currentSecretIndex).getAsJsonObject();
                 }
-
             } catch (Exception e) {
                 LogUtils.error(e);
             }
