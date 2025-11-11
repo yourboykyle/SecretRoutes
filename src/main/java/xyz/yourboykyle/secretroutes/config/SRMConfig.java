@@ -462,6 +462,7 @@ public class SRMConfig extends Config {
     )
     public static CurrentRoomHUD currentRoomHUD = new CurrentRoomHUD();
 
+
     //Color profile saving and loading
     @Text(
             name = "Color Profile Name",
@@ -1493,6 +1494,14 @@ public class SRMConfig extends Config {
     )
     public static Boolean renderBlood = false;
 
+
+    @Switch(
+            name = "Render lines through walls",
+            category = "Dev",
+            subcategory = "WIP",
+            size = 2
+    )
+    public static boolean renderLinesThroughWalls = false;
 
     @Switch(
             name = "Player crosshair to next waypoint",
