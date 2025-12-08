@@ -46,25 +46,28 @@ base {
 
 // Configures Polyfrost Loom, our plugin fork to easily set up the programming environment.
 loom {
-    // Removes the server configs from IntelliJ IDEA, leaving only client runs.
     noServerRunConfigs()
 
-    // Adds the tweak class if we are building legacy version of forge as per the documentation (https://docs.polyfrost.org)
     if (project.platform.isLegacyForge) {
         runConfigs {
             "client" {
                 programArgs("--tweakClass", "cc.polyfrost.oneconfig.loader.stage0.LaunchWrapperTweaker")
-                property("mixin.debug.export", "true") // Outputs all mixin changes to `versions/{mcVersion}/run/.mixin.out/class`
+                property("mixin.debug.export", "true")
             }
         }
     }
-    // Configures the mixins if we are building for forge
+
+    // Add Fabric-specific configuration
+    if (project.platform.isFabric) {
+        // Fabric uses client runs by default, no special config needed
+    }
+
     if (project.platform.isForge) {
         forge {
             mixinConfig("mixins.${mod_id}.json")
         }
     }
-    // Configures the name of the mixin "refmap"
+
     mixin.defaultRefmapName.set("mixins.${mod_id}.refmap.json")
 }
 
@@ -92,21 +95,30 @@ repositories {
 // Configures the libraries/dependencies for your mod.
 dependencies {
     // Adds the OneConfig library, so we can develop with it.
-    modCompileOnly("cc.polyfrost:oneconfig-$platform:0.2.2-alpha+")
+    //modCompileOnly("cc.polyfrost:oneconfig-$platform:1.0.0-alpha+")
+    implementation("cc.polyfrost:oneconfig-$platform:1.0.0-alpha+")
 
     // Adds DevAuth, which we can use to log in to Minecraft in development.
     modRuntimeOnly("me.djtheredstoner:DevAuth-${if (platform.isFabric) "fabric" else if (platform.isLegacyForge) "forge-legacy" else "forge-latest"}:1.2.0")
+
+    // Add Fabric-specific dependencies
+    if (platform.isFabric) {
+        modImplementation("net.fabricmc:fabric-loader:0.18.1")
+        modImplementation("net.fabricmc.fabric-api:fabric-api:0.136.1+1.21.8")
+        //modImplementation("cc.polyfrost:1.21.8-fabric:1.0.0-alpha+")
+    }
 
     shade("moe.nea:libautoupdate:1.3.1"){
         isTransitive = false
     }
 
-    // If we are building for legacy forge, includes the launch wrapper with `shade` as we configured earlier, as well as mixin 0.7.11
+    // If we are building for legacy forge...
     if (platform.isLegacyForge) {
         compileOnly("org.spongepowered:mixin:0.7.11-SNAPSHOT")
         shade("cc.polyfrost:oneconfig-wrapper-launchwrapper:1.0.0-beta17")
     }
 }
+
 
 tasks.shadowJar{
     relocate("moe.nea.libautoupdate", "xyz.yourboykyle.secretroutes.deps.libautoupdate")
