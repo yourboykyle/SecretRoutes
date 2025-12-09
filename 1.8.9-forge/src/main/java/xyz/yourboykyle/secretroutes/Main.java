@@ -50,9 +50,9 @@ import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 
 @Mod(modid = Main.MODID, name = Main.NAME, version = Main.VERSION)
 public class Main {
-    public static final String MODID = "@ID@";
-    public static final String NAME = "@NAME@";
-    public static final String VERSION = "@VER@";
+    public static final String MODID = "secretroutesmod";
+    public static final String NAME = "SecretRoutes";
+    public static final String VERSION = "1.0.0";
     public static final String CONFIG_FOLDER_PATH = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes";
     public static final String ROUTES_PATH = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes"+File.separator+"routes";
     public static final String COLOR_PROFILE_PATH = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes"+File.separator+"colorprofiles";
