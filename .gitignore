@@ -5,8 +5,6 @@ bin
 .metadata
 .classpath
 .project
-*.bat
-!gradlew.bat
 
 # idea
 out
@@ -17,8 +15,12 @@ out
 
 # gradle
 .gradle
-versions/1.8.9-forge/*
+build
+
+# fabric loom
+run
+remappedSrc
 
 # other
 eclipse
-run
+*.log

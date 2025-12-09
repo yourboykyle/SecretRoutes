@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "${id}",
+  "version": "${version}",
+  "name": "${name}",
+  "description": "A Hypixel Skyblock Dungeons mod that shows secret routes",
+  "authors": [
+    "yourboykyle"
+  ],
+  "contact": {
+    "homepage": "https://github.com/yourboykyle/SecretRoutes",
+    "sources": "https://github.com/yourboykyle/SecretRoutes",
+    "issues": "https://github.com/yourboykyle/SecretRoutes/issues"
+  },
+  "license": "GPL-3.0",
+  "icon": "assets/secretroutesmod/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "xyz.yourboykyle.secretroutes.SecretRoutes"
+    ]
+  },
+  "mixins": [
+    "mixins.secretroutesmod.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "minecraft": "${minecraft_version}",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
