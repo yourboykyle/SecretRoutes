@@ -1,3 +1,4 @@
+// TODO: update this file for multi versioning (1.8.9 -> 1.21.8)
 package xyz.yourboykyle.secretroutes.utils.autoupdate;
 
 import com.google.gson.JsonElement;

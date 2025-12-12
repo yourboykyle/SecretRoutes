@@ -1,3 +1,4 @@
+// TODO: update this file for multi versioning (1.8.9 -> 1.21.8)
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
