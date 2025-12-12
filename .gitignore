@@ -17,8 +17,7 @@ out
 
 # gradle
 .gradle
-versions/1.8.9-forge/*
-versions/1.21.8-fabric/*
+versions
 
 # other
 eclipse
