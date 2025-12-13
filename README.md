@@ -177,6 +177,7 @@ Discord: [discord.gg/secretroutes](https://discord.gg/secretroutes)
 ### Credits:
 - @yourboykyle (me) - developer (yourboykyle)
 - @wyannnnn - developer (R-aMcC)
+- @johnd_ - supplied very nice reference code for help translating to 1.21, check out his mod here: https://modrinth.com/mod/hunchclient
 - @mrfast - help with various things
 - @zzyyrraa - recorded routes + meows for custom secret noises
 - @itplays - modern pearlroutes
