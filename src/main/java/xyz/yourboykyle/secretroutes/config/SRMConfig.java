@@ -1527,6 +1527,13 @@ public class SRMConfig extends Config {
             size = 2
     )
     public static boolean debug = false;
+    @Switch(
+            name = "Disable Server Checking (You have to relog for it to work)",
+            category = "Dev",
+            subcategory = "WIP",
+            size = 2
+    )
+    public static boolean disableServerChecking = false;
 
     @Switch(
             name = "Bridge",
@@ -1535,6 +1542,7 @@ public class SRMConfig extends Config {
             size = 2
     )
     public static boolean bridge = false;
+
 
     @Switch(
             name = "Server Data",

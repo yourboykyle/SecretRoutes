@@ -83,7 +83,6 @@ public class DungeonManager {
         if (gameStage == 0 || gameStage == 1) {
 
             if (gameStage == 0) {
-                Utils.checkForConflictingHotkeys();
                 gameStage = 1;
             }
 
