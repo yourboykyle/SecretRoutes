@@ -188,6 +188,7 @@ public class RenderUtils {
         GlStateManager.pushMatrix();
         GlStateManager.translate(-realX, -realY, -realZ);
         GlStateManager.disableTexture2D();
+        GlStateManager.enableDepth();
         if (!depth) {
             GlStateManager.disableDepth();
             GlStateManager.depthMask(false);
@@ -195,7 +196,6 @@ public class RenderUtils {
         GlStateManager.disableLighting();
         GlStateManager.enableBlend();
         GlStateManager.disableAlpha();
-        GlStateManager.enableDepth(); //
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         GL11.glLineWidth(width);
         GlStateManager.color(colour.getRed() / 255f, colour.getGreen() / 255f, colour.getBlue()/ 255f, colour.getAlpha() / 255f);
