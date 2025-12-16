@@ -21,7 +21,7 @@
 
 package xyz.yourboykyle.secretroutes.config;
 
-import cc.polyfrost.oneconfig.config.Config;
+/*import cc.polyfrost.oneconfig.config.Config;
 import cc.polyfrost.oneconfig.config.annotations.*;
 import cc.polyfrost.oneconfig.config.annotations.Number;
 import cc.polyfrost.oneconfig.config.core.OneColor;
@@ -31,10 +31,16 @@ import cc.polyfrost.oneconfig.config.data.Mod;
 import cc.polyfrost.oneconfig.config.data.ModType;
 import cc.polyfrost.oneconfig.config.data.OptionSize;
 import cc.polyfrost.oneconfig.gui.pages.ModConfigPage;
-import cc.polyfrost.oneconfig.libs.universal.UKeyboard;
+import cc.polyfrost.oneconfig.libs.universal.UKeyboard;*/
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
+import org.polyfrost.oneconfig.api.config.v1.Config;
+import org.polyfrost.oneconfig.api.config.v1.annotations.Keybind;
+import org.polyfrost.polyui.input.KeyBinder;
+import org.polyfrost.polyui.input.KeybindHelper;
+import org.polyfrost.polyui.input.Keys;
+import org.polyfrost.polyui.input.PolyBind;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.huds.CurrentRoomHUD;
 import xyz.yourboykyle.secretroutes.config.huds.RecordingHUD;
@@ -43,11 +49,14 @@ import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import xyz.yourboykyle.secretroutes.utils.*;
 
 import java.io.File;
+import java.util.Objects;
 
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
-
 public class SRMConfig extends Config {
+    // Do not touch this ever (probably)
+    public static final SRMConfig INSTANCE = new SRMConfig();
+
     @Switch(
             name = "Render Routes",
             description = "Main toggle",
@@ -1225,7 +1234,7 @@ public class SRMConfig extends Config {
     public static boolean forceUpdateDEBUG = false;
 
     @Info(
-            text = "Do not turn this on unless you know exactly what you are doing",
+            title = "Do not turn this on unless you know exactly what you are doing",
             type = InfoType.ERROR,
             category = "Dev",
             subcategory = "General"
@@ -1239,59 +1248,65 @@ public class SRMConfig extends Config {
     )
     public static int customPearlOrientation = 0;
 
-    @KeyBind(
-            name = "Next Secret",
+    @Keybind(
+            title = "Next Secret",
             description = "Cycles to the next secret",
             category = "Keybinds",
-            subcategory = "Secrets",
-            size = OptionSize.DUAL
+            subcategory = "Secrets"
     )
-    public static OneKeyBind nextSecret = new OneKeyBind(UKeyboard.KEY_RBRACKET);
+    public static PolyBind nextSecret = KeybindHelper.builder().keys(Keys.Z).does((something) -> {
+        if (Utils.inCatacombs) {
+            Main.currentRoom.nextSecretKeybind();
+        } else {
+            if(warnKeybindsOutsideDungeon){
+                sendChatMessage("§cYou are not in a dungeon!");
+            }
+        }
+    }).build();
+    //public static OneKeyBind nextSecret = new OneKeyBind(UKeyboard.KEY_RBRACKET);
 
-    @KeyBind(
-            name = "Last Secret",
+    @Keybind(
+            title = "Last Secret",
             description = "Cycles to the last secret",
             category = "Keybinds",
-            subcategory = "Secrets",
-            size = OptionSize.DUAL
+            subcategory = "Secrets"
     )
     public static OneKeyBind lastSecret = new OneKeyBind(UKeyboard.KEY_LBRACKET);
 
-    @KeyBind(
-            name = "Toggle Secret rendering",
+    @Keybind(
+            title = "Toggle Secret rendering",
             description = "Toggles the rendering of secrets",
             category = "Keybinds",
-            subcategory = "Secrets",
-            size = OptionSize.DUAL
+            subcategory = "Secrets"
     )
     public static OneKeyBind toggleSecrets = new OneKeyBind(UKeyboard.KEY_BACKSLASH);
 
-    @KeyBind(
-            name = "Start recording",
+    @Keybind(
+            title = "Start recording",
             description = "Starts the recording process",
             category = "Keybinds",
             subcategory = "Recording"
     )
     public static OneKeyBind startRecording = new OneKeyBind();
 
-    @KeyBind(
-            name = "Stop recording",
+    @Keybind(
+            title = "Stop recording",
             description = "Stops the recording process and adds an exit waypoint",
             subcategory = "Recording",
             category = "Keybinds"
     )
     public static OneKeyBind stopRecording = new OneKeyBind();
 
-    @KeyBind(
-            name = "Set Bat Waypoint",
+    @Keybind(
+            title = "Set Bat Waypoint",
             description = "Adds a bat waypoint on your current position",
             category = "Keybinds",
             subcategory = "Recording"
     )
     public static OneKeyBind setBatWaypoint = new OneKeyBind();
 
-    @KeyBind(
-            name = "Export Routes",
+    @Keybind(
+            title = "Export Routes",
             description = "Exports current routes to the routes.json in your downloads folder",
             category = "Keybinds",
             subcategory = "Recording"
@@ -1555,92 +1570,95 @@ public class SRMConfig extends Config {
         }
     }
 
+
     public SRMConfig() {
-        super(new Mod(Main.MODID, ModType.SKYBLOCK), Main.MODID + ".json");
-        initialize();
+        super(Main.MODID + ".json", "/assets/" + Main.MODID + "/logo.png", "Secret Routes", Category.HYPIXEL);
 
         try {
-            optionNames.get("lineType").addHideCondition(() -> !lambda("modEnabled"));
-            optionNames.get("width").addHideCondition(() -> !lambda("modEnabled"));
-            optionNames.get("routesFileName").addHideCondition(() -> !lambda("modEnabled"));
-            optionNames.get("runnable").addHideCondition(() -> !lambda("modEnabled"));
-            optionNames.get("runnable9").addHideCondition(() -> !lambda("modEnabled"));
-            optionNames.get("runnable14").addHideCondition(() -> !lambda("modEnabled"));
-            optionNames.get("particles").addHideCondition(() -> !isEqualTo(lineType, 0));
-            optionNames.get("particles").addHideCondition(() -> !lambda("modEnabled"));
-            optionNames.get("tickInterval").addHideCondition(() -> !isEqualTo(lineType, 0));
-            optionNames.get("tickInterval").addHideCondition(() -> !lambda("modEnabled"));
-            optionNames.get("pearlLineWidth").addHideCondition(() -> !lambda("modEnabled"));
-            optionNames.get("pearls").addHideCondition(() -> !lambda("modEnabled"));
-            optionNames.get("pearlRoutesFileName").addHideCondition(() -> !lambda("modEnabled"));
-            optionNames.get("allSecrets").addHideCondition(() -> !lambda("modEnabled"));
-            optionNames.get("renderComplete").addHideCondition(() -> !lambda("modEnabled"));
-            optionNames.get("allSteps").addHideCondition(() -> !lambda("modEnabled"));
-            optionNames.get("allSteps").addHideCondition(() -> !lambda("wholeRoute"));
-            optionNames.get("ignored").addHideCondition(() -> !lambda("modEnabled"));
+            addDependency("lineType", "modEnabled", true);
 
-            optionNames.get("autoDownload").addHideCondition(() -> !lambda("autoCheckUpdates"));
+            addDependency("lineType", "modEnabled", true);
+            addDependency("width", "modEnabled", true);
+            addDependency("routesFileName", "modEnabled", true);
+            addDependency("runnable", "modEnabled", true);
+            addDependency("runnable9", "modEnabled", true);
+            addDependency("runnable14", "modEnabled", true);
+            // TODO: Check if this works properly in the config:
+            hideIf("particles", () -> !isEqualTo(lineType, 0));
+            addDependency("particles", "modEnabled", true);
+            // TODO: Check if this works properly in the config:
+            hideIf("tickInterval", () -> !isEqualTo(lineType, 0));
+            addDependency("tickInterval", "modEnabled", true);
+            addDependency("pearlLineWidth", "modEnabled", true);
+            addDependency("pearls", "modEnabled", true);
+            addDependency("pearlRoutesFileName", "modEnabled", true);
+            addDependency("allSecrets", "modEnabled", true);
+            addDependency("renderComplete", "modEnabled", true);
+            addDependency("allSteps", "modEnabled", true);
+            addDependency("allSteps", "wholeRoute", true);
+            addDependency("ignored", "modEnabled", true);
 
-            optionNames.get("startWaypointColorIndex").addHideCondition(() -> !lambda("startTextToggle"));
-            optionNames.get("startTextSize").addHideCondition(() -> !lambda("startTextToggle"));
-            optionNames.get("exitWaypointColorIndex").addHideCondition(() -> !lambda("exitTextToggle"));
-            optionNames.get("exitTextSize").addHideCondition(() -> !lambda("exitTextToggle"));
-            optionNames.get("interactWaypointColorIndex").addHideCondition(() -> !lambda("interactTextToggle"));
-            optionNames.get("interactTextSize").addHideCondition(() -> !lambda("interactTextToggle"));
-            optionNames.get("itemWaypointColorIndex").addHideCondition(() -> !lambda("itemTextToggle"));
-            optionNames.get("itemTextSize").addHideCondition(() -> !lambda("itemTextToggle"));
-            optionNames.get("batWaypointColorIndex").addHideCondition(() -> !lambda("batTextToggle"));
-            optionNames.get("batTextSize").addHideCondition(() -> !lambda("batTextToggle"));
+            addDependency("autoDownload", "autoCheckUpdates", true);
 
-            optionNames.get("etherwarpsEnumToggle").addHideCondition(() -> !lambda("etherwarpsTextToggle"));
-            optionNames.get("etherwarpsWaypointColorIndex").addHideCondition(() -> !lambda("etherwarpsTextToggle"));
-            optionNames.get("etherwarpsTextSize").addHideCondition(() -> !lambda("etherwarpsTextToggle"));
-            optionNames.get("minesEnumToggle").addHideCondition(() -> !lambda("minesTextToggle"));
-            optionNames.get("minesWaypointColorIndex").addHideCondition(() -> !lambda("minesTextToggle"));
-            optionNames.get("minesTextSize").addHideCondition(() -> !lambda("minesTextToggle"));
-            optionNames.get("interactsEnumToggle").addHideCondition(() -> !lambda("interactsTextToggle"));
-            optionNames.get("interactsWaypointColorIndex").addHideCondition(() -> !lambda("interactsTextToggle"));
-            optionNames.get("interactsTextSize").addHideCondition(() -> !lambda("interactsTextToggle"));
-            optionNames.get("superboomsEnumToggle").addHideCondition(() -> !lambda("superboomsTextToggle"));
-            optionNames.get("superboomsWaypointColorIndex").addHideCondition(() -> !lambda("superboomsTextToggle"));
-            optionNames.get("superboomsTextSize").addHideCondition(() -> !lambda("superboomsTextToggle"));
-            optionNames.get("enderpearlEnumToggle").addHideCondition(() -> !lambda("enderpearlTextToggle"));
-            optionNames.get("enderpearlWaypointColorIndex").addHideCondition(() -> !lambda("enderpearlTextToggle"));
-            optionNames.get("enderpearlTextSize").addHideCondition(() -> !lambda("enderpearlTextToggle"));
+            addDependency("startWaypointColorIndex", "startTextToggle", true);
+            addDependency("startTextSize", "startTextToggle", true);
+            addDependency("exitWaypointColorIndex", "exitTextToggle", true);
+            addDependency("exitTextSize", "exitTextToggle", true);
+            addDependency("interactWaypointColorIndex", "interactTextToggle", true);
+            addDependency("interactTextSize", "interactTextToggle", true);
+            addDependency("itemWaypointColorIndex", "itemTextToggle", true);
+            addDependency("itemTextSize", "itemTextToggle", true);
+            addDependency("batWaypointColorIndex", "batTextToggle", true);
+            addDependency("batTextSize", "batTextToggle", true);
 
-            optionNames.get("forceUpdateDEBUG").addHideCondition(() -> isDevPasswordNotCorrect());
-            optionNames.get("verboseLogging").addHideCondition(() -> isDevPasswordNotCorrect());
-            optionNames.get("c").addHideCondition(() -> isDevPasswordNotCorrect());
-            optionNames.get("debug").addHideCondition(() -> isDevPasswordNotCorrect());
-            optionNames.get("verboseRecording").addHideCondition(() -> !lambda("verboseLogging"));
-            optionNames.get("verboseUpdating").addHideCondition(() -> !lambda("verboseLogging"));
-            optionNames.get("verboseInfo").addHideCondition(() -> !lambda("verboseLogging"));
-            optionNames.get("verboseRendering").addHideCondition(() -> !lambda("verboseLogging"));
-            optionNames.get("actionbarInfo").addHideCondition(() -> !lambda("verboseLogging"));
+            addDependency("etherwarpsEnumToggle", "etherwarpsTextToggle", true);
+            addDependency("etherwarpsWaypointColorIndex", "etherwarpsTextToggle", true);
+            addDependency("etherwarpsTextSize", "etherwarpsTextToggle", true);
+            addDependency("minesEnumToggle", "minesTextToggle", true);
+            addDependency("minesWaypointColorIndex", "minesTextToggle", true);
+            addDependency("minesTextSize", "minesTextToggle", true);
+            addDependency("interactsEnumToggle", "interactsTextToggle", true);
+            addDependency("interactsWaypointColorIndex", "interactsTextToggle", true);
+            addDependency("interactsTextSize", "interactsTextToggle", true);
+            addDependency("superboomsEnumToggle", "superboomsTextToggle", true);
+            addDependency("superboomsWaypointColorIndex", "superboomsTextToggle", true);
+            addDependency("superboomsTextSize", "superboomsTextToggle", true);
+            addDependency("enderpearlEnumToggle", "enderpearlTextToggle", true);
+            addDependency("enderpearlWaypointColorIndex", "enderpearlTextToggle", true);
+            addDependency("enderpearlTextSize", "enderpearlTextToggle", true);
 
+            // TODO: Check if these 4 work properly in the config:
+            hideIf("forceUpdateDEBUG", () -> isDevPasswordNotCorrect());
+            hideIf("verboseLogging", () -> isDevPasswordNotCorrect());
+            hideIf("c", () -> isDevPasswordNotCorrect());
+            hideIf("debug", () -> isDevPasswordNotCorrect());
+            addDependency("verboseRecording", "verboseLogging", true);
+            addDependency("verboseUpdating", "verboseLogging", true);
+            addDependency("verboseInfo", "verboseLogging", true);
+            addDependency("verboseRendering", "verboseLogging", true);
+            addDependency("actionbarInfo", "verboseLogging", true);
 
-            optionNames.get("customSecretSoundIndex").addHideCondition(() -> !lambda("customSecretSound"));
-            optionNames.get("customSecretSoundVolume").addHideCondition(() -> !lambda("customSecretSound"));
-            optionNames.get("customSecretSoundPitch").addHideCondition(() -> !lambda("customSecretSound"));
-            optionNames.get("runnable15").addHideCondition(() -> !lambda("customSecretSound"));
+            addDependency("customSecretSoundIndex", "customSecretSound", true);
+            addDependency("customSecretSoundVolume", "customSecretSound", true);
+            addDependency("customSecretSoundPitch", "customSecretSound", true);
+            addDependency("runnable15", "customSecretSound", true);
 
+            addDependency("hideWatcher", "hideBossMessages", true);
+            addDependency("hideBonzo", "hideBossMessages", true);
+            addDependency("hideScarf", "hideBossMessages", true);
+            addDependency("hideProfessor", "hideBossMessages", true);
+            addDependency("hideThorn", "hideBossMessages", true);
+            addDependency("hideLivid", "hideBossMessages", true);
+            addDependency("hideSadan", "hideBossMessages", true);
+            addDependency("hideWitherLords", "hideBossMessages", true);
 
-            optionNames.get("hideWatcher").addHideCondition(()-> !lambda("hideBossMessages"));
-            optionNames.get("hideBonzo").addHideCondition(()-> !lambda("hideBossMessages"));
-            optionNames.get("hideScarf").addHideCondition(()-> !lambda("hideBossMessages"));
-            optionNames.get("hideProfessor").addHideCondition(()-> !lambda("hideBossMessages"));
-            optionNames.get("hideThorn").addHideCondition(()-> !lambda("hideBossMessages"));
-            optionNames.get("hideLivid").addHideCondition(()-> !lambda("hideBossMessages"));
-            optionNames.get("hideSadan").addHideCondition(()-> !lambda("hideBossMessages"));
-            optionNames.get("hideWitherLords").addHideCondition(()-> !lambda("hideBossMessages"));
-
-            optionNames.get("bloodReadyText").addHideCondition(()-> !lambda("bloodNotif"));
-            optionNames.get("bloodReadyColor").addHideCondition(()-> !lambda("bloodNotif"));
-            optionNames.get("bloodBannerDuration").addHideCondition(()-> !lambda("bloodNotif"));
-            optionNames.get("bloodScale").addHideCondition(()-> !lambda("bloodNotif"));
-            optionNames.get("bloodX").addHideCondition(()-> !lambda("bloodNotif"));
-            optionNames.get("bloodY").addHideCondition(()-> !lambda("bloodNotif"));
-            optionNames.get("renderBlood").addHideCondition(()-> !lambda("bloodNotif"));
+            addDependency("bloodReadyText", "bloodNotif", true);
+            addDependency("bloodReadyColor", "bloodNotif", true);
+            addDependency("bloodBannerDuration", "bloodNotif", true);
+            addDependency("bloodScale", "bloodNotif", true);
+            addDependency("bloodX", "bloodNotif", true);
+            addDependency("bloodY", "bloodNotif", true);
+            addDependency("renderBlood", "bloodNotif", true);
 
             registerKeyBind(lastSecret, () -> {
                 if (Utils.inCatacombs) {
@@ -1651,7 +1669,7 @@ public class SRMConfig extends Config {
                     }
                 }
             });
-            registerKeyBind(nextSecret, () -> {
+            /*registerKeyBind(nextSecret, () -> {
                 if (Utils.inCatacombs) {
                     Main.currentRoom.nextSecretKeybind();
                 } else {
@@ -1659,7 +1677,7 @@ public class SRMConfig extends Config {
                         sendChatMessage("§cYou are not in a dungeon!");
                     }
                 }
-            });
+            });*/
             registerKeyBind(toggleSecrets, () -> {
                 if (Utils.inCatacombs) {
                     Main.toggleSecretsKeybind();
