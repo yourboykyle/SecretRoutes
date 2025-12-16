@@ -48,12 +48,12 @@ public class RenderUtils {
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glLineWidth(3);
-        GlStateManager.pushAttrib();
-        GlStateManager.pushMatrix();
+//        GlStateManager.pushAttrib();
+//        GlStateManager.pushMatrix();
         GlStateManager.disableTexture2D();
         GlStateManager.disableDepth();
         GlStateManager.depthMask(false);
-        GlStateManager.disableLighting();
+//        GlStateManager.disableLighting();
 
         GL11.glTranslated(x, y, z);
 
@@ -84,9 +84,9 @@ public class RenderUtils {
         GlStateManager.depthMask(true);
         GlStateManager.enableDepth();
         GlStateManager.enableTexture2D();
-        GlStateManager.enableLighting();
-        GlStateManager.popMatrix();
-        GlStateManager.popAttrib();
+//        GlStateManager.enableLighting();
+//        GlStateManager.popMatrix();
+//        GlStateManager.popAttrib();
         GL11.glDisable(GL11.GL_BLEND);
         GL11.glColor4f(1, 1, 1, 0);
         GL11.glPopMatrix();
@@ -189,6 +189,7 @@ public class RenderUtils {
         GlStateManager.pushMatrix();
         GlStateManager.translate(-realX, -realY, -realZ);
         GlStateManager.disableTexture2D();
+        GlStateManager.enableDepth();
         if (!depth) {
             GlStateManager.disableDepth();
             GlStateManager.depthMask(false);
@@ -196,7 +197,6 @@ public class RenderUtils {
         GlStateManager.disableLighting();
         GlStateManager.enableBlend();
         GlStateManager.disableAlpha();
-        GlStateManager.enableDepth(); //
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         GL11.glLineWidth(width);
         GlStateManager.color(colour.getRed() / 255f, colour.getGreen() / 255f, colour.getBlue()/ 255f, colour.getAlpha() / 255f);
@@ -243,7 +243,7 @@ public class RenderUtils {
         double distance = Math.sqrt(posX * posX + posY * posY + posZ * posZ);
 
         GlStateManager.pushMatrix();
-        GlStateManager.enableTexture2D();
+//        GlStateManager.enableTexture2D();
         GlStateManager.translate(posX, posY, posZ);
         GlStateManager.translate(0, player.getEyeHeight(), 0);
         GlStateManager.rotate(-rm.playerViewY, 0, 1, 0);
@@ -268,7 +268,7 @@ public class RenderUtils {
             GlStateManager.depthMask(true);
         }
         GlStateManager.disableBlend();
-        GlStateManager.disableTexture2D();
+//        GlStateManager.disableTexture2D();
         GlStateManager.popMatrix();
     }
 

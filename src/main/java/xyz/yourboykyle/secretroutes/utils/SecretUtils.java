@@ -240,7 +240,7 @@ public class SecretUtils {
             Main.checkRoomData();
             BlockPos pos = MapUtils.relativeToActual(new BlockPos(location.get(0).getAsInt(), location.get(1).getAsInt(), location.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
 
-            //GlStateManager.disableTexture2D();
+            GlStateManager.disableTexture2D();
 
             switch (type) {
                 case "interact":

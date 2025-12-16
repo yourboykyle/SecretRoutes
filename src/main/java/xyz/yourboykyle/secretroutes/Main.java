@@ -36,7 +36,6 @@ import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.DungeonRooms;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.handlers.PacketHandler;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import xyz.yourboykyle.secretroutes.events.*;
 import xyz.yourboykyle.secretroutes.utils.*;
 import xyz.yourboykyle.secretroutes.utils.autoupdate.UpdateManager;
@@ -263,7 +262,7 @@ public class Main {
         Minecraft mc = Minecraft.getMinecraft();
         if (mc.getCurrentServerData() == null) return;
         String serverName  = mc.getCurrentServerData().serverIP.toLowerCase();
-        if (serverName.contains("hypixel.") || serverName.contains("fakepixel.")) {
+        if (serverName.contains("hypixel.") || serverName.contains("fakepixel.") || SRMConfig.disableServerChecking) {
 
             if(SRMConfig.autoCheckUpdates) {
                 new Thread(() -> {
@@ -296,23 +295,6 @@ public class Main {
 
             //Packets are used in this mod solely to detect when the player picks up an item. No packets are modified or created.
             event.manager.channel().pipeline().addBefore("packet_handler", "secretroutes_packet_handler", new PacketHandler());
-
-            new Thread(() -> {
-                try {
-                    while (mc.thePlayer == null) {
-                        //Yes, I'm too lazy to code something proper so I'm busy-waiting, shut up. no :) -carmel
-                        //It usually waits for less than half a second
-                        Thread.sleep(100);
-                    }
-                    Thread.sleep(3000);
-                    if (serverName.contains("hypixel.") || serverName.contains("fakepixel.")) {
-                        Utils.checkForConflictingHotkeys();
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-            }).start();
             LogUtils.info("RouteRecording json status: " + RouteRecording.malformed);
             if(RouteRecording.malformed){
                 sendChatMessage("[ERROR] The JSON file in downloads is malformed. Check the file or delete it.", EnumChatFormatting.RED);
