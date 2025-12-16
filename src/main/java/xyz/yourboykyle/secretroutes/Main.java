@@ -51,9 +51,9 @@ import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 
 @Mod(modid = Main.MODID, name = Main.NAME, version = Main.VERSION)
 public class Main {
-    public static final String MODID = "@ID@";
-    public static final String NAME = "@NAME@";
-    public static final String VERSION = "@VER@";
+    public static final String MODID = "@MOD_ID@";
+    public static final String NAME = "@MOD_NAME@";
+    public static final String VERSION = "@MOD_VERSION@";
     public static final String CONFIG_FOLDER_PATH = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes";
     public static final String ROUTES_PATH = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes"+File.separator+"routes";
     public static final String COLOR_PROFILE_PATH = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes"+File.separator+"colorprofiles";
@@ -68,7 +68,7 @@ public class Main {
     private static DungeonRooms dungeonRooms = new DungeonRooms();
 
     public static Main instance = new Main();
-    public static SRMConfig config;
+    //public static SRMConfig config; - oneconfig v0
 
 
     @Mod.EventHandler
@@ -121,7 +121,7 @@ public class Main {
 
 
         // Set up Config
-        config = new SRMConfig();
+        SRMConfig.INSTANCE.preload();
 
         // Auto Updates
         LogUtils.info("Checking for updates...");
