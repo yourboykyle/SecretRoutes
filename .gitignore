@@ -17,7 +17,8 @@ out
 
 # gradle
 .gradle
-versions
+versions/*
+!versions/mainProject
 
 # other
 eclipse

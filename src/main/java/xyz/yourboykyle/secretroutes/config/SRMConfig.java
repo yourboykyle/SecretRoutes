@@ -21,23 +21,12 @@
 
 package xyz.yourboykyle.secretroutes.config;
 
-/*import cc.polyfrost.oneconfig.config.Config;
-import cc.polyfrost.oneconfig.config.annotations.*;
-import cc.polyfrost.oneconfig.config.annotations.Number;
-import cc.polyfrost.oneconfig.config.core.OneColor;
-import cc.polyfrost.oneconfig.config.core.OneKeyBind;
-import cc.polyfrost.oneconfig.config.data.InfoType;
-import cc.polyfrost.oneconfig.config.data.Mod;
-import cc.polyfrost.oneconfig.config.data.ModType;
-import cc.polyfrost.oneconfig.config.data.OptionSize;
-import cc.polyfrost.oneconfig.gui.pages.ModConfigPage;
-import cc.polyfrost.oneconfig.libs.universal.UKeyboard;*/
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
 import org.polyfrost.oneconfig.api.config.v1.Config;
-import org.polyfrost.oneconfig.api.config.v1.annotations.Keybind;
-import org.polyfrost.polyui.input.KeyBinder;
+import org.polyfrost.oneconfig.api.config.v1.annotations.*;
+import org.polyfrost.oneconfig.api.config.v1.annotations.Number;
 import org.polyfrost.polyui.input.KeybindHelper;
 import org.polyfrost.polyui.input.Keys;
 import org.polyfrost.polyui.input.PolyBind;
@@ -49,7 +38,6 @@ import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import xyz.yourboykyle.secretroutes.utils.*;
 
 import java.io.File;
-import java.util.Objects;
 
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
@@ -58,72 +46,69 @@ public class SRMConfig extends Config {
     public static final SRMConfig INSTANCE = new SRMConfig();
 
     @Switch(
-            name = "Render Routes",
+            title = "Render Routes",
             description = "Main toggle",
             subcategory = "General"
     )
     public static boolean modEnabled = true;
 
     @Switch(
-            name = "Render secrets when room is completed",
+            title = "Render secrets when room is completed",
             description = "Renders secrets even if the room is completed",
             subcategory = "General"
     )
     public static boolean renderComplete = false;
 
     @Switch(
-            name = "Full route",
+            title = "Full route",
             description = "Render all secrets in the route",
             subcategory = "General"
     )
     public static boolean wholeRoute = false;
 
     @Switch(
-            name = "Render steps",
+            title = "Render steps",
             description = "Renders the entire path to the secret instead of just the secret",
             subcategory = "General"
     )
     public static boolean allSteps = false;
 
     @Info(
-            text = "Full Route - Renders the Entire route (only secrets unless All Steps is enabled)",
-            subcategory = "General",
-            size = 2,
-            type = InfoType.WARNING
+            title = "Full Route - Renders the Entire route (only secrets unless All Steps is enabled)",
+            description = "Full Route - Renders the Entire route (only secrets unless All Steps is enabled)",
+            subcategory = "General"
     )
     public static boolean ignored;
 
     @Switch(
-            name = "All secrets",
+            title = "All secrets",
             description = "Renders all secrets in the room (DOES NOT RENDER STEPS) - NO LINES",
             subcategory = "General"
     )
     public static boolean allSecrets = false;
     @Info(
-            text = "All secrets displays all secrets, but not the route... (no lines)",
-            subcategory = "General",
-            size = 2,
-            type = InfoType.WARNING
+            title = "All secrets displays all secrets, but not the route... (no lines)",
+            description = "All secrets displays all secrets, but not the route... (no lines)",
+            subcategory = "General"
     )
     public static boolean ignored2;
 
     @Dropdown(
-            name = "Line Type",
+            title = "Line Type",
             options = {"Particles", "Lines", "None"},
-            subcategory = "General",
-            size = OptionSize.DUAL
+            subcategory = "General"
     )
     public static int lineType = 1;
 
     @Dropdown(
-            name = "Particle Type",
+            title = "Particle Type",
             options = {"Explosion Normal", "Explosion Large", "Explosion Huge", "Fireworks Spark", "Bubble", "Water Splash", "Water Wake", "Suspended", "Suspended Depth", "Crit", "Magic Crit", "Smoke Normal", "Smoke Large", "Spell", "Instant Spell", "Mob Spell", "Mob Spell Ambient", "Witch Magic", "Drip Water", "Drip Lava", "Villager Angry", "Villager Happy", "Town Aura", "Note", "Portal", "Enchantment Table", "Flame", "Lava", "Footstep", "Cloud", "Redstone", "Snowball", "Snow Shovel", "Slime", "Heart", "Barrier", "Water Drop", "Item Take", "Mob Appearance"},
             subcategory = "General"
     )
     public static int particles = 26;
 
     @Slider(
-            name = "Tick inverval",
+            title = "Tick inverval",
             description = "The interval between when the game renders the particles. Higher values will reduce lag, but may cause the particles to be less smooth",
             min = 0, max = 20.1F,
             step = 1,
@@ -133,7 +118,7 @@ public class SRMConfig extends Config {
 
 
     @Slider(
-            name = "Line width (not for particles)",
+            title = "Line width (not for particles)",
             min = 1, max = 10.1F,
             step = 1,
             subcategory = "General"
@@ -142,32 +127,32 @@ public class SRMConfig extends Config {
 
 
     @Slider(
-            name = "Line width (for ender pearls)",
+            title = "Line width (for ender pearls)",
             min = 1, max = 10.1F,
             step = 1,
             subcategory = "General"
     )
     public static int pearlLineWidth = 5;
 
-    @DualOption(
-            name = "Type of routes",
-            left = "No pearls", right = "Pearls",
-            description = "Toggle the default between pearls and no pearls",
-            subcategory = "General",
-            size = OptionSize.DUAL
+    @Dropdown(
+            title = "Type of routes",
+            options = {"No pearls", "Pearls"},
+            description = "Select which routes to use (pearls is better + default)",
+            subcategory = "General"
     )
-    public static boolean pearls = true;
+    public static int routeTypeIndex = 1; // Pearls by default
 
     @Text(
-            name = "Routes file name",
+            title = "Routes file name",
             description = "The file name used when No pearls is selected",
             placeholder = "routes.json",
             subcategory = "General"
 
     )
     public static String routesFileName = "routes.json";
+
     @Text(
-            name = "Pearl routes file name",
+            title = "Pearl routes file name",
             description = "The file name used when Pearls is selected",
             placeholder = "pearlroutes.json",
             subcategory = "General"
@@ -176,43 +161,36 @@ public class SRMConfig extends Config {
     public static String pearlRoutesFileName = "pearlroutes.json";
 
     @Button(
-            name = "Update routes",
-            text = "Update routes",
+            title = "Update routes",
             description = "Downloads the routes.json from github",
-            subcategory = "General",
-            size = 2
-    )
-    Runnable runnable = () -> {
-        new Thread(() -> {
-            if (pearls) {
-                RouteUtils.updatePearlRoutes();
-            } else {
-                RouteUtils.updateRoutes();
-            }
-        }).start();
-    };
-
-    @Button(
-            name = "Import routes",
-            text = "Import routes",
-            description = "Select a routes.json file to import, this will be copied to .minecraft/config/SecretRoutes/routes.json",
-            size = 2,
             subcategory = "General"
     )
-    Runnable runnable9 = () -> {
-        new Thread(() -> {
-            try {
-                File file = FileUtils.promptUserForFile();
-                if (file != null) {
-                    FileUtils.copyFileToDirectory(file, Main.ROUTES_PATH);
-                }
-            } catch (Exception e) {
-                LogUtils.error(e);
+    private void updateRoutesButton() {
+        if (routeTypeIndex == 1) {
+            RouteUtils.updatePearlRoutes();
+        } else {
+            RouteUtils.updateRoutes();
+        }
+    }
+
+    @Button(
+            title = "Import routes",
+            description = "Select a routes.json file to import, this will be copied to .minecraft/config/SecretRoutes/routes.json",
+            subcategory = "General"
+    )
+    private void importRoutesButton() {
+        try {
+            File file = FileUtils.promptUserForFile();
+            if (file != null) {
+                FileUtils.copyFileToDirectory(file, Main.ROUTES_PATH);
             }
-        }).start();
-    };
+        } catch (Exception e) {
+            LogUtils.error(e);
+        }
+    }
+
     @Text(
-            name = "Copy file name",
+            title = "Copy file name",
             description = "This is the name of the file to copy the routes.json in your downloads to.",
             subcategory = "General"
     )
@@ -220,84 +198,59 @@ public class SRMConfig extends Config {
 
 
     @Button(
-            name = "Copy routes",
-            text = "Copy routes",
+            title = "Copy routes",
             description = "Copies the Downloads/routes.json to the routes directory under the name specified in the Copy file name field",
-            size = 2,
             subcategory = "General"
     )
-    Runnable runnable21 = () -> {
-        new Thread(() ->{
-            try{
-                FileUtils.copyFileToRoutesDirectory();
-            }catch (Exception e){
-                LogUtils.error(e);
-            }
-        }).start();
-    };
+    private void copyRoutesButton() {
+        try{
+            FileUtils.copyFileToRoutesDirectory();
+        }catch (Exception e){
+            LogUtils.error(e);
+        }
+    }
 
     @Switch(
-            name = "Personal Best Tracking",
+            title = "Personal Best Tracking",
             description = "Tracks your personal best time for completing the secrets in each room",
             subcategory = "Personal Bests"
     )
     public static boolean trackPersonalBests = true;
 
     @Switch(
-            name = "Send Chat Messages For New PBs",
+            title = "Send Chat Messages For New PBs",
             description = "Sends chat messages when you beat your personal best",
             subcategory = "Personal Bests"
     )
     public static boolean sendChatMessages = true;
 
-    // I don't know why I added this lol
-    /*@Button(
-            name = "Reload Personal Bests",
-            text = "Reload",
-            description = "Reloads the personal bests from the personal_bests.json file",
-            subcategory = "Personal Bests"
-    )
-    Runnable runnable18 = () -> {
-        new Thread(() -> {
-            if (PBUtils.loadPBData()) {
-                sendChatMessage(EnumChatFormatting.DARK_GREEN + "Reloaded personal bests");
-            }
-        }).start();
-    };*/
-
     @Button(
-            name = "Get personal best (current room)",
-            text = "Get PB",
+            title = "Get personal best (current room)",
             description = "Gets your personal best time for the current room",
             subcategory = "Personal Bests"
     )
-    Runnable runnable19 = () -> {
-        new Thread(() -> {
-            long pb = PBUtils.getPBForRoom(RoomDetection.roomName);
-            if (pb != -1) {
-                sendChatMessage("Personal best for " + RoomDetection.roomName + ": " + EnumChatFormatting.GREEN + PBUtils.formatTime(pb));
-            } else {
-                sendChatMessage(EnumChatFormatting.DARK_RED + "No personal best found for " + RoomDetection.roomName);
-            }
-        }).start();
-    };
+    private void getPersonalBestButton() {
+        long pb = PBUtils.getPBForRoom(RoomDetection.roomName);
+        if (pb != -1) {
+            sendChatMessage("Personal best for " + RoomDetection.roomName + ": " + EnumChatFormatting.GREEN + PBUtils.formatTime(pb));
+        } else {
+            sendChatMessage(EnumChatFormatting.DARK_RED + "No personal best found for " + RoomDetection.roomName);
+        }
+    }
 
     @Button(
-            name = "Reset personal best (current room)",
-            text = "Reset PB",
+            title = "Reset personal best (current room)",
             description = "Reset your personal best time for the current room",
             subcategory = "Personal Bests"
     )
-    Runnable runnable20 = () -> {
-        new Thread(() -> {
-            // Remove the PB from the JSON
-            PBUtils.removePersonalBest(RoomDetection.roomName);
-            sendChatMessage("Reset personal best for " + RoomDetection.roomName);
-        }).start();
-    };
+    private void resetPersonalBestButton() {
+        // Remove the PB from the JSON
+        PBUtils.removePersonalBest(RoomDetection.roomName);
+        sendChatMessage("Reset personal best for " + RoomDetection.roomName);
+    }
 
     @Switch(
-            name = "Notify for new updates",
+            title = "Notify for new updates",
             description = "Automatically checks for updates on startup. WILL NOT AUTO UPDATE",
             subcategory = "Updates"
     )
@@ -305,7 +258,7 @@ public class SRMConfig extends Config {
 
 
     @Switch(
-            name = "Auto download new updates",
+            title = "Auto download new updates",
             description = "Automatically downloads updates when they are available",
             subcategory = "Updates"
     )
@@ -313,147 +266,117 @@ public class SRMConfig extends Config {
 
 
     @Button(
-            name = "Check for updates",
-            text = "Check for updates",
+            title = "Check for updates",
             description = "Manually check for an update if you wish to make sure",
-            subcategory = "Updates",
-            size = 2
+            subcategory = "Updates"
     )
-    Runnable runnable14 = () -> {
-        new Thread(() -> {
-            sendChatMessage("Checking for updates, please wait a few seconds...");
-            Main.updateManager.checkUpdate(true);
-        }).start();
-    };
+    private void checkForUpdatesButton() {
+        sendChatMessage("Checking for updates, please wait a few seconds...");
+        Main.updateManager.checkUpdate(true);
+    }
+
     @Switch(
-            name = "Auto update Routes",
+            title = "Auto update Routes",
             description = "Automatically updates the routes.json file when it is out of date",
-            subcategory = "Updates",
-            size = 2
+            subcategory = "Updates"
     )
     public static boolean autoUpdateRoutes = false;
-    @Info(
-            text = "THIS WILL OVERWRITE THE FILE. MAKE SURE YOUR CUSTOM ROUTES ARE NOT NAMED ROUTES.JSON OR PEARLROUTES.JSON",
-            subcategory = "Updates",
-            size = 2,
-            type = InfoType.WARNING
-    )
 
+    @Info(
+            title = "THIS WILL OVERWRITE THE FILE. MAKE SURE YOUR CUSTOM ROUTES ARE NOT NAMED ROUTES.JSON OR PEARLROUTES.JSON",
+            description = "THIS WILL OVERWRITE THE FILE. MAKE SURE YOUR CUSTOM ROUTES ARE NOT NAMED ROUTES.JSON OR PEARLROUTES.JSON",
+            subcategory = "Updates"
+    )
+    public static boolean ignored3;
 
     // Recording
-
     @Button(
-            name = "Set Bat Waypoint",
-            text = "Set Bat Waypoint",
+            title = "Set Bat Waypoint",
             description = "Since bat waypoints aren't automatically detected, sadly we must manually set a bat waypoint",
-            size = 2,
             category = "Route Recording"
     )
-    Runnable runnable3 = () -> {
-        new Thread(() -> {
-            if (Main.routeRecording.recording) {
-                BlockPos playerPos = Minecraft.getMinecraft().thePlayer.getPosition();
-                BlockPos targetPos = new BlockPos(playerPos.getX(), playerPos.getY(), playerPos.getZ());
-                targetPos = targetPos.add(-1, 2, -1); // Block above the player, the -1 on X and Z have to be like that, trust the process
+    private void setBatWaypointButton() {
+        if (Main.routeRecording.recording) {
+            BlockPos playerPos = Minecraft.getMinecraft().thePlayer.getPosition();
+            BlockPos targetPos = new BlockPos(playerPos.getX(), playerPos.getY(), playerPos.getZ());
+            targetPos = targetPos.add(-1, 2, -1); // Block above the player, the -1 on X and Z have to be like that, trust the process
 
-                Main.routeRecording.addWaypoint(Room.SECRET_TYPES.BAT, targetPos);
-                Main.routeRecording.newSecret();
-                Main.routeRecording.setRecordingMessage(EnumChatFormatting.YELLOW + "Added bat secret waypoint.");
-            } else {
-                sendChatMessage(EnumChatFormatting.RED + "Route recording is not enabled. Press the start recording button to begin.");
-            }
-        }).start();
-    };
+            Main.routeRecording.addWaypoint(Room.SECRET_TYPES.BAT, targetPos);
+            Main.routeRecording.newSecret();
+            Main.routeRecording.setRecordingMessage(EnumChatFormatting.YELLOW + "Added bat secret waypoint.");
+        } else {
+            sendChatMessage(EnumChatFormatting.RED + "Route recording is not enabled. Press the start recording button to begin.");
+        }
+    }
 
     @Button(
-            name = "Start recording",
-            text = "Start recording",
+            title = "Start recording",
             description = "Start recording a custom secret route",
-            size = 2,
             category = "Route Recording"
     )
-    Runnable runnable2 = () -> {
-        new Thread(() -> {
-            Main.routeRecording.startRecording();
-        }).start();
-    };
+    private void startRecordingButton() {
+        Main.routeRecording.startRecording();
+    }
 
     @Button(
-            name = "Set Exit Waypoint",
-            text = "Set Exit Waypoint",
+            title = "Set Exit Waypoint",
             description = "Set an exit waypoint to at the end of your route",
-            size = 2,
             category = "Route Recording"
     )
-    Runnable runnable16 = () -> {
-        new Thread(() -> {
-            if (Main.routeRecording.recording) {
-                BlockPos playerPos = Minecraft.getMinecraft().thePlayer.getPosition();
-                BlockPos targetPos = new BlockPos(playerPos.getX(), playerPos.getY(), playerPos.getZ());
-                targetPos = targetPos.add(-1, 0, -1); // The -1 on X and Z have to be like that, trust the process
+    private void setExitWaypointButton() {
+        if (Main.routeRecording.recording) {
+            BlockPos playerPos = Minecraft.getMinecraft().thePlayer.getPosition();
+            BlockPos targetPos = new BlockPos(playerPos.getX(), playerPos.getY(), playerPos.getZ());
+            targetPos = targetPos.add(-1, 0, -1); // The -1 on X and Z have to be like that, trust the process
 
-                Main.routeRecording.addWaypoint(Room.SECRET_TYPES.EXITROUTE, targetPos);
-                Main.routeRecording.newSecret();
-                Main.routeRecording.stopRecording(); // Exiting the route, it should be stopped
-                Main.routeRecording.setRecordingMessage("Added route exit waypoint & stopped recording.");
-                LogUtils.info("Added route exit waypoint & stopped recording.");
-            } else {
-                sendChatMessage(EnumChatFormatting.RED + "Route recording is not enabled. Press the start recording button to begin.");
-            }
-        }).start();
-    };
+            Main.routeRecording.addWaypoint(Room.SECRET_TYPES.EXITROUTE, targetPos);
+            Main.routeRecording.newSecret();
+            Main.routeRecording.stopRecording(); // Exiting the route, it should be stopped
+            Main.routeRecording.setRecordingMessage("Added route exit waypoint & stopped recording.");
+            LogUtils.info("Added route exit waypoint & stopped recording.");
+        } else {
+            sendChatMessage(EnumChatFormatting.RED + "Route recording is not enabled. Press the start recording button to begin.");
+        }
+    }
 
     @Button(
-            name = "Stop recording",
-            text = "Stop recording",
+            title = "Stop recording",
             description = "Stop recording your secret route",
-            size = 2,
             category = "Route Recording"
     )
-    Runnable runnable4 = () -> {
-        new Thread(() -> {
-            Main.routeRecording.stopRecording();
-        }).start();
-    };
+    private void stopRecordingButton() {
+        Main.routeRecording.stopRecording();
+    }
 
     @Button(
-            name = "Export routes",
-            text = "Export routes",
+            title = "Export routes",
             description = "Export your current secret routes to your downloads folder as routes.json",
-            size = 2,
             category = "Route Recording"
     )
-    Runnable runnable5 = () -> {
-        new Thread(() -> {
-            Main.routeRecording.exportAllRoutes();
-        }).start();
-    };
+    private void exportRoutesButton() {
+        Main.routeRecording.exportAllRoutes();
+    }
 
     @Button(
-            name = "Import routes",
-            text = "Import routes",
+            title = "Import routes",
             description = "Import routes to recording from a routes.json in your downloads folder",
-            size = 2,
             category = "Route Recording"
     )
-    Runnable runnable6 = () -> {
-        new Thread(() -> {
-            Main.routeRecording.importRoutes("routes.json");
-        }).start();
-    };
+    private void importRoutesToRecordingButton() {
+        Main.routeRecording.importRoutes("routes.json");
+    }
 
     @Number(
-            name = "Route number",
+            title = "Route number",
             description = "Sets the number of the route you are currently recording (NOTE: the preceding number needs to be filled for this route to be checked)",
             min = 0,
             max = 10,
-            category = "Route Recording",
-            size = 2
+            category = "Route Recording"
     )
     public static int routeNumber = 0;
 
     @Slider(
-            name = "Ping",
+            title = "Ping",
             description = "Amount of time to wait before checking pos again to determine etherwarp",
             max = 1000, min = 0,
             category = "Route Recording"
@@ -461,13 +384,13 @@ public class SRMConfig extends Config {
     public static int etherwarpPing = 150;
 
     @HUD(
-            name = "Recording info",
+            title = "Recording info",
             category = "HUD"
     )
     public static RecordingHUD recordingHUD = new RecordingHUD();
 
     @HUD(
-            name = "Current room",
+            title = "Current room",
             category = "HUD"
     )
     public static CurrentRoomHUD currentRoomHUD = new CurrentRoomHUD();
@@ -475,7 +398,7 @@ public class SRMConfig extends Config {
 
     //Color profile saving and loading
     @Text(
-            name = "Color Profile Name",
+            title = "Color Profile Name",
             description = "The name of the color profile to save or load",
             subcategory = "Profiles",
             category = "Rendering",
@@ -484,80 +407,68 @@ public class SRMConfig extends Config {
     public static String colorProfileName = "default.json";
 
     @Info(
-            text = "Will auto append the .json extension if not provided",
+            title = "Will auto append the .json extension if not provided",
+            description = "Will auto append the .json extension if not provided",
             subcategory = "Profiles",
-            category = "Rendering",
-            type = InfoType.INFO
+            category = "Rendering"
     )
     public static boolean b;
 
     @Button(
-            name = "Save Color Profile",
-            text = "Save",
+            title = "Save Color Profile",
             description = "Write the current color profile, excluding waypoints, to a file",
             subcategory = "Profiles",
             category = "Rendering"
     )
-    Runnable runnable10 = () -> {
-        new Thread(() -> {
-            ConfigUtils.writeColorConfig(colorProfileName);
-        }).start();
-    };
+    private void saveColorProfileButton() {
+        ConfigUtils.writeColorConfig(colorProfileName);
+    }
 
     @Button(
-            name = "Load Color Profile",
-            text = "Load",
+            title = "Load Color Profile",
             description = "Reads the color profile from a file",
             subcategory = "Profiles",
             category = "Rendering"
     )
-    Runnable runnable11 = () -> {
-        new Thread(() -> {
-            if (ConfigUtils.loadColorConfig(colorProfileName.isEmpty() ? "default.json" : colorProfileName)) {
-                sendChatMessage(EnumChatFormatting.DARK_GREEN + "Loaded " + EnumChatFormatting.GREEN + colorProfileName + EnumChatFormatting.DARK_GREEN + " as color profile");
-            }
-        }).start();
-    };
+    private void loadColorProfileButton() {
+        if (ConfigUtils.loadColorConfig(colorProfileName.isEmpty() ? "default.json" : colorProfileName)) {
+            sendChatMessage(EnumChatFormatting.DARK_GREEN + "Loaded " + EnumChatFormatting.GREEN + colorProfileName + EnumChatFormatting.DARK_GREEN + " as color profile");
+        }
+    }
 
     @Button(
-            name = "List all Color Profiles",
-            text = "List",
+            title = "List all Color Profiles",
             description = "Lists all the color profiles in the color profile directory",
             subcategory = "Profiles",
             category = "Rendering"
     )
-    Runnable runnable12 = () -> {
-        new Thread(() -> {
-            sendChatMessage("Color Profiles:", EnumChatFormatting.DARK_AQUA);
-            for (String name : FileUtils.getFileNames(Main.COLOR_PROFILE_PATH)) {
-                sendChatMessage(" - " + name, EnumChatFormatting.AQUA);
-            }
-        }).start();
-    };
+    private void listAllColorProfilesButton() {
+        sendChatMessage("Color Profiles:", EnumChatFormatting.DARK_AQUA);
+        for (String name : FileUtils.getFileNames(Main.COLOR_PROFILE_PATH)) {
+            sendChatMessage(" - " + name, EnumChatFormatting.AQUA);
+        }
+    }
 
     @Button(
-            name = "Import Color Profile",
-            text = "Import",
+            title = "Import Color Profile",
             description = "Select a color profile to import, this will be copied to .minecraft/config/SecretRoutes/colorprofiles",
             subcategory = "Profiles",
             category = "Rendering"
     )
-    Runnable runnable13 = () -> {
-        new Thread(() -> {
-            try {
-                File file = FileUtils.promptUserForFile();
-                if (file != null) {
-                    FileUtils.copyFileToDirectory(file, Main.COLOR_PROFILE_PATH);
-                }
-            } catch (Exception e) {
-                LogUtils.error(e);
+    private void importColorProfileButton() {
+        try {
+            File file = FileUtils.promptUserForFile();
+            if (file != null) {
+                FileUtils.copyFileToDirectory(file, Main.COLOR_PROFILE_PATH);
             }
-        }).start();
-    };
+        } catch (Exception e) {
+            LogUtils.error(e);
+        }
+    }
 
     // Rendering
     @Slider(
-            name = "Alpha multiplier",
+            title = "Alpha multiplier",
             description = "Default opacity multiplier. ONLY HAS AN EFFECT ON THE FULL BLOCK",
             min = 0f, max = 1f,
             category = "Rendering",
@@ -567,49 +478,49 @@ public class SRMConfig extends Config {
 
 
     @Color(
-            name = "Line color",
+            title = "Line color",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
     public static OneColor lineColor = new OneColor(255, 0, 0);
 
     @Color(
-            name = "Pearl line color",
+            title = "Pearl line color",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
     public static OneColor pearlLineColor = new OneColor(0, 255, 255);
 
     @Color(
-            name = "EtherWarp",
+            title = "EtherWarp",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
     public static OneColor etherWarp = new OneColor(128, 0, 128);
 
     @Color(
-            name = "Mine",
+            title = "Mine",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
     public static OneColor mine = new OneColor(255, 255, 0);
 
     @Color(
-            name = "Interacts",
+            title = "Interacts",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
     public static OneColor interacts = new OneColor(0, 0, 255);
 
     @Color(
-            name = "superbooms",
+            title = "superbooms",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
     public static OneColor superbooms = new OneColor(255, 0, 0);
 
     @Color(
-            name = "enderpearls",
+            title = "enderpearls",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
@@ -617,34 +528,32 @@ public class SRMConfig extends Config {
 
 
     @Color(
-            name = "Secrets - item",
+            title = "Secrets - item",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
     public static OneColor secretsItem = new OneColor(0, 255, 255);
 
     @Color(
-            name = "Secrets - interact",
+            title = "Secrets - interact",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
     public static OneColor secretsInteract = new OneColor(0, 0, 255);
 
     @Color(
-            name = "Secrets - bat",
+            title = "Secrets - bat",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
     public static OneColor secretsBat = new OneColor(0, 255, 0);
 
     @Button(
-            name = "Reset to default colors",
-            text = "Reset",
-            size = OptionSize.DUAL,
+            title = "Reset to default colors",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
-    Runnable runnable7 = () -> {
+    private void resetToDefaultColorsButton() {
         alphaMultiplier = 0.5f;
         lineColor = new OneColor(255, 0, 0);
         pearlLineColor = new OneColor(0, 255, 255);
@@ -656,9 +565,10 @@ public class SRMConfig extends Config {
         secretsItem = new OneColor(0, 255, 255);
         secretsInteract = new OneColor(0, 0, 255);
         secretsBat = new OneColor(0, 255, 0);
-    };
+    }
+
     @Switch(
-            name = "Render etherwarps",
+            title = "Render etherwarps",
             subcategory = "Render Options",
             category =  "Rendering",
             description = "Toggles the rendering of etherwarp waypoints"
@@ -666,14 +576,14 @@ public class SRMConfig extends Config {
     public static boolean renderEtherwarps = true;
 
     @Switch(
-            name = "Full block",
+            title = "Full block",
             subcategory = "Render Options",
             category = "Rendering"
     )
     public static boolean etherwarpFullBlock = false;
 
     @Switch(
-            name = "Render mines",
+            title = "Render mines",
             subcategory = "Render Options",
             category =  "Rendering",
             description = "Toggles the rendering of mines waypoints"
@@ -681,14 +591,14 @@ public class SRMConfig extends Config {
     public static boolean renderMines = true;
 
     @Switch(
-            name = "Full block",
+            title = "Full block",
             subcategory = "Render Options",
             category = "Rendering"
     )
     public static boolean mineFullBlock = false;
 
     @Switch(
-            name = "Render interacts",
+            title = "Render interacts",
             subcategory = "Render Options",
             category =  "Rendering",
             description = "Toggles the rendering of interact waypoints"
@@ -696,14 +606,14 @@ public class SRMConfig extends Config {
     public static boolean renderInteracts = true;
 
     @Switch(
-            name = "Full block",
+            title = "Full block",
             subcategory = "Render Options",
             category = "Rendering"
     )
     public static boolean interactsFullBlock = false;
 
     @Switch(
-            name = "Render superbooms",
+            title = "Render superbooms",
             subcategory = "Render Options",
             category =  "Rendering",
             description = "Toggles the rendering of superbooms waypoints"
@@ -711,14 +621,14 @@ public class SRMConfig extends Config {
     public static boolean renderSuperboom = true;
 
     @Switch(
-            name = "Full block",
+            title = "Full block",
             subcategory = "Render Options",
             category = "Rendering"
     )
     public static boolean superboomsFullBlock = false;
 
     @Switch(
-            name = "Render enderpearls",
+            title = "Render enderpearls",
             subcategory = "Render Options",
             category =  "Rendering",
             description = "Toggles the rendering of enderpearls waypoints"
@@ -726,14 +636,14 @@ public class SRMConfig extends Config {
     public static boolean renderEnderpearls = true;
 
     @Switch(
-            name = "Full block",
+            title = "Full block",
             subcategory = "Render Options",
             category = "Rendering"
     )
     public static boolean enderpearlFullBlock = false;
 
     @Switch(
-            name = "Render item secrets",
+            title = "Render item secrets",
             subcategory = "Render Options",
             category =  "Rendering",
             description = "Toggles the rendering of item secret waypoints"
@@ -741,14 +651,14 @@ public class SRMConfig extends Config {
     public static boolean renderSecretsItem = true;
 
     @Switch(
-            name = "Full block",
+            title = "Full block",
             subcategory = "Render Options",
             category = "Rendering"
     )
     public static boolean secretsItemFullBlock = false;
 
     @Switch(
-            name = "Render interact secrets",
+            title = "Render interact secrets",
             subcategory = "Render Options",
             category =  "Rendering",
             description = "Toggles the rendering of interact secrets waypoints"
@@ -756,14 +666,14 @@ public class SRMConfig extends Config {
     public static boolean renderSecretIteract = true;
 
     @Switch(
-            name = "Full block",
+            title = "Full block",
             subcategory = "Render Options",
             category = "Rendering"
     )
     public static boolean secretsInteractFullBlock = false;
 
     @Switch(
-            name = "Render bat secrets",
+            title = "Render bat secrets",
             subcategory = "Render Options",
             category =  "Rendering",
             description = "Toggles the rendering of bat secrets waypoints"
@@ -771,20 +681,18 @@ public class SRMConfig extends Config {
     public static boolean renderSecretBat = true;
 
     @Switch(
-            name = "Full block",
+            title = "Full block",
             subcategory = "Render Options",
             category = "Rendering"
     )
     public static boolean secretsBatFullBlock = false;
 
     @Button(
-            name = "Reset default options",
-            text = "reset",
+            title = "Reset default options",
             category = "Rendering",
-            subcategory = "Render Options",
-            size = OptionSize.DUAL
+            subcategory = "Render Options"
     )
-    Runnable runnable17 = () ->{
+    private void resetDefaultOptionsButton() {
         renderEtherwarps = true;
         etherwarpFullBlock = false;
         renderMines = true;
@@ -801,29 +709,26 @@ public class SRMConfig extends Config {
         secretsInteractFullBlock = false;
         renderSecretBat = true;
         secretsBatFullBlock = false;
-    } ;
-
+    }
 
     // Start waypoints
     @Switch(
-            name = "Start text toggle",
-            size = OptionSize.DUAL,
+            title = "Start text toggle",
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
     )
     public static boolean startTextToggle = true;
 
     @Dropdown(
-            name = "Start waypoint text color",
+            title = "Start waypoint text color",
             options = {"Black", "Dark blue", "Dark green", "Dark aqua", "Dark red", "Dark purple", "Gold", "Gray", "Dark gray", "Blue", "Green", "Aqua", "Red", "Light purple", "Yellow", "White"},
-            size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
     )
     public static int startWaypointColorIndex = 12;
 
     @Slider(
-            name = "Start waypoint text size",
+            title = "Start waypoint text size",
             min = 1,
             max = 10,
             subcategory = "Waypoint Text Rendering",
@@ -833,7 +738,7 @@ public class SRMConfig extends Config {
 
     // Exit route waypoints
     @Switch(
-            name = "Exit text toggle",
+            title = "Exit text toggle",
             size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
@@ -841,16 +746,15 @@ public class SRMConfig extends Config {
     public static boolean exitTextToggle = true;
 
     @Dropdown(
-            name = "Exit waypoint text color",
+            title = "Exit waypoint text color",
             options = {"Black", "Dark blue", "Dark green", "Dark aqua", "Dark red", "Dark purple", "Gold", "Gray", "Dark gray", "Blue", "Green", "Aqua", "Red", "Light purple", "Yellow", "White"},
-            size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
     )
     public static int exitWaypointColorIndex = 12;
 
     @Slider(
-            name = "Exit waypoint text size",
+            title = "Exit waypoint text size",
             min = 1,
             max = 10,
             subcategory = "Waypoint Text Rendering",
@@ -860,7 +764,7 @@ public class SRMConfig extends Config {
 
     // Interact waypoints
     @Switch(
-            name = "Interact text toggle",
+            title = "Interact text toggle",
             size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
@@ -868,16 +772,15 @@ public class SRMConfig extends Config {
     public static boolean interactTextToggle = true;
 
     @Dropdown(
-            name = "Interact waypoint text color",
+            title = "Interact waypoint text color",
             options = {"Black", "Dark blue", "Dark green", "Dark aqua", "Dark red", "Dark purple", "Gold", "Gray", "Dark gray", "Blue", "Green", "Aqua", "Red", "Light purple", "Yellow", "White"},
-            size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
     )
     public static int interactWaypointColorIndex = 9;
 
     @Slider(
-            name = "Interact waypoint text size",
+            title = "Interact waypoint text size",
             min = 1,
             max = 10,
             subcategory = "Waypoint Text Rendering",
@@ -887,7 +790,7 @@ public class SRMConfig extends Config {
 
     // Item waypoints
     @Switch(
-            name = "Item text toggle",
+            title = "Item text toggle",
             size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
@@ -895,16 +798,15 @@ public class SRMConfig extends Config {
     public static boolean itemTextToggle = true;
 
     @Dropdown(
-            name = "Item waypoint text color",
+            title = "Item waypoint text color",
             options = {"Black", "Dark blue", "Dark green", "Dark aqua", "Dark red", "Dark purple", "Gold", "Gray", "Dark gray", "Blue", "Green", "Aqua", "Red", "Light purple", "Yellow", "White"},
-            size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
     )
     public static int itemWaypointColorIndex = 11;
 
     @Slider(
-            name = "Item waypoint text size",
+            title = "Item waypoint text size",
             min = 1,
             max = 10,
             subcategory = "Waypoint Text Rendering",
@@ -914,7 +816,7 @@ public class SRMConfig extends Config {
 
     // Bat waypoints
     @Switch(
-            name = "Bat text toggle",
+            title = "Bat text toggle",
             size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
@@ -922,16 +824,15 @@ public class SRMConfig extends Config {
     public static boolean batTextToggle = true;
 
     @Dropdown(
-            name = "Bat waypoint text color",
+            title = "Bat waypoint text color",
             options = {"Black", "Dark blue", "Dark green", "Dark aqua", "Dark red", "Dark purple", "Gold", "Gray", "Dark gray", "Blue", "Green", "Aqua", "Red", "Light purple", "Yellow", "White"},
-            size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
     )
     public static int batWaypointColorIndex = 10;
 
     @Slider(
-            name = "Bat waypoint text size",
+            title = "Bat waypoint text size",
             min = 1,
             max = 10,
             subcategory = "Waypoint Text Rendering",
@@ -941,14 +842,14 @@ public class SRMConfig extends Config {
 
     // Etherwarp waypoints
     @Switch(
-            name = "Etherwarp text toggle",
+            title = "Etherwarp text toggle",
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
     )
     public static boolean etherwarpsTextToggle = false;
 
     @Switch(
-            name = "Etherwarp enumeration toggle",
+            title = "Etherwarp enumeration toggle",
             subcategory = "Waypoint Text Rendering",
             category = "Rendering",
             description = "Adds a number to the etherwarp waypoints"
@@ -956,16 +857,15 @@ public class SRMConfig extends Config {
     public static boolean etherwarpsEnumToggle = false;
 
     @Dropdown(
-            name = "Etherwarp waypoint text color",
+            title = "Etherwarp waypoint text color",
             options = {"Black", "Dark blue", "Dark green", "Dark aqua", "Dark red", "Dark purple", "Gold", "Gray", "Dark gray", "Blue", "Green", "Aqua", "Red", "Light purple", "Yellow", "White"},
-            size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
     )
     public static int etherwarpsWaypointColorIndex = 5;
 
     @Slider(
-            name = "Etherwarp waypoint text size",
+            title = "Etherwarp waypoint text size",
             min = 1,
             max = 10,
             subcategory = "Waypoint Text Rendering",
@@ -975,7 +875,7 @@ public class SRMConfig extends Config {
 
     // Mines waypoints
     @Switch(
-            name = "Stonk text toggle",
+            title = "Stonk text toggle",
             size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
@@ -983,7 +883,7 @@ public class SRMConfig extends Config {
     public static boolean minesTextToggle = false;
 
     @Switch(
-            name = "Stonk enumeration toggle",
+            title = "Stonk enumeration toggle",
             subcategory = "Waypoint Text Rendering",
             category = "Rendering",
             description = "Adds a number to the mines waypoints"
@@ -991,16 +891,15 @@ public class SRMConfig extends Config {
     public static boolean minesEnumToggle = false;
 
     @Dropdown(
-            name = "Stonk waypoint text color",
+            title = "Stonk waypoint text color",
             options = {"Black", "Dark blue", "Dark green", "Dark aqua", "Dark red", "Dark purple", "Gold", "Gray", "Dark gray", "Blue", "Green", "Aqua", "Red", "Light purple", "Yellow", "White"},
-            size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
     )
     public static int minesWaypointColorIndex = 14;
 
     @Slider(
-            name = "Stonk waypoint text size",
+            title = "Stonk waypoint text size",
             min = 1,
             max = 10,
             subcategory = "Waypoint Text Rendering",
@@ -1010,7 +909,7 @@ public class SRMConfig extends Config {
 
     // Interacts waypoints
     @Switch(
-            name = "Interact text toggle",
+            title = "Interact text toggle",
             subcategory = "Waypoint Text Rendering",
             size = OptionSize.DUAL,
             category = "Rendering"
@@ -1018,7 +917,7 @@ public class SRMConfig extends Config {
     public static boolean interactsTextToggle = false;
 
     @Switch(
-            name = "Interact enumeration toggle",
+            title = "Interact enumeration toggle",
             subcategory = "Waypoint Text Rendering",
             category = "Rendering",
             description = "Adds a number to the interact waypoints"
@@ -1026,16 +925,15 @@ public class SRMConfig extends Config {
     public static boolean interactsEnumToggle = false;
 
     @Dropdown(
-            name = "Interact waypoint text color",
+            title = "Interact waypoint text color",
             options = {"Black", "Dark blue", "Dark green", "Dark aqua", "Dark red", "Dark purple", "Gold", "Gray", "Dark gray", "Blue", "Green", "Aqua", "Red", "Light purple", "Yellow", "White"},
-            size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
     )
     public static int interactsWaypointColorIndex = 9;
 
     @Slider(
-            name = "Interact waypoint text size",
+            title = "Interact waypoint text size",
             min = 1,
             max = 10,
             subcategory = "Waypoint Text Rendering",
@@ -1045,7 +943,7 @@ public class SRMConfig extends Config {
 
     // Superboom waypoints
     @Switch(
-            name = "Superboom text toggle",
+            title = "Superboom text toggle",
             subcategory = "Waypoint Text Rendering",
             size = OptionSize.DUAL,
             category = "Rendering"
@@ -1053,7 +951,7 @@ public class SRMConfig extends Config {
     public static boolean superboomsTextToggle = false;
 
     @Switch(
-            name = "Superboom enumeration toggle",
+            title = "Superboom enumeration toggle",
             subcategory = "Waypoint Text Rendering",
             category = "Rendering",
             description = "Adds a number to the superboom waypoints"
@@ -1061,16 +959,15 @@ public class SRMConfig extends Config {
     public static boolean superboomsEnumToggle = false;
 
     @Dropdown(
-            name = "Superboom waypoint text color",
+            title = "Superboom waypoint text color",
             options = {"Black", "Dark blue", "Dark green", "Dark aqua", "Dark red", "Dark purple", "Gold", "Gray", "Dark gray", "Blue", "Green", "Aqua", "Red", "Light purple", "Yellow", "White"},
-            size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
     )
     public static int superboomsWaypointColorIndex = 12;
 
     @Slider(
-            name = "Superboom waypoint text size",
+            title = "Superboom waypoint text size",
             min = 1,
             max = 10,
             subcategory = "Waypoint Text Rendering",
@@ -1080,7 +977,7 @@ public class SRMConfig extends Config {
 
     // Enderpearl waypoints
     @Switch(
-            name = "Ender Pearl text toggle",
+            title = "Ender Pearl text toggle",
             size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
@@ -1088,7 +985,7 @@ public class SRMConfig extends Config {
     public static boolean enderpearlTextToggle = true;
 
     @Switch(
-            name = "Enderpearl enumeration toggle",
+            title = "Enderpearl enumeration toggle",
             subcategory = "Waypoint Text Rendering",
             category = "Rendering",
             description = "Adds a number to the superboom waypoints"
@@ -1096,16 +993,15 @@ public class SRMConfig extends Config {
     public static boolean enderpearlEnumToggle = false;
 
     @Dropdown(
-            name = "Ender Pearl waypoint text color",
+            title = "Ender Pearl waypoint text color",
             options = {"Black", "Dark blue", "Dark green", "Dark aqua", "Dark red", "Dark purple", "Gold", "Gray", "Dark gray", "Blue", "Green", "Aqua", "Red", "Light purple", "Yellow", "White"},
-            size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
     )
     public static int enderpearlWaypointColorIndex = 11;
 
     @Slider(
-            name = "Ender Pearl waypoint text size",
+            title = "Ender Pearl waypoint text size",
             min = 1,
             max = 10,
             subcategory = "Waypoint Text Rendering",
@@ -1115,14 +1011,12 @@ public class SRMConfig extends Config {
 
     // Reset to text defaults
     @Button(
-            name = "Reset to text defaults",
-            text = "Reset",
+            title = "Reset to text defaults",
             description = "Resets all the text options to their default values",
-            size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
     )
-    Runnable runnable8 = () -> {
+    private void resetToTextDefaultsButton() {
         startTextToggle = true;
         startWaypointColorIndex = 12;
         startTextSize = 3;
@@ -1158,28 +1052,26 @@ public class SRMConfig extends Config {
         enderpearlEnumToggle = false;
         enderpearlWaypointColorIndex = 11;
         enderpearlTextSize = 3;
-    };
+    }
 
     @Text(
-            name = "Dev password",
+            title = "Dev password",
             description = "The password to access the dev options",
             subcategory = "General",
-            category = "Dev",
-            size = 2
+            category = "Dev"
     )
     public static String devPassword = "";
 
     @Switch(
-            name = "Verbose logging",
+            title = "Verbose logging",
             description = "Adds more detailed logging, useful for debugging",
             subcategory = "Chat logging",
-            category = "Dev",
-            size = OptionSize.DUAL
+            category = "Dev"
     )
     public static boolean verboseLogging = false;
 
     @Switch(
-            name = "Better recording",
+            title = "Better recording",
             description = "Adds more detailed logging for recording, useful for debugging",
             subcategory = "Chat logging",
             category = "Dev"
@@ -1187,7 +1079,7 @@ public class SRMConfig extends Config {
     public static boolean verboseRecording = true;
     //More verbose logging options will come in future releases
     @Switch(
-            name = "Better updating",
+            title = "Better updating",
             description = "adds more detailed logging for updating, useful for debugging",
             subcategory = "Chat logging",
             category = "Dev"
@@ -1195,7 +1087,7 @@ public class SRMConfig extends Config {
     public static boolean verboseUpdating = true;
 
     @Switch(
-            name = "Better info",
+            title = "Better info",
             description = "adds more detailed logging for info, useful for debugging",
             subcategory = "Chat logging",
             category = "Dev"
@@ -1203,14 +1095,14 @@ public class SRMConfig extends Config {
     public static boolean verboseInfo = false;
 
     @Switch(
-            name = "Better rendering",
+            title = "Better rendering",
             description = "adds more detailed logging rendering, useful for debugging",
             subcategory = "Chat logging",
             category = "Dev"
     )
     public static boolean verboseRendering = false;
     @Switch(
-            name = "Better personal bests",
+            title = "Better personal bests",
             description = "adds more detailed logging personal bests, useful for debugging",
             subcategory = "Chat logging",
             category = "Dev"
@@ -1218,7 +1110,7 @@ public class SRMConfig extends Config {
     public static boolean verbosePersonalBests = false;
 
     @Switch(
-            name = "ActionBar info",
+            title = "ActionBar info",
             description = "Send the actionbar in chat for debugging purposes",
             subcategory = "Chat logging",
             category = "Dev"
@@ -1226,7 +1118,7 @@ public class SRMConfig extends Config {
     public static boolean actionbarInfo = false;
 
     @Switch(
-            name = "Force outdated",
+            title = "Force outdated",
             description = "Forces the version to be outdated, useful for testing the auto updater",
             subcategory = "General",
             category = "Dev"
@@ -1235,14 +1127,14 @@ public class SRMConfig extends Config {
 
     @Info(
             title = "Do not turn this on unless you know exactly what you are doing",
-            type = InfoType.ERROR,
+            description = "Do not turn this on unless you know exactly what you are doing",
             category = "Dev",
             subcategory = "General"
     )
     public static boolean c;
 
     @Dropdown(
-            name = "Custom Pearl Orientation (Unused)",
+            title = "Custom Pearl Orientation (Unused)",
             options = {"Default", "SW", "NW", "NE", "SE"},
             category = "Dev"
     )
@@ -1314,7 +1206,7 @@ public class SRMConfig extends Config {
     public static OneKeyBind exportRoutes = new OneKeyBind();
 
     @Switch(
-            name = "Warn when keybinds used outside of dungeons",
+            title = "Warn when keybinds used outside of dungeons",
             description = "Sends a warning message when keybinds are used outside of dungeons",
             size = 2,
             category = "Keybinds",
@@ -1326,7 +1218,7 @@ public class SRMConfig extends Config {
 
 
     @Switch(
-            name = "Custom Secret Sound",
+            title = "Custom Secret Sound",
             description = "Plays a custom sound when a secret is found",
             category = "General",
             subcategory = "Sound",
@@ -1335,7 +1227,7 @@ public class SRMConfig extends Config {
     public static boolean customSecretSound = false;
 
     @Dropdown(
-            name = "Custom Secret Sound",
+            title = "Custom Secret Sound",
             options = {"mob.blaze.hit", "fire.ignite", "random.orb", "random.break", "mob.guardian.land.hit", "note.pling", "zyra.meow"},
             category = "General",
             subcategory = "Sound"
@@ -1343,7 +1235,7 @@ public class SRMConfig extends Config {
     public static int customSecretSoundIndex = 6;
 
     @Slider(
-            name = "Custom Secret Sound Volume",
+            title = "Custom Secret Sound Volume",
             min = 0,
             max = 1.0f,
             category = "General",
@@ -1352,7 +1244,7 @@ public class SRMConfig extends Config {
     public static float customSecretSoundVolume = 1.0f;
 
     @Slider(
-            name = "Custom Secret Sound Pitch",
+            title = "Custom Secret Sound Pitch",
             min = 0,
             max = 2.0f,
             category = "General",
@@ -1361,28 +1253,25 @@ public class SRMConfig extends Config {
     public static float customSecretSoundPitch = 1.0f;
 
     @Button(
-            name = "Play Custom Secret Sound",
-            text = "Play",
+            title = "Play Custom Secret Sound",
             description = "Plays the custom secret sound",
             category = "General",
-            subcategory = "Sound",
-            size = 2
+            subcategory = "Sound"
     )
-    public static Runnable runnable15 = () -> {
+    private static void playCustomSecretSoundButton() {
         SecretSounds.secretChime(true);
-    };
+    }
 
     @Switch(
-            name = "Hide boss messages",
+            title = "Hide boss messages",
             description = "Hides boss messages without impacting other mods",
             category = "General",
-            size = OptionSize.DUAL,
             subcategory = "Messages"
     )
     public static boolean hideBossMessages = false;
 
     @Checkbox(
-            name = "Hide watcher",
+            title = "Hide watcher",
             description = "Hides watcher messages",
             category = "General",
             subcategory = "Messages"
@@ -1390,7 +1279,7 @@ public class SRMConfig extends Config {
     public static boolean hideWatcher = true;
 
     @Checkbox(
-            name = "Hide Bonzo",
+            title = "Hide Bonzo",
             description = "Hides Bonzo messages",
             category = "General",
             subcategory = "Messages"
@@ -1398,7 +1287,7 @@ public class SRMConfig extends Config {
     public static boolean hideBonzo = true;
 
     @Checkbox(
-            name = "Hide Scarf",
+            title = "Hide Scarf",
             description = "Hides Scarf messages (f2/m2)",
             category = "General",
             subcategory = "Messages"
@@ -1406,7 +1295,7 @@ public class SRMConfig extends Config {
     public static boolean hideScarf = true;
 
     @Checkbox(
-            name = "Hide Professor",
+            title = "Hide Professor",
             description = "Hides Professor messages (f3/m3)",
             category = "General",
             subcategory = "Messages"
@@ -1414,7 +1303,7 @@ public class SRMConfig extends Config {
     public static boolean hideProfessor = true;
 
     @Checkbox(
-            name = "Hide Thorn",
+            title = "Hide Thorn",
             description = "Hides Thron messages (f4/m4)",
             category = "General",
             subcategory = "Messages"
@@ -1422,7 +1311,7 @@ public class SRMConfig extends Config {
     public static boolean hideThorn = true;
 
     @Checkbox(
-            name = "Hide Livid",
+            title = "Hide Livid",
             description = "Hides Livid messages (f5/m5)",
             category = "General",
             subcategory = "Messages"
@@ -1430,7 +1319,7 @@ public class SRMConfig extends Config {
     public static boolean hideLivid = true;
 
     @Checkbox(
-            name = "Hide Sadan",
+            title = "Hide Sadan",
             description = "Hides Sadan messages (f6/m6)",
             category = "General",
             subcategory = "Messages"
@@ -1438,7 +1327,7 @@ public class SRMConfig extends Config {
     public static boolean hideSadan = true;
 
     @Checkbox(
-            name = "Hide Wither lords",
+            title = "Hide Wither lords",
             description = "Hides wither lords messages (f7/m7)",
             category = "General",
             subcategory = "Messages"
@@ -1446,7 +1335,7 @@ public class SRMConfig extends Config {
     public static boolean hideWitherLords = false;
 
     @Switch(
-            name = "Blood spawned notification",
+            title = "Blood spawned notification",
             description = "Notifies when blood is fully spawned",
             category = "General",
             subcategory = "Messages",
@@ -1456,15 +1345,15 @@ public class SRMConfig extends Config {
     public static boolean bloodNotif = false;
 
     @Text(
-            name = "Blood ready text",
+            title = "Blood ready text",
             description = "Text to show when blood is fully spawned",
             subcategory = "Messages",
             size = 1
     )
-    public static String bloodReadyText = "Blood Ready";
+    public static String bloodReadytitle = "Blood Ready";
 
     @Dropdown(
-            name = "Color",
+            title = "Color",
             description = "Color of the message",
             options = {"Black", "Dark blue", "Dark green", "Dark aqua", "Dark red", "Dark purple", "Gold", "Gray", "Dark gray", "Blue", "Green", "Aqua", "Red", "Light purple", "Yellow", "White"},
             subcategory = "Messages"
@@ -1472,7 +1361,7 @@ public class SRMConfig extends Config {
     public static int bloodReadyColor = 6;
 
     @Number(
-            name = "Duration",
+            title = "Duration",
             description = "Duration of the banner",
             max = 15000, min =1,
             subcategory = "Messages"
@@ -1480,16 +1369,15 @@ public class SRMConfig extends Config {
     public static int bloodBannerDuration = 3000;
 
     @Number(
-            name = "Scale",
+            title = "Scale",
             description = "Scale of the text",
             min = 1, max = 10,
-            size = 1,
             subcategory = "Messages"
     )
     public static int bloodScale = 2;
 
     @Slider(
-            name = "X Offset",
+            title = "X Offset",
             description = "X Offset for the message. (POSITIVE TO THE RIGHT)",
             subcategory = "Messages",
             min = -1000, max = 1000
@@ -1497,14 +1385,14 @@ public class SRMConfig extends Config {
     public static int bloodX = 0;
 
     @Slider(
-            name = "Y Offset",
+            title = "Y Offset",
             description = "Y Offset for the message. (POSITIVE TO THE BOTTOM)",
             subcategory = "Messages",
             min = -1000, max = 1000)
     public static int bloodY = -100;
 
     @Checkbox(
-            name = "Render Test message",
+            title = "Render Test message",
             description = "Renders a test message with the paramaters to change position. (Untick when done)",
             subcategory = "Messages"
     )
@@ -1512,7 +1400,7 @@ public class SRMConfig extends Config {
 
 
     @Switch(
-            name = "Render lines through walls",
+            title = "Render lines through walls",
             category = "Dev",
             subcategory = "WIP",
             size = 2
@@ -1520,7 +1408,7 @@ public class SRMConfig extends Config {
     public static boolean renderLinesThroughWalls = false;
 
     @Switch(
-            name = "Player crosshair to next waypoint",
+            title = "Player crosshair to next waypoint",
             category = "Dev",
             subcategory = "WIP",
             size = 2
@@ -1528,7 +1416,7 @@ public class SRMConfig extends Config {
     public static boolean playerWaypointLine = false;
 
     @Switch(
-            name = "Player to Etherwarp",
+            title = "Player to Etherwarp",
             description = "Draws a line to the next etherwarp location",
             size = 2,
             category = "Dev",
@@ -1537,14 +1425,14 @@ public class SRMConfig extends Config {
     public static boolean playerToEtherwarp = false;
 
     @Checkbox(
-            name = "debug",
+            title = "debug",
             category = "Dev",
             subcategory = "WIP",
             size = 2
     )
     public static boolean debug = false;
     @Switch(
-            name = "Disable Server Checking (You have to relog for it to work)",
+            title = "Disable Server Checking (You have to relog for it to work)",
             category = "Dev",
             subcategory = "WIP",
             size = 2
@@ -1552,7 +1440,7 @@ public class SRMConfig extends Config {
     public static boolean disableServerChecking = false;
 
     @Switch(
-            name = "Bridge",
+            title = "Bridge",
             category = "Guild",
             subcategory = "WIP",
             size = 2
@@ -1561,7 +1449,7 @@ public class SRMConfig extends Config {
 
 
     @Switch(
-            name = "Server Data",
+            title = "Server Data",
             subcategory = "Data Privacy",
             description = "Sends data to the server (Masked UUID, Login Timestamp, Mod Version, Online Data)",
             size = 2
@@ -1588,9 +1476,9 @@ public class SRMConfig extends Config {
             addDependency("lineType", "modEnabled", true);
             addDependency("width", "modEnabled", true);
             addDependency("routesFileName", "modEnabled", true);
-            addDependency("runnable", "modEnabled", true);
-            addDependency("runnable9", "modEnabled", true);
-            addDependency("runnable14", "modEnabled", true);
+            addDependency("updateRoutesButton", "modEnabled", true);
+            addDependency("importRoutesButton", "modEnabled", true);
+            addDependency("checkForUpdatesButton", "modEnabled", true);
             // TODO: Check if this works properly in the config:
             hideIf("particles", () -> !isEqualTo(lineType, 0));
             addDependency("particles", "modEnabled", true);
@@ -1598,7 +1486,7 @@ public class SRMConfig extends Config {
             hideIf("tickInterval", () -> !isEqualTo(lineType, 0));
             addDependency("tickInterval", "modEnabled", true);
             addDependency("pearlLineWidth", "modEnabled", true);
-            addDependency("pearls", "modEnabled", true);
+            addDependency("routeTypeIndex", "modEnabled", true);
             addDependency("pearlRoutesFileName", "modEnabled", true);
             addDependency("allSecrets", "modEnabled", true);
             addDependency("renderComplete", "modEnabled", true);
@@ -1649,7 +1537,7 @@ public class SRMConfig extends Config {
             addDependency("customSecretSoundIndex", "customSecretSound", true);
             addDependency("customSecretSoundVolume", "customSecretSound", true);
             addDependency("customSecretSoundPitch", "customSecretSound", true);
-            addDependency("runnable15", "customSecretSound", true);
+            addDependency("playCustomSecretSoundButton", "customSecretSound", true);
 
             addDependency("hideWatcher", "hideBossMessages", true);
             addDependency("hideBonzo", "hideBossMessages", true);
