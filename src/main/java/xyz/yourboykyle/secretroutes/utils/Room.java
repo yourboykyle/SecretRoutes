@@ -74,7 +74,7 @@ public class Room {
 
             if (roomName != null) {
                 String filePath;
-                if(SRMConfig.pearls) {
+                if(SRMConfig.routeTypeIndex == 1) {
                     filePath = Main.ROUTES_PATH + File.separator + (!SRMConfig.pearlRoutesFileName.equals("") ? SRMConfig.pearlRoutesFileName : "pearlroutes.json");
                 }else{
                     filePath = Main.ROUTES_PATH + File.separator + (!SRMConfig.routesFileName.equals("") ? SRMConfig.routesFileName  : "pearlroutes.json");
