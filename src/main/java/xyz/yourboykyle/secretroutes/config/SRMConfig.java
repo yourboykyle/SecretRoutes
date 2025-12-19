@@ -21,14 +21,17 @@
 
 package xyz.yourboykyle.secretroutes.config;
 
+import dev.deftu.omnicore.api.client.input.OmniKeys;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
 import org.polyfrost.oneconfig.api.config.v1.Config;
 import org.polyfrost.oneconfig.api.config.v1.annotations.*;
 import org.polyfrost.oneconfig.api.config.v1.annotations.Number;
+import org.polyfrost.oneconfig.api.ui.v1.keybind.KeybindManager;
+import org.polyfrost.polyui.color.ColorUtils;
+import org.polyfrost.polyui.color.PolyColor;
 import org.polyfrost.polyui.input.KeybindHelper;
-import org.polyfrost.polyui.input.Keys;
 import org.polyfrost.polyui.input.PolyBind;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.huds.CurrentRoomHUD;
@@ -40,7 +43,7 @@ import xyz.yourboykyle.secretroutes.utils.*;
 import java.io.File;
 
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
-import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
+
 public class SRMConfig extends Config {
     // Do not touch this ever (probably)
     public static final SRMConfig INSTANCE = new SRMConfig();
@@ -482,49 +485,49 @@ public class SRMConfig extends Config {
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
-    public static OneColor lineColor = new OneColor(255, 0, 0);
+    public static PolyColor lineColor = ColorUtils.rgba(255, 0, 0);
 
     @Color(
             title = "Pearl line color",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
-    public static OneColor pearlLineColor = new OneColor(0, 255, 255);
+    public static PolyColor pearlLineColor = ColorUtils.rgba(0, 255, 255);
 
     @Color(
             title = "EtherWarp",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
-    public static OneColor etherWarp = new OneColor(128, 0, 128);
+    public static PolyColor etherWarp = ColorUtils.rgba(128, 0, 128);
 
     @Color(
             title = "Mine",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
-    public static OneColor mine = new OneColor(255, 255, 0);
+    public static PolyColor mine = ColorUtils.rgba(255, 255, 0);
 
     @Color(
             title = "Interacts",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
-    public static OneColor interacts = new OneColor(0, 0, 255);
+    public static PolyColor interacts = ColorUtils.rgba(0, 0, 255);
 
     @Color(
             title = "superbooms",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
-    public static OneColor superbooms = new OneColor(255, 0, 0);
+    public static PolyColor superbooms = ColorUtils.rgba(255, 0, 0);
 
     @Color(
             title = "enderpearls",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
-    public static OneColor enderpearls = new OneColor(0, 255, 255);
+    public static PolyColor enderpearls = ColorUtils.rgba(0, 255, 255);
 
 
     @Color(
@@ -532,21 +535,21 @@ public class SRMConfig extends Config {
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
-    public static OneColor secretsItem = new OneColor(0, 255, 255);
+    public static PolyColor secretsItem = ColorUtils.rgba(0, 255, 255);
 
     @Color(
             title = "Secrets - interact",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
-    public static OneColor secretsInteract = new OneColor(0, 0, 255);
+    public static PolyColor secretsInteract = ColorUtils.rgba(0, 0, 255);
 
     @Color(
             title = "Secrets - bat",
             subcategory = "Waypoint Colors",
             category = "Rendering"
     )
-    public static OneColor secretsBat = new OneColor(0, 255, 0);
+    public static PolyColor secretsBat = ColorUtils.rgba(0, 255, 0);
 
     @Button(
             title = "Reset to default colors",
@@ -555,16 +558,16 @@ public class SRMConfig extends Config {
     )
     private void resetToDefaultColorsButton() {
         alphaMultiplier = 0.5f;
-        lineColor = new OneColor(255, 0, 0);
-        pearlLineColor = new OneColor(0, 255, 255);
-        etherWarp = new OneColor(128, 0, 128);
-        mine = new OneColor(255, 255, 0);
-        interacts = new OneColor(0, 0, 255);
-        superbooms = new OneColor(255, 0, 0);
-        enderpearls = new OneColor(0, 255, 255);
-        secretsItem = new OneColor(0, 255, 255);
-        secretsInteract = new OneColor(0, 0, 255);
-        secretsBat = new OneColor(0, 255, 0);
+        lineColor = ColorUtils.rgba(255, 0, 0);
+        pearlLineColor = ColorUtils.rgba(0, 255, 255);
+        etherWarp = ColorUtils.rgba(128, 0, 128);
+        mine = ColorUtils.rgba(255, 255, 0);
+        interacts = ColorUtils.rgba(0, 0, 255);
+        superbooms = ColorUtils.rgba(255, 0, 0);
+        enderpearls = ColorUtils.rgba(0, 255, 255);
+        secretsItem = ColorUtils.rgba(0, 255, 255);
+        secretsInteract = ColorUtils.rgba(0, 0, 255);
+        secretsBat = ColorUtils.rgba(0, 255, 0);
     }
 
     @Switch(
@@ -739,7 +742,6 @@ public class SRMConfig extends Config {
     // Exit route waypoints
     @Switch(
             title = "Exit text toggle",
-            size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
     )
@@ -765,7 +767,6 @@ public class SRMConfig extends Config {
     // Interact waypoints
     @Switch(
             title = "Interact text toggle",
-            size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
     )
@@ -791,7 +792,6 @@ public class SRMConfig extends Config {
     // Item waypoints
     @Switch(
             title = "Item text toggle",
-            size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
     )
@@ -817,7 +817,6 @@ public class SRMConfig extends Config {
     // Bat waypoints
     @Switch(
             title = "Bat text toggle",
-            size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
     )
@@ -876,7 +875,6 @@ public class SRMConfig extends Config {
     // Mines waypoints
     @Switch(
             title = "Stonk text toggle",
-            size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
     )
@@ -911,7 +909,6 @@ public class SRMConfig extends Config {
     @Switch(
             title = "Interact text toggle",
             subcategory = "Waypoint Text Rendering",
-            size = OptionSize.DUAL,
             category = "Rendering"
     )
     public static boolean interactsTextToggle = false;
@@ -945,7 +942,6 @@ public class SRMConfig extends Config {
     @Switch(
             title = "Superboom text toggle",
             subcategory = "Waypoint Text Rendering",
-            size = OptionSize.DUAL,
             category = "Rendering"
     )
     public static boolean superboomsTextToggle = false;
@@ -978,7 +974,6 @@ public class SRMConfig extends Config {
     // Enderpearl waypoints
     @Switch(
             title = "Ender Pearl text toggle",
-            size = OptionSize.DUAL,
             subcategory = "Waypoint Text Rendering",
             category = "Rendering"
     )
@@ -1140,13 +1135,21 @@ public class SRMConfig extends Config {
     )
     public static int customPearlOrientation = 0;
 
+    @Switch(
+            title = "Warn when keybinds used outside of dungeons",
+            description = "Sends a warning message when keybinds are used outside of dungeons",
+            category = "Keybinds",
+            subcategory = "General"
+    )
+    public static boolean warnKeybindsOutsideDungeon = true;
+
     @Keybind(
             title = "Next Secret",
             description = "Cycles to the next secret",
             category = "Keybinds",
             subcategory = "Secrets"
     )
-    public static PolyBind nextSecret = KeybindHelper.builder().keys(Keys.Z).does((something) -> {
+    public static PolyBind nextSecret = KeybindHelper.builder().keys(OmniKeys.KEY_RIGHT_BRACKET.getCode()).does((something) -> {
         if (Utils.inCatacombs) {
             Main.currentRoom.nextSecretKeybind();
         } else {
@@ -1163,7 +1166,16 @@ public class SRMConfig extends Config {
             category = "Keybinds",
             subcategory = "Secrets"
     )
-    public static OneKeyBind lastSecret = new OneKeyBind(UKeyboard.KEY_LBRACKET);
+    public static PolyBind lastSecret = KeybindHelper.builder().keys(OmniKeys.KEY_LEFT_BRACKET.getCode()).does((something) -> {
+        if (Utils.inCatacombs) {
+            Main.currentRoom.lastSecretKeybind();
+        } else {
+            if(warnKeybindsOutsideDungeon){
+                sendChatMessage("§cYou are not in a dungeon!");
+            }
+        }
+    }).build();
+    //public static OneKeyBind lastSecret = new OneKeyBind(UKeyboard.KEY_LBRACKET);
 
     @Keybind(
             title = "Toggle Secret rendering",
@@ -1171,7 +1183,16 @@ public class SRMConfig extends Config {
             category = "Keybinds",
             subcategory = "Secrets"
     )
-    public static OneKeyBind toggleSecrets = new OneKeyBind(UKeyboard.KEY_BACKSLASH);
+    public static PolyBind toggleSecrets = KeybindHelper.builder().keys(OmniKeys.KEY_BACKSPACE.getCode()).does((something) -> {
+        if (Utils.inCatacombs) {
+            Main.toggleSecretsKeybind();
+        } else {
+            if(warnKeybindsOutsideDungeon){
+                sendChatMessage("§cYou are not in a dungeon!");
+            }
+        }
+    }).build();
+    //public static OneKeyBind toggleSecrets = new OneKeyBind(UKeyboard.KEY_BACKSLASH);
 
     @Keybind(
             title = "Start recording",
@@ -1179,7 +1200,10 @@ public class SRMConfig extends Config {
             category = "Keybinds",
             subcategory = "Recording"
     )
-    public static OneKeyBind startRecording = new OneKeyBind();
+    public static PolyBind startRecording = KeybindHelper.builder().keys(OmniKeys.KEY_NONE.getCode()).does((something) -> {
+        INSTANCE.startRecordingButton();
+    }).build();
+    //public static OneKeyBind startRecording = new OneKeyBind();
 
     @Keybind(
             title = "Stop recording",
@@ -1187,7 +1211,10 @@ public class SRMConfig extends Config {
             subcategory = "Recording",
             category = "Keybinds"
     )
-    public static OneKeyBind stopRecording = new OneKeyBind();
+    public static PolyBind stopRecording = KeybindHelper.builder().keys(OmniKeys.KEY_NONE.getCode()).does((something) -> {
+        INSTANCE.stopRecordingButton();
+    }).build();
+    //public static OneKeyBind stopRecording = new OneKeyBind();
 
     @Keybind(
             title = "Set Bat Waypoint",
@@ -1195,7 +1222,10 @@ public class SRMConfig extends Config {
             category = "Keybinds",
             subcategory = "Recording"
     )
-    public static OneKeyBind setBatWaypoint = new OneKeyBind();
+    public static PolyBind setBatWaypoint = KeybindHelper.builder().keys(OmniKeys.KEY_NONE.getCode()).does((something) -> {
+        INSTANCE.setBatWaypointButton();
+    }).build();
+    //public static OneKeyBind setBatWaypoint = new OneKeyBind();
 
     @Keybind(
             title = "Export Routes",
@@ -1203,26 +1233,16 @@ public class SRMConfig extends Config {
             category = "Keybinds",
             subcategory = "Recording"
     )
-    public static OneKeyBind exportRoutes = new OneKeyBind();
-
-    @Switch(
-            title = "Warn when keybinds used outside of dungeons",
-            description = "Sends a warning message when keybinds are used outside of dungeons",
-            size = 2,
-            category = "Keybinds",
-            subcategory = "General"
-    )
-    public static boolean warnKeybindsOutsideDungeon = true;
-
-
-
+    public static PolyBind exportRoutes = KeybindHelper.builder().keys(OmniKeys.KEY_NONE.getCode()).does((something) -> {
+        INSTANCE.exportRoutesButton();
+    }).build();
+    //public static OneKeyBind exportRoutes = new OneKeyBind();
 
     @Switch(
             title = "Custom Secret Sound",
             description = "Plays a custom sound when a secret is found",
             category = "General",
-            subcategory = "Sound",
-            size = OptionSize.DUAL
+            subcategory = "Sound"
     )
     public static boolean customSecretSound = false;
 
@@ -1338,8 +1358,7 @@ public class SRMConfig extends Config {
             title = "Blood spawned notification",
             description = "Notifies when blood is fully spawned",
             category = "General",
-            subcategory = "Messages",
-            size = 2
+            subcategory = "Messages"
 
     )
     public static boolean bloodNotif = false;
@@ -1347,8 +1366,7 @@ public class SRMConfig extends Config {
     @Text(
             title = "Blood ready text",
             description = "Text to show when blood is fully spawned",
-            subcategory = "Messages",
-            size = 1
+            subcategory = "Messages"
     )
     public static String bloodReadytitle = "Blood Ready";
 
@@ -1402,23 +1420,20 @@ public class SRMConfig extends Config {
     @Switch(
             title = "Render lines through walls",
             category = "Dev",
-            subcategory = "WIP",
-            size = 2
+            subcategory = "WIP"
     )
     public static boolean renderLinesThroughWalls = false;
 
     @Switch(
             title = "Player crosshair to next waypoint",
             category = "Dev",
-            subcategory = "WIP",
-            size = 2
+            subcategory = "WIP"
     )
     public static boolean playerWaypointLine = false;
 
     @Switch(
             title = "Player to Etherwarp",
             description = "Draws a line to the next etherwarp location",
-            size = 2,
             category = "Dev",
             subcategory = "WIP"
     )
@@ -1427,45 +1442,29 @@ public class SRMConfig extends Config {
     @Checkbox(
             title = "debug",
             category = "Dev",
-            subcategory = "WIP",
-            size = 2
+            subcategory = "WIP"
     )
     public static boolean debug = false;
     @Switch(
             title = "Disable Server Checking (You have to relog for it to work)",
             category = "Dev",
-            subcategory = "WIP",
-            size = 2
+            subcategory = "WIP"
     )
     public static boolean disableServerChecking = false;
 
     @Switch(
             title = "Bridge",
             category = "Guild",
-            subcategory = "WIP",
-            size = 2
+            subcategory = "WIP"
     )
     public static boolean bridge = false;
-
 
     @Switch(
             title = "Server Data",
             subcategory = "Data Privacy",
-            description = "Sends data to the server (Masked UUID, Login Timestamp, Mod Version, Online Data)",
-            size = 2
+            description = "Sends data to the server (Masked UUID, Login Timestamp, Mod Version, Online Data)"
     )
     public static boolean sendData = true;
-
-
-    public Boolean lambda(String dependentOption) {
-        try {
-            return (boolean) optionNames.get(dependentOption).get();
-        } catch (IllegalAccessException ignored) {
-            sendVerboseMessage("Error in lambda function");
-            return true;
-        }
-    }
-
 
     public SRMConfig() {
         super(Main.MODID + ".json", "/assets/" + Main.MODID + "/logo.png", "Secret Routes", Category.HYPIXEL);
@@ -1556,7 +1555,15 @@ public class SRMConfig extends Config {
             addDependency("bloodY", "bloodNotif", true);
             addDependency("renderBlood", "bloodNotif", true);
 
-            registerKeyBind(lastSecret, () -> {
+            KeybindManager.registerKeybind(nextSecret);
+            KeybindManager.registerKeybind(lastSecret);
+            KeybindManager.registerKeybind(toggleSecrets);
+            KeybindManager.registerKeybind(startRecording);
+            KeybindManager.registerKeybind(stopRecording);
+            KeybindManager.registerKeybind(setBatWaypoint);
+            KeybindManager.registerKeybind(exportRoutes);
+
+            /*registerKeyBind(lastSecret, () -> {
                 if (Utils.inCatacombs) {
                     Main.currentRoom.lastSecretKeybind();
                 } else {
@@ -1565,7 +1572,7 @@ public class SRMConfig extends Config {
                     }
                 }
             });
-            /*registerKeyBind(nextSecret, () -> {
+            registerKeyBind(nextSecret, () -> {
                 if (Utils.inCatacombs) {
                     Main.currentRoom.nextSecretKeybind();
                 } else {
@@ -1573,7 +1580,7 @@ public class SRMConfig extends Config {
                         sendChatMessage("§cYou are not in a dungeon!");
                     }
                 }
-            });*/
+            });*
             registerKeyBind(toggleSecrets, () -> {
                 if (Utils.inCatacombs) {
                     Main.toggleSecretsKeybind();
@@ -1587,7 +1594,7 @@ public class SRMConfig extends Config {
             registerKeyBind(startRecording, runnable2);
             registerKeyBind(stopRecording, runnable16);
             registerKeyBind(setBatWaypoint, runnable3);
-            registerKeyBind(exportRoutes, runnable5);
+            registerKeyBind(exportRoutes, runnable5);*/
 
 
         } catch (Exception e) {
@@ -1608,7 +1615,7 @@ public class SRMConfig extends Config {
         return a.equals(b);
     }
 
-    public void openGui(String page){
+    public void openGui() {
         ModConfigPage test = new ModConfigPage(Main.config.mod.defaultPage);
         test.getPage().categories.get("add").subcategories.get(1);
     }
