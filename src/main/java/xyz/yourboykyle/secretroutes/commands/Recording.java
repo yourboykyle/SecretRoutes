@@ -21,6 +21,7 @@
 
 package xyz.yourboykyle.secretroutes.commands;
 
+import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
@@ -48,7 +49,7 @@ public class Recording extends CommandBase {
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         if(args.length == 0){
-            Main.config.openGui();
+            SRMConfig.INSTANCE.openGui();
         }
         if(args[0].equalsIgnoreCase("start")) {
             Main.routeRecording.startRecording();

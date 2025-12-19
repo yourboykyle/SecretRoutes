@@ -115,9 +115,7 @@ public class Main {
         LogUtils.info("§bSetting ssl certificate");
         SSLUtils.setSSlCertificate();
 
-
         routeRecording = new RouteRecording();
-
 
         // Set up Config
         SRMConfig.INSTANCE.preload();
