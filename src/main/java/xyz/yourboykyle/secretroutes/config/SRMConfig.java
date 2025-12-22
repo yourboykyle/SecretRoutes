@@ -1356,7 +1356,7 @@ public class SRMConfig extends Config {
             description = "Text to show when blood is fully spawned",
             subcategory = "Messages"
     )
-    public static String bloodReadytitle = "Blood Ready";
+    public static String bloodReadyText = "Blood Ready";
 
     @Dropdown(
             title = "Color",

@@ -19,7 +19,6 @@
 
 package xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils;
 
-import cc.polyfrost.oneconfig.config.core.OneColor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -32,6 +31,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
+import org.polyfrost.polyui.color.PolyColor;
 
 public class WaypointUtils {
     private static final ResourceLocation beaconBeam = new ResourceLocation("textures/entity/beacon_beam.png");
@@ -114,7 +114,7 @@ public class WaypointUtils {
         tessellator.draw();
     }
 
-    public static void drawFilledBoundingBox(AxisAlignedBB aabb, OneColor c, float alphaMultiplier) {
+    public static void drawFilledBoundingBox(AxisAlignedBB aabb, PolyColor c, float alphaMultiplier) {
         GlStateManager.pushMatrix();
         GlStateManager.enableBlend();
         GlStateManager.disableLighting();
@@ -123,7 +123,7 @@ public class WaypointUtils {
 
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-        GlStateManager.color(c.getRed()/255f, c.getGreen()/255f, c.getBlue()/255f, c.getAlpha()/255f*alphaMultiplier);
+        GlStateManager.color(c.red()/255f, c.green()/255f, c.blue()/255f, c.getAlpha()/255f*alphaMultiplier);
         //vertical
         worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
         worldrenderer.pos(aabb.minX, aabb.minY, aabb.minZ).endVertex();
@@ -139,7 +139,7 @@ public class WaypointUtils {
         tessellator.draw();
 
 
-        GlStateManager.color(c.getRed()/255f*0.8f, c.getGreen()/255f*0.8f, c.getBlue()/255f*0.8f, c.getAlpha()/255f*alphaMultiplier);
+        GlStateManager.color(c.red()/255f*0.8f, c.green()/255f*0.8f, c.blue()/255f*0.8f, c.getAlpha()/255f*alphaMultiplier);
         //x
         worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
         worldrenderer.pos(aabb.minX, aabb.minY, aabb.maxZ).endVertex();
@@ -155,7 +155,7 @@ public class WaypointUtils {
         tessellator.draw();
 
 
-        GlStateManager.color(c.getRed()/255f*0.9f, c.getGreen()/255f*0.9f, c.getBlue()/255f*0.9f, c.getAlpha()/255f*alphaMultiplier);
+        GlStateManager.color(c.red()/255f*0.9f, c.green()/255f*0.9f, c.blue()/255f*0.9f, c.getAlpha()/255f*alphaMultiplier);
         //z
         worldrenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
         worldrenderer.pos(aabb.minX, aabb.maxY, aabb.minZ).endVertex();

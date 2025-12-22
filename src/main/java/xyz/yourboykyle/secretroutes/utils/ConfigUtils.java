@@ -21,9 +21,10 @@
 
 package xyz.yourboykyle.secretroutes.utils;
 
-import cc.polyfrost.oneconfig.config.core.OneColor;
 import com.google.gson.*;
 import net.minecraft.util.EnumChatFormatting;
+import org.polyfrost.polyui.color.ColorUtils;
+import org.polyfrost.polyui.color.PolyColor;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 
 import java.io.*;
@@ -172,7 +173,7 @@ public class ConfigUtils {
                     case "secretsInteract":
                     case "secretsBat":
                     case "pearlLineColor":
-                        SRMConfig.class.getDeclaredField(key).set(null, data.has(key) ? parseOneColor(data.get(key)) : new OneColor(255, 255, 255));
+                        SRMConfig.class.getDeclaredField(key).set(null, data.has(key) ? parsePolyColor(data.get(key)) : ColorUtils.rgba(255, 255, 255));
                     default:
                         continue;
                 }
@@ -183,7 +184,7 @@ public class ConfigUtils {
         return true;
     }
 
-    public static OneColor parseOneColor(JsonElement json){
+    public static PolyColor parsePolyColor(JsonElement json){
         JsonObject jsonObject = json.getAsJsonObject();
         JsonArray hsba = jsonObject.getAsJsonArray("hsba");
         int hue = hsba.get(0).getAsInt();
@@ -191,6 +192,8 @@ public class ConfigUtils {
         int brightness = hsba.get(2).getAsInt();
         int alpha = hsba.get(3).getAsInt();
         int chromaSpeed = jsonObject.get("dataBit").getAsInt();
-        return new OneColor(hue, saturation, brightness, alpha, chromaSpeed);
+        return ColorUtils.hsba(hue, saturation, brightness, alpha);
+        // TODO: see if chroma can be implemented (exists in old OneConfig)
+        //return ColorUtils.hsba(hue, saturation, brightness, alpha, chromaSpeed);
     }
 }
