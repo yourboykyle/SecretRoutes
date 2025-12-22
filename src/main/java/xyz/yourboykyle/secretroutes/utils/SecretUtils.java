@@ -23,7 +23,6 @@
 
 package xyz.yourboykyle.secretroutes.utils;
 
-import cc.polyfrost.oneconfig.config.core.OneColor;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -34,6 +33,8 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import org.polyfrost.polyui.color.ColorUtils;
+import org.polyfrost.polyui.color.PolyColor;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
@@ -90,7 +91,7 @@ public class SecretUtils {
                 BlockPos pos = MapUtils.relativeToActual(new BlockPos(etherwarpLocation.get(0).getAsInt(), etherwarpLocation.get(1).getAsInt(), etherwarpLocation.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
                 if(!SRMConfig.wholeRoute && etherwarpLocations.get(0) == etherwarpLocationElement && SRMConfig.playerToEtherwarp){
                     EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
-                    RenderUtils.drawFromPlayer(player, pos, new OneColor(0, 255, 255), event.partialTicks, 1);
+                    RenderUtils.drawFromPlayer(player, pos, ColorUtils.rgba(0, 255, 255), event.partialTicks, 1);
                 }
                 etherwarpPositions.add(pos);
                 if(SRMConfig.etherwarpFullBlock){
@@ -372,7 +373,7 @@ public class SecretUtils {
                     int zPos = secretInfos.get("z").getAsInt();
                     Main.checkRoomData();
                     Triple<Double, Double, Double> abs = MapUtils.relativeToActual(xPos, yPos, zPos, RoomDetection.roomDirection, RoomDetection.roomCorner);
-                    OneColor color = new OneColor(255, 255, 255);
+                    PolyColor color = ColorUtils.rgba(255, 255, 255);
                     if(secretLocations.contains(BlockUtils.blockPos(new BlockPos(xPos, yPos, zPos)))){continue;}
                     if(name.contains("Chest") || name.contains("Wither Essence")) {
                         color = SRMConfig.secretsInteract;

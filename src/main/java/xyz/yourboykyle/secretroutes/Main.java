@@ -31,8 +31,11 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
+import org.polyfrost.oneconfig.api.hud.v1.HudManager;
 import xyz.yourboykyle.secretroutes.commands.*;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
+import xyz.yourboykyle.secretroutes.config.huds.CurrentRoomHUD;
+import xyz.yourboykyle.secretroutes.config.huds.RecordingHUD;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.DungeonRooms;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.handlers.PacketHandler;
@@ -68,6 +71,10 @@ public class Main {
 
     public static Main instance = new Main();
     //public static SRMConfig config; - oneconfig v0
+
+    // HUD instances
+    public static RecordingHUD recordingHUD;
+    public static CurrentRoomHUD currentRoomHUD;
 
 
     @Mod.EventHandler
@@ -119,6 +126,10 @@ public class Main {
 
         // Set up Config
         SRMConfig.INSTANCE.preload();
+        recordingHUD = new RecordingHUD();
+        currentRoomHUD = new CurrentRoomHUD();
+        HudManager.register(recordingHUD);
+        HudManager.register(currentRoomHUD);
 
         // Auto Updates
         LogUtils.info("Checking for updates...");
