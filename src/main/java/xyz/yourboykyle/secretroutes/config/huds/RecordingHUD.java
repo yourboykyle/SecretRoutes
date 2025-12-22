@@ -21,23 +21,24 @@
 
 package xyz.yourboykyle.secretroutes.config.huds;
 
-import cc.polyfrost.oneconfig.config.annotations.Color;
-import cc.polyfrost.oneconfig.config.core.OneColor;
-import cc.polyfrost.oneconfig.hud.SingleTextHud;
+import org.polyfrost.oneconfig.api.config.v1.annotations.Color;
+import org.polyfrost.oneconfig.api.hud.v1.TextHud;
+import org.polyfrost.polyui.color.ColorUtils;
+import org.polyfrost.polyui.color.PolyColor;
 import xyz.yourboykyle.secretroutes.Main;
 
-public class RecordingHUD extends SingleTextHud {
+public class RecordingHUD extends TextHud {
     @Color(
-            name = "Default HUD colour"
+            title = "Default HUD colour"
     )
-    public static OneColor hudColour = new OneColor(255, 255, 255);
+    public static PolyColor hudColour = ColorUtils.rgba(255, 255, 255);
 
     public RecordingHUD(){
-        super("", false);
+        super("recordingHUD", "Recording info", Category.getINFO(), "Recording status:", "");
     }
 
     @Override
-    public String getText(boolean example) {
+    public String getText() {
         if(Main.routeRecording.recording){
             return Main.routeRecording.recordingMessage;
         }

@@ -29,6 +29,7 @@ import org.polyfrost.oneconfig.api.config.v1.Config;
 import org.polyfrost.oneconfig.api.config.v1.annotations.*;
 import org.polyfrost.oneconfig.api.config.v1.annotations.Number;
 import org.polyfrost.oneconfig.api.ui.v1.keybind.KeybindManager;
+import org.polyfrost.oneconfig.utils.v1.dsl.ScreensKt;
 import org.polyfrost.polyui.color.ColorUtils;
 import org.polyfrost.polyui.color.PolyColor;
 import org.polyfrost.polyui.input.KeybindHelper;
@@ -385,19 +386,6 @@ public class SRMConfig extends Config {
             category = "Route Recording"
     )
     public static int etherwarpPing = 150;
-
-    @HUD(
-            title = "Recording info",
-            category = "HUD"
-    )
-    public static RecordingHUD recordingHUD = new RecordingHUD();
-
-    @HUD(
-            title = "Current room",
-            category = "HUD"
-    )
-    public static CurrentRoomHUD currentRoomHUD = new CurrentRoomHUD();
-
 
     //Color profile saving and loading
     @Text(
@@ -1616,7 +1604,7 @@ public class SRMConfig extends Config {
     }
 
     public void openGui() {
-        ModConfigPage test = new ModConfigPage(Main.config.mod.defaultPage);
-        test.getPage().categories.get("add").subcategories.get(1);
+        // TODO: Check if this works
+        ScreensKt.openUI(INSTANCE);
     }
 }
