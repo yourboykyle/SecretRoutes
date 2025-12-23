@@ -76,7 +76,6 @@ public class Main {
     public static RecordingHUD recordingHUD;
     public static CurrentRoomHUD currentRoomHUD;
 
-
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
         dungeonRooms.preInit(e);
