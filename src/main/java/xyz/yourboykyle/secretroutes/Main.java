@@ -181,7 +181,7 @@ public class Main {
         RoomDetection.roomCorner = new Point(0, 0);
         RoomDetection.roomDirection = "NW";
     }
-    
+
     public static void checkRoomData() {
         if(RoomDetection.roomName == null) {
             RoomDetection.roomName = "undefined";
@@ -264,7 +264,7 @@ public class Main {
         try{
             Thread.sleep(3000);
         }catch(Exception e){
-            //nothign needed, literally just waiting
+            //nothing needed, literally just waiting
         }
 
         Minecraft mc = Minecraft.getMinecraft();
