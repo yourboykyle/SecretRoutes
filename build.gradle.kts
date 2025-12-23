@@ -71,7 +71,10 @@ repositories {
 }
 
 dependencies {
-    implementation("moe.nea:libautoupdate:1.3.1") {
+    modCompileOnly("moe.nea:libautoupdate:1.3.1") {
+        isTransitive = false
+    }
+    shade("moe.nea:libautoupdate:1.3.1") {
         isTransitive = false
     }
 }
