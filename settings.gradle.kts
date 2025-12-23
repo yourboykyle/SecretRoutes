@@ -41,7 +41,7 @@ rootProject.buildFileName = "root.gradle.kts"
 // **REMEMBER TO ALSO UPDATE THE `root.gradle.kts` AND `build.gradle.kts` FILES WITH THE NEW VERSION(S).
 listOf(
     "1.8.9-forge",
-    /*"1.8.9-fabric",
+    "1.8.9-fabric",
 
     "1.12.2-forge",
     "1.12.2-fabric",
@@ -69,7 +69,7 @@ listOf(
     "1.21.8-fabric",
 
     "1.21.10-neoforge",
-    "1.21.10-fabric",*/
+    "1.21.10-fabric",
 ).forEach { version ->
     include(":$version")
     project(":$version").apply {
