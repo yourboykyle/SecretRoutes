@@ -1,4 +1,5 @@
-// TODO: update this file for multi versioning (1.8.9 -> 1.21.8)
+//#if FORGE == 1.8.9
+// TODO: update this file for multi versioning (1.8.9 -> 1.21.10)
 package xyz.yourboykyle.secretroutes.utils;
 
 import xyz.yourboykyle.secretroutes.Main;
@@ -20,3 +21,4 @@ public class VersionUtils {
         return true;
     }
 }
+//#endif

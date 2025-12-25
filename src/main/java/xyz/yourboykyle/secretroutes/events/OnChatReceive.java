@@ -1,4 +1,5 @@
-// TODO: update this file for multi versioning (1.8.9 -> 1.21.8)
+//#if FORGE == 1.8.9
+// TODO: update this file for multi versioning (1.8.9 -> 1.21.10)
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -152,3 +153,4 @@ public class OnChatReceive {
 
 
 }
+//#endif
