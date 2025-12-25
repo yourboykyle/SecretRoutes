@@ -324,3 +324,10 @@ public class Main {
 
 }
 //#endif
+//#if FABRIC && MC == 1.21.10
+class Test {
+    public Test() {
+        System.out.println("Hello World!");
+    }
+}
+//#endif
