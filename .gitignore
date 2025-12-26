@@ -19,6 +19,8 @@ out
 .gradle
 versions/*
 !versions/mainProject
+!versions/1.8.9-forge/
+!versions/1.21.10-fabric/
 
 # other
 eclipse

@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+MixinConfigs: mixins.secretroutesmod.init.json,mixins.secretroutesmod.js
+ on
+

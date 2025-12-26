@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${mod_version}-${mc_version}",
+  "name": "${mod_name}",
+  "description": "${mod_description}",
+  "authors": ["Discord: yourboykyle", "Wyan (wyannnnn)"],
+  "contributors": [
+    "zzyyrraa",
+    "itplays"
+  ],
+  "icon": "assets/${mod_id}/logo.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      {
+        "value": "xyz.yourboykyle.secretroutes.Main"
+      }
+    ]
+  },
+  "mixins": [
+    "mixins.${mod_id}.json"
+  ],
+  "depends": {
+    "minecraft": "~${minor_mc_version}",
+    "fabricloader": ">=0.15.11",
+    "fabric-api": "*"
+  },
+  "custom": {
+    "modmenu": {
+      "update_checker": true,
+      "links": {
+        "GitHub": "https://github.com/yourboykyle/SecretRoutes"
+      }
+    }
+  }
+}
