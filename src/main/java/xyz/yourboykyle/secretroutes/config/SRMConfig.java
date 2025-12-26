@@ -36,8 +36,6 @@ import org.polyfrost.polyui.color.PolyColor;
 import org.polyfrost.polyui.input.KeybindHelper;
 import org.polyfrost.polyui.input.PolyBind;
 import xyz.yourboykyle.secretroutes.Main;
-import xyz.yourboykyle.secretroutes.config.huds.CurrentRoomHUD;
-import xyz.yourboykyle.secretroutes.config.huds.RecordingHUD;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import xyz.yourboykyle.secretroutes.utils.*;
