@@ -320,8 +320,6 @@ public class Main {
             sendChatMessage(EnumChatFormatting.GREEN + "Secret Routes Mod secret rendering has been enabled.");
         }
     }
-
-
 }
 //#endif
 //#if FABRIC && MC == 1.21.10
@@ -350,11 +348,39 @@ public class Main {
 //$$ package xyz.yourboykyle.secretroutes;
 //$$
 //$$ import net.fabricmc.api.ClientModInitializer;
+//$$ import net.minecraft.client.MinecraftClient;
+//$$
+//$$ import java.io.File;
+//$$ import java.text.SimpleDateFormat;
 //$$
 //$$ public class Main implements ClientModInitializer {
+//$$     public static final String MODID = "@MOD_ID@";
+//$$     public static final String NAME = "@MOD_NAME@";
+//$$     public static final String VERSION = "@MOD_VERSION@";
+//$$     public static final String CONFIG_FOLDER_PATH = MinecraftClient.getInstance().runDirectory.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes";
+//$$     public static final String ROUTES_PATH = MinecraftClient.getInstance().runDirectory.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes"+File.separator+"routes";
+//$$     public static final String COLOR_PROFILE_PATH = MinecraftClient.getInstance().runDirectory.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes"+File.separator+"colorprofiles";
+//$$     public static final String tmpDir = MinecraftClient.getInstance().runDirectory.getAbsolutePath() + File.separator + "SecretRoutes" + File.separator + "tmp";
+//$$     private final static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//$$     public final static File logDir = new File(MinecraftClient.getInstance().runDirectory.getAbsolutePath() + File.separator + "logs" + File.separator + "SecretRoutes");
+//$$     public static File outputLogs;
+//$$
+//$$     /*
+//$$     public static Room currentRoom = new Room(null);
+//$$     public static RouteRecording routeRecording = null;
+//$$     public static UpdateManager updateManager = new UpdateManager();
+//$$     private static DungeonRooms dungeonRooms = new DungeonRooms();
+//$$      */
+//$$
+//$$     public static Main instance;
+//$$
+//$$     // HUD instances
+//$$     //public static RecordingHUD recordingHUD;
+//$$     //public static CurrentRoomHUD currentRoomHUD;
+//$$
 //$$     @Override
 //$$     public void onInitializeClient() {
-//$$        System.out.println("Hello world!");
+//$$         System.out.println("Hello from SecretRoutes 1.21.10!");
 //$$     }
 //$$ }
 //#endif
