@@ -4,5 +4,4 @@ ForceLoadAsMod: true
 TweakOrder: 0
 Side: client
 MixinConfigs: mixins.secretroutesmod.json
-Class-Path: stage0-1.1.0-alpha.53-all.jar libautoupdate-1.3.1.jar
 

@@ -34,6 +34,10 @@ public class SRMConfig {
     public static int routeTypeIndex = 0; // 0 = normal, 1 = pearl
     public static String pearlRoutesFileName = "pearl_routes.json";
     public static String routesFileName = "routes.json";
-
+    public static boolean forceUpdateDEBUG = false;
+    public static boolean autoDownload = true;
+    public static String copyFileName = "copy.json";
+    public static boolean trackPersonalBests = true;
+    public static boolean sendChatMessages = true;
 }
 //#endif

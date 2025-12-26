@@ -26,9 +26,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
-import xyz.yourboykyle.secretroutes.config.SRMConfig;
 
-public class GuiUitls {
+public class GuiUtils {
     public static void displayText(String text, float posx, float posy, float scale) {
         try {
             FontRenderer fr = Minecraft.getMinecraft().fontRendererObj;

@@ -25,7 +25,7 @@
 //$$ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 //$$ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 //$$ import xyz.yourboykyle.secretroutes.config.SRMConfig;
-//$$ import xyz.yourboykyle.secretroutes.utils.GuiUitls;
+//$$ import xyz.yourboykyle.secretroutes.utils.GuiUtils;
 //$$ import xyz.yourboykyle.secretroutes.utils.SecretRoutesRenderUtils;
 //$$
 //$$ import static xyz.yourboykyle.secretroutes.utils.SecretUtils.removeBannerTime;
@@ -38,12 +38,12 @@
 //$$
 //$$
 //$$         if(removeBannerTime != null && System.currentTimeMillis()<removeBannerTime){
-//$$             GuiUitls.displayText("§bSet waypoint at lever", 0, -100, 2);
+//$$             GuiUtils.displayText("§bSet waypoint at lever", 0, -100, 2);
 //$$         }
 //$$
 //$$         if(spawnNotifTime != null || SRMConfig.renderBlood){
 //$$             if(SRMConfig.renderBlood || System.currentTimeMillis()<spawnNotifTime){
-//$$                 GuiUitls.displayText(SecretRoutesRenderUtils.getTextColor(SRMConfig.bloodReadyColor)+SRMConfig.bloodReadyText, SRMConfig.bloodX, SRMConfig.bloodY, SRMConfig.bloodScale);
+//$$                 GuiUtils.displayText(SecretRoutesRenderUtils.getTextColor(SRMConfig.bloodReadyColor)+SRMConfig.bloodReadyText, SRMConfig.bloodX, SRMConfig.bloodY, SRMConfig.bloodScale);
 //$$             }else{
 //$$                 spawnNotifTime = null;
 //$$             }
