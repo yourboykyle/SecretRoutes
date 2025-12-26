@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Class-Path: libautoupdate-1.3.1.jar
+Fabric-Jar-Type: classes
+Fabric-Loom-Mixin-Remap-Type: mixin
+Fabric-Gradle-Version: 8.11.1
+Fabric-Loom-Version: 1.11.3
+Fabric-Mixin-Compile-Extensions-Version: 0.6.0
+Fabric-Minecraft-Version: 1.21.10
+Fabric-Tiny-Remapper-Version: 0.11.1
+Fabric-Loader-Version: 0.16.14
+Fabric-Mixin-Version: 0.15.5+mixin.0.8.7
+Fabric-Mixin-Group: net.fabricmc
+Fabric-Mapping-Namespace: intermediary
+

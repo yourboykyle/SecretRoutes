@@ -1,4 +1,4 @@
-//#if FORGE == 1.8.9
+//#if FORGE && MC == 1.8.9
 // TODO: update this file for multi versioning (1.8.9 -> 1.21.10)
 /*
  * Dungeon Rooms Mod - Secret Waypoints for Hypixel Skyblock Dungeons

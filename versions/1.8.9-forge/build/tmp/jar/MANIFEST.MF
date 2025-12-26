@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+TweakClass: org.polyfrost.oneconfig.loader.stage0.LaunchWrapperTweaker
+ForceLoadAsMod: true
+TweakOrder: 0
+Side: client
+MixinConfigs: mixins.secretroutesmod.init.json,mixins.secretroutesmod.js
+ on
+
