@@ -54,9 +54,9 @@ import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 
 @Mod(modid = Main.MODID, name = Main.NAME, version = Main.VERSION)
 public class Main {
-    public static final String MODID = "@MOD_ID@";
-    public static final String NAME = "@MOD_NAME@";
-    public static final String VERSION = "@MOD_VERSION@";
+    public static final String MODID = "secretroutesmod";
+    public static final String NAME = "SecretRoutes";
+    public static final String VERSION = "1.0.0-beta1";
     public static final String CONFIG_FOLDER_PATH = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes";
     public static final String ROUTES_PATH = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes"+File.separator+"routes";
     public static final String COLOR_PROFILE_PATH = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes"+File.separator+"colorprofiles";
@@ -323,7 +323,6 @@ public class Main {
 }
 //#endif
 //#if FABRIC && MC == 1.21.10
-//$$ // TODO: update this file for multi versioning (1.8.9 -> 1.21.10)
 //$$ /*
 //$$  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
 //$$  * Copyright 2025 yourboykyle & R-aMcC
@@ -344,7 +343,6 @@ public class Main {
 //$$  * with this program.  If not, see <https://www.gnu.org/licenses/>.
 //$$  */
 //$$
-//$$
 //$$ package xyz.yourboykyle.secretroutes;
 //$$
 //$$ import net.fabricmc.api.ClientModInitializer;
@@ -354,9 +352,9 @@ public class Main {
 //$$ import java.text.SimpleDateFormat;
 //$$
 //$$ public class Main implements ClientModInitializer {
-//$$     public static final String MODID = "@MOD_ID@";
-//$$     public static final String NAME = "@MOD_NAME@";
-//$$     public static final String VERSION = "@MOD_VERSION@";
+//$$     public static final String MODID = "secretroutesmod";
+//$$     public static final String NAME = "SecretRoutes";
+//$$     public static final String VERSION = "1.0.0-beta1";
 //$$     public static final String CONFIG_FOLDER_PATH = MinecraftClient.getInstance().runDirectory.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes";
 //$$     public static final String ROUTES_PATH = MinecraftClient.getInstance().runDirectory.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes"+File.separator+"routes";
 //$$     public static final String COLOR_PROFILE_PATH = MinecraftClient.getInstance().runDirectory.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes"+File.separator+"colorprofiles";
@@ -364,20 +362,20 @@ public class Main {
 //$$     private final static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 //$$     public final static File logDir = new File(MinecraftClient.getInstance().runDirectory.getAbsolutePath() + File.separator + "logs" + File.separator + "SecretRoutes");
 //$$     public static File outputLogs;
-//$$
+//$$ 
 //$$     /*
 //$$     public static Room currentRoom = new Room(null);
 //$$     public static RouteRecording routeRecording = null;
 //$$     public static UpdateManager updateManager = new UpdateManager();
 //$$     private static DungeonRooms dungeonRooms = new DungeonRooms();
 //$$      */
-//$$
+//$$ 
 //$$     public static Main instance;
-//$$
+//$$ 
 //$$     // HUD instances
 //$$     //public static RecordingHUD recordingHUD;
 //$$     //public static CurrentRoomHUD currentRoomHUD;
-//$$
+//$$ 
 //$$     @Override
 //$$     public void onInitializeClient() {
 //$$         System.out.println("Hello from SecretRoutes 1.21.10!");
