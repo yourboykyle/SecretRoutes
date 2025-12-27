@@ -31,14 +31,14 @@ import net.minecraft.text.Text;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
-public class SecretRoutesCommand {
+public class TestRoomCommand {
     public static void register() {
-        ClientCommandRegistrationCallback.EVENT.register(SecretRoutesCommand::registerCommands);
+        ClientCommandRegistrationCallback.EVENT.register(TestRoomCommand::registerCommands);
     }
 
     private static void registerCommands(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandRegistryAccess registryAccess) {
-        dispatcher.register(literal("srm")
-                .executes(SecretRoutesCommand::executeCommand));
+        dispatcher.register(literal("testroom")
+                .executes(TestRoomCommand::executeCommand));
     }
 
     private static int executeCommand(CommandContext<FabricClientCommandSource> context) {
