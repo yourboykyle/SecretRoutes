@@ -39,5 +39,6 @@ public class SRMConfig {
     public static String copyFileName = "copy.json";
     public static boolean trackPersonalBests = true;
     public static boolean sendChatMessages = true;
+    public static boolean renderLinesThroughWalls = true;
 }
 //#endif

@@ -23,6 +23,7 @@ package xyz.yourboykyle.secretroutes;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.client.MinecraftClient;
+import xyz.yourboykyle.secretroutes.commands.SecretRoutesCommand;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -55,6 +56,7 @@ public class Main implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         System.out.println("Hello from SecretRoutes 1.21.10!");
+        SecretRoutesCommand.register();
     }
 }
 //#endif
