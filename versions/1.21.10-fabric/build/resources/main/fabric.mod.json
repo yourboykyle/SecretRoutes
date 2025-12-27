@@ -18,13 +18,11 @@
       }
     ]
   },
-  "mixins": [
-    "mixins.secretroutesmod.json"
-  ],
   "depends": {
     "minecraft": "~1.21",
     "fabricloader": ">=0.15.11",
-    "fabric-api": "*"
+    "fabric-api": "*",
+    "skyblocker": ">=5.11.0"
   },
   "custom": {
     "modmenu": {

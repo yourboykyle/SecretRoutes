@@ -2,6 +2,7 @@
 
 import dev.deftu.gradle.utils.GameSide
 import groovy.lang.MissingPropertyException
+import org.gradle.kotlin.dsl.include
 
 plugins {
     java
@@ -75,6 +76,12 @@ dependencies {
         isTransitive = false
     }
     shade("moe.nea:libautoupdate:1.3.1") {
+        isTransitive = false
+    }
+    modCompileOnly("maven.modrinth:skyblocker-liap:v5.11.0+1.21.10") {
+        isTransitive = false
+    }
+    modRuntimeOnly("maven.modrinth:skyblocker-liap:v5.11.0+1.21.10") {
         isTransitive = false
     }
 }
