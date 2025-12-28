@@ -1,3 +1,4 @@
+//#if FABRIC && MC == 1.21.10
 package xyz.yourboykyle.secretroutes.utils;
 
 import de.hysky.skyblocker.skyblock.dungeon.secrets.DungeonManager;
@@ -26,3 +27,4 @@ public class RoomDetection {
         return DungeonManager.getCurrentRoom().getName();
     }
 }
+//#endif

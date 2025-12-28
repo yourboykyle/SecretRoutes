@@ -43,6 +43,11 @@ public class TestRoomCommand {
 
     private static int executeCommand(CommandContext<FabricClientCommandSource> context) {
         try {
+            // TODO: Find out how to use room IDs, instead of room name
+            if (DungeonManager.getCurrentRoom() == null) {
+                context.getSource().sendError(Text.literal("No current room detected."));
+                return 1;
+            }
             String roomName = DungeonManager.getCurrentRoom().getName();
             context.getSource().sendFeedback(Text.literal(roomName));
         } catch (Exception e) {

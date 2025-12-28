@@ -21,6 +21,7 @@
 
 package xyz.yourboykyle.secretroutes.config;
 
+// TODO: Update config for multi versioning (1.8.9 -> 1.21.10)
 public class SRMConfig {
     // Temporary
     public static boolean sendData = true;
@@ -40,5 +41,14 @@ public class SRMConfig {
     public static boolean trackPersonalBests = true;
     public static boolean sendChatMessages = true;
     public static boolean renderLinesThroughWalls = true;
+    public static int lineType = 1;
+    public static int tickInterval = 1;
+    public static int particles = 26;
+    public static int routeNumber = 0;
+    public static float alphaMultiplier = 0.5f;
+    public static boolean customSecretSound = false;
+    public static int customSecretSoundIndex = 6;
+    public static float customSecretSoundVolume = 1.0f;
+    public static float customSecretSoundPitch = 1.0f;
 }
 //#endif
