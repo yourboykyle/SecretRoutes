@@ -34,4 +34,4 @@ versions/1.21.10-fabric/*
 # other
 eclipse
 run
-build
+**/build/
