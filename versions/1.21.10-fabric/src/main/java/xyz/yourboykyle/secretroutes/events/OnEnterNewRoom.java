@@ -1,5 +1,4 @@
-//#if FORGE && MC == 1.8.9
-// TODO: update this file for multi versioning (1.8.9 -> 1.21.10)
+//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -22,27 +21,27 @@
 
 package xyz.yourboykyle.secretroutes.events;
 
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.DungeonManager;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
+import de.hysky.skyblocker.skyblock.dungeon.secrets.DungeonManager;
+import de.hysky.skyblocker.utils.Utils;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
+import xyz.yourboykyle.secretroutes.utils.RoomDetection;
 import xyz.yourboykyle.secretroutes.utils.SecretUtils;
 
 import java.util.ArrayList;
 
+// TODO: Make sure this is called
 public class OnEnterNewRoom {
     public static void onEnterNewRoom(Room room) {
         try {
             // Make sure the player is actually in a dungeon
-            Utils.checkForCatacombs();
-            if(!Utils.inCatacombs || DungeonManager.gameStage != 2) {
+            if(!Utils.isInDungeons() || !DungeonManager.isClearingDungeon()) {
                 return;
             }
 
-            LogUtils.info("Entered new room \"" + RoomDetection.roomName + "\".");
-            LogUtils.info("Room direction: \"" + RoomDetection.roomDirection);
+            LogUtils.info("Entered new room \"" + RoomDetection.roomName() + "\".");
+            LogUtils.info("Room direction: \"" + RoomDetection.roomDirection());
 
             Main.currentRoom = room;
             SecretUtils.secrets = null;
