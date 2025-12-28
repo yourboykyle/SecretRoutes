@@ -1,7 +1,7 @@
 //#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
- * Copyright 2025 yourboykyle & R-aMcC
+ * Copyright 2024 yourboykyle & R-aMcC
  *
  * <DO NOT REMOVE THIS COPYRIGHT NOTICE>
  *
@@ -21,38 +21,58 @@
 
 package xyz.yourboykyle.secretroutes.commands;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
-import de.hysky.skyblocker.skyblock.dungeon.secrets.DungeonManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.utils.LogUtils;
+import xyz.yourboykyle.secretroutes.utils.Room;
+import xyz.yourboykyle.secretroutes.utils.RoomDetection;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
-public class TestRoomCommand {
+public class LoadRoute {
     public static void register() {
-        ClientCommandRegistrationCallback.EVENT.register(TestRoomCommand::registerCommands);
+        ClientCommandRegistrationCallback.EVENT.register(LoadRoute::registerCommands);
     }
 
     private static void registerCommands(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandRegistryAccess registryAccess) {
-        dispatcher.register(literal("testroom")
-                .executes(TestRoomCommand::executeCommand));
+        dispatcher.register(literal("loadroute")
+                .executes(LoadRoute::executeCommand));
     }
 
     private static int executeCommand(CommandContext<FabricClientCommandSource> context) {
+        // Load the route from Downloads folder
+        String filePath = System.getProperty("user.home") + File.separator + "Downloads" + File.separator + "routes.json";
+
         try {
-            // TODO: Find out how to use room IDs, instead of room name
-            if (DungeonManager.getCurrentRoom() == null) {
-                context.getSource().sendError(Text.literal("No current room detected."));
-                return 1;
-            }
-            String roomName = DungeonManager.getCurrentRoom().getName();
-            context.getSource().sendFeedback(Text.literal(roomName));
-        } catch (Exception e) {
-            context.getSource().sendError(Text.literal("Error getting current room: " + e.getMessage()));
+            Gson gson = new GsonBuilder().create();
+            FileReader reader = new FileReader(filePath);
+
+            JsonObject data = gson.fromJson(reader, JsonObject.class);
+            Main.currentRoom = new Room(RoomDetection.roomName(), filePath);
+            context.getSource().sendFeedback(
+                    Text.literal("Loaded route for room: " + RoomDetection.roomName()).formatted(Formatting.GREEN)
+            );
+            reader.close();
+        } catch (IOException e) {
+            context.getSource().sendError(
+                    Text.literal("Failed to load route: " + e.getMessage())
+            );
+            LogUtils.error(e);
         }
+
         return 1;
     }
 }

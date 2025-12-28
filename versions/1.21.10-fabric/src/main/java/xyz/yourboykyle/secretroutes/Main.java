@@ -23,8 +23,14 @@ package xyz.yourboykyle.secretroutes;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.client.MinecraftClient;
-import xyz.yourboykyle.secretroutes.commands.TestRoomCommand;
+import org.polyfrost.oneconfig.api.event.v1.EventManager;
+import xyz.yourboykyle.secretroutes.commands.*;
+import xyz.yourboykyle.secretroutes.config.huds.CurrentRoomHUD;
+import xyz.yourboykyle.secretroutes.config.huds.RecordingHUD;
+import xyz.yourboykyle.secretroutes.events.GuildEvents;
 import xyz.yourboykyle.secretroutes.utils.Room;
+import xyz.yourboykyle.secretroutes.utils.RouteRecording;
+import xyz.yourboykyle.secretroutes.utils.autoupdate.UpdateManager;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -44,23 +50,33 @@ public class Main implements ClientModInitializer {
 
 
     public static Room currentRoom = new Room(null);
-    /*public static RouteRecording routeRecording = null;
+    public static RouteRecording routeRecording = null;
     public static UpdateManager updateManager = new UpdateManager();
-    private static DungeonRooms dungeonRooms = new DungeonRooms();
-     */
 
     public static Main instance;
 
     // HUD instances
-    //public static RecordingHUD recordingHUD;
-    //public static CurrentRoomHUD currentRoomHUD;
+    public static RecordingHUD recordingHUD;
+    public static CurrentRoomHUD currentRoomHUD;
 
     @Override
     public void onInitializeClient() {
         System.out.println("Hello from SecretRoutes 1.21.10!");
-        TestRoomCommand.register();
+        instance = this;
+
+        // Commands
+        ChangeColorProfile.register();
+        ChangeRoute.register();
+        Debug.register();
+        LoadRoute.register();
+        Recording.register();
+        SRM.register();
+
+        // Events
+        EventManager.INSTANCE.register(new GuildEvents());
     }
 
     public static void checkRoomData() {}
+    public static void toggleSecretsKeybind() {}
 }
 //#endif
