@@ -72,6 +72,12 @@ repositories {
 }
 
 dependencies {
+    // Fabric API - only for Fabric 1.21.10 build
+    // Other Fabric versions don't load Fabric API to avoid compatibility issues
+    if (mcData.isFabric && project.name == "1.21.10-fabric") {
+        modImplementation("net.fabricmc.fabric-api:fabric-api:0.138.4+1.21.10")
+    }
+
     modCompileOnly("moe.nea:libautoupdate:1.3.1") {
         isTransitive = false
     }
