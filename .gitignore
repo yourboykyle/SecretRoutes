@@ -30,8 +30,10 @@ versions/1.8.9-forge/*
 versions/1.21.10-fabric/*
 !versions/1.21.10-fabric/src/
 
-
 # other
 eclipse
 run
 **/build/
+
+# macOS
+**/.DS_Store
