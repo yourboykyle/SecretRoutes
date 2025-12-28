@@ -23,11 +23,13 @@ package xyz.yourboykyle.secretroutes;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.client.MinecraftClient;
-import xyz.yourboykyle.secretroutes.commands.SecretRoutesCommand;
+import xyz.yourboykyle.secretroutes.commands.TestRoomCommand;
+import xyz.yourboykyle.secretroutes.utils.Room;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 
+// TODO: Update this file for fabric 1.21.10
 public class Main implements ClientModInitializer {
     public static final String MODID = "secretroutesmod";
     public static final String NAME = "SecretRoutes";
@@ -40,9 +42,9 @@ public class Main implements ClientModInitializer {
     public final static File logDir = new File(MinecraftClient.getInstance().runDirectory.getAbsolutePath() + File.separator + "logs" + File.separator + "SecretRoutes");
     public static File outputLogs;
 
-    /*
+
     public static Room currentRoom = new Room(null);
-    public static RouteRecording routeRecording = null;
+    /*public static RouteRecording routeRecording = null;
     public static UpdateManager updateManager = new UpdateManager();
     private static DungeonRooms dungeonRooms = new DungeonRooms();
      */
@@ -56,7 +58,9 @@ public class Main implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         System.out.println("Hello from SecretRoutes 1.21.10!");
-        SecretRoutesCommand.register();
+        TestRoomCommand.register();
     }
+
+    public static void checkRoomData() {}
 }
 //#endif

@@ -108,7 +108,7 @@
 //$$
 //$$
 //$$     /**
-//$$      * This function finds the coordinates of the NW and NE corners of the entrance room on the hotbar map. This is
+//$$      * This function finds the coordinates of the northwest and NE corners of the entrance room on the hotbar map. This is
 //$$      * later used to determine the size of the room grid on the hotbar map. Different floors have slightly different
 //$$      * pixel widths of the rooms, so it is important for the mod to be able to identify the location and size of various
 //$$      * portions of the room grid. Since all rooms within a floor are the same size on the hotbar map and since the
@@ -118,7 +118,7 @@
 //$$      * This function works by iterating through the map and looking for a green entrance room pixel. Once it finds one
 //$$      * and determines that the map pixel above is a blank spot, it checks for map pixels on the left and right side.
 //$$      *
-//$$      * @return `entranceMapCorners[0]` is the coordinate of the left NW corner and `entranceMapCorners[1]` is the
+//$$      * @return `entranceMapCorners[0]` is the coordinate of the left northwest corner and `entranceMapCorners[1]` is the
 //$$      * coordinate of the right NE corner
 //$$      */
 //$$     public static Point[] entranceMapCorners(Integer[][] map) {
@@ -141,7 +141,7 @@
 //$$     }
 //$$
 //$$     /**
-//$$      * @return the coordinate of the NW hotbar map corner closest to the coordinate provided
+//$$      * @return the coordinate of the northwest hotbar map corner closest to the coordinate provided
 //$$      */
 //$$     public static Point getClosestNWMapCorner(Point mapPos, Point leftCorner, Point rightCorner) {
 //$$         int roomWidthAndGap = rightCorner.x - leftCorner.x + 1 + 4; //+1 to count left corner block, +4 to account for gap between rooms
@@ -366,13 +366,13 @@
 //$$         }
 //$$
 //$$         switch (direction) {
-//$$             case "NW":
+//$$             case "northwest":
 //$$                 return new Point(xSet.first(), ySet.first());
-//$$             case "NE":
+//$$             case "northeast":
 //$$                 return new Point(xSet.last() + 30, ySet.first());
-//$$             case "SE":
+//$$             case "southeast":
 //$$                 return new Point(xSet.last() + 30, ySet.last() + 30);
-//$$             case "SW":
+//$$             case "southwest":
 //$$                 return new Point(xSet.first(), ySet.last() + 30);
 //$$         }
 //$$         return null;
@@ -390,10 +390,10 @@
 //$$         //eliminates two possibilities for rectangular rooms, three possibilities for L-shape
 //$$         List<String> directions = new ArrayList<>();
 //$$         if (roomSize.equals("1x1") || roomSize.equals("2x2")) {
-//$$             directions.add("NW");
-//$$             directions.add("NE");
-//$$             directions.add("SE");
-//$$             directions.add("SW");
+//$$             directions.add("northwest");
+//$$             directions.add("northeast");
+//$$             directions.add("southeast");
+//$$             directions.add("southwest");
 //$$         } else {
 //$$             TreeSet<Integer> xSet = new TreeSet<>(); //TreeSet removes duplicates and sorts increasing
 //$$             TreeSet<Integer> ySet = new TreeSet<>();
@@ -405,18 +405,18 @@
 //$$                 List<Integer> x = new ArrayList<>(xSet);
 //$$                 List<Integer> y = new ArrayList<>(ySet);
 //$$
-//$$                 if (!currentRoomSegments.contains(new Point(x.get(0), y.get(0)))) directions.add("SW");
-//$$                 else if (!currentRoomSegments.contains(new Point(x.get(0), y.get(1)))) directions.add("SE");
-//$$                 else if (!currentRoomSegments.contains(new Point(x.get(1), y.get(0)))) directions.add("NW");
-//$$                 else if (!currentRoomSegments.contains(new Point(x.get(1), y.get(1)))) directions.add("NE");
+//$$                 if (!currentRoomSegments.contains(new Point(x.get(0), y.get(0)))) directions.add("southwest");
+//$$                 else if (!currentRoomSegments.contains(new Point(x.get(0), y.get(1)))) directions.add("southeast");
+//$$                 else if (!currentRoomSegments.contains(new Point(x.get(1), y.get(0)))) directions.add("northwest");
+//$$                 else if (!currentRoomSegments.contains(new Point(x.get(1), y.get(1)))) directions.add("northeast");
 //$$
 //$$             } else if (roomSize.startsWith("1x")) { //not 1x1 bc else statement earlier
 //$$                 if (xSet.size() >= 2  && ySet.size() == 1) {
-//$$                     directions.add("NW");
-//$$                     directions.add("SE");
+//$$                     directions.add("northwest");
+//$$                     directions.add("southeast");
 //$$                 } else if (xSet.size() == 1  && ySet.size() >= 2) {
-//$$                     directions.add("NE");
-//$$                     directions.add("SW");
+//$$                     directions.add("northeast");
+//$$                     directions.add("southwest");
 //$$                 }
 //$$             }
 //$$         }
@@ -428,7 +428,7 @@
 //$$      */
 //$$     public static BlockPos actualToRelative(BlockPos actual, String cornerDirection, Point locationOfCorner) {
 //$$         if(cornerDirection == null) {
-//$$             cornerDirection = "NW";
+//$$             cornerDirection = "northwest";
 //$$         }
 //$$         if(locationOfCorner == null) {
 //$$             locationOfCorner = new Point(0, 0);
@@ -436,19 +436,19 @@
 //$$         double x = 0;
 //$$         double z = 0;
 //$$         switch (cornerDirection) {
-//$$             case "NW":
+//$$             case "northwest":
 //$$                 x = actual.getX() - locationOfCorner.getX();
 //$$                 z = actual.getZ() - locationOfCorner.getY(); //.getY in a point is the MC Z coord
 //$$                 break;
-//$$             case "NE":
+//$$             case "northeast":
 //$$                 x = actual.getZ() - locationOfCorner.getY();
 //$$                 z = -(actual.getX() - locationOfCorner.getX());
 //$$                 break;
-//$$             case "SE":
+//$$             case "southeast":
 //$$                 x = -(actual.getX() - locationOfCorner.getX());
 //$$                 z = -(actual.getZ() - locationOfCorner.getY());
 //$$                 break;
-//$$             case "SW":
+//$$             case "southwest":
 //$$                 x = -(actual.getZ() - locationOfCorner.getY());
 //$$                 z = actual.getX() - locationOfCorner.getX();
 //$$                 break;
@@ -458,7 +458,7 @@
 //$$
 //$$     public static Triple<Double, Double, Double> actualToRelative(double posX, double posY, double posZ, String cornerDirection, Point locationOfCorner) {
 //$$         if(cornerDirection == null) {
-//$$             cornerDirection = "NW";
+//$$             cornerDirection = "northwest";
 //$$         }
 //$$         if(locationOfCorner == null) {
 //$$             locationOfCorner = new Point(0, 0);
@@ -466,19 +466,19 @@
 //$$         double x = 0;
 //$$         double z = 0;
 //$$         switch (cornerDirection) {
-//$$             case "NW":
+//$$             case "northwest":
 //$$                 x = posX - locationOfCorner.getX();
 //$$                 z = posZ - locationOfCorner.getY(); //.getY in a point is the MC Z coord
 //$$                 break;
-//$$             case "NE":
+//$$             case "northeast":
 //$$                 x = posZ - locationOfCorner.getY();
 //$$                 z = -(posX - locationOfCorner.getX());
 //$$                 break;
-//$$             case "SE":
+//$$             case "southeast":
 //$$                 x = -(posX - locationOfCorner.getX());
 //$$                 z = -(posZ - locationOfCorner.getY());
 //$$                 break;
-//$$             case "SW":
+//$$             case "southwest":
 //$$                 x = -(posZ - locationOfCorner.getY());
 //$$                 z = posX - locationOfCorner.getX();
 //$$                 break;
@@ -491,7 +491,7 @@
 //$$      */
 //$$     public static BlockPos relativeToActual(BlockPos relative, String cornerDirection, Point locationOfCorner) {
 //$$         if(cornerDirection == null) {
-//$$             cornerDirection = "NW";
+//$$             cornerDirection = "northwest";
 //$$         }
 //$$         if(locationOfCorner == null) {
 //$$             locationOfCorner = new Point(0, 0);
@@ -499,19 +499,19 @@
 //$$         double x = 0;
 //$$         double z = 0;
 //$$         switch (cornerDirection) {
-//$$             case "NW":
+//$$             case "northwest":
 //$$                 x = relative.getX() + locationOfCorner.getX();
 //$$                 z = relative.getZ() + locationOfCorner.getY(); //.getY in a point is the MC Z coord
 //$$                 break;
-//$$             case "NE":
+//$$             case "northeast":
 //$$                 x = -(relative.getZ() - locationOfCorner.getX());
 //$$                 z = relative.getX() + locationOfCorner.getY();
 //$$                 break;
-//$$             case "SE":
+//$$             case "southeast":
 //$$                 x = -(relative.getX() - locationOfCorner.getX());
 //$$                 z = -(relative.getZ() - locationOfCorner.getY());
 //$$                 break;
-//$$             case "SW":
+//$$             case "southwest":
 //$$                 x = relative.getZ() + locationOfCorner.getX();
 //$$                 z = -(relative.getX() - locationOfCorner.getY());
 //$$                 break;
@@ -521,7 +521,7 @@
 //$$
 //$$     public static Triple<Double, Double, Double> relativeToActual(double posX, double posY, double posZ, String cornerDirection, Point locationOfCorner) {
 //$$         if(cornerDirection == null) {
-//$$             cornerDirection = "NW";
+//$$             cornerDirection = "northwest";
 //$$         }
 //$$         if(locationOfCorner == null) {
 //$$             locationOfCorner = new Point(0, 0);
@@ -529,19 +529,19 @@
 //$$         double x = 0;
 //$$         double z = 0;
 //$$         switch (cornerDirection) {
-//$$             case "NW":
+//$$             case "northwest":
 //$$                 x = posX + locationOfCorner.getX();
 //$$                 z = posZ + locationOfCorner.getY(); //.getY in a point is the MC Z coord
 //$$                 break;
-//$$             case "NE":
+//$$             case "northeast":
 //$$                 x = -(posZ - locationOfCorner.getX());
 //$$                 z = posX + locationOfCorner.getY();
 //$$                 break;
-//$$             case "SE":
+//$$             case "southeast":
 //$$                 x = -(posX - locationOfCorner.getX());
 //$$                 z = -(posZ - locationOfCorner.getY());
 //$$                 break;
-//$$             case "SW":
+//$$             case "southwest":
 //$$                 x = posZ + locationOfCorner.getX();
 //$$                 z = -(posX - locationOfCorner.getY());
 //$$                 break;
