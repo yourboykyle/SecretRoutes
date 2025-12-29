@@ -191,10 +191,8 @@ public class ConfigUtils {
         int saturation = hsba.get(1).getAsInt();
         int brightness = hsba.get(2).getAsInt();
         int alpha = hsba.get(3).getAsInt();
-        int chromaSpeed = jsonObject.get("dataBit").getAsInt();
+        //int chromaSpeed = jsonObject.get("dataBit").getAsInt();
         return ColorUtils.hsba(hue, saturation, brightness, alpha);
-        // TODO: see if chroma can be implemented (exists in old OneConfig)
-        //return ColorUtils.hsba(hue, saturation, brightness, alpha, chromaSpeed);
     }
 }
 //#endif

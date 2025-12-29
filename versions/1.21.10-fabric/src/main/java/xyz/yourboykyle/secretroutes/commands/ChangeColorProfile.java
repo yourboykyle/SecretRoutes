@@ -70,8 +70,7 @@ public class ChangeColorProfile {
     }
 
     private static int openGui(CommandContext<FabricClientCommandSource> context) {
-        // TODO: Make the gui open
-        //SRMConfig.INSTANCE.openGui();
+        SRMConfig.INSTANCE.openGui();
         return 1;
     }
 

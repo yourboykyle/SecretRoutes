@@ -1,5 +1,4 @@
 //#if FABRIC && MC == 1.21.10
-// TODO: update this file for multi versioning (1.8.9 -> 1.21.10)
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -29,6 +28,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.util.math.BlockPos;
+import org.polyfrost.oneconfig.api.event.v1.events.PostWorldRenderEvent;
 import org.polyfrost.polyui.color.ColorUtils;
 import org.polyfrost.polyui.color.PolyColor;
 import xyz.yourboykyle.secretroutes.Main;
@@ -56,6 +56,11 @@ public class SecretUtils {
     public static String leverName = null;
     public static String leverNumber = null;
     public static ArrayList<String> secretLocations = new ArrayList<>();
+
+    // TODO: Update the rendering stuff for secret utils
+    public static void renderingCallback(JsonObject currentSecretWaypoints, PostWorldRenderEvent event, int index2){}
+    public static void renderSecrets(PostWorldRenderEvent event){}
+    public static void renderLever(PostWorldRenderEvent e){}
 
     /*
     public static void renderingCallback(JsonObject currentSecretWaypoints, RenderWorldLastEvent event, int index2){

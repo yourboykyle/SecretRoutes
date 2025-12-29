@@ -1,5 +1,4 @@
-//#if FORGE && MC == 1.8.9
-// TODO: update this file for multi versioning (1.8.9 -> 1.21.10)
+//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -29,7 +28,7 @@ import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 
 public class SecretRoutesRenderUtils {
-    // TODO: Update this file for fabric 1.21.10
+    // TODO: Update this rendering stuff for fabric 1.21.10
     /*public static void drawBoxAtBlock(double worldX, double worldY, double worldZ, PolyColor color) {
         drawBoxAtBlock(worldX, worldY, worldZ, color, 1, 1, 1);
     }

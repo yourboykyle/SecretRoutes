@@ -1,5 +1,4 @@
 //#if FORGE && MC == 1.8.9
-// TODO: update this file for multi versioning (1.8.9 -> 1.21.10)
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -70,7 +69,7 @@ public class Main {
     public static UpdateManager updateManager = new UpdateManager();
     private static DungeonRooms dungeonRooms = new DungeonRooms();
 
-    public static Main instance = new Main();
+    public static Main instance;
     //public static SRMConfig config; - oneconfig v0
 
     // HUD instances
@@ -122,7 +121,6 @@ public class Main {
         LogUtils.info("§bSetting ssl certificate");
         SSLUtils.setSSlCertificate();
 
-        routeRecording = new RouteRecording();
 
         // Set up Config
         SRMConfig.INSTANCE.preload();
@@ -131,11 +129,9 @@ public class Main {
         HudManager.register(recordingHUD);
         HudManager.register(currentRoomHUD);
 
-        // Auto Updates
-        LogUtils.info("Checking for updates...");
-
         // Initialize Other Stuff
         instance = this;
+        routeRecording = new RouteRecording();
         dungeonRooms.init(e);
         checkRoutesData();
         checkProfilesData();
@@ -148,7 +144,7 @@ public class Main {
         //MinecraftForge.EVENT_BUS.register(new OnPlayerInteract());
         MinecraftForge.EVENT_BUS.register(new OnPlayerTick());
         MinecraftForge.EVENT_BUS.register(new OnPlaySound());
-        MinecraftForge.EVENT_BUS.register(new OnRecievePacket());
+        MinecraftForge.EVENT_BUS.register(new OnReceivePacket());
         MinecraftForge.EVENT_BUS.register(new OnSendPacket());
         MinecraftForge.EVENT_BUS.register(new OnWorldRender());
         MinecraftForge.EVENT_BUS.register(new OnMouseInput());
@@ -168,6 +164,7 @@ public class Main {
         ClientCommandHandler.instance.registerCommand(new Debug());
 
         if(SRMConfig.autoUpdateRoutes){
+            LogUtils.info("Checking for route updates...");
             new Thread(()->{
                 try{
                     RouteUtils.checkRoutesFiles();
