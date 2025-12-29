@@ -27,6 +27,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.command.CommandRegistryAccess;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
+import xyz.yourboykyle.secretroutes.utils.LogUtils;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
@@ -46,6 +47,7 @@ public class SRM {
     }
 
     private static int executeCommand(CommandContext<FabricClientCommandSource> context) {
+        LogUtils.info("Opening SRM GUI (command)...");
         SRMConfig.INSTANCE.openGui();
         return 1;
     }

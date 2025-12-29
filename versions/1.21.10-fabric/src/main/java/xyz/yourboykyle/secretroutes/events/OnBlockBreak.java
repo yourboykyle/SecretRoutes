@@ -79,7 +79,6 @@ public class OnBlockBreak {
 
                 ItemStack heldItem = player.getMainHandStack();
                 if (heldItem != null && !heldItem.isEmpty()) {
-                    // TODO: Check if this works
                     // Check if the player is holding a pickaxe by checking the item's registry ID
                     String itemId = Registries.ITEM.getId(heldItem.getItem()).toString();
                     if (!itemId.contains("pickaxe")) {

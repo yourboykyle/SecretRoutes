@@ -1034,13 +1034,21 @@ public class SRMConfig extends Config {
         enderpearlTextSize = 3;
     }
 
-    @Text(
+    @Switch(
+            title = "I KNOW WHAT I'M DOING",
+            description = "Enables the dev options",
+            subcategory = "General",
+            category = "Dev"
+    )
+    public static boolean enableDevOptions = false;
+
+    /*@Text(
             title = "Dev password",
             description = "The password to access the dev options",
             subcategory = "General",
             category = "Dev"
     )
-    public static String devPassword = "";
+    public static String devPassword = "";*/
 
     @Switch(
             title = "Verbose logging",
@@ -1097,14 +1105,6 @@ public class SRMConfig extends Config {
     )
     public static boolean actionbarInfo = false;
 
-    @Switch(
-            title = "Force outdated",
-            description = "Forces the version to be outdated, useful for testing the auto updater",
-            subcategory = "General",
-            category = "Dev"
-    )
-    public static boolean forceUpdateDEBUG = false;
-
     @Info(
             title = "Do not turn this on unless you know exactly what you are doing",
             description = "Do not turn this on unless you know exactly what you are doing",
@@ -1112,6 +1112,14 @@ public class SRMConfig extends Config {
             subcategory = "General"
     )
     public static boolean c;
+
+    @Switch(
+            title = "Force outdated",
+            description = "Forces the version to be outdated, useful for testing the auto updater",
+            subcategory = "General",
+            category = "Dev"
+    )
+    public static boolean forceUpdateDEBUG = false;
 
     @Dropdown(
             title = "Custom Pearl Orientation (Unused)",
@@ -1463,10 +1471,8 @@ public class SRMConfig extends Config {
             addDependency("updateRoutesButton", "modEnabled", true);
             addDependency("importRoutesButton", "modEnabled", true);
             addDependency("checkForUpdatesButton", "modEnabled", true);
-            // TODO: Check if this works properly in the config:
             hideIf("particles", () -> !isEqualTo(lineType, 0));
             addDependency("particles", "modEnabled", true);
-            // TODO: Check if this works properly in the config:
             hideIf("tickInterval", () -> !isEqualTo(lineType, 0));
             addDependency("tickInterval", "modEnabled", true);
             addDependency("pearlLineWidth", "modEnabled", true);
@@ -1507,16 +1513,25 @@ public class SRMConfig extends Config {
             addDependency("enderpearlWaypointColorIndex", "enderpearlTextToggle", true);
             addDependency("enderpearlTextSize", "enderpearlTextToggle", true);
 
-            // TODO: Check if these 4 work properly in the config:
-            hideIf("forceUpdateDEBUG", () -> isDevPasswordNotCorrect());
-            hideIf("verboseLogging", () -> isDevPasswordNotCorrect());
-            hideIf("c", () -> isDevPasswordNotCorrect());
-            hideIf("debug", () -> isDevPasswordNotCorrect());
+            // These don't work, maybe they could with some small changes but I have priorities to do for 1.21
+            /*hideIf("forceUpdateDEBUG", () -> isDevPasswordCorrect());
+            hideIf("verboseLogging", () -> isDevPasswordCorrect());
+            hideIf("c", () -> isDevPasswordCorrect());
+            hideIf("debug", () -> isDevPasswordCorrect());*/
+            addDependency("customPearlOrientation", "enableDevOptions", true);
+            addDependency("forceUpdateDEBUG", "enableDevOptions", true);
+            addDependency("verboseLogging", "enableDevOptions", true);
+            addDependency("c", "enableDevOptions", true);
+            addDependency("debug", "enableDevOptions", true);
             addDependency("verboseRecording", "verboseLogging", true);
             addDependency("verboseUpdating", "verboseLogging", true);
             addDependency("verboseInfo", "verboseLogging", true);
             addDependency("verboseRendering", "verboseLogging", true);
             addDependency("actionbarInfo", "verboseLogging", true);
+            addDependency("renderLinesThroughWalls", "enableDevOptions", true);
+            addDependency("playerWaypointLine", "enableDevOptions", true);
+            addDependency("playerToEtherwarp", "enableDevOptions", true);
+            addDependency("disableServerChecking", "enableDevOptions", true);
 
             addDependency("customSecretSoundIndex", "customSecretSound", true);
             addDependency("customSecretSoundVolume", "customSecretSound", true);
@@ -1586,22 +1601,23 @@ public class SRMConfig extends Config {
             LogUtils.error(e);
         }
     }
-
-    public boolean isDevPasswordNotCorrect() {
+/*
+    public boolean isDevPasswordCorrect() {
         if (devPassword.equals("KyleIsMyDaddy")) {
-            return false;
+            LogUtils.info("Dev password correct, unlocking dev options");
+            return true;
         }
+        LogUtils.info("Dev password not correct, locking dev options");
         verboseLogging = false;
         forceUpdateDEBUG = false;
-        return true;
+        return false;
     }
-
+*/
     public boolean isEqualTo(Object a, Object b) {
         return a.equals(b);
     }
 
     public void openGui() {
-        // TODO: Check if this works
         ScreensKt.openUI(INSTANCE);
     }
 }

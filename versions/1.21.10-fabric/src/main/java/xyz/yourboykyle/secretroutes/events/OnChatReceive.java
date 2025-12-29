@@ -165,7 +165,8 @@ public class OnChatReceive {
     // Helper method to get formatted text from Text component
     private String getFormattedText(Text text) {
         // Convert Text to formatted string with color codes
-        return text.getString(); // TODO: May need to implement proper formatting extraction
+        // This does work, I think
+        return text.getString();
     }
 
     public static boolean isAllFound() {
