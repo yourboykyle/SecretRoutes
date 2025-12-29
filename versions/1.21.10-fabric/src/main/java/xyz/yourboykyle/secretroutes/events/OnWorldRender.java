@@ -1,4 +1,4 @@
-//#if FORGE && MC == 1.8.9
+//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -22,10 +22,9 @@
 package xyz.yourboykyle.secretroutes.events;
 
 import com.google.gson.JsonArray;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.DungeonManager;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import de.hysky.skyblocker.utils.Utils;
+import org.polyfrost.oneconfig.api.event.v1.events.PostWorldRenderEvent;
+import org.polyfrost.oneconfig.api.event.v1.invoke.impl.Subscribe;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.*;
@@ -34,16 +33,16 @@ public class OnWorldRender {
     private final static String verboseTAG = "Rendering";
     public static boolean playCompleteFirst = true;
 
-    @SubscribeEvent
-    public void onRenderWorld(RenderWorldLastEvent event) {
+    @Subscribe
+    public void onRenderWorld(PostWorldRenderEvent event) {
         try {
-
-
             // Make sure the player is actually in a dungeon
-            Utils.checkForCatacombs();
-            if (!Utils.inCatacombs || DungeonManager.gameStage != 2 || !SRMConfig.modEnabled) {
+            if (!Utils.isInDungeons() || !SRMConfig.modEnabled) {
                 return;
             }
+
+            // Check dungeon game stage (if available in Skyblocker)
+            // DungeonManager.gameStage check might need adjustment based on Skyblocker API
 
             if(OnChatReceive.isAllFound()){
                 /*
@@ -91,9 +90,6 @@ public class OnWorldRender {
             LogUtils.error(e);
         }
     }
-
-
-
 
 }
 //#endif

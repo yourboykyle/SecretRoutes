@@ -33,6 +33,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
 import xyz.yourboykyle.secretroutes.utils.RoomDetection;
@@ -66,8 +67,7 @@ public class Recording {
     }
 
     private static int openGui(CommandContext<FabricClientCommandSource> context) {
-        // TODO: Implement config GUI for 1.21.10
-        // SRMConfig.INSTANCE.openGui();
+        SRMConfig.INSTANCE.openGui();
         return 1;
     }
 

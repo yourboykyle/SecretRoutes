@@ -43,6 +43,10 @@ public class OnBlockBreak {
         PlayerBlockBreakEvents.AFTER.register(OnBlockBreak::onBlockBreak);
     }
 
+    public static void handleBlockBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        onBlockBreak(world, player, pos, state, null);
+    }
+
     private static void onBlockBreak(World world, PlayerEntity player, BlockPos pos, BlockState state, BlockEntity blockEntity) {
         try {
             MinecraftClient mc = MinecraftClient.getInstance();

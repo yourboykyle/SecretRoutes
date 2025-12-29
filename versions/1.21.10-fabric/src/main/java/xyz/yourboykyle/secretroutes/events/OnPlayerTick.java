@@ -1,4 +1,4 @@
-//#if FORGE && MC == 1.8.9
+//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -21,20 +21,26 @@
 
 package xyz.yourboykyle.secretroutes.events;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.util.BlockPos;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.util.math.BlockPos;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
 
 public class OnPlayerTick {
-    @SubscribeEvent
-    public void onPlayerTick(TickEvent.PlayerTickEvent e) {
-        if(e.player.getUniqueID() != Minecraft.getMinecraft().thePlayer.getUniqueID()) {
+
+    public static void register() {
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            onPlayerTick(client);
+        });
+    }
+
+    private static void onPlayerTick(MinecraftClient client) {
+        ClientPlayerEntity player = client.player;
+        if (player == null) {
             return;
         }
 
@@ -49,7 +55,7 @@ public class OnPlayerTick {
         }
 
         if(Main.currentRoom.getSecretType() == Room.SECRET_TYPES.BAT) {
-            BlockPos pos = e.player.getPosition();
+            BlockPos pos = player.getBlockPos();
             BlockPos batPos = Main.currentRoom.getSecretLocation();
 
             if (pos.getX() >= batPos.getX() - 3 && pos.getX() <= batPos.getX() + 3 && pos.getY() >= batPos.getY() - 3 && pos.getY() <= batPos.getY() + 3 && pos.getZ() >= batPos.getZ() - 3 && pos.getZ() <= batPos.getZ() + 3) {
@@ -63,7 +69,7 @@ public class OnPlayerTick {
         But you can still get the secret if you walk over to the item secret, or just press the next secret keybind if you're lazy.
         */
         if(Main.currentRoom.getSecretType() == Room.SECRET_TYPES.ITEM) {
-            BlockPos pos = e.player.getPosition();
+            BlockPos pos = player.getBlockPos();
             BlockPos itemPos = Main.currentRoom.getSecretLocation();
 
             if (pos.getX() >= itemPos.getX() - 2 && pos.getX() <= itemPos.getX() + 2 && pos.getY() >= itemPos.getY() - 2 && pos.getY() <= itemPos.getY() + 2 && pos.getZ() >= itemPos.getZ() - 2 && pos.getZ() <= itemPos.getZ() + 2) {
@@ -87,22 +93,20 @@ public class OnPlayerTick {
         // Route Recording
         if(Main.routeRecording.recording) {
             if (Main.routeRecording.previousLocation == null) {
-                EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
-                BlockPos targetPos = new BlockPos(Math.floor(player.posX), Math.floor(player.posY), Math.floor(player.posZ));
+                BlockPos targetPos = new BlockPos((int)Math.floor(player.getX()), (int)Math.floor(player.getY()), (int)Math.floor(player.getZ()));
                 Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.LOCATIONS, targetPos); // Trust the process
-                Main.routeRecording.previousLocation = e.player.getPosition();
+                Main.routeRecording.previousLocation = player.getBlockPos();
             } else {
-                BlockPos pos = e.player.getPosition();
+                BlockPos pos = player.getBlockPos();
                 BlockPos prevPos = Main.routeRecording.previousLocation;
 
                 double distance = Math.abs(Math.sqrt(Math.pow(pos.getX() - prevPos.getX(), 2) + Math.pow(pos.getY() - prevPos.getY(), 2) + Math.pow(pos.getZ() - prevPos.getZ(), 2)));
 
                 // If the player has moved 5 blocks or more from the previous waypoint
                 if (distance >= 2.4) {
-                    EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
-                    BlockPos targetPos = new BlockPos(Math.floor(player.posX), Math.floor(player.posY), Math.floor(player.posZ));
+                    BlockPos targetPos = new BlockPos((int)Math.floor(player.getX()), (int)Math.floor(player.getY()), (int)Math.floor(player.getZ()));
                     Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.LOCATIONS, targetPos);
-                    Main.routeRecording.previousLocation = e.player.getPosition();
+                    Main.routeRecording.previousLocation = player.getBlockPos();
                 }
             }
         }

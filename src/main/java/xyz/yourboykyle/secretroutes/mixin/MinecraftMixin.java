@@ -1,5 +1,4 @@
 //#if FORGE && MC == 1.8.9
-// TODO: update this file for multi versioning (1.8.9 -> 1.21.10)
 package xyz.yourboykyle.secretroutes.mixin;
 
 import net.minecraft.client.Minecraft;

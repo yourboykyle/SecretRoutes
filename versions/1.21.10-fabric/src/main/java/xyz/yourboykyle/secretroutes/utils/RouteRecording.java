@@ -1,5 +1,4 @@
 //#if FABRIC && MC == 1.21.10
-// TODO: update this file for multi versioning (1.8.9 -> 1.21.10)
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -131,9 +130,8 @@ public class RouteRecording {
         // Start recording the secret route
         recording = true;
         sendVerboseMessage("§eRecording started...", verboseTag);
-        // TODO: Add HUD toggling here
-        //Main.recordingHUD.enable();
-        //Main.currentRoomHUD.enable();
+        Main.recordingHUD.enable();
+        Main.currentRoomHUD.enable();
     }
 
     public void stopRecording() {
@@ -156,9 +154,8 @@ public class RouteRecording {
         tntWaypoints = 0;
         enderPearlWaypoints = 0;
         enderPearlAngleWaypoints = 0;
-        // TODO: Add HUD toggling here
-        //Main.recordingHUD.disable();
-        //Main.currentRoomHUD.disable();
+        Main.recordingHUD.disable();
+        Main.currentRoomHUD.disable();
     }
 
     public void importRoutes(String fileName) {

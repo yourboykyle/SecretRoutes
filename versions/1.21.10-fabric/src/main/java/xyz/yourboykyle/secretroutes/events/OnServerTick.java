@@ -1,4 +1,4 @@
-//#if FORGE && MC == 1.8.9
+//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -19,19 +19,32 @@
  * with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.yourboykyle.secretroutes.utils;
+package xyz.yourboykyle.secretroutes.events;
 
-public class PrintingUtils {
-    public long lastPrinted;
-    public PrintingUtils(){
-        lastPrinted = System.currentTimeMillis();
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.minecraft.client.MinecraftClient;
+import xyz.yourboykyle.secretroutes.Main;
+
+/**
+ * Tracks server ticks using client tick events.
+ * Note: This is an approximation since we're on the client side.
+ * The old Forge version used transaction packets to estimate server ticks,
+ * but in Fabric we just count client ticks as a close approximation.
+ */
+public class OnServerTick {
+    public static int ticks = 0;
+
+    public static void register() {
+        ClientTickEvents.END_CLIENT_TICK.register(OnServerTick::onClientTick);
     }
-    public void print(String message, int delay){
-        long currentTime = System.currentTimeMillis();
-        if(currentTime - lastPrinted > delay){
-            ChatUtils.sendVerboseMessage(message);
-            lastPrinted = currentTime;
+
+    private static void onClientTick(MinecraftClient client) {
+        if (client.player == null || client.world == null) {
+            return;
         }
+
+        ticks++;
+
     }
 }
 //#endif

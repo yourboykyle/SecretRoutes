@@ -64,6 +64,12 @@ public class LogUtils {
 
     public static void appendToFile(String msg) {
         try {
+            // Check if outputLogs is initialized, if not, just print to console
+            if (Main.outputLogs == null) {
+                System.out.println("[Secret Routes] " + msg);
+                return;
+            }
+
             FileWriter fw = new FileWriter(Main.outputLogs, true);
             fw.write(msg + "\n");
             fw.close();

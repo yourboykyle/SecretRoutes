@@ -1,5 +1,4 @@
-//#if FORGE && MC == 1.8.9
-// TODO: update this file for multi versioning (1.8.9 -> 1.21.10)
+//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -46,7 +45,7 @@ import net.minecraft.util.math.BlockPos;
 
 import java.util.List;
 
-// TODO: Update this class for 1.21.10 (help me)
+// TODO: Update this rendering stuff for 1.21.10
 public class RenderUtils {
     // Temporary
     public static void drawLineMultipleParticles(ParticleEffect particle, List<BlockPos> locations) {

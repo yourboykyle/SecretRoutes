@@ -30,7 +30,6 @@ import xyz.yourboykyle.secretroutes.config.SRMConfig;
 
 
 public class SecretSounds {
-    // TODO: update this file for multi versioning (1.8.9 -> 1.21.10)
     private static boolean shouldBypassVolume = false;
     private static MinecraftClient mc = MinecraftClient.getInstance();
     private static long lastPlayed = System.currentTimeMillis();

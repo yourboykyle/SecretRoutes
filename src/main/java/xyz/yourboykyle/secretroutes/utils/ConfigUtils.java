@@ -1,5 +1,4 @@
 //#if FORGE && MC == 1.8.9
-// TODO: update this file for multi versioning (1.8.9 -> 1.21.10)
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -192,10 +191,8 @@ public class ConfigUtils {
         int saturation = hsba.get(1).getAsInt();
         int brightness = hsba.get(2).getAsInt();
         int alpha = hsba.get(3).getAsInt();
-        int chromaSpeed = jsonObject.get("dataBit").getAsInt();
+        //int chromaSpeed = jsonObject.get("dataBit").getAsInt();
         return ColorUtils.hsba(hue, saturation, brightness, alpha);
-        // TODO: see if chroma can be implemented (exists in old OneConfig)
-        //return ColorUtils.hsba(hue, saturation, brightness, alpha, chromaSpeed);
     }
 }
 //#endif

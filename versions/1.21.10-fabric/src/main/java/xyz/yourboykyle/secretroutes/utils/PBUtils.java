@@ -111,19 +111,18 @@ public class PBUtils {
         long time = System.currentTimeMillis() - startTime;
         startTime = 0;
         // Check if it's a PB
-        // TODO: update this file for multi versioning (1.8.9 -> 1.21.10)
-        /*long pbTime = getPBForRoom(RoomDetection.roomName);
-        ChatUtils.sendVerboseMessage("PB for " + RoomDetection.roomName + ": " + (pbTime == -1 ? "N/A" : formatTime(pbTime)), "Personal Bests");
+        long pbTime = getPBForRoom(RoomDetection.roomName());
+        ChatUtils.sendVerboseMessage("PB for " + RoomDetection.roomName() + ": " + (pbTime == -1 ? "N/A" : formatTime(pbTime)), "Personal Bests");
         if (pbTime == -1 || time < pbTime) {
             // New PB
             if(SRMConfig.sendChatMessages) {
-                sendChatMessage("§rNew personal best for " + RoomDetection.roomName + ": §a" + formatTime(time));
+                sendChatMessage("§rNew personal best for " + RoomDetection.roomName() + ": §a" + formatTime(time));
             }
-            setPersonalBest(RoomDetection.roomName, time);
+            setPersonalBest(RoomDetection.roomName(), time);
         }
 
         PBUtils.pbIsValid = false;
-        ChatUtils.sendVerboseMessage("Time for " + RoomDetection.roomName + ": §a" + formatTime(time), "Personal Bests");*/
+        ChatUtils.sendVerboseMessage("Time for " + RoomDetection.roomName() + ": §a" + formatTime(time), "Personal Bests");
     }
 
     public static String formatTime(long millis) {

@@ -35,6 +35,7 @@ import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
+import xyz.yourboykyle.secretroutes.events.OnGuiRender;
 import xyz.yourboykyle.secretroutes.utils.*;
 
 import java.lang.reflect.Field;
@@ -42,6 +43,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
+import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 
 public class Debug {
     public static void register() {
@@ -75,8 +77,12 @@ public class Debug {
     }
 
     private static int executeLever(CommandContext<FabricClientCommandSource> context) {
-        // TODO: Update for 1.21.10 - SecretUtils, MapUtils, RoomDetection need porting
-        context.getSource().sendError(Text.literal("Lever debug not yet implemented for 1.21.10"));
+        sendChatMessage("Relative :" + BlockUtils.blockPos(SecretUtils.currentLeverPos));
+        BlockPos abs = MapUtils.relativeToActual(SecretUtils.currentLeverPos, RoomDetection.roomDirection(), RoomDetection.roomCorner());
+        sendChatMessage("Abs: " + BlockUtils.blockPos(abs));
+        sendChatMessage("Chest: " + SecretUtils.chestName);
+        sendChatMessage("Lever: " + SecretUtils.leverName);
+        sendChatMessage("Num: " + SecretUtils.leverNumber);
         return 1;
     }
 
@@ -93,20 +99,37 @@ public class Debug {
     }
 
     private static int executeBloodtime(CommandContext<FabricClientCommandSource> context, long time) {
-        // TODO: Update for 1.21.10 - OnGuiRender needs porting
-        context.getSource().sendError(Text.literal("Bloodtime debug not yet implemented for 1.21.10"));
+        OnGuiRender.spawnNotifTime = System.currentTimeMillis() + time;
+        context.getSource().sendFeedback(Text.literal("Blood spawn notification set for " + time + "ms from now").formatted(Formatting.GREEN));
         return 1;
     }
 
     private static int executeCr(CommandContext<FabricClientCommandSource> context) {
-        // TODO: Update for 1.21.10 - Main.currentRoom needs porting
-        context.getSource().sendError(Text.literal("CR debug not yet implemented for 1.21.10"));
+        context.getSource().sendFeedback(
+            Text.literal("Current index: " + xyz.yourboykyle.secretroutes.Main.currentRoom.closest.getTwo())
+                .formatted(Formatting.AQUA)
+        );
         return 1;
     }
 
     private static int executeCrDirection(CommandContext<FabricClientCommandSource> context, boolean forward) {
-        // TODO: Update for 1.21.10 - Main.currentRoom needs porting
-        context.getSource().sendError(Text.literal("CR direction debug not yet implemented for 1.21.10"));
+        try {
+            int currentIndex = xyz.yourboykyle.secretroutes.Main.currentRoom.closest.getTwo();
+            int newIndex = forward ? currentIndex + 1 : currentIndex - 1;
+
+            if (newIndex >= 0 && newIndex < xyz.yourboykyle.secretroutes.Main.currentRoom.arrays.size()) {
+                xyz.yourboykyle.secretroutes.Main.currentRoom.currentSecretRoute =
+                    xyz.yourboykyle.secretroutes.Main.currentRoom.arrays.get(newIndex);
+                context.getSource().sendFeedback(
+                    Text.literal("Changed to index: " + newIndex).formatted(Formatting.GREEN)
+                );
+            } else {
+                context.getSource().sendError(Text.literal("Index out of bounds"));
+            }
+        } catch (Exception e) {
+            context.getSource().sendError(Text.literal("Error changing route: " + e.getMessage()));
+            LogUtils.error(e);
+        }
         return 1;
     }
 

@@ -27,6 +27,7 @@ import de.hysky.skyblocker.utils.Utils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import xyz.yourboykyle.secretroutes.Main;
@@ -89,6 +90,15 @@ public class OnItemPickedUp {
 
         previousInventory.clear();
         previousInventory.putAll(currentInventory);
+    }
+
+    // Overload for packet-based item pickup detection
+    public static void handleItemPickup(ClientPlayerEntity player, ItemEntity itemEntity) {
+        ItemStack stack = itemEntity.getStack();
+        if (stack == null || stack.isEmpty()) return;
+
+        String itemName = stack.getName().getString();
+        handleItemPickup(player, itemName);
     }
 
     private static void handleItemPickup(ClientPlayerEntity player, String itemName) {

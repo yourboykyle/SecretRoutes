@@ -1,4 +1,4 @@
-//#if FORGE && MC == 1.8.9
+//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -19,17 +19,18 @@
  * with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.yourboykyle.secretroutes.utils;
+package xyz.yourboykyle.secretroutes.events;
 
-public class Constants {
-    //This class contains a bunch of constants used throughout the code. The sole purpose of this is to be able to use the "/srmdebug" command to change these values from within the game.
+/**
+ * A simple event to track server ticks.
+ * In Fabric, we use ClientTickEvents instead of transaction packets to estimate server ticks.
+ */
+public class ServerTickEvent {
+    public final String modid;
 
-    //RenderUtils
-    public static float distanceScaleFactor = 0.08f;
-    public static float baseScale = 0.012f;
-    public static boolean shadows = false;
+    public ServerTickEvent(String modid) {
+        this.modid = modid;
+    }
 
-    //GUI render utils
-    public static int zPos = 1000;
 }
 //#endif

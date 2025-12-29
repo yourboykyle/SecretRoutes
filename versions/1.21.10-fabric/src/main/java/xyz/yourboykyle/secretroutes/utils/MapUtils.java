@@ -19,7 +19,6 @@
 
 package xyz.yourboykyle.secretroutes.utils;
 
-// TODO: update this file for multi versioning (1.8.9 -> 1.21.10)
 import net.minecraft.util.math.BlockPos;
 import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 

@@ -22,11 +22,15 @@
 package xyz.yourboykyle.secretroutes.events;
 
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.ChatUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
@@ -57,6 +61,18 @@ public class OnBlockPlace {
 
             return ActionResult.PASS;
         });
+    }
+
+    // Handle block place from packet events
+    public static void handleBlockPlace(World world, BlockPos pos, BlockState blockState, BlockState placedAgainst, PlayerEntity player) {
+        if (blockState.getBlock() == net.minecraft.block.Blocks.TNT && Main.routeRecording.recording) {
+            String blockName = Registries.BLOCK.getId(blockState.getBlock()).toString();
+            ChatUtils.sendVerboseMessage("§d Block placed: " + blockName, verboseTag);
+            ChatUtils.sendVerboseMessage("§d TNT placed at: " + pos, verboseTag);
+
+            Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.TNTS, pos);
+            Main.routeRecording.setRecordingMessage("Added TNT waypoint.");
+        }
     }
 }
 //#endif

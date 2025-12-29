@@ -1,5 +1,4 @@
-//#if FORGE && MC == 1.8.9
-// TODO: update this file for multi versioning (1.8.9 -> 1.21.10)
+//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -189,19 +188,20 @@ public class Room {
 
     private ParticleEffect getParticleFromId(int id) {
         try {
-            // Get particle type from registry by raw ID
-            ParticleType<?> particleType = Registries.PARTICLE_TYPE.get(id);
-
-            if (particleType == null) {
-                return ParticleTypes.FLAME; // Fallback
+            // In modern Minecraft, we need to iterate through the registry to find by raw ID
+            // or use the registry's getRawId method in reverse
+            for (ParticleType<?> particleType : Registries.PARTICLE_TYPE) {
+                if (Registries.PARTICLE_TYPE.getRawId(particleType) == id) {
+                    // For SimpleParticleType, we can cast directly
+                    if (particleType instanceof net.minecraft.particle.SimpleParticleType) {
+                        return (ParticleEffect) particleType;
+                    }
+                    // For other particle types, return the default effect
+                    return ParticleTypes.FLAME;
+                }
             }
 
-            // For SimpleParticleType, we can cast directly
-            if (particleType instanceof net.minecraft.particle.SimpleParticleType) {
-                return (ParticleEffect) particleType;
-            }
-
-            // For other particle types, return the default effect
+            // If not found, return fallback
             return ParticleTypes.FLAME;
         } catch (Exception e) {
             LogUtils.error(e);
