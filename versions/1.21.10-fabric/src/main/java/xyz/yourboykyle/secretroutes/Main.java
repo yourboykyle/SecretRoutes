@@ -138,6 +138,9 @@ public class Main implements ClientModInitializer {
         OnPlayerTick.register();
         OnServerTick.register();
 
+        // Skyblocker Events
+        OnEnterNewRoom.register();
+
         // Commands
         ChangeColorProfile.register();
         ChangeRoute.register();
