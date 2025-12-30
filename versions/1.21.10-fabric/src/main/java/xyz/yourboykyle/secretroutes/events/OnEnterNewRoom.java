@@ -21,6 +21,7 @@
 
 package xyz.yourboykyle.secretroutes.events;
 
+import de.hysky.skyblocker.events.DungeonEvents;
 import de.hysky.skyblocker.skyblock.dungeon.secrets.DungeonManager;
 import de.hysky.skyblocker.utils.Utils;
 import xyz.yourboykyle.secretroutes.Main;
@@ -31,8 +32,14 @@ import xyz.yourboykyle.secretroutes.utils.SecretUtils;
 
 import java.util.ArrayList;
 
-// TODO: Make sure this is called
 public class OnEnterNewRoom {
+    public static void register() {
+        DungeonEvents.ROOM_MATCHED.register(room -> {
+            LogUtils.info("Entered new room: " + room.getName());
+            onEnterNewRoom(new Room(room.getName()));
+        });
+    }
+
     public static void onEnterNewRoom(Room room) {
         try {
             // Make sure the player is actually in a dungeon
