@@ -1,3 +1,4 @@
+//#if FORGE && MC == 1.8.9
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -21,8 +22,6 @@
 package xyz.yourboykyle.secretroutes.events;
 
 import net.minecraft.network.play.server.S32PacketConfirmTransaction;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.events.PacketEvent;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -33,7 +32,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.network.play.server.S0DPacketCollectItem;
 import net.minecraft.network.play.server.S23PacketBlockChange;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.world.BlockEvent;
@@ -43,7 +41,7 @@ import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.ChatUtils;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 
-public class OnRecievePacket {
+public class OnReceivePacket {
     // The S23PacketBlockChange packet is sent twice for each block break and place. These variables are workarounds to keep track of if it's the first time each packet is sent, and just ignore the second time
     public static boolean firstBlockBreakPacket = true;
     public static boolean firstBlockPlacePacket = true;
@@ -105,3 +103,4 @@ public class OnRecievePacket {
         }
     }
 }
+//#endif

@@ -1,3 +1,4 @@
+//#if FORGE && MC == 1.8.9
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -21,38 +22,38 @@
 
 package xyz.yourboykyle.secretroutes.utils;
 
-import cc.polyfrost.oneconfig.config.core.OneColor;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
+import org.polyfrost.polyui.color.PolyColor;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.WaypointUtils;
 import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 
 public class SecretRoutesRenderUtils {
-    public static void drawBoxAtBlock(double worldX, double worldY, double worldZ, OneColor color) {
+    public static void drawBoxAtBlock(double worldX, double worldY, double worldZ, PolyColor color) {
         drawBoxAtBlock(worldX, worldY, worldZ, color, 1, 1, 1);
     }
-    public static void drawBoxAtBlock(double worldX, double worldY, double worldZ, OneColor color, int width, int height) {
+    public static void drawBoxAtBlock(double worldX, double worldY, double worldZ, PolyColor color, int width, int height) {
         drawBoxAtBlock(worldX, worldY, worldZ, color, width, height, 1);
     }
-    public static void drawBoxAtBlock(double worldX, double worldY, double worldZ, OneColor color, double width, double height) {
+    public static void drawBoxAtBlock(double worldX, double worldY, double worldZ, PolyColor color, double width, double height) {
         drawBoxAtBlock(worldX, worldY, worldZ, color, width, height, 1);
     }
-    public static void drawBoxAtBlock(double worldX, double worldY, double worldZ, OneColor color, double width, double height, int alpha) {
+    public static void drawBoxAtBlock(double worldX, double worldY, double worldZ, PolyColor color, double width, double height, int alpha) {
         Triple<Double, Double, Double> pos = BlockUtils.playerToWorld(worldX, worldY, worldZ);
         RenderUtils.drawBoxAtBlock(pos.getOne(), pos.getTwo(), pos.getThree(), color, width, height, alpha);
     }
 
-    public static void drawFilledBoxAtBlock(double worldX, double worldY, double worldZ, OneColor color) {
+    public static void drawFilledBoxAtBlock(double worldX, double worldY, double worldZ, PolyColor color) {
         drawFilledBoxAtBlock(worldX, worldY, worldZ, color, 1, 1, SRMConfig.alphaMultiplier);
 
 
     }
-    public static void drawFilledBoxAtBlock(double worldX, double worldY, double worldZ, OneColor color, float width, float height) {
+    public static void drawFilledBoxAtBlock(double worldX, double worldY, double worldZ, PolyColor color, float width, float height) {
         drawFilledBoxAtBlock(worldX, worldY, worldZ, color, width, height, SRMConfig.alphaMultiplier);
     }
-    public static void drawFilledBoxAtBlock(double worldX, double worldY, double worldZ, OneColor color, float width, float height, float alpha) {
+    public static void drawFilledBoxAtBlock(double worldX, double worldY, double worldZ, PolyColor color, float width, float height, float alpha) {
         Triple<Double, Double, Double> pos = BlockUtils.playerToWorld(worldX, worldY, worldZ);
         WaypointUtils.drawFilledBoundingBox(new AxisAlignedBB(pos.getOne() - 0.01, pos.getTwo() - 0.01, pos.getThree() - 0.01, pos.getOne() + width + 0.01, pos.getTwo() + height + 0.01, pos.getThree() + width + 0.01), color, alpha);
     }
@@ -65,10 +66,7 @@ public class SecretRoutesRenderUtils {
     public static void drawText(double worldX, double worldY, double worldZ, String text, float size, float partialTicks) {
         BlockPos pos = new BlockPos(worldX, worldY, worldZ);
         text = EnumChatFormatting.BOLD + text;
-        //GlStateManager.disableTexture2D();
-        //WaypointUtils.renderWaypointText(text, pos, partialTicks, size);
         RenderUtils.drawText(text, pos, partialTicks, false, Constants.shadows, size);
-        //GlStateManager.enableTexture2D();
     }
 
 
@@ -111,3 +109,4 @@ public class SecretRoutesRenderUtils {
         }
     }
 }
+//#endif

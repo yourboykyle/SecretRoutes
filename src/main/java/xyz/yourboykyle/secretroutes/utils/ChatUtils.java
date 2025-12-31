@@ -1,3 +1,4 @@
+//#if FORGE && MC == 1.8.9
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -27,6 +28,9 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatStyle;
 import net.minecraft.util.EnumChatFormatting;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class ChatUtils {
     public static void sendChatMessage(String message, EnumChatFormatting color) {
@@ -111,3 +115,4 @@ public class ChatUtils {
         Minecraft.getMinecraft().thePlayer.addChatMessage(component);
     }
 }
+//#endif

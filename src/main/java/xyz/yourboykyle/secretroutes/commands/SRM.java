@@ -1,3 +1,4 @@
+//#if FORGE && MC == 1.8.9
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2024 yourboykyle & R-aMcC
@@ -25,6 +26,7 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.BlockPos;
 import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.ChatUtils;
 
 import java.util.ArrayList;
@@ -43,7 +45,7 @@ public class SRM extends CommandBase {
 
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
-        Main.config.openGui();
+        SRMConfig.INSTANCE.openGui();
     }
 
     @Override
@@ -74,3 +76,4 @@ public class SRM extends CommandBase {
         return completions;
     }
 }
+//#endif

@@ -1,3 +1,4 @@
+//#if FORGE && MC == 1.8.9
 package xyz.yourboykyle.secretroutes.utils;
 
 import com.google.gson.Gson;
@@ -98,3 +99,4 @@ public class RouteUtils {
         }
     }
 }
+//#endif

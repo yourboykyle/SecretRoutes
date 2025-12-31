@@ -1,3 +1,4 @@
+//#if FORGE && MC == 1.8.9
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -22,7 +23,6 @@ package xyz.yourboykyle.secretroutes.utils;
 
 import net.minecraft.client.Minecraft;
 
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
@@ -71,3 +71,4 @@ public class HashingUtils {
         return new UUID(msb, lsb);
     }
 }
+//#endif

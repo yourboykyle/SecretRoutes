@@ -1,3 +1,4 @@
+//#if FORGE && MC == 1.8.9
 package xyz.yourboykyle.secretroutes.utils.autoupdate;
 
 import com.google.gson.JsonElement;
@@ -170,3 +171,4 @@ public class UpdateManager {
         return false;
     }
 }
+//#endif

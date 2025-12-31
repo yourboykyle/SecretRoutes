@@ -1,3 +1,4 @@
+//#if FORGE && MC == 1.8.9
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -20,24 +21,25 @@
 
 package xyz.yourboykyle.secretroutes.config.huds;
 
-import cc.polyfrost.oneconfig.config.annotations.Color;
-import cc.polyfrost.oneconfig.config.core.OneColor;
-import cc.polyfrost.oneconfig.hud.SingleTextHud;
+import org.polyfrost.oneconfig.api.config.v1.annotations.Color;
+import org.polyfrost.oneconfig.api.hud.v1.TextHud;
+import org.polyfrost.polyui.color.ColorUtils;
+import org.polyfrost.polyui.color.PolyColor;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
 import xyz.yourboykyle.secretroutes.Main;
 
-public class CurrentRoomHUD extends SingleTextHud {
+public class CurrentRoomHUD extends TextHud {
     @Color(
-            name = "Default HUD colour"
+            title = "Default HUD colour"
     )
-    public static OneColor hudColour = new OneColor(255, 255, 255);
+    public static PolyColor hudColour = ColorUtils.rgba(255, 255, 255);
 
     public CurrentRoomHUD(){
-        super("", false);
+        super("currentRoomHUD", "Current room", Category.getINFO(), "Room name:", "");
     }
 
     @Override
-    public String getText(boolean example) {
+    public String getText() {
         if(Main.routeRecording.recording){
             return RoomDetection.roomName;
         }
@@ -52,4 +54,6 @@ public class CurrentRoomHUD extends SingleTextHud {
     public void disable() {
         this.enabled = false;
     }
+
 }
+//#endif

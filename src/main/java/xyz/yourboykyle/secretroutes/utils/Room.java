@@ -1,3 +1,4 @@
+//#if FORGE && MC == 1.8.9
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -73,7 +74,7 @@ public class Room {
 
             if (roomName != null) {
                 String filePath;
-                if(SRMConfig.pearls) {
+                if(SRMConfig.routeTypeIndex == 1) {
                     filePath = Main.ROUTES_PATH + File.separator + (!SRMConfig.pearlRoutesFileName.equals("") ? SRMConfig.pearlRoutesFileName : "pearlroutes.json");
                 }else{
                     filePath = Main.ROUTES_PATH + File.separator + (!SRMConfig.routesFileName.equals("") ? SRMConfig.routesFileName  : "pearlroutes.json");
@@ -277,3 +278,4 @@ public class Room {
 
     }
 }
+//#endif

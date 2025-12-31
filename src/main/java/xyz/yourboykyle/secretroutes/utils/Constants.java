@@ -1,3 +1,4 @@
+//#if FORGE && MC == 1.8.9
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -23,26 +24,12 @@ package xyz.yourboykyle.secretroutes.utils;
 public class Constants {
     //This class contains a bunch of constants used throughout the code. The sole purpose of this is to be able to use the "/srmdebug" command to change these values from within the game.
 
-
     //RenderUtils
     public static float distanceScaleFactor = 0.08f;
     public static float baseScale = 0.012f;
     public static boolean shadows = false;
 
-
     //GUI render utils
     public static int zPos = 1000;
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
+//#endif
