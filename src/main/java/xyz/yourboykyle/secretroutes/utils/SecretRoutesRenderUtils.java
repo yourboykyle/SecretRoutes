@@ -66,10 +66,7 @@ public class SecretRoutesRenderUtils {
     public static void drawText(double worldX, double worldY, double worldZ, String text, float size, float partialTicks) {
         BlockPos pos = new BlockPos(worldX, worldY, worldZ);
         text = EnumChatFormatting.BOLD + text;
-        //GlStateManager.disableTexture2D();
-        //WaypointUtils.renderWaypointText(text, pos, partialTicks, size);
         RenderUtils.drawText(text, pos, partialTicks, false, Constants.shadows, size);
-        //GlStateManager.enableTexture2D();
     }
 
 

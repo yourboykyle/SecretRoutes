@@ -58,5 +58,49 @@ public class RenderTypes {
             this.throughWalls = throughWalls;
         }
     }
+
+    public static class FilledBox {
+        public Vec3d position;
+        public PolyColor color;
+        public float boxWidth;
+        public float boxHeight;
+        public boolean throughWalls;
+
+        public FilledBox(Vec3d position, PolyColor color, float boxWidth, float boxHeight, boolean throughWalls) {
+            this.position = position;
+            this.color = color;
+            this.boxWidth = boxWidth;
+            this.boxHeight = boxHeight;
+            this.throughWalls = throughWalls;
+        }
+    }
+
+    public static class Line {
+        public Vec3d start;
+        public Vec3d end;
+        public PolyColor color;
+        public float lineWidth;
+        public boolean throughWalls;
+
+        public Line(Vec3d start, Vec3d end, PolyColor color, float lineWidth, boolean throughWalls) {
+            this.start = start;
+            this.end = end;
+            this.color = color;
+            this.lineWidth = lineWidth;
+            this.throughWalls = throughWalls;
+        }
+    }
+
+    public static class LineFromCursor {
+        public Vec3d point;
+        public PolyColor color;
+        public float lineWidth;
+
+        public LineFromCursor(Vec3d point, PolyColor color, float lineWidth) {
+            this.point = point;
+            this.color = color;
+            this.lineWidth = lineWidth;
+        }
+    }
 }
 //#endif
