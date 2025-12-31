@@ -21,7 +21,6 @@
 
 package xyz.yourboykyle.secretroutes.events;
 
-import de.hysky.skyblocker.events.DungeonEvents;
 import de.hysky.skyblocker.skyblock.dungeon.secrets.DungeonManager;
 import de.hysky.skyblocker.utils.Utils;
 import xyz.yourboykyle.secretroutes.Main;
@@ -33,12 +32,29 @@ import xyz.yourboykyle.secretroutes.utils.SecretUtils;
 import java.util.ArrayList;
 
 public class OnEnterNewRoom {
-    public static void register() {
+    public static String lastKnownRoom = null;
+
+    // Function that will be called every 20 ticks, check if the player has entered a new room
+    public static void checkForNewRoom() {
+        if(!Utils.isInDungeons()) return;
+
+        String roomName = RoomDetection.roomName();
+
+        if (lastKnownRoom == null) {
+            lastKnownRoom = roomName;
+            onEnterNewRoom(new Room(lastKnownRoom));
+        } else if (!lastKnownRoom.equals(roomName)) {
+            lastKnownRoom = roomName;
+            onEnterNewRoom(new Room(lastKnownRoom));
+        }
+    }
+
+    /*public static void register() {
         DungeonEvents.ROOM_MATCHED.register(room -> {
             LogUtils.info("Entered new room: " + room.getName());
             onEnterNewRoom(new Room(room.getName()));
         });
-    }
+    }*/
 
     public static void onEnterNewRoom(Room room) {
         try {
@@ -46,9 +62,6 @@ public class OnEnterNewRoom {
             if(!Utils.isInDungeons() || !DungeonManager.isClearingDungeon()) {
                 return;
             }
-
-            LogUtils.info("Entered new room \"" + RoomDetection.roomName() + "\".");
-            LogUtils.info("Room direction: \"" + RoomDetection.roomDirection());
 
             Main.currentRoom = room;
             SecretUtils.secrets = null;

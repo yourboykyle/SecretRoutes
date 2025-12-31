@@ -23,8 +23,6 @@ package xyz.yourboykyle.secretroutes.events;
 
 import com.google.gson.JsonArray;
 import de.hysky.skyblocker.utils.Utils;
-import org.polyfrost.oneconfig.api.event.v1.events.PostWorldRenderEvent;
-import org.polyfrost.oneconfig.api.event.v1.invoke.impl.Subscribe;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.*;
@@ -33,16 +31,12 @@ public class OnWorldRender {
     private final static String verboseTAG = "Rendering";
     public static boolean playCompleteFirst = true;
 
-    @Subscribe
-    public void onRenderWorld(PostWorldRenderEvent event) {
+    public static void onRenderWorld() {
         try {
             // Make sure the player is actually in a dungeon
             if (!Utils.isInDungeons() || !SRMConfig.modEnabled) {
                 return;
             }
-
-            // Check dungeon game stage (if available in Skyblocker)
-            // DungeonManager.gameStage check might need adjustment based on Skyblocker API
 
             if(OnChatReceive.isAllFound()){
                 /*
@@ -69,23 +63,21 @@ public class OnWorldRender {
             }
 
             if(SRMConfig.allSecrets){
-                SecretUtils.renderSecrets(event);
+                SecretUtils.renderSecrets();
             }else if(SRMConfig.wholeRoute){
                 JsonArray csr = Main.currentRoom.currentSecretRoute;
                 if(csr != null){
                     for(int i = Main.currentRoom.currentSecretIndex; i<csr.size(); i++){
-                        SecretUtils.renderingCallback(csr.get(i).getAsJsonObject(), event, i);
+                        SecretUtils.renderingCallback(csr.get(i).getAsJsonObject(), i);
                     }
                 }
 
             }else{
-                SecretUtils.renderingCallback(Main.currentRoom.currentSecretWaypoints, event, Main.currentRoom.currentSecretIndex);
+                SecretUtils.renderingCallback(Main.currentRoom.currentSecretWaypoints, Main.currentRoom.currentSecretIndex);
             }
             if(SecretUtils.renderLever){
-                SecretUtils.renderLever(event);
+                SecretUtils.renderLever();
             }
-
-
         } catch (Exception e) {
             LogUtils.error(e);
         }

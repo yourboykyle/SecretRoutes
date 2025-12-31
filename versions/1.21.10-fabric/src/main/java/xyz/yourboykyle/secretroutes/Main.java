@@ -21,6 +21,7 @@
 
 package xyz.yourboykyle.secretroutes;
 
+import de.hysky.skyblocker.utils.scheduler.Scheduler;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
@@ -122,7 +123,6 @@ public class Main implements ClientModInitializer {
 
         // OneConfig Events
         EventManager.INSTANCE.register(new OnPlaySound());
-        EventManager.INSTANCE.register(new OnWorldRender());
         EventManager.INSTANCE.register(new OnReceivePacket());
         EventManager.INSTANCE.register(new OnSendPacket());
 
@@ -139,7 +139,13 @@ public class Main implements ClientModInitializer {
         OnServerTick.register();
 
         // Skyblocker Events
-        OnEnterNewRoom.register();
+        //OnEnterNewRoom.register();
+        OnSkyblockerRender.register();
+
+        // Server connection events (for this)
+        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+            onServerConnect();
+        });
 
         // Commands
         ChangeColorProfile.register();
@@ -149,10 +155,9 @@ public class Main implements ClientModInitializer {
         Recording.register();
         SRM.register();
 
-        // Server connection events (for this)
-        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
-            onServerConnect();
-        });
+        // Scheduled tasks
+        // Create a new scheduled cyclic task every 20 game ticks that called OnEnterNewRoom.checkForNewRoom
+        Scheduler.INSTANCE.scheduleCyclic(OnEnterNewRoom::checkForNewRoom, 20);
 
         if(SRMConfig.autoUpdateRoutes){
             LogUtils.info("Checking for route updates...");

@@ -464,6 +464,14 @@ public class SRMConfig extends Config {
     )
     public static float alphaMultiplier = 0.5f;
 
+    @Slider(
+            title = "Box line width",
+            category = "Rendering",
+            min = 0.1f,
+            max = 20f,
+            step = 0.1f
+    )
+    public static float boxLineWidth = 10f;
 
     @Color(
             title = "Line color",
@@ -1123,7 +1131,7 @@ public class SRMConfig extends Config {
 
     @Dropdown(
             title = "Custom Pearl Orientation (Unused)",
-            options = {"Default", "SW", "NW", "NE", "SE"},
+            options = {"Default", "southwest", "northwest", "northeast", "southeast"},
             category = "Dev"
     )
     public static int customPearlOrientation = 0;
