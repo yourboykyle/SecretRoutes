@@ -1,3 +1,4 @@
+//#if FORGE && MC == 1.8.9
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -30,8 +31,11 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
+import org.polyfrost.oneconfig.api.hud.v1.HudManager;
 import xyz.yourboykyle.secretroutes.commands.*;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
+import xyz.yourboykyle.secretroutes.config.huds.CurrentRoomHUD;
+import xyz.yourboykyle.secretroutes.config.huds.RecordingHUD;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.DungeonRooms;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.handlers.PacketHandler;
@@ -49,9 +53,9 @@ import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 
 @Mod(modid = Main.MODID, name = Main.NAME, version = Main.VERSION)
 public class Main {
-    public static final String MODID = "@ID@";
-    public static final String NAME = "@NAME@";
-    public static final String VERSION = "@VER@";
+    public static final String MODID = "secretroutesmod";
+    public static final String NAME = "SecretRoutes";
+    public static final String VERSION = "1.0.0-beta1";
     public static final String CONFIG_FOLDER_PATH = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes";
     public static final String ROUTES_PATH = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes"+File.separator+"routes";
     public static final String COLOR_PROFILE_PATH = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes"+File.separator+"colorprofiles";
@@ -65,9 +69,12 @@ public class Main {
     public static UpdateManager updateManager = new UpdateManager();
     private static DungeonRooms dungeonRooms = new DungeonRooms();
 
-    public static Main instance = new Main();
-    public static SRMConfig config;
+    public static Main instance;
+    //public static SRMConfig config; - oneconfig v0
 
+    // HUD instances
+    public static RecordingHUD recordingHUD;
+    public static CurrentRoomHUD currentRoomHUD;
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
@@ -115,17 +122,16 @@ public class Main {
         SSLUtils.setSSlCertificate();
 
 
-        routeRecording = new RouteRecording();
-
-
         // Set up Config
-        config = new SRMConfig();
-
-        // Auto Updates
-        LogUtils.info("Checking for updates...");
+        SRMConfig.INSTANCE.preload();
+        recordingHUD = new RecordingHUD();
+        currentRoomHUD = new CurrentRoomHUD();
+        HudManager.register(recordingHUD);
+        HudManager.register(currentRoomHUD);
 
         // Initialize Other Stuff
         instance = this;
+        routeRecording = new RouteRecording();
         dungeonRooms.init(e);
         checkRoutesData();
         checkProfilesData();
@@ -138,7 +144,7 @@ public class Main {
         //MinecraftForge.EVENT_BUS.register(new OnPlayerInteract());
         MinecraftForge.EVENT_BUS.register(new OnPlayerTick());
         MinecraftForge.EVENT_BUS.register(new OnPlaySound());
-        MinecraftForge.EVENT_BUS.register(new OnRecievePacket());
+        MinecraftForge.EVENT_BUS.register(new OnReceivePacket());
         MinecraftForge.EVENT_BUS.register(new OnSendPacket());
         MinecraftForge.EVENT_BUS.register(new OnWorldRender());
         MinecraftForge.EVENT_BUS.register(new OnMouseInput());
@@ -158,6 +164,7 @@ public class Main {
         ClientCommandHandler.instance.registerCommand(new Debug());
 
         if(SRMConfig.autoUpdateRoutes){
+            LogUtils.info("Checking for route updates...");
             new Thread(()->{
                 try{
                     RouteUtils.checkRoutesFiles();
@@ -172,7 +179,7 @@ public class Main {
         RoomDetection.roomCorner = new Point(0, 0);
         RoomDetection.roomDirection = "NW";
     }
-    
+
     public static void checkRoomData() {
         if(RoomDetection.roomName == null) {
             RoomDetection.roomName = "undefined";
@@ -255,7 +262,7 @@ public class Main {
         try{
             Thread.sleep(3000);
         }catch(Exception e){
-            //nothign needed, literally just waiting
+            //nothing needed, literally just waiting
         }
 
         Minecraft mc = Minecraft.getMinecraft();
@@ -310,6 +317,5 @@ public class Main {
             sendChatMessage(EnumChatFormatting.GREEN + "Secret Routes Mod secret rendering has been enabled.");
         }
     }
-
-
 }
+//#endif

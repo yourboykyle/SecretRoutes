@@ -1,3 +1,4 @@
+//#if FORGE && MC == 1.8.9
 /*
  * Dungeon Rooms Mod - Secret Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2021 Quantizr(_risk)
@@ -162,3 +163,4 @@ public class DungeonRooms
         }
     }
 }
+//#endif

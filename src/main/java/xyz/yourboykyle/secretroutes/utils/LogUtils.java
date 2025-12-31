@@ -1,3 +1,4 @@
+//#if FORGE && MC == 1.8.9
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -21,7 +22,6 @@
 package xyz.yourboykyle.secretroutes.utils;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
@@ -46,7 +46,7 @@ public class LogUtils {
         if(Minecraft.getMinecraft().thePlayer != null) {
             switch(error.getClass().getTypeName()){
                 case "java.io.FileNotFoundException":
-                    sendChatMessage(EnumChatFormatting.DARK_RED+"The system cannot find the file specified. Please ensure that this is the correct file name §c\""+ (SRMConfig.pearls ? SRMConfig.pearlRoutesFileName : SRMConfig.routesFileName) + "\"§4 and that it exists in §c" + Main.ROUTES_PATH);
+                    sendChatMessage(EnumChatFormatting.DARK_RED+"The system cannot find the file specified. Please ensure that this is the correct file name §c\""+ ((SRMConfig.routeTypeIndex == 1) ? SRMConfig.pearlRoutesFileName : SRMConfig.routesFileName) + "\"§4 and that it exists in §c" + Main.ROUTES_PATH);
                     break;
                 default:
                     sendChatMessage(EnumChatFormatting.DARK_RED+"Error caught by Secret Routes. Check latest logs at .minecraft/logs/SecretRoutes/LATEST-{date}.log. SEND THIS FILE IN #SUPPORT IN THE DISCORD FOR HELP. ("+ error.getLocalizedMessage()+")");
@@ -75,3 +75,4 @@ public class LogUtils {
 
 
 }
+//#endif

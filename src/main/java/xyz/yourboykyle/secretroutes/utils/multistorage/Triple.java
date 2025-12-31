@@ -1,3 +1,4 @@
+//#if FORGE && MC == 1.8.9
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2024 yourboykyle & R-aMcC
@@ -30,3 +31,4 @@ public class Triple <X, Y, Z> extends Tuple<X, Y>{
     public void setThree(Z three) {this.three = three;}
     public Z getThree() {return three;}
 }
+//#endif

@@ -1,3 +1,4 @@
+//#if FORGE && MC == 1.8.9
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2024 yourboykyle & R-aMcC
@@ -20,6 +21,7 @@
 
 package xyz.yourboykyle.secretroutes.commands;
 
+import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
 import net.minecraft.client.Minecraft;
 import net.minecraft.command.CommandBase;
@@ -47,7 +49,7 @@ public class Recording extends CommandBase {
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
         if(args.length == 0){
-            Main.config.openGui();
+            SRMConfig.INSTANCE.openGui();
         }
         if(args[0].equalsIgnoreCase("start")) {
             Main.routeRecording.startRecording();
@@ -99,3 +101,4 @@ public class Recording extends CommandBase {
     @Override
     public int getRequiredPermissionLevel() {return 0;}
 }
+//#endif

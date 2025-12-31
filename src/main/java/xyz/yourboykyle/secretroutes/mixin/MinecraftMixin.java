@@ -1,3 +1,4 @@
+//#if FORGE && MC == 1.8.9
 package xyz.yourboykyle.secretroutes.mixin;
 
 import net.minecraft.client.Minecraft;
@@ -19,3 +20,4 @@ public class MinecraftMixin {
         System.out.println("Thank you for using Secret Routes Mod!");
     }
 }
+//#endif

@@ -1,3 +1,4 @@
+//#if FORGE && MC == 1.8.9
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -131,8 +132,8 @@ public class RouteRecording {
         // Start recording the secret route
         recording = true;
         sendVerboseMessage("§eRecording started...", verboseTag);
-        SRMConfig.recordingHUD.enable();
-        SRMConfig.currentRoomHUD.enable();
+        Main.recordingHUD.enable();
+        Main.currentRoomHUD.enable();
     }
 
     public void stopRecording() {
@@ -155,8 +156,8 @@ public class RouteRecording {
         tntWaypoints = 0;
         enderPearlWaypoints = 0;
         enderPearlAngleWaypoints = 0;
-        SRMConfig.recordingHUD.disable();
-        SRMConfig.currentRoomHUD.disable();
+        Main.recordingHUD.disable();
+        Main.currentRoomHUD.disable();
     }
 
     public void importRoutes(String fileName) {
@@ -479,3 +480,4 @@ public class RouteRecording {
         }).start();
     }
 }
+//#endif

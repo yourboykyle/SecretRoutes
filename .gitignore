@@ -17,8 +17,23 @@ out
 
 # gradle
 .gradle
+
+# versions directory
+versions/*
+!versions/mainProject
+!versions/1.8.9-forge/
+!versions/1.21.10-fabric/
+
 versions/1.8.9-forge/*
+!versions/1.8.9-forge/src/
+
+versions/1.21.10-fabric/*
+!versions/1.21.10-fabric/src/
 
 # other
 eclipse
 run
+**/build/
+
+# macOS
+**/.DS_Store

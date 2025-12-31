@@ -1,3 +1,4 @@
+//#if FORGE && MC == 1.8.9
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -20,7 +21,6 @@
 
 package xyz.yourboykyle.secretroutes.utils;
 
-import cc.polyfrost.oneconfig.config.core.OneColor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
@@ -35,6 +35,7 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
+import org.polyfrost.polyui.color.PolyColor;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 
@@ -42,7 +43,7 @@ import java.util.List;
 
 public class RenderUtils {
     private static final ResourceLocation beaconBeam = new ResourceLocation("textures/entity/beacon_beam.png");
-    public static void drawBoxAtBlock(double x, double y, double z, OneColor color, double width, double height, double alpha) {
+    public static void drawBoxAtBlock(double x, double y, double z, PolyColor color, double width, double height, double alpha) {
         GL11.glPushMatrix();
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glEnable(GL11.GL_BLEND);
@@ -56,7 +57,7 @@ public class RenderUtils {
 
         GL11.glTranslated(x, y, z);
 
-        GL11.glColor4f(color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f, (float) alpha);
+        GL11.glColor4f(color.red() / 255.0f, color.green() / 255.0f, color.blue() / 255.0f, (float) alpha);
 
         GL11.glBegin(GL11.GL_LINE_STRIP);
         GL11.glVertex3d(width, height, width);
@@ -154,7 +155,7 @@ public class RenderUtils {
         }
     }
 
-    public static void drawMultipleNormalLines(List<Triple<Double, Double, Double>> locations, float partialTicks, OneColor color, int width) {
+    public static void drawMultipleNormalLines(List<Triple<Double, Double, Double>> locations, float partialTicks, PolyColor color, int width) {
         if(locations == null) {
             return;
         }
@@ -173,10 +174,10 @@ public class RenderUtils {
     }
 
     //
-    public static void drawNormalLine(double x1, double y1, double z1, BlockPos pos, OneColor color, float partialTicks, boolean depth, int width) {
+    public static void drawNormalLine(double x1, double y1, double z1, BlockPos pos, PolyColor color, float partialTicks, boolean depth, int width) {
         drawNormalLine(x1, y1, z1, pos.getX(), pos.getY(), pos.getZ(), color, partialTicks, depth, width);
     }
-    public static void drawNormalLine(double x1, double y1, double z1, double x2, double y2, double z2, OneColor colour, float partialTicks, boolean depth, int width) {
+    public static void drawNormalLine(double x1, double y1, double z1, double x2, double y2, double z2, PolyColor colour, float partialTicks, boolean depth, int width) {
         Entity render = Minecraft.getMinecraft().getRenderViewEntity();
         WorldRenderer worldRenderer = Tessellator.getInstance().getWorldRenderer();
 
@@ -198,7 +199,7 @@ public class RenderUtils {
         GlStateManager.disableAlpha();
         GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
         GL11.glLineWidth(width);
-        GlStateManager.color(colour.getRed() / 255f, colour.getGreen() / 255f, colour.getBlue()/ 255f, colour.getAlpha() / 255f);
+        GlStateManager.color(colour.red() / 255f, colour.green() / 255f, colour.blue()/ 255f, colour.getAlpha() / 255f);
         worldRenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
 
         worldRenderer.pos(x1, y1, z1).endVertex();
@@ -219,7 +220,7 @@ public class RenderUtils {
         GlStateManager.popMatrix();
     }
 
-    public static void drawNormalLine(BlockPos pos1, BlockPos pos2, OneColor color, float partialTicks, boolean depth, int width){
+    public static void drawNormalLine(BlockPos pos1, BlockPos pos2, PolyColor color, float partialTicks, boolean depth, int width){
         drawNormalLine(pos1.getX(), pos1.getY(), pos1.getZ(), pos2.getX(), pos2.getY(), pos2.getZ(), color, partialTicks, depth, width);
     }
 
@@ -271,7 +272,7 @@ public class RenderUtils {
         GlStateManager.popMatrix();
     }
 
-    public static void drawFromPlayer(EntityPlayerSP p, BlockPos pos, OneColor color, float partialticks, int width){
+    public static void drawFromPlayer(EntityPlayerSP p, BlockPos pos, PolyColor color, float partialticks, int width){
 
         double px = p.prevPosX + (p.posX - p.prevPosX)*partialticks;
         double py = p.prevPosY + (p.posY - p.prevPosY)*partialticks;
@@ -282,7 +283,7 @@ public class RenderUtils {
         drawNormalLine(px, py+p.getEyeHeight(), pz, pos.getX()+0.5, pos.getY(), pos.getZ() +0.5, color, partialticks, !SRMConfig.renderLinesThroughWalls, width);
     }
 
-    public static void drawFromPlayer(EntityPlayerSP p, double x, double y, double z, OneColor color, float partialticks, int width){
+    public static void drawFromPlayer(EntityPlayerSP p, double x, double y, double z, PolyColor color, float partialticks, int width){
 
         double px = p.prevPosX + (p.posX - p.prevPosX)*partialticks;
         double py = p.prevPosY + (p.posY - p.prevPosY)*partialticks;
@@ -294,3 +295,4 @@ public class RenderUtils {
     }
 
 }
+//#endif

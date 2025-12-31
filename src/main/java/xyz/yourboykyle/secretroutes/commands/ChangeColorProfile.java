@@ -1,3 +1,4 @@
+//#if FORGE && MC == 1.8.9
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2024 yourboykyle & R-aMcC
@@ -27,6 +28,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
 import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.ConfigUtils;
 import xyz.yourboykyle.secretroutes.utils.FileUtils;
 
@@ -51,7 +53,7 @@ public class ChangeColorProfile extends CommandBase {
     @Override
     public void processCommand(ICommandSender sender, String[] args) throws CommandException {
        if(args.length == 0){
-           Main.config.openGui();
+           SRMConfig.INSTANCE.openGui();
        } else if (args.length == 1) {
            if(args[0].equals("list")){
                sendChatMessage(EnumChatFormatting.DARK_AQUA+"Color Profiles:");
@@ -130,3 +132,4 @@ public class ChangeColorProfile extends CommandBase {
     }
 
 }
+//#endif
