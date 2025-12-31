@@ -27,12 +27,15 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import org.polyfrost.oneconfig.api.event.v1.events.PostWorldRenderEvent;
 import org.polyfrost.polyui.color.ColorUtils;
 import org.polyfrost.polyui.color.PolyColor;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
+import xyz.yourboykyle.secretroutes.events.OnSkyblockerRender;
 import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 import xyz.yourboykyle.secretroutes.utils.multistorage.Tuple;
 
@@ -58,9 +61,73 @@ public class SecretUtils {
     public static ArrayList<String> secretLocations = new ArrayList<>();
 
     // TODO: Update the rendering stuff for secret utils
-    public static void renderingCallback(JsonObject currentSecretWaypoints, PostWorldRenderEvent event, int index2){}
-    public static void renderSecrets(PostWorldRenderEvent event){}
-    public static void renderLever(PostWorldRenderEvent e){}
+    public static void renderingCallback(JsonObject currentSecretWaypoints, int index2){}
+    public static void renderLever(){}
+
+    public static void renderSecrets(){
+        secrets = getSecrets();
+
+        if(secrets != null){
+            for(JsonElement secret : secrets){
+                JsonObject secretInfos = secret.getAsJsonObject();
+                String name = secretInfos.get("secretName").getAsString();
+                String type = secretInfos.get("category").getAsString();
+                if(name.contains("Chest") || name.contains("Bat") || name.contains("Wither Essence") || name.contains("Lever") || name.contains("Item")){
+
+                    int xPos = secretInfos.get("x").getAsInt();
+                    int yPos = secretInfos.get("y").getAsInt();
+                    int zPos = secretInfos.get("z").getAsInt();
+                    Main.checkRoomData();
+                    Triple<Double, Double, Double> abs = MapUtils.relativeToActual(xPos, yPos, zPos, RoomDetection.roomDirection(), RoomDetection.roomCorner());
+                    System.out.println("Relative position: " + xPos + ", " + yPos + ", " + zPos + " (Direction: " + RoomDetection.roomDirection() + ", Corner: " + RoomDetection.roomCorner() + ")");
+                    System.out.println("Actual position: " + abs.getOne() + ", " + abs.getTwo() + ", " + abs.getThree());
+                    PolyColor color = ColorUtils.rgba(255, 255, 255);
+                    if(secretLocations.contains(BlockUtils.blockPos(new BlockPos(xPos, yPos, zPos)))){continue;}
+                    if(name.contains("Chest") || name.contains("Wither Essence")) {
+                        color = SRMConfig.secretsInteract;
+                        if(SRMConfig.interactTextToggle){
+                            // Draw the text
+                            Text text = Text.literal(SecretRoutesRenderUtils.getTextColor(SRMConfig.interactWaypointColorIndex) + "Interact");
+                            Vec3d position = new Vec3d(abs.getOne() + 0.5, abs.getTwo() + 0.5, abs.getThree() + 0.5);
+                            System.out.println("Adding world text at " + position);
+                            OnSkyblockerRender.addWorldText(new RenderTypes.WorldText(text, position, true, SRMConfig.interactTextSize));
+                        }
+                    }else if(name.contains("Bat")){
+                        color = SRMConfig.secretsBat;
+                        if(SRMConfig.batTextToggle) {
+                            // Draw the text
+                            Text text = Text.literal(SecretRoutesRenderUtils.getTextColor(SRMConfig.batWaypointColorIndex) + "Bat");
+                            Vec3d position = new Vec3d(abs.getOne() + 0.5, abs.getTwo() + 0.5, abs.getThree() + 0.5);
+                            System.out.println("Adding world text at " + position);
+                            OnSkyblockerRender.addWorldText(new RenderTypes.WorldText(text, position, true, SRMConfig.batTextSize));
+                        }
+                    }else if (name.contains("Lever")){
+                        color = SRMConfig.interacts;
+                        if(SRMConfig.interactsTextToggle){
+                            // Draw the text
+                            Text text = Text.literal(SecretRoutesRenderUtils.getTextColor(SRMConfig.interactsWaypointColorIndex) + "Interact");
+                            Vec3d position = new Vec3d(abs.getOne() + 0.5, abs.getTwo() + 0.5, abs.getThree() + 0.5);
+                            System.out.println("Adding world text at " + position);
+                            OnSkyblockerRender.addWorldText(new RenderTypes.WorldText(text, position, true, SRMConfig.interactsTextSize));
+                        }
+                    }else if (name.contains("Item")){
+                        color = SRMConfig.secretsItem;
+                        if(SRMConfig.itemTextToggle) {
+                            // Draw the text
+                            Text text = Text.literal(SecretRoutesRenderUtils.getTextColor(SRMConfig.itemWaypointColorIndex) + "Item");
+                            Vec3d position = new Vec3d(abs.getOne() + 0.5, abs.getTwo() + 0.5, abs.getThree() + 0.5);
+                            System.out.println("Adding world text at " + position);
+                            OnSkyblockerRender.addWorldText(new RenderTypes.WorldText(text, position, true, SRMConfig.itemTextSize));
+                        }
+                    }
+                    Vec3d position = new Vec3d(abs.getOne(), abs.getTwo(), abs.getThree());
+                    System.out.println("Adding box at at " + position);
+                    OnSkyblockerRender.addOutlinedBox(new RenderTypes.OutlinedBox(position, color, 1f, 1f, true));
+                }
+            }
+
+        }
+    }
 
     /*
     public static void renderingCallback(JsonObject currentSecretWaypoints, RenderWorldLastEvent event, int index2){
@@ -512,15 +579,19 @@ public class SecretUtils {
 
     public static JsonArray getSecrets(){
         Main.checkRoomData();
-        String roomName = Main.currentRoom.name;
+        if(Main.currentRoom == null || Main.currentRoom.name == null) return null;
+
+        String roomName = Main.currentRoom.name.toLowerCase();
         if(secrets == null){
             try{
                 try (Reader reader  = new InputStreamReader(Main.class.getResourceAsStream("/assets/roomdetection/secretlocations.json"))) {
                     JsonParser parser = new JsonParser();
                     JsonObject object = parser.parse(reader).getAsJsonObject();
-                    if(object.has(roomName)){
-                        secrets = object.getAsJsonArray(roomName);
-
+                    for (String key : object.keySet()) {
+                        if (key.equalsIgnoreCase(roomName)) {
+                            secrets = object.getAsJsonArray(key);
+                            break;
+                        }
                     }
                     return secrets;
                 }

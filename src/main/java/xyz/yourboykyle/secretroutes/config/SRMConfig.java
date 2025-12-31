@@ -1464,10 +1464,8 @@ public class SRMConfig extends Config {
             addDependency("updateRoutesButton", "modEnabled", true);
             addDependency("importRoutesButton", "modEnabled", true);
             addDependency("checkForUpdatesButton", "modEnabled", true);
-            // TODO: Check if this works properly in the config:
             hideIf("particles", () -> !isEqualTo(lineType, 0));
             addDependency("particles", "modEnabled", true);
-            // TODO: Check if this works properly in the config:
             hideIf("tickInterval", () -> !isEqualTo(lineType, 0));
             addDependency("tickInterval", "modEnabled", true);
             addDependency("pearlLineWidth", "modEnabled", true);
@@ -1508,7 +1506,6 @@ public class SRMConfig extends Config {
             addDependency("enderpearlWaypointColorIndex", "enderpearlTextToggle", true);
             addDependency("enderpearlTextSize", "enderpearlTextToggle", true);
 
-            // TODO: Check if these 4 work properly in the config:
             hideIf("forceUpdateDEBUG", () -> isDevPasswordNotCorrect());
             hideIf("verboseLogging", () -> isDevPasswordNotCorrect());
             hideIf("c", () -> isDevPasswordNotCorrect());
@@ -1602,7 +1599,6 @@ public class SRMConfig extends Config {
     }
 
     public void openGui() {
-        // TODO: Check if this works
         ScreensKt.openUI(INSTANCE);
     }
 }

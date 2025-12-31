@@ -30,7 +30,7 @@ public class MapUtils {
      */
     public static BlockPos actualToRelative(BlockPos actual, String cornerDirection, Point locationOfCorner) {
         if(cornerDirection == null) {
-            cornerDirection = "NW";
+            cornerDirection = "northwest";
         }
         if(locationOfCorner == null) {
             locationOfCorner = new Point(0, 0);
@@ -38,19 +38,19 @@ public class MapUtils {
         double x = 0;
         double z = 0;
         switch (cornerDirection) {
-            case "NW":
+            case "northwest":
                 x = actual.getX() - locationOfCorner.getX();
                 z = actual.getZ() - locationOfCorner.getY(); //.getY in a point is the MC Z coord
                 break;
-            case "NE":
+            case "northeast":
                 x = actual.getZ() - locationOfCorner.getY();
                 z = -(actual.getX() - locationOfCorner.getX());
                 break;
-            case "SE":
+            case "southeast":
                 x = -(actual.getX() - locationOfCorner.getX());
                 z = -(actual.getZ() - locationOfCorner.getY());
                 break;
-            case "SW":
+            case "southwest":
                 x = -(actual.getZ() - locationOfCorner.getY());
                 z = actual.getX() - locationOfCorner.getX();
                 break;
@@ -60,7 +60,7 @@ public class MapUtils {
 
     public static Triple<Double, Double, Double> actualToRelative(double posX, double posY, double posZ, String cornerDirection, Point locationOfCorner) {
         if(cornerDirection == null) {
-            cornerDirection = "NW";
+            cornerDirection = "northwest";
         }
         if(locationOfCorner == null) {
             locationOfCorner = new Point(0, 0);
@@ -68,19 +68,19 @@ public class MapUtils {
         double x = 0;
         double z = 0;
         switch (cornerDirection) {
-            case "NW":
+            case "northwest":
                 x = posX - locationOfCorner.getX();
                 z = posZ - locationOfCorner.getY(); //.getY in a point is the MC Z coord
                 break;
-            case "NE":
+            case "northeast":
                 x = posZ - locationOfCorner.getY();
                 z = -(posX - locationOfCorner.getX());
                 break;
-            case "SE":
+            case "southeast":
                 x = -(posX - locationOfCorner.getX());
                 z = -(posZ - locationOfCorner.getY());
                 break;
-            case "SW":
+            case "southwest":
                 x = -(posZ - locationOfCorner.getY());
                 z = posX - locationOfCorner.getX();
                 break;
@@ -93,7 +93,7 @@ public class MapUtils {
      */
     public static BlockPos relativeToActual(BlockPos relative, String cornerDirection, Point locationOfCorner) {
         if(cornerDirection == null) {
-            cornerDirection = "NW";
+            cornerDirection = "northwest";
         }
         if(locationOfCorner == null) {
             locationOfCorner = new Point(0, 0);
@@ -101,19 +101,19 @@ public class MapUtils {
         double x = 0;
         double z = 0;
         switch (cornerDirection) {
-            case "NW":
+            case "northwest":
                 x = relative.getX() + locationOfCorner.getX();
                 z = relative.getZ() + locationOfCorner.getY(); //.getY in a point is the MC Z coord
                 break;
-            case "NE":
+            case "northeast":
                 x = -(relative.getZ() - locationOfCorner.getX());
                 z = relative.getX() + locationOfCorner.getY();
                 break;
-            case "SE":
+            case "southeast":
                 x = -(relative.getX() - locationOfCorner.getX());
                 z = -(relative.getZ() - locationOfCorner.getY());
                 break;
-            case "SW":
+            case "southwest":
                 x = relative.getZ() + locationOfCorner.getX();
                 z = -(relative.getX() - locationOfCorner.getY());
                 break;
@@ -123,7 +123,7 @@ public class MapUtils {
 
     public static Triple<Double, Double, Double> relativeToActual(double posX, double posY, double posZ, String cornerDirection, Point locationOfCorner) {
         if(cornerDirection == null) {
-            cornerDirection = "NW";
+            cornerDirection = "northwest";
         }
         if(locationOfCorner == null) {
             locationOfCorner = new Point(0, 0);
@@ -131,19 +131,19 @@ public class MapUtils {
         double x = 0;
         double z = 0;
         switch (cornerDirection) {
-            case "NW":
+            case "northwest":
                 x = posX + locationOfCorner.getX();
                 z = posZ + locationOfCorner.getY(); //.getY in a point is the MC Z coord
                 break;
-            case "NE":
+            case "northeast":
                 x = -(posZ - locationOfCorner.getX());
                 z = posX + locationOfCorner.getY();
                 break;
-            case "SE":
+            case "southeast":
                 x = -(posX - locationOfCorner.getX());
                 z = -(posZ - locationOfCorner.getY());
                 break;
-            case "SW":
+            case "southwest":
                 x = posZ + locationOfCorner.getX();
                 z = -(posX - locationOfCorner.getY());
                 break;

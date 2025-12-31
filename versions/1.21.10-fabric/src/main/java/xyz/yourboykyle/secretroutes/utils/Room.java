@@ -261,21 +261,28 @@ public class Room {
             try {
                 Gson gson = new GsonBuilder().create();
                 FileReader reader = new FileReader(filePath);
-                JsonObject data = gson.fromJson(reader, JsonObject.class);
+                JsonObject rawData = gson.fromJson(reader, JsonObject.class);
+                if (rawData == null || rawData.isJsonNull()) {
+                    currentSecretRoute = null;
+                    return;
+                }
+
+                // Build a case-insensitive key map
+                Map<String, JsonElement> data = new HashMap<>();
+                for (Map.Entry<String, JsonElement> entry : rawData.entrySet()) {
+                    data.put(entry.getKey().toLowerCase(Locale.ROOT), entry.getValue());
+                }
+
                 for (int i = 0; i <= 10; i++) {
-                    String path = name;
-                    if (i == 0) {
-                        if (data == null || data.isJsonNull() || data.get(name) == null || data.get(name).isJsonNull()) {
-                            currentSecretRoute = null;
-                        }
-                    } else {
-                        path = name + ":" + i;
-                    }
-                    if (data == null || data.isJsonNull() || data.get(path) == null || data.get(path).isJsonNull()) {
+                    String path = (i == 0 ? name : name + ":" + i).toLowerCase(Locale.ROOT);
+
+                    JsonElement element = data.get(path);
+                    if (element == null || element.isJsonNull()) {
+                        if (i == 0) currentSecretRoute = null;
                         continue;
                     }
-                    JsonArray route = data.get(path).getAsJsonArray();
 
+                    JsonArray route = element.getAsJsonArray();
                     arrays.add(route);
                     JsonArray starPoseArray = route.get(0).getAsJsonObject().get("locations").getAsJsonArray().get(0).getAsJsonArray();
                     BlockPos startPos = new BlockPos(starPoseArray.get(0).getAsInt(), starPoseArray.get(1).getAsInt(), starPoseArray.get(2).getAsInt());
@@ -302,6 +309,8 @@ public class Room {
                 if(closest != null) {
                     currentSecretRoute = arrays.get(closest.getTwo());
                     currentSecretWaypoints = currentSecretRoute.get(currentSecretIndex).getAsJsonObject();
+                    System.out.println("route: " + currentSecretRoute);
+                    System.out.println("waypoints: " + currentSecretWaypoints);
                 }
             } catch (Exception e) {
                 LogUtils.error(e);

@@ -10,7 +10,14 @@ public class RoomDetection {
         if (DungeonManager.getCurrentRoom() == null || DungeonManager.getCurrentRoom().getDirection() == null) {
             return "UNKNOWN";
         }
-        return DungeonManager.getCurrentRoom().getDirection().toString();
+
+        return switch (DungeonManager.getCurrentRoom().getDirection()) {
+            case NE -> "northeast";
+            case NW -> "northwest";
+            case SE -> "southeast";
+            case SW -> "southwest";
+            default -> "UNKNOWN";
+        };
     }
 
     public static Point roomCorner() {

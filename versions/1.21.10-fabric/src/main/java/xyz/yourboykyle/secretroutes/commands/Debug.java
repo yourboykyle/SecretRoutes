@@ -36,6 +36,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import xyz.yourboykyle.secretroutes.events.OnGuiRender;
+import xyz.yourboykyle.secretroutes.events.OnSkyblockerRender;
 import xyz.yourboykyle.secretroutes.utils.*;
 
 import java.lang.reflect.Field;
@@ -95,6 +96,11 @@ public class Debug {
 
         BlockPos pos = player.getBlockPos();
         context.getSource().sendFeedback(Text.literal("Position: " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ()));
+
+        // Temporary rendering debugging
+        ChatUtils.sendChatMessage("World texts: " + OnSkyblockerRender.worldTexts.toString());
+        ChatUtils.sendChatMessage("Outlined boxes: " + OnSkyblockerRender.outlinedBoxes.toString());
+
         return 1;
     }
 
