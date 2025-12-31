@@ -456,17 +456,20 @@ public class SRMConfig extends Config {
 
     // Rendering
     @Slider(
-            title = "Alpha multiplier",
+            title = "Filled box alpha multiplier",
             description = "Default opacity multiplier. ONLY HAS AN EFFECT ON THE FULL BLOCK",
-            min = 0f, max = 1f,
+            min = 0f,
+            max = 1f,
+            step = 0.01f,
             category = "Rendering",
             subcategory = "Waypoint Colors"
     )
-    public static float alphaMultiplier = 0.5f;
+    public static float filledBoxAlpha = 0.5f;
 
     @Slider(
             title = "Box line width",
             category = "Rendering",
+            subcategory = "Waypoint Colors",
             min = 0.1f,
             max = 20f,
             step = 0.1f
@@ -550,7 +553,7 @@ public class SRMConfig extends Config {
             category = "Rendering"
     )
     private void resetToDefaultColorsButton() {
-        alphaMultiplier = 0.5f;
+        filledBoxAlpha = 0.5f;
         lineColor = ColorUtils.rgba(255, 0, 0);
         pearlLineColor = ColorUtils.rgba(0, 255, 255);
         etherWarp = ColorUtils.rgba(128, 0, 128);
@@ -1423,7 +1426,7 @@ public class SRMConfig extends Config {
             category = "Dev",
             subcategory = "WIP"
     )
-    public static boolean renderLinesThroughWalls = false;
+    public static boolean renderLinesThroughWalls = true;
 
     @Switch(
             title = "Player crosshair to next waypoint",
@@ -1470,8 +1473,10 @@ public class SRMConfig extends Config {
     public SRMConfig() {
         super(Main.MODID + ".json", "/assets/" + Main.MODID + "/logo.png", "Secret Routes", Category.HYPIXEL);
 
+        // There is a bug with oneconfig, when that is fixed, I will uncomment the parts that say "UNCOMMENT THIS," for now, the addDependency is broken
         try {
-            addDependency("lineType", "modEnabled", true);
+            // UNCOMMENT THIS
+            /*addDependency("lineType", "modEnabled", true);
 
             addDependency("lineType", "modEnabled", true);
             addDependency("width", "modEnabled", true);
@@ -1519,14 +1524,16 @@ public class SRMConfig extends Config {
             addDependency("superboomsTextSize", "superboomsTextToggle", true);
             addDependency("enderpearlEnumToggle", "enderpearlTextToggle", true);
             addDependency("enderpearlWaypointColorIndex", "enderpearlTextToggle", true);
-            addDependency("enderpearlTextSize", "enderpearlTextToggle", true);
+            addDependency("enderpearlTextSize", "enderpearlTextToggle", true);*/
 
             // These don't work, maybe they could with some small changes but I have priorities to do for 1.21
             /*hideIf("forceUpdateDEBUG", () -> isDevPasswordCorrect());
             hideIf("verboseLogging", () -> isDevPasswordCorrect());
             hideIf("c", () -> isDevPasswordCorrect());
             hideIf("debug", () -> isDevPasswordCorrect());*/
-            addDependency("customPearlOrientation", "enableDevOptions", true);
+
+            // UNCOMMENT THIS
+            /*addDependency("customPearlOrientation", "enableDevOptions", true);
             addDependency("forceUpdateDEBUG", "enableDevOptions", true);
             addDependency("verboseLogging", "enableDevOptions", true);
             addDependency("c", "enableDevOptions", true);
@@ -1561,7 +1568,7 @@ public class SRMConfig extends Config {
             addDependency("bloodScale", "bloodNotif", true);
             addDependency("bloodX", "bloodNotif", true);
             addDependency("bloodY", "bloodNotif", true);
-            addDependency("renderBlood", "bloodNotif", true);
+            addDependency("renderBlood", "bloodNotif", true);*/
 
             KeybindManager.registerKeybind(nextSecret);
             KeybindManager.registerKeybind(lastSecret);
@@ -1570,44 +1577,12 @@ public class SRMConfig extends Config {
             KeybindManager.registerKeybind(stopRecording);
             KeybindManager.registerKeybind(setBatWaypoint);
             KeybindManager.registerKeybind(exportRoutes);
-
-            /*registerKeyBind(lastSecret, () -> {
-                if (Utils.inCatacombs) {
-                    Main.currentRoom.lastSecretKeybind();
-                } else {
-                    if(warnKeybindsOutsideDungeon){
-                        sendChatMessage("§cYou are not in a dungeon!");
-                    }
-                }
-            });
-            registerKeyBind(nextSecret, () -> {
-                if (Utils.inCatacombs) {
-                    Main.currentRoom.nextSecretKeybind();
-                } else {
-                    if(warnKeybindsOutsideDungeon){
-                        sendChatMessage("§cYou are not in a dungeon!");
-                    }
-                }
-            });*
-            registerKeyBind(toggleSecrets, () -> {
-                if (Utils.inCatacombs) {
-                    Main.toggleSecretsKeybind();
-                } else {
-                    if(warnKeybindsOutsideDungeon){
-                        sendChatMessage("§cYou are not in a dungeon!");
-                    }
-                }
-            });
-
-            registerKeyBind(startRecording, runnable2);
-            registerKeyBind(stopRecording, runnable16);
-            registerKeyBind(setBatWaypoint, runnable3);
-            registerKeyBind(exportRoutes, runnable5);*/
-
-
         } catch (Exception e) {
+            System.out.println("[SecretRoutes] An error occurred while setting up config dependencies:");
+            System.out.println(e.getMessage());
             LogUtils.error(e);
         }
+
     }
 /*
     public boolean isDevPasswordCorrect() {
