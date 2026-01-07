@@ -68,7 +68,6 @@ listOf(
     "1.21.8-neoforge",
     "1.21.8-fabric",
 
-    "1.21.10-neoforge",
     "1.21.10-fabric",
 ).forEach { version ->
     include(":$version")

@@ -10,7 +10,6 @@ preprocess {
     //     "1.8.9-forge"(10809, "srg")
     // }
 
-    "1.21.10-neoforge"(1_21_10, "srg") {
         "1.21.10-fabric"(1_21_10, "yarn") {
             "1.21.8-fabric"(1_21_08, "yarn") {
                 "1.21.8-neoforge"(1_21_08, "srg") {
@@ -50,7 +49,6 @@ preprocess {
                 }
             }
         }
-    }
 
     strictExtraMappings.set(true)
 }
