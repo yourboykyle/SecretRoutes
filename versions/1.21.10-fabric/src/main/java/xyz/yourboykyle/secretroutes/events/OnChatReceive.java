@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -23,7 +22,6 @@ package xyz.yourboykyle.secretroutes.events;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import de.hysky.skyblocker.utils.Utils;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
@@ -41,9 +39,8 @@ import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
 
 public class OnChatReceive {
-    private Long lastSent = System.currentTimeMillis();
-    private static boolean allFound = false;
     private static final HashMap<String, String> msgMap = new HashMap<>();
+    private static boolean allFound = false;
 
     public static void register() {
         OnChatReceive instance = new OnChatReceive();
@@ -59,8 +56,12 @@ public class OnChatReceive {
         });
     }
 
+    public static boolean isAllFound() {
+        return allFound;
+    }
+
     private boolean handleChatReceive(Text message, boolean overlay) {
-        if (!Utils.isOnSkyblock()) {
+        if (!LocationUtils.isOnSkyblock()) {
             return true;
         }
 
@@ -90,7 +91,8 @@ public class OnChatReceive {
             new Thread(() -> {
                 try {
                     Thread.sleep(100);
-                } catch (InterruptedException ignored) {}
+                } catch (InterruptedException ignored) {
+                }
                 SecretUtils.secretLocations.remove(BlockUtils.blockPos(SecretUtils.lastInteract));
             }).start();
             SecretUtils.renderLever = true;
@@ -119,7 +121,7 @@ public class OnChatReceive {
         // Don't process overlay messages
         if (overlay) return true;
 
-        if (SRMConfig.hideBossMessages) {
+        if (SRMConfig.get().hideBossMessages) {
             if (msgMap.isEmpty()) {
                 msgMap.put("§r§c[BOSS] The Watcher", "hideWatcher");
                 msgMap.put("§r§c[BOSS] Bonzo", "hideBonzo");
@@ -137,10 +139,10 @@ public class OnChatReceive {
             String formatted = getFormattedText(message);
             if (!formatted.contains("BOSS")) return true;
 
-            if (SRMConfig.bloodNotif) {
+            if (SRMConfig.get().bloodNotif) {
                 if (formatted.equals("§r§c[BOSS] The Watcher§r§f: That will be enough for now.§r")) {
                     sendChatMessage("KILL BLOOD");
-                    OnGuiRender.spawnNotifTime = System.currentTimeMillis() + SRMConfig.bloodBannerDuration;
+                    OnGuiRender.spawnNotifTime = System.currentTimeMillis() + SRMConfig.get().bloodBannerDuration;
                 }
             }
 
@@ -168,9 +170,4 @@ public class OnChatReceive {
         // This does work, I think
         return text.getString();
     }
-
-    public static boolean isAllFound() {
-        return allFound;
-    }
 }
-//#endif

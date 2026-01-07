@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -23,7 +22,7 @@ package xyz.yourboykyle.secretroutes.utils;
 
 public class RotationUtils {
     public static float actualToRelativeYaw(float yaw, String direction) {
-        switch(direction) {
+        switch (direction) {
             case "southwest":
                 return yaw;
             case "northwest":
@@ -38,7 +37,7 @@ public class RotationUtils {
     }
 
     public static float relativeToActualYaw(float yaw, String direction) {
-        switch(direction) {
+        switch (direction) {
             case "southwest":
                 return yaw;
             case "northwest":
@@ -52,4 +51,3 @@ public class RotationUtils {
         }
     }
 }
-//#endif

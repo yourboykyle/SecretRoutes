@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -33,7 +32,7 @@ public class OnSecretComplete {
         SecretSounds.secretChime();
 
         // PB Stuff
-        if(Main.currentRoom.currentSecretIndex == 0) {
+        if (Main.currentRoom.currentSecretIndex == 0) {
             ChatUtils.sendVerboseMessage("Starting timer for " + Main.currentRoom.name, "Personal Bests");
             PBUtils.pbIsValid = true;
             PBUtils.startRoute();
@@ -42,10 +41,9 @@ public class OnSecretComplete {
             PBUtils.stopRoute();
         }
 
-        if(Main.currentRoom.currentSecretIndex <= Main.currentRoom.currentSecretRoute.size() - 1) {
+        if (Main.currentRoom.currentSecretIndex <= Main.currentRoom.currentSecretRoute.size() - 1) {
             // If the route hasn't been completed yet, log progress for debugging
             ChatUtils.sendVerboseMessage("Secret " + (Main.currentRoom.currentSecretIndex + 1) + "/" + (Main.currentRoom.currentSecretRoute.size()) + " in " + RoomDetection.roomName() + " completed in §a" + ((Main.currentRoom.currentSecretIndex > 0) ? PBUtils.formatTime(System.currentTimeMillis() - PBUtils.startTime) : "0.000s") + " §r(PB is valid: " + (PBUtils.pbIsValid ? "true" : "false") + ")", "Personal Bests");
         }
     }
 }
-//#endif

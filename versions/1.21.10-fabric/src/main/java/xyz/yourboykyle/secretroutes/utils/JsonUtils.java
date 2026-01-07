@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -25,9 +24,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class JsonUtils {
-    public static JsonObject toJsonObject(String string){
+    public static JsonObject toJsonObject(String string) {
         JsonParser parser = new JsonParser();
         return parser.parse(string).getAsJsonObject();
     }
 }
-//#endif

@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -27,13 +26,14 @@ import net.minecraft.text.HoverEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
+import xyz.yourboykyle.secretroutes.utils.LogUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
 public class ChatUtils {
     public static void sendChatMessage(String message, Formatting color) {
-        if(MinecraftClient.getInstance().player == null){
+        if (MinecraftClient.getInstance().player == null) {
             return;
         }
         MinecraftClient.getInstance().player.sendMessage(Text.literal(message).formatted(color), false);
@@ -41,7 +41,7 @@ public class ChatUtils {
     }
 
     public static void sendChatMessage(String message) {
-        if(MinecraftClient.getInstance().player == null){
+        if (MinecraftClient.getInstance().player == null) {
             return;
         }
         MinecraftClient.getInstance().player.sendMessage(Text.literal(message), false);
@@ -49,55 +49,55 @@ public class ChatUtils {
         LogUtils.info("Sent chat message: " + message);
     }
 
-    public static void sendVerboseMessage(String message){
-        if(SRMConfig.verboseLogging){
+    public static void sendVerboseMessage(String message) {
+        if (SRMConfig.get().verboseLogging) {
             sendChatMessage(message);
         }
     }
 
-    public static boolean sendVerboseMessage(String message, String TAG){
-        if(MinecraftClient.getInstance().player == null){
+    public static boolean sendVerboseMessage(String message, String TAG) {
+        if (MinecraftClient.getInstance().player == null) {
             return false;
         }
-        switch(TAG){
+        switch (TAG) {
             case "Recording":
-                if(SRMConfig.verboseRecording){
+                if (SRMConfig.get().verboseRecording) {
                     sendVerboseMessage("§d[Recording] " + message);
                     return true;
                 }
                 return false;
             case "Update":
-                if(SRMConfig.verboseUpdating){
+                if (SRMConfig.get().verboseUpdating) {
                     sendVerboseMessage("§d[Update] " + message);
                     return true;
                 }
                 return false;
             case "Info":
-                if(SRMConfig.verboseInfo && !message.contains("Sent chat message")){
+                if (SRMConfig.get().verboseInfo && !message.contains("Sent chat message")) {
                     sendVerboseMessage("§d[Info] " + message);
                     return true;
                 }
                 return false;
             case "Rendering":
-                if(SRMConfig.verboseRendering){
+                if (SRMConfig.get().verboseRendering) {
                     sendVerboseMessage("§5[Rendering] " + message);
                     return true;
                 }
                 return false;
             case "Actionbar":
-                if(SRMConfig.actionbarInfo){
-                    sendVerboseMessage("§3[ActionBar] §a "+message);
+                if (SRMConfig.get().actionbarInfo) {
+                    sendVerboseMessage("§3[ActionBar] §a " + message);
                     return true;
                 }
                 return false;
             case "Personal Bests":
-                if(SRMConfig.verbosePersonalBests){
+                if (SRMConfig.get().verbosePersonalBests) {
                     sendVerboseMessage("§d[Personal Bests] " + message);
                     return true;
                 }
                 return false;
             default:
-                if(SRMConfig.verboseLogging){
+                if (SRMConfig.get().verboseLogging) {
                     sendChatMessage("§d[" + TAG + "] " + message);
                     return true;
                 }
@@ -115,8 +115,8 @@ public class ChatUtils {
         MinecraftClient.getInstance().player.sendMessage(component);
     }*/
 
-    public static void sendClickableMessage(String text, String link){
-        if(MinecraftClient.getInstance().player == null){
+    public static void sendClickableMessage(String text, String link) {
+        if (MinecraftClient.getInstance().player == null) {
             return;
         }
         MinecraftClient.getInstance().player.sendMessage(
@@ -136,4 +136,3 @@ public class ChatUtils {
         );
     }
 }
-//#endif

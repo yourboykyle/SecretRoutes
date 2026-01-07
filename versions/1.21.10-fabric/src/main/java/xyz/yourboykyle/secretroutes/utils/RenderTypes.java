@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Dungeon Rooms Mod - Secret Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2021 Quantizr(_risk)
@@ -20,7 +19,8 @@ package xyz.yourboykyle.secretroutes.utils;
 
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
-import org.polyfrost.polyui.color.PolyColor;
+
+import java.awt.*;
 
 public class RenderTypes {
     public static class WorldText {
@@ -45,12 +45,12 @@ public class RenderTypes {
 
     public static class OutlinedBox {
         public Vec3d position;
-        public PolyColor color;
+        public Color color;
         public float boxWidth;
         public float boxHeight;
         public boolean throughWalls;
 
-        public OutlinedBox(Vec3d position, PolyColor color, float boxWidth, float boxHeight, boolean throughWalls) {
+        public OutlinedBox(Vec3d position, Color color, float boxWidth, float boxHeight, boolean throughWalls) {
             this.position = position;
             this.color = color;
             this.boxWidth = boxWidth;
@@ -61,12 +61,12 @@ public class RenderTypes {
 
     public static class FilledBox {
         public Vec3d position;
-        public PolyColor color;
+        public Color color;
         public float boxWidth;
         public float boxHeight;
         public boolean throughWalls;
 
-        public FilledBox(Vec3d position, PolyColor color, float boxWidth, float boxHeight, boolean throughWalls) {
+        public FilledBox(Vec3d position, Color color, float boxWidth, float boxHeight, boolean throughWalls) {
             this.position = position;
             this.color = color;
             this.boxWidth = boxWidth;
@@ -78,11 +78,11 @@ public class RenderTypes {
     public static class Line {
         public Vec3d start;
         public Vec3d end;
-        public PolyColor color;
+        public Color color;
         public float lineWidth;
         public boolean throughWalls;
 
-        public Line(Vec3d start, Vec3d end, PolyColor color, float lineWidth, boolean throughWalls) {
+        public Line(Vec3d start, Vec3d end, Color color, float lineWidth, boolean throughWalls) {
             this.start = start;
             this.end = end;
             this.color = color;
@@ -93,14 +93,13 @@ public class RenderTypes {
 
     public static class LineFromCursor {
         public Vec3d point;
-        public PolyColor color;
+        public Color color;
         public float lineWidth;
 
-        public LineFromCursor(Vec3d point, PolyColor color, float lineWidth) {
+        public LineFromCursor(Vec3d point, Color color, float lineWidth) {
             this.point = point;
             this.color = color;
             this.lineWidth = lineWidth;
         }
     }
 }
-//#endif
