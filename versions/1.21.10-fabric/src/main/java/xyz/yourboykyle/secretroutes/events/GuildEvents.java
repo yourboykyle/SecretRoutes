@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -32,7 +31,7 @@ public class GuildEvents {
     public static void register() {
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
             // overlay = true means it's an overlay/actionbar message
-            if (overlay || !SRMConfig.bridge) return true;
+            if (overlay || !SRMConfig.get().bridge) return true;
 
             String messageText = message.getString();
             if (messageText.contains(SEARCH)) {
@@ -53,4 +52,3 @@ public class GuildEvents {
         return message;
     }
 }
-//#endif

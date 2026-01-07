@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -24,10 +23,15 @@ package xyz.yourboykyle.secretroutes.utils;
 import org.apache.commons.io.IOUtils;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
+import xyz.yourboykyle.secretroutes.utils.LogUtils;
+import xyz.yourboykyle.secretroutes.utils.SSLUtils;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.awt.*;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,11 +45,14 @@ public class FileUtils {
     public static List<String> getFileNames(String path) {
         File[] files = new File(path).listFiles();
         List<String> list = new ArrayList<>();
-        for(File f : files){
-            if(f.getName().contains(".json")){ list.add(f.getName());}
+        for (File f : files) {
+            if (f.getName().contains(".json")) {
+                list.add(f.getName());
+            }
         }
         return list;
     }
+
     public static List<String> getRouteFileNames() {
         return getFileNames(Main.ROUTES_PATH);
     }
@@ -55,7 +62,7 @@ public class FileUtils {
         return routeFileNames.toArray(new String[0]);
     }
 
-    public static boolean doesFileExist(String path){
+    public static boolean doesFileExist(String path) {
         return new File(path).exists();
     }
 
@@ -96,16 +103,16 @@ public class FileUtils {
         }
     }
 
-    public static void copyFileToRoutesDirectory(){
-        try{
-            String filename = SRMConfig.copyFileName;
+    public static void copyFileToRoutesDirectory() {
+        try {
+            String filename = SRMConfig.get().copyFileName;
             copyAndRename(System.getProperty("user.home") + File.separator + "Downloads" + File.separator + "routes.json", Main.ROUTES_PATH, filename);
-        }catch (Exception e){
+        } catch (Exception e) {
             LogUtils.error(e);
         }
     }
 
-    public static void copyAndRename(String sourceFile, String targetDirectoryPath, String targetFileName){
+    public static void copyAndRename(String sourceFile, String targetDirectoryPath, String targetFileName) {
         Path sourcePath = Paths.get(sourceFile);
         Path destinationPath = Paths.get(targetDirectoryPath, targetFileName);
 
@@ -122,7 +129,7 @@ public class FileUtils {
     }
 
     public static void downloadFile(File outputFile, URL url) throws IOException {
-        HttpsURLConnection connection =  (HttpsURLConnection) url.openConnection();
+        HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
 
         connection.setSSLSocketFactory(SSLUtils.getSSLSocketFactory());
 
@@ -133,4 +140,3 @@ public class FileUtils {
         inputStream.close();
     }
 }
-//#endif

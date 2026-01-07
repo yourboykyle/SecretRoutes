@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -25,9 +24,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
 import xyz.yourboykyle.secretroutes.Main;
-import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
 
@@ -84,7 +81,7 @@ public class OnMouseInput {
             /*
             if (itemName.contains("aspect of the void") && button == 1 && player.isSneaking()) {
                 LogUtils.info("§bPlayer is holding an aspect of the void");
-                if (Main.routeRecording.recording) {
+                if (xyz.yourboykyle.secretroutes.Main.routeRecording.recording) {
                     new Thread(() -> {
                         try {
                             BlockPos pos = player.getBlockPos();
@@ -97,7 +94,7 @@ public class OnMouseInput {
 
                             if (!pos.equals(pos2)) {
                                 LogUtils.info("§bPlayer teleported and moved");
-                                Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.ETHERWARPS, pos2);
+                                xyz.yourboykyle.secretroutes.Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.ETHERWARPS, pos2);
                             } else {
                                 LogUtils.info("§bPlayer teleported and did not move");
                             }
@@ -114,4 +111,3 @@ public class OnMouseInput {
         }
     }
 }
-//#endif

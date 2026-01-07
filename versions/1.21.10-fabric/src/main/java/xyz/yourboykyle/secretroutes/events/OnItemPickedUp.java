@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -23,7 +22,6 @@ package xyz.yourboykyle.secretroutes.events;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import de.hysky.skyblocker.utils.Utils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -38,7 +36,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class OnItemPickedUp {
-    public static boolean itemSecretOnCooldown = false; // True: do not add item secret waypoint, False: add item secret waypoint
     public static final String[] validItems = {
             "Decoy",
             "Defuse Kit",
@@ -50,8 +47,8 @@ public class OnItemPickedUp {
             "Trap",
             "Treasure Talisman"
     };
-
     private static final Map<String, Integer> previousInventory = new HashMap<>();
+    public static boolean itemSecretOnCooldown = false;
     private static int tickCounter = 0;
 
     public static void register() {
@@ -65,7 +62,7 @@ public class OnItemPickedUp {
         // Only check every 5 ticks to reduce overhead
         if (++tickCounter % 5 != 0) return;
 
-        if (!Utils.isInDungeons()) return;
+        if (!LocationUtils.isInDungeons()) return;
 
         // Track inventory changes to detect item pickups
         Map<String, Integer> currentInventory = new HashMap<>();
@@ -104,7 +101,7 @@ public class OnItemPickedUp {
     private static void handleItemPickup(ClientPlayerEntity player, String itemName) {
         BlockPos pos = player.getBlockPos();
 
-        if (SRMConfig.allSecrets) {
+        if (SRMConfig.get().allSecrets) {
             if (SecretUtils.secrets == null) return;
             for (JsonElement obj : SecretUtils.secrets) {
                 try {
@@ -114,13 +111,14 @@ public class OnItemPickedUp {
                     int y = secret.get("y").getAsInt();
                     int z = secret.get("z").getAsInt();
                     if (pos.getX() >= x - 10 && pos.getX() <= x + 10 &&
-                        pos.getY() >= y - 10 && pos.getY() <= y + 10 &&
-                        pos.getZ() >= z - 10 && pos.getZ() <= z + 10) {
+                            pos.getY() >= y - 10 && pos.getY() <= y + 10 &&
+                            pos.getZ() >= z - 10 && pos.getZ() <= z + 10) {
                         if (!SecretUtils.secretLocations.contains(BlockUtils.blockPos(new BlockPos(x, y, z)))) {
                             SecretUtils.secretLocations.add(BlockUtils.blockPos(new BlockPos(x, y, z)));
                         }
                     }
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
         }
 
@@ -128,8 +126,8 @@ public class OnItemPickedUp {
             BlockPos itemPos = Main.currentRoom.getSecretLocation();
 
             if (pos.getX() >= itemPos.getX() - 10 && pos.getX() <= itemPos.getX() + 10 &&
-                pos.getY() >= itemPos.getY() - 10 && pos.getY() <= itemPos.getY() + 10 &&
-                pos.getZ() >= itemPos.getZ() - 10 && pos.getZ() <= itemPos.getZ() + 10) {
+                    pos.getY() >= itemPos.getY() - 10 && pos.getY() <= itemPos.getY() + 10 &&
+                    pos.getZ() >= itemPos.getZ() - 10 && pos.getZ() <= itemPos.getZ() + 10) {
                 Main.currentRoom.nextSecret();
                 SecretSounds.secretChime();
                 LogUtils.info("Picked up item at " + itemPos);
@@ -155,4 +153,3 @@ public class OnItemPickedUp {
         return false;
     }
 }
-//#endif

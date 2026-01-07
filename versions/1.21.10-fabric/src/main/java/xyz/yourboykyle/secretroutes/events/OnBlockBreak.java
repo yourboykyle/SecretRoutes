@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -35,8 +34,8 @@ import net.minecraft.world.World;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.MapUtils;
-import xyz.yourboykyle.secretroutes.utils.RoomDetection;
 import xyz.yourboykyle.secretroutes.utils.Room;
+import xyz.yourboykyle.secretroutes.utils.RoomDetection;
 
 public class OnBlockBreak {
     public static void register() {
@@ -66,8 +65,8 @@ public class OnBlockBreak {
 
                         // Check if waypoints already has the broken block
                         if (!(relPos.getX() == waypointCoords.get(0).getAsInt() &&
-                              relPos.getY() == waypointCoords.get(1).getAsInt() &&
-                              relPos.getZ() == waypointCoords.get(2).getAsInt())) {
+                                relPos.getY() == waypointCoords.get(1).getAsInt() &&
+                                relPos.getZ() == waypointCoords.get(2).getAsInt())) {
                             // Waypoint doesn't exist yet
                             shouldAddWaypoint = true;
                         }
@@ -100,5 +99,4 @@ public class OnBlockBreak {
         }
     }
 }
-//#endif
 

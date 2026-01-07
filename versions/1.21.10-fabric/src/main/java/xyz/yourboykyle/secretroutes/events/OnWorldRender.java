@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -22,10 +21,12 @@
 package xyz.yourboykyle.secretroutes.events;
 
 import com.google.gson.JsonArray;
-import de.hysky.skyblocker.utils.Utils;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
-import xyz.yourboykyle.secretroutes.utils.*;
+import xyz.yourboykyle.secretroutes.events.OnChatReceive;
+import xyz.yourboykyle.secretroutes.utils.LocationUtils;
+import xyz.yourboykyle.secretroutes.utils.LogUtils;
+import xyz.yourboykyle.secretroutes.utils.SecretUtils;
 
 public class OnWorldRender {
     private final static String verboseTAG = "Rendering";
@@ -34,11 +35,11 @@ public class OnWorldRender {
     public static void onRenderWorld() {
         try {
             // Make sure the player is actually in a dungeon
-            if (!Utils.isInDungeons() || !SRMConfig.modEnabled) {
+            if (!LocationUtils.isInDungeons() || !SRMConfig.get().modEnabled) {
                 return;
             }
 
-            if(OnChatReceive.isAllFound()){
+            if (OnChatReceive.isAllFound()) {
                 /*
                 if(playCompleteFirst){
                     playCompleteFirst = false;
@@ -55,27 +56,27 @@ public class OnWorldRender {
                 }
 
                  */
-                if(!SRMConfig.renderComplete){
+                if (!SRMConfig.get().renderComplete) {
                     return;
                 }
-            }else{
+            } else {
                 playCompleteFirst = true;
             }
 
-            if(SRMConfig.allSecrets){
+            if (SRMConfig.get().allSecrets) {
                 SecretUtils.renderSecrets();
-            }else if(SRMConfig.wholeRoute){
+            } else if (SRMConfig.get().wholeRoute) {
                 JsonArray csr = Main.currentRoom.currentSecretRoute;
-                if(csr != null){
-                    for(int i = Main.currentRoom.currentSecretIndex; i<csr.size(); i++){
+                if (csr != null) {
+                    for (int i = Main.currentRoom.currentSecretIndex; i < csr.size(); i++) {
                         SecretUtils.renderingCallback(csr.get(i).getAsJsonObject(), i);
                     }
                 }
 
-            }else{
+            } else {
                 SecretUtils.renderingCallback(Main.currentRoom.currentSecretWaypoints, Main.currentRoom.currentSecretIndex);
             }
-            if(SecretUtils.renderLever){
+            if (SecretUtils.renderLever) {
                 SecretUtils.renderLever();
             }
         } catch (Exception e) {
@@ -84,4 +85,3 @@ public class OnWorldRender {
     }
 
 }
-//#endif

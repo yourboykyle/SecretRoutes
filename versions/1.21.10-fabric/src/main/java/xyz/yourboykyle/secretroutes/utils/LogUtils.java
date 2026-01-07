@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -26,16 +25,16 @@ import net.minecraft.util.Formatting;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 
-import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
-import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
-
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
+import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
+
 public class LogUtils {
     public static void info(String msg) {
-        if(!sendVerboseMessage(msg, "Info")) {
+        if (!sendVerboseMessage(msg, "Info")) {
             appendToFile("====================\n[INFO] " + msg);
         }
     }
@@ -43,16 +42,21 @@ public class LogUtils {
     public static void error(Exception error) {
         errorNoShout(error);
 
-        if(MinecraftClient.getInstance().player != null) {
-            switch(error.getClass().getTypeName()){
+        if (MinecraftClient.getInstance().player != null) {
+            switch (error.getClass().getTypeName()) {
                 case "java.io.FileNotFoundException":
-                    sendChatMessage(Formatting.DARK_RED+"The system cannot find the file specified. Please ensure that this is the correct file name §c\""+ ((SRMConfig.routeTypeIndex == 1) ? SRMConfig.pearlRoutesFileName : SRMConfig.routesFileName) + "\"§4 and that it exists in §c" + Main.ROUTES_PATH);
+                    String fileName = (SRMConfig.get().routeType == SRMConfig.RouteType.PEARLS)
+                            ? SRMConfig.get().pearlRoutesFileName
+                            : SRMConfig.get().routesFileName;
+
+                    sendChatMessage(Formatting.DARK_RED + "The system cannot find the file specified. Please ensure that this is the correct file name §c\"" + fileName + "\"§4 and that it exists in §c" + Main.ROUTES_PATH);
                     break;
                 default:
-                    sendChatMessage(Formatting.DARK_RED+"Error caught by Secret Routes. Check latest logs at .minecraft/logs/SecretRoutes/LATEST-{date}.log. SEND THIS FILE IN #SUPPORT IN THE DISCORD FOR HELP. ("+ error.getLocalizedMessage()+")");
+                    sendChatMessage(Formatting.DARK_RED + "Error caught by Secret Routes. Check latest logs at .minecraft/logs/SecretRoutes/LATEST-{date}.log. SEND THIS FILE IN #SUPPORT IN THE DISCORD FOR HELP. (" + error.getLocalizedMessage() + ")");
             }
         }
     }
+
     public static void errorNoShout(Exception error) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -64,7 +68,6 @@ public class LogUtils {
 
     public static void appendToFile(String msg) {
         try {
-            // Check if outputLogs is initialized, if not, just print to console
             if (Main.outputLogs == null) {
                 System.out.println("[Secret Routes] " + msg);
                 return;
@@ -79,4 +82,3 @@ public class LogUtils {
         }
     }
 }
-//#endif

@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -23,15 +22,16 @@ package xyz.yourboykyle.secretroutes.utils;
 
 public class PrintingUtils {
     public long lastPrinted;
-    public PrintingUtils(){
+
+    public PrintingUtils() {
         lastPrinted = System.currentTimeMillis();
     }
-    public void print(String message, int delay){
+
+    public void print(String message, int delay) {
         long currentTime = System.currentTimeMillis();
-        if(currentTime - lastPrinted > delay){
+        if (currentTime - lastPrinted > delay) {
             ChatUtils.sendVerboseMessage(message);
             lastPrinted = currentTime;
         }
     }
 }
-//#endif

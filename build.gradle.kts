@@ -17,7 +17,7 @@ plugins {
 }
 
 if (mcData.isForge) {
-    loom.forge.mixinConfig("mixins.${modData.id}.init.json")
+    loom.forge.mixinConfig("mixins.${modData.id}.json")
 }
 
 val mod_archives_name: String = extra["mod.archives_name"]?.toString()
@@ -28,20 +28,21 @@ base {
 }
 
 toolkitLoomHelper {
-    useOneConfig {
-        version = "1.0.0-alpha.171"
-        loaderVersion = "1.1.0-alpha.53"
+    if (mcData.isForge) {
+        useOneConfig {
+            version = "1.0.0-alpha.171"
+            loaderVersion = "1.1.0-alpha.53"
 
-        usePolyMixin = true
-        polyMixinVersion = "0.8.4+build.7"
+            usePolyMixin = true
+            polyMixinVersion = "0.8.4+build.7"
 
-        applyLoaderTweaker = true
+            applyLoaderTweaker = true
 
-        for (module in arrayOf("commands", "config", "config-impl", "events", "internal", "ui", "utils")) {
-            +module
+            for (module in arrayOf("commands", "config", "config-impl", "events", "internal", "ui", "utils")) {
+                +module
+            }
         }
     }
-
     useDevAuth("1.2.+")
     useMixinExtras("0.5.0")
 
@@ -69,6 +70,15 @@ repositories {
         content { includeGroup("com.github.bawnorton.mixinsquared") }
     }
     maven("https://repo.nea.moe/releases")
+
+    // YACL
+    maven("https://maven.isxander.dev/releases")
+
+    // Hypixel mod api
+    maven("https://repo.hypixel.net/repository/Hypixel/")
+
+    // ModMenu
+    maven("https://maven.terraformersmc.com/")
 }
 
 dependencies {
@@ -76,6 +86,12 @@ dependencies {
     // Other Fabric versions don't load Fabric API to avoid compatibility issues
     if (mcData.isFabric && project.name == "1.21.10-fabric") {
         modImplementation("net.fabricmc.fabric-api:fabric-api:0.138.4+1.21.10")
+
+        modImplementation("dev.isxander:yet-another-config-lib:3.8.1+1.21.10-fabric")
+
+        modImplementation("net.hypixel:mod-api:1.0.1")
+
+        modImplementation("com.terraformersmc:modmenu:16.0.0-rc.2")
     }
 
     modCompileOnly("moe.nea:libautoupdate:1.3.1") {
@@ -84,24 +100,33 @@ dependencies {
     shade("moe.nea:libautoupdate:1.3.1") {
         isTransitive = false
     }
-    modCompileOnly("maven.modrinth:skyblocker-liap:v5.11.0+1.21.10") {
-        isTransitive = false
-    }
-    modRuntimeOnly("maven.modrinth:skyblocker-liap:v5.11.0+1.21.10") {
-        isTransitive = false
-    }
 }
 
 tasks {
+    processResources {
+        if (mcData.isForge) {
+            exclude("mixins.${modData.id}.fabric.json")
+        } else if (mcData.isFabric) {
+            exclude("mixins.${modData.id}.json")
+        }
+    }
     jar {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
 
     remapJar {
-        manifest {
-            attributes(mapOf(
-                "MixinConfigs" to "mixins.${modData.id}.init.json,mixins.${modData.id}.json",
-            ))
+        val configs = mutableListOf<String>()
+
+        if (mcData.isForge) {
+            configs.add("mixins.${modData.id}.forge.json")
+        }
+
+        if (configs.isNotEmpty()) {
+            manifest {
+                attributes(mapOf(
+                    "MixinConfigs" to configs.joinToString(",")
+                ))
+            }
         }
     }
 }

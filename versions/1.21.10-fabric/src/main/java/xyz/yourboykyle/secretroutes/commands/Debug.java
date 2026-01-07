@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2024 yourboykyle & R-aMcC
@@ -35,8 +34,8 @@ import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
+import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.events.OnGuiRender;
-import xyz.yourboykyle.secretroutes.events.OnSkyblockerRender;
 import xyz.yourboykyle.secretroutes.utils.*;
 
 import java.lang.reflect.Field;
@@ -108,8 +107,8 @@ public class Debug {
 
     private static int executeCr(CommandContext<FabricClientCommandSource> context) {
         context.getSource().sendFeedback(
-            Text.literal("Current index: " + xyz.yourboykyle.secretroutes.Main.currentRoom.closest.getTwo())
-                .formatted(Formatting.AQUA)
+                Text.literal("Current index: " + xyz.yourboykyle.secretroutes.Main.currentRoom.closest.getTwo())
+                        .formatted(Formatting.AQUA)
         );
         return 1;
     }
@@ -121,9 +120,9 @@ public class Debug {
 
             if (newIndex >= 0 && newIndex < xyz.yourboykyle.secretroutes.Main.currentRoom.arrays.size()) {
                 xyz.yourboykyle.secretroutes.Main.currentRoom.currentSecretRoute =
-                    xyz.yourboykyle.secretroutes.Main.currentRoom.arrays.get(newIndex);
+                        xyz.yourboykyle.secretroutes.Main.currentRoom.arrays.get(newIndex);
                 context.getSource().sendFeedback(
-                    Text.literal("Changed to index: " + newIndex).formatted(Formatting.GREEN)
+                        Text.literal("Changed to index: " + newIndex).formatted(Formatting.GREEN)
                 );
             } else {
                 context.getSource().sendError(Text.literal("Index out of bounds"));
@@ -149,9 +148,9 @@ public class Debug {
     private static int executeVarGet(CommandContext<FabricClientCommandSource> context) {
         String fieldName = StringArgumentType.getString(context, "field");
         try {
-            Field field = Constants.class.getDeclaredField(fieldName);
+            Field field = SRMConfig.class.getDeclaredField(fieldName);
             field.setAccessible(true);
-            Object currentValue = field.get(null);
+            Object currentValue = field.get(SRMConfig.get());
             context.getSource().sendFeedback(
                     Text.literal(fieldName + ": " + currentValue).formatted(Formatting.AQUA)
             );
@@ -172,31 +171,34 @@ public class Debug {
         String value = StringArgumentType.getString(context, "value");
 
         try {
-            Field field = Constants.class.getDeclaredField(fieldName);
+            Field field = SRMConfig.class.getDeclaredField(fieldName);
             String type = field.getAnnotatedType().getType().getTypeName();
             field.setAccessible(true);
-            Object currentValue = field.get(null);
+
+            Object currentValue = field.get(SRMConfig.get());
 
             switch (type) {
                 case "int":
-                    field.set(null, Integer.valueOf(value));
+                    field.set(SRMConfig.get(), Integer.valueOf(value));
                     break;
                 case "float":
-                    field.set(null, Float.valueOf(value));
+                    field.set(SRMConfig.get(), Float.valueOf(value));
                     break;
                 case "boolean":
-                    field.set(null, Boolean.valueOf(value));
+                    field.set(SRMConfig.get(), Boolean.valueOf(value));
                     break;
                 case "double":
-                    field.set(null, Double.valueOf(value));
+                    field.set(SRMConfig.get(), Double.valueOf(value));
                     break;
                 case "java.lang.String":
-                    field.set(null, value);
+                    field.set(SRMConfig.get(), value);
                     break;
                 default:
                     context.getSource().sendError(Text.literal("Unsupported type: " + type));
                     return 0;
             }
+
+            SRMConfig.HANDLER.save();
 
             context.getSource().sendFeedback(
                     Text.literal("Changed [" + fieldName + "] from " + currentValue + " to " + value)
@@ -219,7 +221,7 @@ public class Debug {
 
     private static CompletableFuture<Suggestions> suggestFields(CommandContext<FabricClientCommandSource> context, SuggestionsBuilder builder) {
         try {
-            Field[] fields = Constants.class.getDeclaredFields();
+            Field[] fields = SRMConfig.class.getDeclaredFields();
             for (Field field : fields) {
                 builder.suggest(field.getName());
             }
@@ -229,4 +231,3 @@ public class Debug {
         return builder.buildFuture();
     }
 }
-//#endif
