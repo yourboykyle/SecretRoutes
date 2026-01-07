@@ -110,7 +110,6 @@ tasks {
         } else if (mcData.isFabric) {
             exclude("mixins.${modData.id}.json")
             exclude("assets/roomdetection/**")
-            exclude("assets/secretroutesmod/**")
         }
     }
     jar {
