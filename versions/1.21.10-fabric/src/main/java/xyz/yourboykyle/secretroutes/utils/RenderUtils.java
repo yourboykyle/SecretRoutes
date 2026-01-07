@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -66,7 +65,7 @@ public class RenderUtils {
             //double offsetX = Math.cos(offsetRot)*0.25;
             //double offsetZ = Math.sin(offsetRot)*0.25;
 
-            spawnParticleAtLocation(new BlockPos((int)x, (int)y, (int)z), new BlockPos(0, 0, 0), particle);
+            spawnParticleAtLocation(new BlockPos((int) x, (int) y, (int) z), new BlockPos(0, 0, 0), particle);
 
             x += deltaX;
             y += deltaY;
@@ -75,10 +74,10 @@ public class RenderUtils {
     }
 
     public static void drawLineMultipleParticles(ParticleEffect particle, List<BlockPos> locations) {
-        if(locations == null) {
+        if (locations == null) {
             return;
         }
-        if(locations.size() >= 2) {
+        if (locations.size() >= 2) {
             BlockPos lastLoc = null;
             for (BlockPos loc : locations) {
                 if (lastLoc == null) {
@@ -92,4 +91,3 @@ public class RenderUtils {
         }
     }
 }
-//#endif

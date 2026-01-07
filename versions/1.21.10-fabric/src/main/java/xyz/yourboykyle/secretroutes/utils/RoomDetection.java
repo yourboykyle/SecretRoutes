@@ -1,17 +1,19 @@
-//#if FABRIC && MC == 1.21.10
 package xyz.yourboykyle.secretroutes.utils;
 
-import de.hysky.skyblocker.skyblock.dungeon.secrets.DungeonManager;
+import xyz.yourboykyle.secretroutes.utils.skyblocker.DungeonScanner;
+import xyz.yourboykyle.secretroutes.utils.skyblocker.StructureRoom;
 
 import java.awt.*;
 
 public class RoomDetection {
     public static String roomDirection() {
-        if (DungeonManager.getCurrentRoom() == null || DungeonManager.getCurrentRoom().getDirection() == null) {
+        StructureRoom room = DungeonScanner.currentRoom;
+
+        if (room == null || !room.isMatched() || room.getDirection() == null) {
             return "UNKNOWN";
         }
 
-        return switch (DungeonManager.getCurrentRoom().getDirection()) {
+        return switch (room.getDirection()) {
             case NE -> "northeast";
             case NW -> "northwest";
             case SE -> "southeast";
@@ -21,17 +23,20 @@ public class RoomDetection {
     }
 
     public static Point roomCorner() {
-        if (DungeonManager.getCurrentRoom() == null || DungeonManager.getCurrentRoom().getPhysicalCornerPos() == null) {
+        StructureRoom room = DungeonScanner.currentRoom;
+
+        if (room == null || room.getPhysicalCornerPos() == null) {
             return null;
         }
-        return new Point(DungeonManager.getCurrentRoom().getPhysicalCornerPos().x(), DungeonManager.getCurrentRoom().getPhysicalCornerPos().y());
+        return new Point(room.getPhysicalCornerPos().x(), room.getPhysicalCornerPos().y());
     }
 
     public static String roomName() {
-        if (DungeonManager.getCurrentRoom() == null || DungeonManager.getCurrentRoom().getName() == null) {
+        StructureRoom room = DungeonScanner.currentRoom;
+
+        if (room == null || room.getName() == null) {
             return "UNKNOWN";
         }
-        return DungeonManager.getCurrentRoom().getName();
+        return room.getName();
     }
 }
-//#endif

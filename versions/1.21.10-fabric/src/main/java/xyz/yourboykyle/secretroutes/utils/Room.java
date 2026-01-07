@@ -1,263 +1,206 @@
-//#if FABRIC && MC == 1.21.10
-/*
- * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
- * Copyright 2025 yourboykyle & R-aMcC
- *
- *<DO NOT REMOVE THIS COPYRIGHT NOTICE>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package xyz.yourboykyle.secretroutes.utils;
 
 import com.google.gson.*;
-import de.hysky.skyblocker.skyblock.dungeon.secrets.DungeonManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleType;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.Registries;
 import net.minecraft.util.math.BlockPos;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.events.OnSecretComplete;
 import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
+import xyz.yourboykyle.secretroutes.utils.skyblocker.DungeonMapUtils;
+import xyz.yourboykyle.secretroutes.utils.skyblocker.DungeonScanner;
 
 import java.io.File;
 import java.io.FileReader;
 import java.util.*;
-import java.util.List;
 
 public class Room {
-    int c = 0;
-    public enum WAYPOINT_TYPES {
-        LOCATIONS,
-        ETHERWARPS,
-        MINES,
-        INTERACTS,
-        TNTS,
-        ENDERPEARLS,
-    };
-    public enum SECRET_TYPES {
-        INTERACT,
-        ITEM,
-        BAT,
-        EXITROUTE
-    };
+    public enum WAYPOINT_TYPES { LOCATIONS, ETHERWARPS, MINES, INTERACTS, TNTS, ENDERPEARLS }
+    public enum SECRET_TYPES { INTERACT, ITEM, BAT, EXITROUTE }
+
     public String name;
     public JsonArray currentSecretRoute;
-    public JsonArray currentSecretRoute2;
     public int currentSecretIndex = 0;
     public JsonObject currentSecretWaypoints;
-    public JsonArray tests;
-    public HashMap<String, Integer> map = new HashMap<>();
-    public PrintingUtils printer = new PrintingUtils();
     public ArrayList<JsonArray> arrays = new ArrayList<>();
     public Triple<String, Integer, Double> closest = null;
-
-
+    int c = 0;
 
     public Room(String roomName) {
         currentSecretIndex = 0;
-
         try {
             name = roomName;
-
             if (roomName != null) {
                 String filePath;
-                if(SRMConfig.routeTypeIndex == 1) {
-                    filePath = Main.ROUTES_PATH + File.separator + (!SRMConfig.pearlRoutesFileName.equals("") ? SRMConfig.pearlRoutesFileName : "pearlroutes.json");
-                }else{
-                    filePath = Main.ROUTES_PATH + File.separator + (!SRMConfig.routesFileName.equals("") ? SRMConfig.routesFileName  : "pearlroutes.json");
+                if (SRMConfig.get().routeType == SRMConfig.RouteType.PEARLS) {
+                    String fileName = SRMConfig.get().pearlRoutesFileName;
+                    filePath = Main.ROUTES_PATH + File.separator + (!fileName.equals("") ? fileName : "pearlroutes.json");
+                } else {
+                    String fileName = SRMConfig.get().routesFileName;
+                    filePath = Main.ROUTES_PATH + File.separator + (!fileName.equals("") ? fileName : "routes.json");
                 }
                 getData(filePath);
             } else {
                 currentSecretRoute = null;
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             LogUtils.error(e);
         }
     }
 
     public Room(String roomName, String filePath) {
         currentSecretIndex = 0;
-
         try {
             name = roomName;
             if (roomName != null) {
                 getData(filePath);
+            } else {
+                currentSecretRoute = null;
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             LogUtils.error(e);
         }
     }
 
     public void lastSecretKeybind() {
         PBUtils.pbIsValid = false;
-
-        if(currentSecretIndex > 0) {
-            currentSecretIndex--;
-        }
-
-        if(!(currentSecretIndex >= currentSecretRoute.size())) {
-            currentSecretWaypoints = currentSecretRoute.get(currentSecretIndex).getAsJsonObject();
-        } else {
-            currentSecretWaypoints = null;
-        }
+        if (currentSecretIndex > 0) currentSecretIndex--;
+        updateWaypoints();
     }
 
     public void nextSecret() {
         OnSecretComplete.onSecretCompleteNoKeybind();
-
         currentSecretIndex++;
+        updateWaypoints();
+    }
 
-        if(!(currentSecretIndex >= currentSecretRoute.size())) {
+    public void nextSecretKeybind() {
+        PBUtils.pbIsValid = false;
+        if (currentSecretRoute != null && currentSecretIndex < currentSecretRoute.size() - 1) {
+            currentSecretIndex++;
+        }
+        updateWaypoints();
+    }
+
+    private void updateWaypoints() {
+        if (currentSecretRoute != null && currentSecretIndex < currentSecretRoute.size()) {
             currentSecretWaypoints = currentSecretRoute.get(currentSecretIndex).getAsJsonObject();
         } else {
             currentSecretWaypoints = null;
         }
     }
 
-    public void nextSecretKeybind() {
-        PBUtils.pbIsValid = false;
-
-        if(currentSecretRoute != null) {
-            if(currentSecretIndex < currentSecretRoute.size() - 1) {
-                currentSecretIndex++;
-            }
-
-            if (!(currentSecretIndex >= currentSecretRoute.size())) {
-                currentSecretWaypoints = currentSecretRoute.get(currentSecretIndex).getAsJsonObject();
-            } else {
-                currentSecretWaypoints = null;
-            }
-        }
-    }
-
-
-
-
     public SECRET_TYPES getSecretType() {
-        try{
-            if(currentSecretWaypoints != null && currentSecretWaypoints.get("secret") != null && currentSecretWaypoints.get("secret").getAsJsonObject().get("type") != null) {
+        try {
+            if (currentSecretWaypoints != null && currentSecretWaypoints.has("secret")) {
                 String type = currentSecretWaypoints.get("secret").getAsJsonObject().get("type").getAsString();
-                switch (type) {
-                    case "interact":
-                        return SECRET_TYPES.INTERACT;
-                    case "item":
-                        return SECRET_TYPES.ITEM;
-                    case "bat":
-                        return SECRET_TYPES.BAT;
-                    case "exitroute":
-                        return SECRET_TYPES.EXITROUTE;
-                }
+                return switch (type) {
+                    case "interact" -> SECRET_TYPES.INTERACT;
+                    case "item" -> SECRET_TYPES.ITEM;
+                    case "bat" -> SECRET_TYPES.BAT;
+                    case "exitroute" -> SECRET_TYPES.EXITROUTE;
+                    default -> null;
+                };
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             LogUtils.error(e);
         }
-
         return null;
     }
 
     public BlockPos getSecretLocation() {
-        if(currentSecretWaypoints == null){return null;}
-        if(currentSecretWaypoints.get("secret") != null && currentSecretWaypoints.get("secret").getAsJsonObject().get("location") != null) {
+        if (currentSecretWaypoints == null) return null;
+        if (currentSecretWaypoints.has("secret")) {
             JsonArray location = currentSecretWaypoints.get("secret").getAsJsonObject().get("location").getAsJsonArray();
 
-            Main.checkRoomData();
-            if (DungeonManager.getCurrentRoom() != null && DungeonManager.getCurrentRoom().getDirection() != null && DungeonManager.getCurrentRoom().getPhysicalCornerPos() != null) {
-                return MapUtils.relativeToActual(new BlockPos(location.get(0).getAsInt(), location.get(1).getAsInt(), location.get(2).getAsInt()), RoomDetection.roomDirection(), RoomDetection.roomCorner());
-            } else {
-                return null;
+            if (DungeonScanner.getCurrentRoom() != null && DungeonScanner.getCurrentRoom().getDirection() != null && DungeonScanner.getCurrentRoom().getPhysicalCornerPos() != null) {
+                return DungeonMapUtils.relativeToActual(
+                        DungeonScanner.getCurrentRoom().getDirection(),
+                        DungeonScanner.getCurrentRoom().getPhysicalCornerPos(),
+                        new BlockPos(location.get(0).getAsInt(), location.get(1).getAsInt(), location.get(2).getAsInt())
+                );
             }
         }
         return null;
     }
 
-    private ParticleEffect getParticleFromId(int id) {
-        try {
-            // In modern Minecraft, we need to iterate through the registry to find by raw ID
-            // or use the registry's getRawId method in reverse
-            for (ParticleType<?> particleType : Registries.PARTICLE_TYPE) {
-                if (Registries.PARTICLE_TYPE.getRawId(particleType) == id) {
-                    // For SimpleParticleType, we can cast directly
-                    if (particleType instanceof net.minecraft.particle.SimpleParticleType) {
-                        return (ParticleEffect) particleType;
-                    }
-                    // For other particle types, return the default effect
-                    return ParticleTypes.FLAME;
-                }
-            }
-
-            // If not found, return fallback
-            return ParticleTypes.FLAME;
-        } catch (Exception e) {
-            LogUtils.error(e);
-            return ParticleTypes.FLAME;
-        }
+    private ParticleEffect getParticleFromType(SRMConfig.ParticleType type) {
+        return switch (type) {
+            case EXPLOSION_NORMAL -> ParticleTypes.EXPLOSION;
+            case EXPLOSION_LARGE, EXPLOSION_HUGE -> ParticleTypes.EXPLOSION_EMITTER;
+            case FIREWORKS_SPARK -> ParticleTypes.FIREWORK;
+            case BUBBLE -> ParticleTypes.BUBBLE;
+            case WATER_SPLASH -> ParticleTypes.SPLASH;
+            case WATER_WAKE -> ParticleTypes.FISHING;
+            case SUSPENDED_DEPTH -> ParticleTypes.UNDERWATER;
+            case CRIT -> ParticleTypes.CRIT;
+            case MAGIC_CRIT -> ParticleTypes.ENCHANTED_HIT;
+            case SMOKE_NORMAL -> ParticleTypes.SMOKE;
+            case SMOKE_LARGE -> ParticleTypes.LARGE_SMOKE;
+            case WITCH_MAGIC -> ParticleTypes.WITCH;
+            case DRIP_WATER -> ParticleTypes.DRIPPING_WATER;
+            case DRIP_LAVA -> ParticleTypes.DRIPPING_LAVA;
+            case VILLAGER_ANGRY -> ParticleTypes.ANGRY_VILLAGER;
+            case VILLAGER_HAPPY -> ParticleTypes.HAPPY_VILLAGER;
+            case TOWN_AURA -> ParticleTypes.MYCELIUM;
+            case NOTE -> ParticleTypes.NOTE;
+            case PORTAL -> ParticleTypes.PORTAL;
+            case ENCHANTMENT_TABLE -> ParticleTypes.ENCHANT;
+            case FLAME -> ParticleTypes.FLAME;
+            case LAVA -> ParticleTypes.LAVA;
+            case FOOTSTEP, CLOUD -> ParticleTypes.CLOUD;
+            case SNOWBALL, SNOW_SHOVEL -> ParticleTypes.ITEM_SNOWBALL;
+            case SLIME -> ParticleTypes.ITEM_SLIME;
+            case HEART -> ParticleTypes.HEART;
+            case WATER_DROP -> ParticleTypes.RAIN;
+            case ITEM_TAKE -> ParticleTypes.POOF;
+            case MOB_APPEARANCE -> ParticleTypes.ELDER_GUARDIAN;
+            default -> ParticleTypes.FLAME;
+        };
     }
 
     public void renderLines() {
         try {
             if (currentSecretWaypoints != null && currentSecretWaypoints.has("locations")) {
-                // Render the lines
                 List<BlockPos> lines = new LinkedList<>();
-                JsonArray lineLocations = new JsonArray();
-                try {
-                    lineLocations = currentSecretWaypoints.get("locations").getAsJsonArray();
+                JsonArray lineLocations = currentSecretWaypoints.get("locations").getAsJsonArray();
 
-                } catch (IllegalStateException e) {
-                    LogUtils.info(String.valueOf(currentSecretWaypoints.get("locations")));
-                    LogUtils.info(currentSecretWaypoints.get("locations").getClass().getName());
-                    LogUtils.error(e);
-                    return;
-                }
                 for (JsonElement lineLocationElement : lineLocations) {
                     JsonArray lineLocation = lineLocationElement.getAsJsonArray();
 
-                    Main.checkRoomData();
-                    lines.add(MapUtils.relativeToActual(new BlockPos(lineLocation.get(0).getAsInt(), lineLocation.get(1).getAsInt(), lineLocation.get(2).getAsInt()), RoomDetection.roomDirection(), RoomDetection.roomCorner()));
+                    if (DungeonScanner.getCurrentRoom() != null && DungeonScanner.getCurrentRoom().getPhysicalCornerPos() != null) {
+                        lines.add(DungeonMapUtils.relativeToActual(
+                                DungeonScanner.getCurrentRoom().getDirection(),
+                                DungeonScanner.getCurrentRoom().getPhysicalCornerPos(),
+                                new BlockPos(lineLocation.get(0).getAsInt(), lineLocation.get(1).getAsInt(), lineLocation.get(2).getAsInt())
+                        ));
+                    }
                 }
 
-                if (SRMConfig.lineType == 0) {
-                    //Add tick delay
-                    if (c < SRMConfig.tickInterval) {
+                if (SRMConfig.get().lineType == SRMConfig.LineType.PARTICLES) {
+                    if (c < SRMConfig.get().tickInterval) {
                         c++;
                         return;
                     }
                     c = 0;
-                    int particleType = SRMConfig.particles;
-                    if (particleType >= 36) {
-                        particleType += 3;
-                    }
-                    // Draw particles based on registry lookup
                     try {
-                        ParticleEffect particle = getParticleFromId(particleType);
+                        ParticleEffect particle = getParticleFromType(SRMConfig.get().particles);
                         RenderUtils.drawLineMultipleParticles(particle, lines);
                     } catch (Exception e) {
                         LogUtils.error(e);
                     }
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             LogUtils.error(e);
         }
     }
-    public void getData(String filePath){
-        new Thread( () ->{
-            HashMap<String, Integer> map = new HashMap<>();
+
+    public void getData(String filePath) {
+        new Thread(() -> {
             try {
                 Gson gson = new GsonBuilder().create();
                 FileReader reader = new FileReader(filePath);
@@ -267,15 +210,15 @@ public class Room {
                     return;
                 }
 
-                // Build a case-insensitive key map
                 Map<String, JsonElement> data = new HashMap<>();
                 for (Map.Entry<String, JsonElement> entry : rawData.entrySet()) {
                     data.put(entry.getKey().toLowerCase(Locale.ROOT), entry.getValue());
                 }
 
+                HashMap<String, Integer> map = new HashMap<>();
+
                 for (int i = 0; i <= 10; i++) {
                     String path = (i == 0 ? name : name + ":" + i).toLowerCase(Locale.ROOT);
-
                     JsonElement element = data.get(path);
                     if (element == null || element.isJsonNull()) {
                         if (i == 0) currentSecretRoute = null;
@@ -288,25 +231,34 @@ public class Room {
                     BlockPos startPos = new BlockPos(starPoseArray.get(0).getAsInt(), starPoseArray.get(1).getAsInt(), starPoseArray.get(2).getAsInt());
                     map.put(BlockUtils.blockPos(startPos), i);
                 }
+
                 int i = 0;
                 for (Map.Entry<String, Integer> entry : map.entrySet()) {
                     ClientPlayerEntity p = MinecraftClient.getInstance().player;
+                    if (p == null) continue;
                     BlockPos pPos = p.getBlockPos();
-                    if(pPos == null){continue;}
-                    BlockPos relPos = MapUtils.actualToRelative(pPos, RoomDetection.roomDirection(), RoomDetection.roomCorner());
+                    if (pPos == null) continue;
+
+                    if (DungeonScanner.getCurrentRoom() == null || !DungeonScanner.getCurrentRoom().isMatched())
+                        continue;
+
+                    BlockPos relPos = DungeonMapUtils.actualToRelative(
+                            DungeonScanner.getCurrentRoom().getDirection(),
+                            DungeonScanner.getCurrentRoom().getPhysicalCornerPos(),
+                            pPos
+                    );
                     double dist1 = BlockUtils.blockDistance(relPos, entry.getKey());
 
-                    if(closest != null){
+                    if (closest != null) {
                         double dist2 = closest.getThree();
-                        if(dist1 > dist2) {
-                            continue;
-                        }
+                        if (dist1 > dist2) continue;
                     }
 
                     closest = new Triple<>(entry.getKey(), i, dist1);
                     i++;
                 }
-                if(closest != null) {
+
+                if (closest != null) {
                     currentSecretRoute = arrays.get(closest.getTwo());
                     currentSecretWaypoints = currentSecretRoute.get(currentSecretIndex).getAsJsonObject();
                     System.out.println("route: " + currentSecretRoute);
@@ -316,7 +268,5 @@ public class Room {
                 LogUtils.error(e);
             }
         }).start();
-
     }
 }
-//#endif

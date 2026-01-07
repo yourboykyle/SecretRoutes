@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2024 yourboykyle & R-aMcC
@@ -25,6 +24,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandRegistryAccess;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
@@ -37,19 +37,20 @@ public class SRM {
     }
 
     private static void registerCommands(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandRegistryAccess registryAccess) {
-        // Main command and aliases
+        // xyz.yourboykyle.secretroutes.Main command and aliases
         dispatcher.register(literal("srm")
                 .executes(SRM::executeCommand));
 
         // Aliases
-        dispatcher.register(literal("secretroutes").redirect(dispatcher.register(literal("srm"))));
+        dispatcher.register(literal("xyz/yourboykyle/secretroutes").redirect(dispatcher.register(literal("srm"))));
         dispatcher.register(literal("secretroutesmod").redirect(dispatcher.register(literal("srm"))));
     }
 
     private static int executeCommand(CommandContext<FabricClientCommandSource> context) {
         LogUtils.info("Opening SRM GUI (command)...");
-        SRMConfig.INSTANCE.openGui();
+        MinecraftClient.getInstance().send(() ->
+                MinecraftClient.getInstance().setScreen(SRMConfig.getScreen(MinecraftClient.getInstance().currentScreen))
+        );
         return 1;
     }
 }
-//#endif
