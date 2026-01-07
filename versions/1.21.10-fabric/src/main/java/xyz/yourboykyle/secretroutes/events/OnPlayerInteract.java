@@ -20,8 +20,6 @@
 
 package xyz.yourboykyle.secretroutes.events;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -34,6 +32,7 @@ import net.minecraft.world.World;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.*;
+import xyz.yourboykyle.secretroutes.utils.skyblocker.DungeonScanner;
 
 public class OnPlayerInteract {
 
@@ -82,10 +81,9 @@ public class OnPlayerInteract {
 
             if (SRMConfig.get().allSecrets) {
                 if (SecretUtils.secrets != null) {
-                    for (JsonElement secret : SecretUtils.secrets) {
+                    for (DungeonScanner.SecretWaypoint secret : SecretUtils.secrets) {
                         try {
-                            JsonObject json = secret.getAsJsonObject();
-                            BlockPos spos = new BlockPos(json.get("x").getAsInt(), json.get("y").getAsInt(), json.get("z").getAsInt());
+                            BlockPos spos = new BlockPos(secret.x(), secret.y(), secret.z());
                             BlockPos rel = MapUtils.actualToRelative(pos, RoomDetection.roomDirection(), RoomDetection.roomCorner());
                             if (BlockUtils.blockPos(spos).equals(BlockUtils.blockPos(rel))) {
                                 if (!SecretUtils.secretLocations.contains(BlockUtils.blockPos(spos))) {

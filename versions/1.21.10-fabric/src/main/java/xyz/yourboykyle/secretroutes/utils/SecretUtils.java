@@ -33,6 +33,7 @@ import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 import xyz.yourboykyle.secretroutes.utils.multistorage.Tuple;
+import xyz.yourboykyle.secretroutes.utils.skyblocker.DungeonScanner;
 
 import java.awt.*;
 import java.io.InputStreamReader;
@@ -42,7 +43,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class SecretUtils {
-    public static JsonArray secrets = null;
+    public static List<DungeonScanner.SecretWaypoint> secrets = null;
     public static boolean renderLever = false;
     public static PrintingUtils xPrinter = new PrintingUtils();
     public static PrintingUtils yPrinter = new PrintingUtils();
@@ -395,15 +396,13 @@ public class SecretUtils {
         secrets = getSecrets();
 
         if (secrets != null) {
-            for (JsonElement secret : secrets) {
-                JsonObject secretInfos = secret.getAsJsonObject();
-                String name = secretInfos.get("secretName").getAsString();
-                // String type = secretInfos.get("category").getAsString();
+            for (DungeonScanner.SecretWaypoint secret : secrets) {
+                String name = secret.secretName();
 
                 if (name.contains("Chest") || name.contains("Bat") || name.contains("Wither Essence") || name.contains("Lever") || name.contains("Item")) {
-                    int xPos = secretInfos.get("x").getAsInt();
-                    int yPos = secretInfos.get("y").getAsInt();
-                    int zPos = secretInfos.get("z").getAsInt();
+                    int xPos = secret.x();
+                    int yPos = secret.y();
+                    int zPos = secret.z();
                     Main.checkRoomData();
                     Triple<Double, Double, Double> abs = MapUtils.relativeToActual(xPos, yPos, zPos, RoomDetection.roomDirection(), RoomDetection.roomCorner());
 
@@ -445,26 +444,25 @@ public class SecretUtils {
                     AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, color, 1f, 1f, true));
                 }
             }
-
         }
     }
 
     public static void renderLever() {
-        ArrayList<JsonElement> levers = new ArrayList<>();
-        JsonArray csr = getSecrets();
+        ArrayList<DungeonScanner.SecretWaypoint> levers = new ArrayList<>();
+        List<DungeonScanner.SecretWaypoint> csr = getSecrets();
         String leverNum = null;
         if (csr == null) {
             SecretUtils.renderLever = false;
         }
         if (currentLeverPos == null && csr != null) {
-            for (JsonElement secret : csr) {
-                JsonObject secretInfos = secret.getAsJsonObject();
-                String name = secretInfos.get("secretName").getAsString();
-                String category = secretInfos.get("category").getAsString();
+            for (DungeonScanner.SecretWaypoint secret : csr) {
+                String name = secret.secretName();
+                String category = secret.category();
+
                 if (category.equals("chest") && leverNum == null) {
-                    int x = secretInfos.get("x").getAsInt();
-                    int y = secretInfos.get("y").getAsInt();
-                    int z = secretInfos.get("z").getAsInt();
+                    int x = secret.x();
+                    int y = secret.y();
+                    int z = secret.z();
 
                     Triple<Double, Double, Double> abs = MapUtils.relativeToActual(x, y, z, RoomDetection.roomDirection(), RoomDetection.roomCorner());
                     BlockPos pos = new BlockPos(abs.getOne().intValue(), abs.getTwo().intValue(), abs.getThree().intValue());
@@ -481,27 +479,23 @@ public class SecretUtils {
                         String[] nums = leverNum.split("/");
                         for (String num : nums) {
                             if (name.contains(num)) {
-                                currentLeverPos = new BlockPos(secretInfos.get("x").getAsInt(), secretInfos.get("y").getAsInt(), secretInfos.get("z").getAsInt());
+                                currentLeverPos = new BlockPos(secret.x(), secret.y(), secret.z());
                                 leverName = name;
                             }
                         }
-
                     }
                 }
-
             }
         }
 
-
         if (currentLeverPos != null || !levers.isEmpty()) {
             if (currentLeverPos == null && leverNum != null) {
-                for (JsonElement secret : levers) {
-                    JsonObject secretInfos = secret.getAsJsonObject();
-                    String name = secretInfos.get("secretName").getAsString();
+                for (DungeonScanner.SecretWaypoint secret : levers) {
+                    String name = secret.secretName();
                     String[] nums = leverNum.split("/");
                     for (String num : nums) {
                         if (name.contains(num)) {
-                            currentLeverPos = new BlockPos(secretInfos.get("x").getAsInt(), secretInfos.get("y").getAsInt(), secretInfos.get("z").getAsInt());
+                            currentLeverPos = new BlockPos(secret.x(), secret.y(), secret.z());
                             leverName = name;
                         }
                     }
@@ -519,10 +513,9 @@ public class SecretUtils {
                     AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, SRMConfig.get().secretsInteract, 1f, 1f, true));
                 }
 
-                // Using interactWaypointColor for lever
                 Text text = Text.literal(getColorCode(SRMConfig.get().interactWaypointColor) + "Locked chest lever");
                 Vec3d position = new Vec3d(abs.getOne(), abs.getTwo(), abs.getThree());
-                AnotherRenderingUtil.addWorldText(new RenderTypes.WorldText(text, position, true, SRMConfig.get().interactsTextSize)); // Assuming interactsTextSize exists
+                AnotherRenderingUtil.addWorldText(new RenderTypes.WorldText(text, position, true, SRMConfig.get().interactsTextSize));
 
                 if (first) {
                     removeBannerTime = System.currentTimeMillis() + 5000;
@@ -541,32 +534,24 @@ public class SecretUtils {
         }
     }
 
-    public static JsonArray getSecrets() {
+    public static List<DungeonScanner.SecretWaypoint> getSecrets() {
         Main.checkRoomData();
         if (Main.currentRoom == null || Main.currentRoom.name == null) return null;
 
-        String roomName = Main.currentRoom.name.toLowerCase();
         if (secrets == null) {
-            try {
-                try (Reader reader = new InputStreamReader(Main.class.getResourceAsStream("/assets/roomdetection/secretlocations.json"))) {
-                    JsonParser parser = new JsonParser();
-                    JsonObject object = parser.parse(reader).getAsJsonObject();
-                    for (String key : object.keySet()) {
-                        if (key.equalsIgnoreCase(roomName)) {
-                            secrets = object.getAsJsonArray(key);
-                            break;
-                        }
-                    }
-                    return secrets;
-                }
-            } catch (Exception e) {
-                LogUtils.error(e);
-            }
-            return null;
-        } else {
-            return secrets;
-        }
+            String roomName = Main.currentRoom.name;
+            secrets = DungeonScanner.ROOMS_WAYPOINTS.get(roomName);
 
+            if (secrets == null) {
+                for (String key : DungeonScanner.ROOMS_WAYPOINTS.keySet()) {
+                    if (key.equalsIgnoreCase(roomName)) {
+                        secrets = DungeonScanner.ROOMS_WAYPOINTS.get(key);
+                        break;
+                    }
+                }
+            }
+        }
+        return secrets;
     }
 
     public static void resetValues() {
@@ -577,5 +562,6 @@ public class SecretUtils {
         chestName = null;
         leverName = null;
         leverNumber = null;
+        secrets = null;
     }
 }
