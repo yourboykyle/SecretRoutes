@@ -48,7 +48,7 @@ public class OnItemPickedUp {
             "Treasure Talisman"
     };
     private static final Map<String, Integer> previousInventory = new HashMap<>();
-    public static boolean itemSecretOnCooldown = false; // True: do not add item secret waypoint, False: add item secret waypoint
+    public static boolean itemSecretOnCooldown = false;
     private static int tickCounter = 0;
 
     public static void register() {

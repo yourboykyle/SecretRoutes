@@ -87,7 +87,7 @@ public class ConfigUtils {
             String json = gson.toJson(profileData);
 
             File profileFile = new File(COLOR_PROFILE_PATH + File.separator + path);
-            profileFile.getParentFile().mkdirs(); // Ensure directory exists
+            profileFile.getParentFile().mkdirs();
 
             try (FileWriter writer = new FileWriter(profileFile)) {
                 writer.write(json);
