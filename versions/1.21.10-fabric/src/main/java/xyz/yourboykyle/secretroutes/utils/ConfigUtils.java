@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -23,11 +22,16 @@ package xyz.yourboykyle.secretroutes.utils;
 
 import com.google.gson.*;
 import net.minecraft.util.Formatting;
-import org.polyfrost.polyui.color.ColorUtils;
-import org.polyfrost.polyui.color.PolyColor;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
+import xyz.yourboykyle.secretroutes.config.SRMConfig.TextColor;
+import xyz.yourboykyle.secretroutes.utils.LogUtils;
 
-import java.io.*;
+import java.awt.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,16 +40,15 @@ import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 
 public class ConfigUtils {
     static String[] keys = {
-            "startTextToggle", "startWaypointColorIndex", "startTextSize",
-            "exitTextToggle", "exitWaypointColorIndex", "exitTextSize",
-            "interactTextToggle", "interactWaypointColorIndex", "interactTextSize",
-            "itemTextToggle", "itemWaypointColorIndex", "itemTextSize",
-            "batTextToggle", "batWaypointColorIndex", "batTextSize",
-            "etherwarpsTextToggle", "etherwarpsEnumToggle", "etherwarpsWaypointColorIndex", "etherwarpsTextSize",
-            "minesTextToggle", "minesEnumToggle", "minesWaypointColorIndex", "minesTextSize",
-            "interactsTextToggle", "interactsEnumToggle", "interactsWaypointColorIndex", "interactsTextSize",
-            "superboomsTextToggle", "superboomsEnumToggle", "superboomsWaypointColorIndex", "superboomsTextSize",
-            "enderpearlTextToggle", "enderpearlEnumToggle", "enderpearlWaypointColorIndex", "enderpearlTextSize",
+            "startTextToggle", "startWaypointColor", "startTextSize",
+            "exitTextToggle", "exitWaypointColor", "exitTextSize",
+            "interactTextToggle", "interactWaypointColor", "interactTextSize",
+            "itemTextToggle", "itemWaypointColor", "itemTextSize",
+            "batTextToggle", "batWaypointColor", "batTextSize",
+            "etherwarpsTextToggle", "etherwarpsEnumToggle", "etherwarpsWaypointColor", "etherwarpsTextSize",
+            "minesTextToggle", "minesEnumToggle", "minesWaypointColor", "minesTextSize",
+            "interactTextToggle", "interactsEnumToggle", "interactWaypointColor", "interactsTextSize",
+            "superboomsTextToggle", "superboomsEnumToggle", "superboomsWaypointColor", "superboomsTextSize",
             "etherwarpFullBlock", "mineFullBlock", "superboomsFullBlock", "enderpearlFullBlock",
             "secretsItemFullBlock", "secretsInteractFullBlock", "secretsBatFullBlock", "interactsFullBlock",
             "lineColor", "etherWarp", "mine", "interacts", "superbooms", "enderpearls",
@@ -54,36 +57,45 @@ public class ConfigUtils {
             "renderSecretsItem", "renderSecretIteract", "renderSecretBat"
     };
 
-
-
-
-
     public static void writeColorConfig(String path) {
-        if(!path.endsWith(".json")){
+        if (!path.endsWith(".json")) {
             path += ".json";
         }
-        Map<String, Object> defaultColors = new HashMap<>();
+
+        SRMConfig config = SRMConfig.get();
+        Map<String, Object> profileData = new HashMap<>();
+
         for (String key : keys) {
             try {
-                defaultColors.put(key,SRMConfig.class.getDeclaredField(key).get(null));
-            }catch(Exception e){
+                Field field = SRMConfig.class.getDeclaredField(key);
+                field.setAccessible(true);
+                Object value = field.get(config);
+
+                if (value instanceof Color) {
+                    profileData.put(key, ((Color) value).getRGB());
+                } else {
+                    profileData.put(key, value);
+                }
+            } catch (NoSuchFieldException e) {
+            } catch (Exception e) {
                 LogUtils.error(e);
             }
         }
-        try{
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            String json = gson.toJson(defaultColors);
-            try (FileWriter writer = new FileWriter(COLOR_PROFILE_PATH+ File.separator+path)) {
-                writer.write(json);
-                sendChatMessage(Formatting.GREEN+path+Formatting.DARK_GREEN+" color profile created successfully.");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
 
-        }catch (Exception e){
+        try {
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            String json = gson.toJson(profileData);
+
+            File profileFile = new File(COLOR_PROFILE_PATH + File.separator + path);
+            profileFile.getParentFile().mkdirs();
+
+            try (FileWriter writer = new FileWriter(profileFile)) {
+                writer.write(json);
+                sendChatMessage(Formatting.GREEN + path + Formatting.DARK_GREEN + " color profile created successfully.");
+            }
+        } catch (Exception e) {
             LogUtils.error(e);
         }
-
     }
 
     public static boolean loadColorConfig(String path) {
@@ -91,108 +103,91 @@ public class ConfigUtils {
             path += ".json";
         }
         String finalPath = COLOR_PROFILE_PATH + File.separator + path;
-        if(!new File(finalPath).exists()){
-            sendChatMessage(Formatting.RED+"Color profile not found, please select different one or create it.");
+
+        if (!new File(finalPath).exists()) {
+            sendChatMessage(Formatting.RED + "Color profile not found, please select different one or create it.");
             return false;
         }
+
         Gson gson = new GsonBuilder().create();
-        FileReader reader = null;
-        try{
+        FileReader reader;
+        try {
             reader = new FileReader(finalPath);
-        }catch(FileNotFoundException e){
-            //This should never happen...
+        } catch (FileNotFoundException e) {
             LogUtils.error(e);
-            sendChatMessage("§4 THIS SHOULD NEVER HAVE HAPPENED... (ConfigUtils 123)");
             return false;
         }
+
         JsonObject data = gson.fromJson(reader, JsonObject.class);
+        SRMConfig config = SRMConfig.get();
+
+        boolean changed = false;
 
         for (String key : keys) {
+            if (!data.has(key)) continue;
 
             try {
-                switch (key) {
-                    case "startTextToggle":
-                    case "exitTextToggle":
-                    case "interactTextToggle":
-                    case "itemTextToggle":
-                    case "batTextToggle":
-                    case "etherwarpsTextToggle":
-                    case "minesTextToggle":
-                    case "interactsTextToggle":
-                    case "superboomsTextToggle":
-                    case "enderpearlTextToggle":
-                    case "etherwarpFullBlock":
-                    case "mineFullBlock":
-                    case "superboomsFullBlock":
-                    case "enderpearlFullBlock":
-                    case "interactsFullBlock":
-                    case "secretsItemFullBlock":
-                    case "secretsInteractFullBlock":
-                    case "secretsBatFullBlock":
-                    case "renderEtherwarps ":
-                    case "renderMines":
-                    case "renderInteracts":
-                    case "renderSuperboom":
-                    case "renderEnderpearls":
-                    case "renderSecretsItem":
-                    case "renderSecretIteract":
-                    case "renderSecretBat":
-                        SRMConfig.class.getDeclaredField(key).setBoolean(null, data.has(key) && data.get(key).getAsBoolean());
-                        continue;
-                    case "startWaypointColorIndex":
-                    case "exitWaypointColorIndex":
-                    case "interactWaypointColorIndex":
-                    case "itemWaypointColorIndex":
-                    case "batWaypointColorIndex":
-                    case "etherwarpsWaypointColorIndex":
-                    case "minesWaypointColorIndex":
-                    case "interactsWaypointColorIndex":
-                    case "superboomsWaypointColorIndex":
-                    case "enderpearlWaypointColorIndex":
-                        SRMConfig.class.getDeclaredField(key).setInt(null, data.has(key) ? data.get(key).getAsInt() : 0);
-                        continue;
-                    case "startTextSize":
-                    case "exitTextSize":
-                    case "interactTextSize":
-                    case "itemTextSize":
-                    case "batTextSize":
-                    case "etherwarpsTextSize":
-                    case "minesTextSize":
-                    case "interactsTextSize":
-                    case "superboomsTextSize":
-                    case "enderpearlTextSize":
-                        SRMConfig.class.getDeclaredField(key).setFloat(null, data.has(key) ? data.get(key).getAsFloat() : 3f);
-                        continue;
-                    case "lineColor":
-                    case "etherWarp":
-                    case "mine":
-                    case "interacts":
-                    case "superbooms":
-                    case "enderpearls":
-                    case "secretsItem":
-                    case "secretsInteract":
-                    case "secretsBat":
-                    case "pearlLineColor":
-                        SRMConfig.class.getDeclaredField(key).set(null, data.has(key) ? parsePolyColor(data.get(key)) : ColorUtils.rgba(255, 255, 255));
-                    default:
-                        continue;
+                Field field = SRMConfig.class.getDeclaredField(key);
+                field.setAccessible(true);
+                Class<?> type = field.getType();
+
+                if (type == boolean.class) {
+                    field.setBoolean(config, data.get(key).getAsBoolean());
+                } else if (type == int.class) {
+                    field.setInt(config, data.get(key).getAsInt());
+                } else if (type == float.class) {
+                    field.setFloat(config, data.get(key).getAsFloat());
+                } else if (type == String.class) {
+                    field.set(config, data.get(key).getAsString());
+                } else if (type == Color.class) {
+                    field.set(config, parseColor(data.get(key)));
+                } else if (type == TextColor.class) {
+                    try {
+                        String enumName = data.get(key).getAsString();
+                        field.set(config, TextColor.valueOf(enumName));
+                    } catch (Exception ex) {
+                        field.set(config, TextColor.RED);
+                    }
                 }
-            }catch (Exception e) {
+                changed = true;
+            } catch (NoSuchFieldException e) {
+            } catch (Exception e) {
                 LogUtils.error(e);
             }
         }
+
+        if (changed) {
+            SRMConfig.HANDLER.save();
+        }
+
         return true;
     }
 
-    public static PolyColor parsePolyColor(JsonElement json){
-        JsonObject jsonObject = json.getAsJsonObject();
-        JsonArray hsba = jsonObject.getAsJsonArray("hsba");
-        int hue = hsba.get(0).getAsInt();
-        int saturation = hsba.get(1).getAsInt();
-        int brightness = hsba.get(2).getAsInt();
-        int alpha = hsba.get(3).getAsInt();
-        //int chromaSpeed = jsonObject.get("dataBit").getAsInt();
-        return ColorUtils.hsba(hue, saturation, brightness, alpha);
+    private static Color parseColor(JsonElement json) {
+        try {
+            if (json.isJsonPrimitive() && json.getAsJsonPrimitive().isNumber()) {
+                return new Color(json.getAsInt(), true);
+            }
+
+            if (json.isJsonObject()) {
+                JsonObject jsonObject = json.getAsJsonObject();
+                if (jsonObject.has("hsba")) {
+                    JsonArray hsba = jsonObject.getAsJsonArray("hsba");
+                    float h = hsba.get(0).getAsInt() / 360f;
+                    float s = hsba.get(1).getAsInt() / 100f;
+                    float b = hsba.get(2).getAsInt() / 100f;
+                    int a = hsba.get(3).getAsInt();
+
+                    Color c = Color.getHSBColor(h, s, b);
+                    return new Color(c.getRed(), c.getGreen(), c.getBlue(), a);
+                }
+                if (jsonObject.has("value")) {
+                    return new Color(jsonObject.get("value").getAsInt(), true);
+                }
+            }
+        } catch (Exception e) {
+            LogUtils.error(e);
+        }
+        return Color.WHITE;
     }
 }
-//#endif

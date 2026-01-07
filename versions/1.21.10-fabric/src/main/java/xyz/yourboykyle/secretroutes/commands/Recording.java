@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2024 yourboykyle & R-aMcC
@@ -67,7 +66,8 @@ public class Recording {
     }
 
     private static int openGui(CommandContext<FabricClientCommandSource> context) {
-        SRMConfig.INSTANCE.openGui();
+        MinecraftClient client = MinecraftClient.getInstance();
+        client.send(() -> client.setScreen(SRMConfig.getScreen(client.currentScreen)));
         return 1;
     }
 
@@ -89,8 +89,8 @@ public class Recording {
     private static int executeGetRoom(CommandContext<FabricClientCommandSource> context) {
         context.getSource().sendFeedback(
                 Text.literal("Room Name: " + RoomDetection.roomName() +
-                        ", Room Corner: " + RoomDetection.roomCorner() +
-                        ", Room Direction: " + RoomDetection.roomDirection())
+                                ", Room Corner: " + RoomDetection.roomCorner() +
+                                ", Room Direction: " + RoomDetection.roomDirection())
                         .formatted(Formatting.BLUE)
         );
         return 1;
@@ -127,7 +127,7 @@ public class Recording {
 
             BlockPos playerPos = player.getBlockPos();
             BlockPos targetPos = new BlockPos(playerPos.getX(), playerPos.getY(), playerPos.getZ());
-            targetPos = targetPos.add(-1, 0, -1); // The -1 on X and Z have to be like that, trust the process
+            targetPos = targetPos.add(-1, 0, -1);
 
             Main.routeRecording.addWaypoint(Room.SECRET_TYPES.EXITROUTE, targetPos);
             Main.routeRecording.newSecret();
@@ -150,4 +150,3 @@ public class Recording {
         return 1;
     }
 }
-//#endif

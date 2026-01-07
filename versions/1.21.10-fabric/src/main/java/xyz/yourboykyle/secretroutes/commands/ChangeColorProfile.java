@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2024 yourboykyle & R-aMcC
@@ -28,6 +27,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -49,7 +49,6 @@ public class ChangeColorProfile {
     }
 
     private static void registerCommands(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandRegistryAccess registryAccess) {
-        // Main command and aliases
         dispatcher.register(literal("changecolorprofile")
                 .executes(ChangeColorProfile::openGui)
                 .then(literal("list")
@@ -70,7 +69,8 @@ public class ChangeColorProfile {
     }
 
     private static int openGui(CommandContext<FabricClientCommandSource> context) {
-        SRMConfig.INSTANCE.openGui();
+        MinecraftClient client = MinecraftClient.getInstance();
+        client.send(() -> client.setScreen(SRMConfig.getScreen(client.currentScreen)));
         return 1;
     }
 
@@ -126,4 +126,3 @@ public class ChangeColorProfile {
     }
 
 }
-//#endif

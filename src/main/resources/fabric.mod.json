@@ -13,17 +13,21 @@
   "environment": "client",
   "entrypoints": {
     "client": [
-      {
-        "value": "xyz.yourboykyle.secretroutes.Main"
-      }
+      "xyz.yourboykyle.secretroutes.Main"
+    ],
+    "modmenu": [
+      "xyz.yourboykyle.secretroutes.config.ModMenuIntegration"
     ]
   },
+  "mixins": [
+    "mixins.secretroutesmod.fabric.json"
+  ],
   "depends": {
     "minecraft": "~${minor_mc_version}",
     "fabricloader": ">=0.15.11",
     "fabric-api": "*",
-    "skyblocker": ">=5.11.0",
-    "oneconfigbootstrap": ">=1.0.0-alpha.180"
+    "yet_another_config_lib_v3": ">=3.8.1+1.21.10-fabric",
+    "hypixel-mod-api": ">=1.0.1"
   },
   "custom": {
     "modmenu": {

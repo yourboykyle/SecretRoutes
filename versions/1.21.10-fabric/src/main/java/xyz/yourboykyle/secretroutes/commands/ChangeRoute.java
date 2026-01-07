@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2024 yourboykyle & R-aMcC
@@ -47,7 +46,6 @@ public class ChangeRoute {
     }
 
     private static void registerCommands(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandRegistryAccess registryAccess) {
-        // Main command and aliases
         dispatcher.register(literal("changeroute")
                 .then(literal("list")
                         .executes(ChangeRoute::listRoutes))
@@ -73,7 +71,7 @@ public class ChangeRoute {
         String routeName = StringArgumentType.getString(context, "route");
 
         if (FileUtils.doesFileExist(Main.ROUTES_PATH + File.separator + routeName)) {
-            SRMConfig.routesFileName = routeName;
+            SRMConfig.get().routesFileName = routeName;
             context.getSource().sendFeedback(
                     Text.literal("Loaded ").formatted(Formatting.DARK_GREEN)
                             .append(Text.literal(routeName).formatted(Formatting.GREEN))
@@ -92,4 +90,3 @@ public class ChangeRoute {
         return builder.buildFuture();
     }
 }
-//#endif

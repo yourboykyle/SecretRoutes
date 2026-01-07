@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 package xyz.yourboykyle.secretroutes.utils.autoupdate;
 
 import com.google.gson.JsonElement;
@@ -20,7 +19,44 @@ import java.util.function.Supplier;
  */
 
 public class UpdateManager {
+    private static final UpdateContext context = new UpdateContext(
+            UpdateSource.githubUpdateSource("yourboykyle", "SecretRoutes"),
+            UpdateTarget.deleteAndSaveInTheSameFolder(UpdateManager.class),
+            new CurrentVersion() {
+                private final CurrentVersion normalDelegate = CurrentVersion.ofTag("v" + Main.VERSION);
+
+                @Override
+                public String display() {
+                    if (SRMConfig.get().forceUpdateDEBUG) {
+                        return "Force Outdated";
+                    }
+                    return normalDelegate.display();
+                }
+
+                @Override
+                public boolean isOlderThan(JsonElement element) {
+                    if (SRMConfig.get().forceUpdateDEBUG) {
+                        LogUtils.info("isOlderThan: force update!");
+                        return true;
+                    }
+                    return normalDelegate.isOlderThan(element);
+                }
+
+                @Override
+                public String toString() {
+                    return "" + normalDelegate;
+                }
+            },
+            Main.MODID
+    );
     private static CompletableFuture<?> _activePromise = null;
+    private static UpdateState updateState = UpdateState.NONE;
+    private static PotentialUpdate potentialUpdate = null;
+
+    static {
+        context.cleanup();
+
+    }
 
     public static void setActivePromise(CompletableFuture<?> value) {
         if (_activePromise != null) {
@@ -28,10 +64,6 @@ public class UpdateManager {
         }
         _activePromise = value;
     }
-
-    private static UpdateState updateState = UpdateState.NONE;
-    private static PotentialUpdate potentialUpdate = null;
-
 
     public static String getNextVersion() {
         return potentialUpdate != null ? potentialUpdate.getUpdate().getVersionNumber().getAsString() : null;
@@ -65,12 +97,12 @@ public class UpdateManager {
                     LogUtils.info("Latest version: " + update.getUpdate().getVersionNumber());
 
 
-                    if (checkVersion(update) || SRMConfig.forceUpdateDEBUG) { // Dev option to test auto update: Forces an out of date version no matter what (HIDDEN THROUGH A (not very secure) DEV PASSWORD)
+                    if (checkVersion(update) || SRMConfig.get().forceUpdateDEBUG) { // Dev option to test auto update: Forces an out of date version no matter what (HIDDEN THROUGH A (not very secure) DEV PASSWORD)
                         updateState = UpdateState.AVAILABLE;
                         LogUtils.info("Update available");
 
                         ChatUtils.sendChatMessage(Formatting.GREEN + "Secret Routes Mod found a new update: " + update.getUpdate().getVersionName());
-                        if (SRMConfig.autoDownload) {
+                        if (SRMConfig.get().autoDownload) {
                             LogUtils.info("Update available, autoUpdate is enabled");
                             ChatUtils.sendChatMessage(Formatting.GREEN + "Automatically downloading new Secret Routes Mod update, since AutoDownload is true...");
                             queueUpdate();
@@ -78,7 +110,7 @@ public class UpdateManager {
                             ChatUtils.sendClickableMessage(Formatting.GREEN + "Download at https://github.com/yourboykyle/SecretRoutes/releases/latest", "https://github.com/yourboykyle/SecretRoutes/releases/latest");
                         }
                     } else {
-                        if(button){
+                        if (button) {
                             ChatUtils.sendChatMessage(Formatting.GREEN + "Secret Routes Mod is up to date!");
                         }
                         LogUtils.info("No update available.");
@@ -111,49 +143,6 @@ public class UpdateManager {
         }));
     }
 
-    private static final UpdateContext context = new UpdateContext(
-            UpdateSource.githubUpdateSource("yourboykyle", "SecretRoutes"),
-            UpdateTarget.deleteAndSaveInTheSameFolder(UpdateManager.class),
-            new CurrentVersion() {
-                private final CurrentVersion normalDelegate = CurrentVersion.ofTag("v" + Main.VERSION);
-
-                @Override
-                public String display() {
-                    if (SRMConfig.forceUpdateDEBUG) {
-                        return "Force Outdated";
-                    }
-                    return normalDelegate.display();
-                }
-
-                @Override
-                public boolean isOlderThan(JsonElement element) {
-                    if (SRMConfig.forceUpdateDEBUG) {
-                        LogUtils.info("isOlderThan: force update!");
-                        return true;
-                    }
-                    return normalDelegate.isOlderThan(element);
-                }
-
-                @Override
-                public String toString() {
-                    return "" + normalDelegate;
-                }
-            },
-            Main.MODID
-    );
-
-    static {
-        context.cleanup();
-
-    }
-
-    public enum UpdateState {
-        AVAILABLE,
-        QUEUED,
-        DOWNLOADED,
-        NONE
-    }
-
     public boolean checkVersion(PotentialUpdate update) {
         String[] currentV = Main.VERSION.split("\\.");
         String[] nextV = update.getUpdate().getVersionName().substring(1).split("\\.");
@@ -170,5 +159,11 @@ public class UpdateManager {
         }
         return false;
     }
+
+    public enum UpdateState {
+        AVAILABLE,
+        QUEUED,
+        DOWNLOADED,
+        NONE
+    }
 }
-//#endif

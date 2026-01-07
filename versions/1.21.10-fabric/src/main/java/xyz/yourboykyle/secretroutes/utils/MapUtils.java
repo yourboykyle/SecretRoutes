@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Dungeon Rooms Mod - Secret Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2021 Quantizr(_risk)
@@ -29,10 +28,10 @@ public class MapUtils {
      * @return the actual coordinate of a block given the relative coordinate
      */
     public static BlockPos actualToRelative(BlockPos actual, String cornerDirection, Point locationOfCorner) {
-        if(cornerDirection == null) {
+        if (cornerDirection == null) {
             cornerDirection = "northwest";
         }
-        if(locationOfCorner == null) {
+        if (locationOfCorner == null) {
             locationOfCorner = new Point(0, 0);
         }
         double x = 0;
@@ -55,14 +54,14 @@ public class MapUtils {
                 z = actual.getX() - locationOfCorner.getX();
                 break;
         }
-        return new BlockPos((int)x, actual.getY(), (int)z);
+        return new BlockPos((int) x, actual.getY(), (int) z);
     }
 
     public static Triple<Double, Double, Double> actualToRelative(double posX, double posY, double posZ, String cornerDirection, Point locationOfCorner) {
-        if(cornerDirection == null) {
+        if (cornerDirection == null) {
             cornerDirection = "northwest";
         }
-        if(locationOfCorner == null) {
+        if (locationOfCorner == null) {
             locationOfCorner = new Point(0, 0);
         }
         double x = 0;
@@ -92,10 +91,10 @@ public class MapUtils {
      * @return the relative coordinate of a block given the actual coordinate
      */
     public static BlockPos relativeToActual(BlockPos relative, String cornerDirection, Point locationOfCorner) {
-        if(cornerDirection == null) {
+        if (cornerDirection == null) {
             cornerDirection = "northwest";
         }
-        if(locationOfCorner == null) {
+        if (locationOfCorner == null) {
             locationOfCorner = new Point(0, 0);
         }
         double x = 0;
@@ -118,14 +117,14 @@ public class MapUtils {
                 z = -(relative.getX() - locationOfCorner.getY());
                 break;
         }
-        return new BlockPos((int)x, relative.getY(), (int)z);
+        return new BlockPos((int) x, relative.getY(), (int) z);
     }
 
     public static Triple<Double, Double, Double> relativeToActual(double posX, double posY, double posZ, String cornerDirection, Point locationOfCorner) {
-        if(cornerDirection == null) {
+        if (cornerDirection == null) {
             cornerDirection = "northwest";
         }
-        if(locationOfCorner == null) {
+        if (locationOfCorner == null) {
             locationOfCorner = new Point(0, 0);
         }
         double x = 0;
@@ -151,4 +150,3 @@ public class MapUtils {
         return new Triple<>(x, posY, z);
     }
 }
-//#endif
