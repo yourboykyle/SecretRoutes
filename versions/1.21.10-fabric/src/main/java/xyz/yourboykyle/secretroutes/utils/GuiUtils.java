@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -23,6 +22,7 @@ package xyz.yourboykyle.secretroutes.utils;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import xyz.yourboykyle.secretroutes.utils.LogUtils;
 
 public class GuiUtils {
     public static void displayText(DrawContext context, String text, float posx, float posy, float scale) {
@@ -33,8 +33,8 @@ public class GuiUtils {
             int screenHeight = mc.getWindow().getScaledHeight();
 
             int textWidth = mc.textRenderer.getWidth(text);
-            int x = (int)((screenWidth/2.0f-((textWidth*scale)/ 2.0f))+posx);
-            int y = (int)(screenHeight/2.0f+posy);
+            int x = (int) ((screenWidth / 2.0f - ((textWidth * scale) / 2.0f)) + posx);
+            int y = (int) (screenHeight / 2.0f + posy);
 
             // TODO: Check that the text rendering actually works
             context.drawText(mc.textRenderer, text, x, y, 0xFFFFFF, true);
@@ -43,4 +43,3 @@ public class GuiUtils {
         }
     }
 }
-//#endif

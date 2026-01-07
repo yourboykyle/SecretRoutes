@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2024 yourboykyle & R-aMcC
@@ -21,14 +20,19 @@
 
 package xyz.yourboykyle.secretroutes.utils.multistorage;
 
-public class Triple <X, Y, Z> extends Tuple<X, Y>{
+public class Triple<X, Y, Z> extends Tuple<X, Y> {
     private Z three;
 
-    public Triple(X one, Y two, Z three){
+    public Triple(X one, Y two, Z three) {
         super(one, two);
         this.three = three;
     }
-    public void setThree(Z three) {this.three = three;}
-    public Z getThree() {return three;}
+
+    public Z getThree() {
+        return three;
+    }
+
+    public void setThree(Z three) {
+        this.three = three;
+    }
 }
-//#endif

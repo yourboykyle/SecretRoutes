@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2024 yourboykyle & R-aMcC
@@ -60,12 +59,15 @@ public class LoadRoute {
             Gson gson = new GsonBuilder().create();
             FileReader reader = new FileReader(filePath);
 
-            JsonObject data = gson.fromJson(reader, JsonObject.class);
+            gson.fromJson(reader, JsonObject.class);
+            reader.close();
+
             Main.currentRoom = new Room(RoomDetection.roomName(), filePath);
+
             context.getSource().sendFeedback(
                     Text.literal("Loaded route for room: " + RoomDetection.roomName()).formatted(Formatting.GREEN)
             );
-            reader.close();
+
         } catch (IOException e) {
             context.getSource().sendError(
                     Text.literal("Failed to load route: " + e.getMessage())
@@ -76,4 +78,3 @@ public class LoadRoute {
         return 1;
     }
 }
-//#endif

@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -23,7 +22,6 @@ package xyz.yourboykyle.secretroutes.events;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import de.hysky.skyblocker.utils.Utils;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -39,9 +37,9 @@ import xyz.yourboykyle.secretroutes.utils.*;
 
 public class OnPlayerInteract {
 
+    private static final long INTERACT_COOLDOWN = 110; // 50ms cooldown to prevent duplicate triggers
     private static long lastInteractTime = 0;
     private static BlockPos lastInteractPos = null;
-    private static final long INTERACT_COOLDOWN = 110; // 50ms cooldown to prevent duplicate triggers
 
     public static void register() {
         UseBlockCallback.EVENT.register(OnPlayerInteract::onUseBlock);
@@ -56,7 +54,7 @@ public class OnPlayerInteract {
             BlockPos pos = hitResult.getBlockPos();
 
             if (lastInteractPos != null && lastInteractPos.equals(pos) &&
-                (currentTime - lastInteractTime) < INTERACT_COOLDOWN) {
+                    (currentTime - lastInteractTime) < INTERACT_COOLDOWN) {
                 return ActionResult.PASS;
             }
 
@@ -69,32 +67,32 @@ public class OnPlayerInteract {
 
             Block block = world.getBlockState(pos).getBlock();
 
-            if (!Utils.isInDungeons()) {
+            if (!LocationUtils.isInDungeons()) {
                 return ActionResult.PASS;
             }
 
-            if(block != Blocks.CHEST && block != Blocks.TRAPPED_CHEST && block != Blocks.LEVER && block != Blocks.PLAYER_HEAD && block != Blocks.SKELETON_SKULL) {
+            if (block != Blocks.CHEST && block != Blocks.TRAPPED_CHEST && block != Blocks.LEVER && block != Blocks.PLAYER_HEAD && block != Blocks.SKELETON_SKULL) {
                 return ActionResult.PASS;
             }
 
-            if(BlockUtils.blockPos(MapUtils.actualToRelative(pos, RoomDetection.roomDirection(), RoomDetection.roomCorner())).equals(BlockUtils.blockPos(SecretUtils.currentLeverPos))) {
+            if (BlockUtils.blockPos(MapUtils.actualToRelative(pos, RoomDetection.roomDirection(), RoomDetection.roomCorner())).equals(BlockUtils.blockPos(SecretUtils.currentLeverPos))) {
                 SecretUtils.resetValues();
             }
             SecretUtils.lastInteract = pos;
 
-            if(SRMConfig.allSecrets){
-                if(SecretUtils.secrets != null){
-                    for(JsonElement secret : SecretUtils.secrets){
-                        try{
+            if (SRMConfig.get().allSecrets) {
+                if (SecretUtils.secrets != null) {
+                    for (JsonElement secret : SecretUtils.secrets) {
+                        try {
                             JsonObject json = secret.getAsJsonObject();
                             BlockPos spos = new BlockPos(json.get("x").getAsInt(), json.get("y").getAsInt(), json.get("z").getAsInt());
                             BlockPos rel = MapUtils.actualToRelative(pos, RoomDetection.roomDirection(), RoomDetection.roomCorner());
-                            if(BlockUtils.blockPos(spos).equals(BlockUtils.blockPos(rel))){
-                                if(!SecretUtils.secretLocations.contains(BlockUtils.blockPos(spos))){
+                            if (BlockUtils.blockPos(spos).equals(BlockUtils.blockPos(rel))) {
+                                if (!SecretUtils.secretLocations.contains(BlockUtils.blockPos(spos))) {
                                     SecretUtils.secretLocations.add(BlockUtils.blockPos(spos));
                                 }
                             }
-                        }catch(Exception ex){
+                        } catch (Exception ex) {
                             LogUtils.error(ex);
                         }
                     }
@@ -111,7 +109,7 @@ public class OnPlayerInteract {
             }
 
             // Route Recording
-            if(Main.routeRecording.recording) {
+            if (Main.routeRecording.recording) {
                 if (block == Blocks.LEVER) {
                     // If the block is a lever, then it is a waypoint on the route, going to a secret
                     Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.INTERACTS, pos);
@@ -119,7 +117,7 @@ public class OnPlayerInteract {
                 } else if (block == Blocks.PLAYER_HEAD || block == Blocks.SKELETON_SKULL || block == Blocks.CHEST || block == Blocks.TRAPPED_CHEST) {
                     // If the block is a chest, trapped chest (mimic chest), or skull (essence), then it is a waypoint for a secret, so start a new secret waypoint list
                     boolean created = Main.routeRecording.addWaypoint(Room.SECRET_TYPES.INTERACT, pos);
-                    if(created) {
+                    if (created) {
                         Main.routeRecording.newSecret();
                         Main.routeRecording.setRecordingMessage("Added interact secret waypoint.");
 
@@ -143,4 +141,3 @@ public class OnPlayerInteract {
         return ActionResult.PASS;
     }
 }
-//#endif

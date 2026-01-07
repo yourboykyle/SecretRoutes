@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -19,12 +18,18 @@
  * with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 package xyz.yourboykyle.secretroutes.utils;
 
 import net.minecraft.util.Formatting;
+import xyz.yourboykyle.secretroutes.config.SRMConfig;
 
 public class SecretRoutesRenderUtils {
+
+    public static String getTextColor(SRMConfig.TextColor color) {
+        if (color == null) return Formatting.RED.toString();
+        return color.formatting.toString();
+    }
+
     public static String getTextColor(int index) {
         switch (index) {
             case 0:
@@ -62,4 +67,3 @@ public class SecretRoutesRenderUtils {
         }
     }
 }
-//#endif

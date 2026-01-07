@@ -1,3 +1,4 @@
+package xyz.yourboykyle.secretroutes.config;
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -18,17 +19,12 @@
  * with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package xyz.yourboykyle.secretroutes.events;
+import com.terraformersmc.modmenu.api.ConfigScreenFactory;
+import com.terraformersmc.modmenu.api.ModMenuApi;
 
-/**
- * A simple event to track server ticks.
- * In Fabric, we use ClientTickEvents instead of transaction packets to estimate server ticks.
- */
-public class ServerTickEvent {
-    public final String modid;
-
-    public ServerTickEvent(String modid) {
-        this.modid = modid;
+public class ModMenuIntegration implements ModMenuApi {
+    @Override
+    public ConfigScreenFactory<?> getModConfigScreenFactory() {
+        return SRMConfig::getScreen;
     }
-
 }
