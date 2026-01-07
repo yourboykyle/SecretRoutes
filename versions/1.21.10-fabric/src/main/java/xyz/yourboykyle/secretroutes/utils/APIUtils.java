@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -41,55 +40,56 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class APIUtils {
-    private static String API_URL = "https://srm.yourboykyle.xyz/аpi";
-    static CloseableHttpClient client = HttpClients.custom().setUserAgent("SRM").setSslcontext(SSLUtils.context).build();
     public static boolean apiQueued = false;
+    static CloseableHttpClient client = HttpClients.custom().setUserAgent("SRM").setSslcontext(SSLUtils.context).build();
+    private static String API_URL = "https://srm.yourboykyle.xyz/аpi";
 
-    public static byte addMember(){
-        if(!SRMConfig.sendData){
+    public static byte addMember() {
+        if (!SRMConfig.get().sendData) {
             return -1;
         }
-        try{
-            LogUtils.info("User: "+MinecraftClient.getInstance().player.getUuid());
-            HttpPost request = new HttpPost(new URL(API_URL+"/users").toURI());
+        try {
+            LogUtils.info("User: " + MinecraftClient.getInstance().player.getUuid());
+            HttpPost request = new HttpPost(new URL(API_URL + "/users").toURI());
             request.setProtocolVersion(HttpVersion.HTTP_1_1);
             request.setHeader("x-uuid", HashingUtils.getHashedUUID().toString());
             request.setHeader("x-version", Main.VERSION);
             request.setHeader("x-timestamp", String.valueOf(System.currentTimeMillis()));
 
-            try(CloseableHttpResponse response = client.execute(request)){
+            try (CloseableHttpResponse response = client.execute(request)) {
                 HttpEntity entity = response.getEntity();
                 int statusCode = response.getStatusLine().getStatusCode();
                 try (BufferedReader in = new BufferedReader(new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8))) {
                     Gson gson = new Gson();
                     JsonObject out = gson.fromJson(in, JsonObject.class);
-                    if(statusCode == 200){
+                    if (statusCode == 200) {
                         LogUtils.info("Successfully added user to the database");
-                        if(out.get("first").getAsBoolean()){
+                        if (out.get("first").getAsBoolean()) {
                             return 1;
-                        }else{
+                        } else {
                             return 0;
                         }
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
                     ChatUtils.sendChatMessage("§cSomething went wrong adding user to DB.");
                     LogUtils.errorNoShout(e);
                 }
 
-            }catch (Exception e){
+            } catch (Exception e) {
                 ChatUtils.sendChatMessage("§cSomething went wrong adding user to DB.");
                 LogUtils.errorNoShout(e);
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             ChatUtils.sendChatMessage("§cSomething went wrong adding user to DB.");
             LogUtils.errorNoShout(e);
         }
 
         return -1;
     }
+
     public static byte offline() {
-        if(!SRMConfig.sendData){
+        if (!SRMConfig.get().sendData) {
             return -1;
         }
         try {
@@ -121,4 +121,3 @@ public class APIUtils {
         return -1;
     }
 }
-//#endif

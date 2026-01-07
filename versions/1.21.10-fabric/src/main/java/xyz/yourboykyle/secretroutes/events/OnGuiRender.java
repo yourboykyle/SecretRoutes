@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -42,14 +41,14 @@ public class OnGuiRender {
             GuiUtils.displayText(drawContext, "§bSet waypoint at lever", 0, -100, 2);
         }
 
-        if (spawnNotifTime != null || SRMConfig.renderBlood) {
-            if (SRMConfig.renderBlood || System.currentTimeMillis() < spawnNotifTime) {
+        if (spawnNotifTime != null || SRMConfig.get().renderBlood) {
+            if (SRMConfig.get().renderBlood || System.currentTimeMillis() < spawnNotifTime) {
                 GuiUtils.displayText(
-                    drawContext,
-                    SecretRoutesRenderUtils.getTextColor(SRMConfig.bloodReadyColor) + SRMConfig.bloodReadyText,
-                    SRMConfig.bloodX,
-                    SRMConfig.bloodY,
-                    SRMConfig.bloodScale
+                        drawContext,
+                        SecretRoutesRenderUtils.getTextColor(SRMConfig.get().bloodReadyColor) + SRMConfig.get().bloodReadyText,
+                        SRMConfig.get().bloodX,
+                        SRMConfig.get().bloodY,
+                        SRMConfig.get().bloodScale
                 );
             } else {
                 spawnNotifTime = null;
@@ -58,4 +57,3 @@ public class OnGuiRender {
     }
 
 }
-//#endif

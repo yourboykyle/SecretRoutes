@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -63,7 +62,7 @@ public class OnBlockPlace {
         });
     }
 
-    // Handle block place from packet events
+    // Handle block place from packet xyz.yourboykyle.secretroutes.events
     public static void handleBlockPlace(World world, BlockPos pos, BlockState blockState, BlockState placedAgainst, PlayerEntity player) {
         if (blockState.getBlock() == net.minecraft.block.Blocks.TNT && Main.routeRecording.recording) {
             String blockName = Registries.BLOCK.getId(blockState.getBlock()).toString();
@@ -75,4 +74,3 @@ public class OnBlockPlace {
         }
     }
 }
-//#endif

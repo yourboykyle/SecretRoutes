@@ -1,4 +1,3 @@
-//#if FABRIC && MC == 1.21.10
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -23,10 +22,9 @@ package xyz.yourboykyle.secretroutes.events;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
-import xyz.yourboykyle.secretroutes.Main;
 
 /**
- * Tracks server ticks using client tick events.
+ * Tracks server ticks using client tick xyz.yourboykyle.secretroutes.events.
  * Note: This is an approximation since we're on the client side.
  * The old Forge version used transaction packets to estimate server ticks,
  * but in Fabric we just count client ticks as a close approximation.
@@ -47,4 +45,3 @@ public class OnServerTick {
 
     }
 }
-//#endif
