@@ -27,12 +27,22 @@ public class StructureRoom {
     private Direction direction = null;
     private Vector2ic physicalCornerPos;
     private boolean matched = false;
-    private boolean failed = false;
+    private int doubleCheckBlocks = 0;
+    private int retryDelay = 0;
+
     private List<CandidateGroup> candidates = new ArrayList<>();
+
     public StructureRoom(Type type, Set<Vector2ic> segments) {
         this.type = type;
         this.segments = segments;
         this.shape = determineShape(type, segments);
+
+        if (type == Type.ENTRANCE) {
+            this.name = "Entrance";
+            this.matched = true;
+            return;
+        }
+
         initializeCandidates();
     }
 
@@ -54,17 +64,13 @@ public class StructureRoom {
     }
 
     private void initializeCandidates() {
-        if (failed) return;
-
         if (!DungeonScanner.ROOMS_DATA.containsKey("catacombs") ||
                 !DungeonScanner.ROOMS_DATA.get("catacombs").containsKey(shape.key)) {
-            failed = true;
             return;
         }
 
         Set<String> allRoomNames = DungeonScanner.ROOMS_DATA.get("catacombs").get(shape.key).keySet();
         if (allRoomNames.isEmpty()) {
-            failed = true;
             return;
         }
 
@@ -96,21 +102,37 @@ public class StructureRoom {
     }
 
     public void tickMatch(ClientWorld world, ClientPlayerEntity player) {
-        if (matched || failed || candidates.isEmpty()) return;
+        if (matched) return;
+
+        // Handle Retry Delay
+        if (retryDelay > 0) {
+            retryDelay--;
+            if (retryDelay == 0) {
+                reset();
+            }
+            return;
+        }
+
+        if (candidates.isEmpty()) {
+            initializeCandidates();
+            if (candidates.isEmpty()) return;
+        }
 
         BlockPos pPos = player.getBlockPos();
 
         for (BlockPos pos : BlockPos.iterate(pPos.add(-5, -5, -5), pPos.add(5, 5, 5))) {
-            if (pos.getY() < 66 || pos.getY() > 73) continue;
-            if (!checkedBlocks.add(pos.toImmutable())) continue;
 
             if (!segments.contains(DungeonMapUtils.getPhysicalRoomPos(pos))) continue;
+
+            if (!DungeonMapUtils.notInDoorway(pos)) continue;
+
+            if (!checkedBlocks.add(pos.toImmutable())) continue;
 
             byte blockId = DungeonConstants.NUMERIC_ID.getByte(Registries.BLOCK.getId(world.getBlockState(pos).getBlock()).toString());
             if (blockId == 0) continue;
 
             checkBlock(pos, blockId);
-            if (matched || failed) return;
+            if (matched || retryDelay > 0) return;
         }
     }
 
@@ -138,19 +160,30 @@ public class StructureRoom {
 
         int totalPossibilities = candidates.stream().mapToInt(c -> c.potentialRoomNames.size()).sum();
 
-        if (totalPossibilities == 1) {
-            CandidateGroup winner = candidates.get(0);
-            this.name = winner.potentialRoomNames.get(0);
-            this.direction = winner.direction;
-            this.physicalCornerPos = winner.cornerPos;
-            this.matched = true;
-            this.candidates.clear();
-            this.checkedBlocks.clear();
-        } else if (totalPossibilities == 0) {
-            this.failed = true;
-            this.checkedBlocks.clear();
-            this.candidates.clear();
+        if (totalPossibilities == 0) {
+            System.out.println("[SecretRoutes] Match failed. Retrying in 50 ticks...");
+            retryDelay = 50;
+        } else if (totalPossibilities == 1) {
+            if (doubleCheckBlocks < 10) {
+                doubleCheckBlocks++;
+            } else {
+                CandidateGroup winner = candidates.getFirst();
+                this.name = winner.potentialRoomNames.getFirst();
+                this.direction = winner.direction;
+                this.physicalCornerPos = winner.cornerPos;
+                this.matched = true;
+
+                this.candidates.clear();
+                this.checkedBlocks.clear();
+            }
         }
+    }
+
+    private void reset() {
+        this.checkedBlocks.clear();
+        this.candidates.clear();
+        this.doubleCheckBlocks = 0;
+        initializeCandidates();
     }
 
     private int encode(BlockPos pos, int id) {
@@ -187,15 +220,6 @@ public class StructureRoom {
         }
     }
 
-    private static class CandidateGroup {
-        final Direction direction;
-        final Vector2ic cornerPos;
-        final List<String> potentialRoomNames;
-
-        CandidateGroup(Direction direction, Vector2ic cornerPos, List<String> potentialRoomNames) {
-            this.direction = direction;
-            this.cornerPos = cornerPos;
-            this.potentialRoomNames = potentialRoomNames;
-        }
+    private record CandidateGroup(Direction direction, Vector2ic cornerPos, List<String> potentialRoomNames) {
     }
 }

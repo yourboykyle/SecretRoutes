@@ -10,10 +10,7 @@ import it.unimi.dsi.fastutil.objects.Object2ByteMap;
 import it.unimi.dsi.fastutil.objects.Object2ByteOpenHashMap;
 
 public class DungeonConstants {
-    // Basic Map Colors
-    public static final byte BLACK_COLOR = 119;
     public static final byte RED_COLOR = 18;
-    public static final byte WHITE_COLOR = 34;
     public static final byte GREEN_COLOR = 30;
 
     public static final Object2ByteMap<String> NUMERIC_ID = new Object2ByteOpenHashMap<>();
@@ -32,8 +29,10 @@ public class DungeonConstants {
         NUMERIC_ID.put("minecraft:bedrock", (byte) 10);
         NUMERIC_ID.put("minecraft:oak_leaves", (byte) 11);
         NUMERIC_ID.put("minecraft:gray_wool", (byte) 12);
-        NUMERIC_ID.put("minecraft:double_stone_slab", (byte) 13);
+        NUMERIC_ID.put("minecraft:stone_slab", (byte) 13);
+        NUMERIC_ID.put("minecraft:smooth_stone", (byte) 13);
         NUMERIC_ID.put("minecraft:smooth_stone_slab", (byte) 13);
+        NUMERIC_ID.put("minecraft:double_stone_slab", (byte) 13); // Kept for safety
         NUMERIC_ID.put("minecraft:mossy_cobblestone", (byte) 14);
         NUMERIC_ID.put("minecraft:clay", (byte) 15);
         NUMERIC_ID.put("minecraft:stone_bricks", (byte) 16);
