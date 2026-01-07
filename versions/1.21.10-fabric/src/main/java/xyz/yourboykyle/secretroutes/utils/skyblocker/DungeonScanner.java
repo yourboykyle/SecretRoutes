@@ -10,6 +10,7 @@ package xyz.yourboykyle.secretroutes.utils.skyblocker;
  */
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.ints.Int2ByteMap;
@@ -41,6 +42,7 @@ public class DungeonScanner {
     private static final MinecraftClient client = MinecraftClient.getInstance();
     private static final Gson GSON = new Gson();
     private static final Map<Vector2ic, StructureRoom> rooms = new HashMap<>();
+
     // Legacy ID Mapping (1.8.9 ID -> 1.21 Internal Byte ID)
     private static final Int2ByteMap LEGACY_ID_MAP = new Int2ByteOpenHashMap();
     public static StructureRoom currentRoom;
@@ -73,7 +75,7 @@ public class DungeonScanner {
     }
 
     public static void init() {
-        System.out.println("[SecretRoutes] Initializing Dungeon Scanner...");
+        System.out.println("[SecretRoutes] Initializing Dungeon Scanner (Modern Assets)...");
         loadResources();
         ClientTickEvents.END_CLIENT_TICK.register(client -> tick());
     }
@@ -82,10 +84,10 @@ public class DungeonScanner {
         new Thread(() -> {
             try {
                 loadFromJar();
-                loadSecretsDirectly();
 
                 if (ROOMS_DATA.containsKey("catacombs")) {
                     System.out.println("[SecretRoutes] Dungeon Data Loaded Successfully (" + ROOMS_DATA.get("catacombs").size() + " shapes).");
+                    System.out.println("[SecretRoutes] Loaded Secrets for " + ROOMS_WAYPOINTS.size() + " rooms.");
                 } else {
                     System.err.println("[SecretRoutes] WARNING: Catacombs data missing!");
                 }
@@ -105,13 +107,18 @@ public class DungeonScanner {
             if (uri.toString().endsWith(".jar")) {
                 try {
                     fs = FileSystems.newFileSystem(URI.create("jar:" + uri), Collections.emptyMap());
-                    myPath = fs.getPath("/");
+                    myPath = fs.getPath("/assets/skyblocker-catacombs");
                 } catch (FileSystemAlreadyExistsException e) {
                     fs = FileSystems.getFileSystem(URI.create("jar:" + uri));
-                    myPath = fs.getPath("/");
+                    myPath = fs.getPath("/assets/skyblocker-catacombs");
                 }
             } else {
-                myPath = Paths.get(uri);
+                myPath = Paths.get(uri).resolve("assets/skyblocker-catacombs");
+            }
+
+            if (!Files.exists(myPath)) {
+                System.err.println("[SecretRoutes] Could not find asset path: " + myPath);
+                return;
             }
 
             Stream<Path> walk = Files.walk(myPath);
@@ -122,6 +129,8 @@ public class DungeonScanner {
 
                 if (pathString.endsWith(".skeleton")) {
                     loadSkeletonFile(p);
+                } else if (pathString.endsWith(".json") && !pathString.endsWith("floorskulls.json")) {
+                    loadRoomJsonFile(p);
                 }
             }
 
@@ -139,13 +148,13 @@ public class DungeonScanner {
 
             int catIndex = -1;
             for (int i = 0; i < parts.length; i++) {
-                if (parts[i].equals("catacombs")) {
+                if (parts[i].equals("skyblocker-catacombs")) {
                     catIndex = i;
                     break;
                 }
             }
 
-            if (catIndex == -1 || parts.length < catIndex + 3) return;
+            if (catIndex == -1 || parts.length < catIndex + 2) return;
 
             String category = "catacombs";
             String shape = parts[catIndex + 1];
@@ -159,9 +168,8 @@ public class DungeonScanner {
 
                 if (obj instanceof int[]) {
                     ROOMS_DATA.get(category).get(shape).put(name, (int[]) obj);
-                } else if (obj instanceof long[]) {
+                } else if (obj instanceof long[] legacyData) {
                     // Legacy Format Conversion (1.8.9 -> 1.21)
-                    long[] legacyData = (long[]) obj;
                     int[] modernData = new int[legacyData.length];
 
                     for (int i = 0; i < legacyData.length; i++) {
@@ -171,7 +179,7 @@ public class DungeonScanner {
                         short z = (short) (l >> 16);
                         short legacyId = (short) (l);
 
-                        byte newId = LEGACY_ID_MAP.getOrDefault((int) legacyId, (byte) 0);
+                        byte newId = LEGACY_ID_MAP.getOrDefault(legacyId, (byte) 0);
                         modernData[i] = (x << 24) | (y << 16) | (z << 8) | (newId & 0xFF);
                     }
                     Arrays.sort(modernData);
@@ -182,36 +190,33 @@ public class DungeonScanner {
         }
     }
 
-    private static void loadSecretsDirectly() {
-        String[] possiblePaths = {
-                "/assets/roomdetection/secretlocations.json",
-                "/assets/roomdetection/catacombs/secretlocations.json",
-                "/assets/secretroutes/roomdetection/secretlocations.json"
-        };
+    private static void loadRoomJsonFile(Path path) {
+        try (InputStream is = Files.newInputStream(path)) {
+            JsonObject root = GSON.fromJson(new InputStreamReader(is), JsonObject.class);
 
-        for (String path : possiblePaths) {
-            try (InputStream is = DungeonScanner.class.getResourceAsStream(path)) {
-                if (is != null) {
-                    JsonObject json = GSON.fromJson(new InputStreamReader(is), JsonObject.class);
-                    for (String roomName : json.keySet()) {
-                        if (roomName.equals("copyright") || roomName.equals("license")) continue;
-                        List<SecretWaypoint> secrets = new ArrayList<>();
-                        for (JsonElement el : json.getAsJsonArray(roomName)) {
-                            JsonObject obj = el.getAsJsonObject();
-                            secrets.add(new SecretWaypoint(
-                                    obj.has("secretName") ? obj.get("secretName").getAsString() : "Unknown",
-                                    obj.get("category").getAsString(),
-                                    obj.get("x").getAsInt(),
-                                    obj.get("y").getAsInt(),
-                                    obj.get("z").getAsInt()
-                            ));
-                        }
-                        ROOMS_WAYPOINTS.put(roomName, secrets);
+            if (root.has("info") && root.getAsJsonObject("info").has("name")) {
+                String roomName = root.getAsJsonObject("info").get("name").getAsString();
+
+                if (root.has("secrets")) {
+                    JsonArray secretsArray = root.getAsJsonArray("secrets");
+                    List<SecretWaypoint> secretList = new ArrayList<>();
+
+                    for (JsonElement el : secretsArray) {
+                        JsonObject obj = el.getAsJsonObject();
+                        secretList.add(new SecretWaypoint(
+                                obj.has("secretName") ? obj.get("secretName").getAsString() : "Unknown",
+                                obj.has("category") ? obj.get("category").getAsString() : "unknown",
+                                obj.get("x").getAsInt(),
+                                obj.get("y").getAsInt(),
+                                obj.get("z").getAsInt()
+                        ));
                     }
-                    return;
+                    ROOMS_WAYPOINTS.put(roomName, secretList);
                 }
-            } catch (Exception ignored) {
             }
+        } catch (Exception e) {
+            System.err.println("Failed to load room JSON: " + path);
+            e.printStackTrace();
         }
     }
 

@@ -45,6 +45,19 @@ public class DungeonMapUtils {
         return getPhysicalRoomPos(new Vec3d(pos.getX(), pos.getY(), pos.getZ()));
     }
 
+    public static boolean notInDoorway(BlockPos pos) {
+        if (pos.getY() < 66 || pos.getY() > 73) {
+            return true;
+        }
+        // Shift by -8 because Hypixel offsets dungeons by 8 blocks
+        int x = Math.floorMod(pos.getX() - 8, 32);
+        int z = Math.floorMod(pos.getZ() - 8, 32);
+
+        // Standard door is ~13-18. Entrance gate can be wider.
+        // We exclude a safer buffer (11 to 20) to ignore all connection geometry.
+        return (x < 11 || x > 20 || z > 2 && z < 28) && (z < 11 || z > 20 || x > 2 && x < 28);
+    }
+
     public static Vector2ic findMapEntrance(MapState map) {
         if (map == null) return null;
         for (int x = 0; x < 128; x++) {
