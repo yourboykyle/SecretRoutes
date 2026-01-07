@@ -37,12 +37,11 @@ public class SRM {
     }
 
     private static void registerCommands(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandRegistryAccess registryAccess) {
-        // xyz.yourboykyle.secretroutes.Main command and aliases
         dispatcher.register(literal("srm")
                 .executes(SRM::executeCommand));
 
         // Aliases
-        dispatcher.register(literal("xyz/yourboykyle/secretroutes").redirect(dispatcher.register(literal("srm"))));
+        dispatcher.register(literal("secretroutes").redirect(dispatcher.register(literal("srm"))));
         dispatcher.register(literal("secretroutesmod").redirect(dispatcher.register(literal("srm"))));
     }
 

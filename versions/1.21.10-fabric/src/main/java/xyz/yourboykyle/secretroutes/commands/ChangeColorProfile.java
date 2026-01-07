@@ -49,7 +49,6 @@ public class ChangeColorProfile {
     }
 
     private static void registerCommands(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandRegistryAccess registryAccess) {
-        // xyz.yourboykyle.secretroutes.Main command and aliases
         dispatcher.register(literal("changecolorprofile")
                 .executes(ChangeColorProfile::openGui)
                 .then(literal("list")
