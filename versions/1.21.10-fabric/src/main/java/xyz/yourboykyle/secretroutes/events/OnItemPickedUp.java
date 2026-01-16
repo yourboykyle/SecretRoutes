@@ -122,7 +122,7 @@ public class OnItemPickedUp {
             }
         }
 
-        if (Main.currentRoom.getSecretType() == Room.SECRET_TYPES.ITEM) {
+        if (Main.currentRoom != null && Main.currentRoom.getSecretType() == Room.SECRET_TYPES.ITEM) {
             BlockPos itemPos = Main.currentRoom.getSecretLocation();
 
             if (pos.getX() >= itemPos.getX() - 10 && pos.getX() <= itemPos.getX() + 10 &&

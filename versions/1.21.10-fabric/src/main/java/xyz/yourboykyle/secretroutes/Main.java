@@ -37,7 +37,7 @@ import xyz.yourboykyle.secretroutes.config.huds.RecordingHUD;
 import xyz.yourboykyle.secretroutes.events.*;
 import xyz.yourboykyle.secretroutes.utils.*;
 import xyz.yourboykyle.secretroutes.utils.autoupdate.UpdateManager;
-import xyz.yourboykyle.secretroutes.utils.skyblocker.DungeonScanner;
+import xyz.yourboykyle.secretroutes.utils.dungeon.DungeonScanner;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -202,6 +202,8 @@ public class Main implements ClientModInitializer {
     public void onInitializeClient() {
         instance = this;
 
+        LocationUtils.init();
+
         String jarpath = Main.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         // Set up logging system
         String date = sdf.format(System.currentTimeMillis());
@@ -261,17 +263,16 @@ public class Main implements ClientModInitializer {
         checkPBData();
         PBUtils.loadPBData();
 
-        KeyBinding.Category c = KeyBinding.Category.create(Identifier.of(MODID, "category.secretroutes.main"));
-
-        // Register Fabric Keybinds
+        // Register Keybinds
+        KeyBinding.Category cat = KeyBinding.Category.create(Identifier.of(MODID, "category.secretroutes.main"));
         nextSecretKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                "key.secretroutes.nextSecret", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT_BRACKET, c
+                "key.secretroutes.nextSecret", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT_BRACKET, cat
         ));
         lastSecretKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                "key.secretroutes.lastSecret", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_BRACKET, c
+                "key.secretroutes.lastSecret", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_BRACKET, cat
         ));
         toggleSecretsKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                "key.secretroutes.toggleSecrets", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_BACKSPACE, c
+                "key.secretroutes.toggleSecrets", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_BACKSPACE, cat
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
@@ -289,20 +290,16 @@ public class Main implements ClientModInitializer {
         // Fabric Events
         GuildEvents.register();
         OnBlockBreak.register();
-        OnBlockPlace.register();
         OnChatReceive.register();
         OnGuiRender.register();
         OnItemPickedUp.register();
         OnMouseInput.register();
         OnPlayerInteract.register();
         OnPlayerTick.register();
-        OnServerTick.register();
 
-        // Skyblocker Events
-        //OnEnterNewRoom.register();
         AnotherRenderingUtil.register();
 
-        // Server connection xyz.yourboykyle.secretroutes.events (for this)
+        // Server connection
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             onServerConnect();
         });
@@ -314,8 +311,6 @@ public class Main implements ClientModInitializer {
         LoadRoute.register();
         Recording.register();
         SRM.register();
-
-        LocationUtils.init();
 
         DungeonScanner.init();
 

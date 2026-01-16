@@ -85,7 +85,7 @@ public class SecretUtils {
                 JsonArray etherwarpLocation = etherwarpLocationElement.getAsJsonArray();
 
                 Main.checkRoomData();
-                BlockPos pos = MapUtils.relativeToActual(new BlockPos(etherwarpLocation.get(0).getAsInt(), etherwarpLocation.get(1).getAsInt(), etherwarpLocation.get(2).getAsInt()), RoomDetection.roomDirection(), RoomDetection.roomCorner());
+                BlockPos pos = RoomRotationUtils.relativeToActual(new BlockPos(etherwarpLocation.get(0).getAsInt(), etherwarpLocation.get(1).getAsInt(), etherwarpLocation.get(2).getAsInt()), RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
                 if (!SRMConfig.get().wholeRoute && etherwarpLocations.get(0) == etherwarpLocationElement && SRMConfig.get().playerToEtherwarp) {
                     ClientPlayerEntity player = MinecraftClient.getInstance().player;
                     if (player != null) {
@@ -111,7 +111,7 @@ public class SecretUtils {
                 JsonArray mineLocation = mineLocationElement.getAsJsonArray();
 
                 Main.checkRoomData();
-                BlockPos pos = MapUtils.relativeToActual(new BlockPos(mineLocation.get(0).getAsInt(), mineLocation.get(1).getAsInt(), mineLocation.get(2).getAsInt()), RoomDetection.roomDirection(), RoomDetection.roomCorner());
+                BlockPos pos = RoomRotationUtils.relativeToActual(new BlockPos(mineLocation.get(0).getAsInt(), mineLocation.get(1).getAsInt(), mineLocation.get(2).getAsInt()), RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
                 minesPositions.add(pos);
                 if (SRMConfig.get().mineFullBlock) {
                     Vec3d position = new Vec3d(pos.getX(), pos.getY(), pos.getZ());
@@ -130,7 +130,7 @@ public class SecretUtils {
                 JsonArray interactLocation = interactLocationElement.getAsJsonArray();
 
                 Main.checkRoomData();
-                BlockPos pos = MapUtils.relativeToActual(new BlockPos(interactLocation.get(0).getAsInt(), interactLocation.get(1).getAsInt(), interactLocation.get(2).getAsInt()), RoomDetection.roomDirection(), RoomDetection.roomCorner());
+                BlockPos pos = RoomRotationUtils.relativeToActual(new BlockPos(interactLocation.get(0).getAsInt(), interactLocation.get(1).getAsInt(), interactLocation.get(2).getAsInt()), RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
                 interactsPositions.add(pos);
                 if (SRMConfig.get().interactsFullBlock) {
                     Vec3d position = new Vec3d(pos.getX(), pos.getY(), pos.getZ());
@@ -149,7 +149,7 @@ public class SecretUtils {
                 JsonArray tntLocation = tntLocationElement.getAsJsonArray();
 
                 Main.checkRoomData();
-                BlockPos pos = MapUtils.relativeToActual(new BlockPos(tntLocation.get(0).getAsInt(), tntLocation.get(1).getAsInt(), tntLocation.get(2).getAsInt()), RoomDetection.roomDirection(), RoomDetection.roomCorner());
+                BlockPos pos = RoomRotationUtils.relativeToActual(new BlockPos(tntLocation.get(0).getAsInt(), tntLocation.get(1).getAsInt(), tntLocation.get(2).getAsInt()), RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
                 superboomsPositions.add(pos);
                 if (SRMConfig.get().superboomsFullBlock) {
                     Vec3d position = new Vec3d(pos.getX(), pos.getY(), pos.getZ());
@@ -170,7 +170,7 @@ public class SecretUtils {
                 JsonArray lineLocation = lineLocationElement.getAsJsonArray();
 
                 Main.checkRoomData();
-                Triple<Double, Double, Double> linePos = MapUtils.relativeToActual(lineLocation.get(0).getAsDouble(), lineLocation.get(1).getAsDouble(), lineLocation.get(2).getAsDouble(), RoomDetection.roomDirection(), RoomDetection.roomCorner());
+                Triple<Double, Double, Double> linePos = RoomRotationUtils.relativeToActual(lineLocation.get(0).getAsDouble(), lineLocation.get(1).getAsDouble(), lineLocation.get(2).getAsDouble(), RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
                 linePos.setOne(linePos.getOne() + 0.5);
                 linePos.setTwo(linePos.getTwo() + 0.5);
                 linePos.setThree(linePos.getThree() + 0.5);
@@ -206,7 +206,7 @@ public class SecretUtils {
                 double posY = pearlLocation.get(1).getAsDouble();
                 double posZ = pearlLocation.get(2).getAsDouble();
 
-                Triple<Double, Double, Double> positions = MapUtils.relativeToActual(posX, posY, posZ, RoomDetection.roomDirection(), RoomDetection.roomCorner());
+                Triple<Double, Double, Double> positions = RoomRotationUtils.relativeToActual(posX, posY, posZ, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
                 posX = positions.getOne() - 0.25;
                 posY = positions.getTwo();
                 posZ = positions.getThree() - 0.25;
@@ -219,7 +219,7 @@ public class SecretUtils {
                     AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, SRMConfig.get().enderpearls, 1, 1, true));
                 }
 
-                double yaw = RotationUtils.relativeToActualYaw(enderpearlAngles.get(index).getTwo(), RoomDetection.roomDirection());
+                double yaw = RotationUtils.relativeToActualYaw(enderpearlAngles.get(index).getTwo(), RoomDirectionUtils.roomDirection()) + 90;
                 double pitch = enderpearlAngles.get(index).getOne();
                 double yawRadians = Math.toRadians(yaw);
                 double pitchRadians = Math.toRadians(pitch);
@@ -253,7 +253,7 @@ public class SecretUtils {
             JsonArray location = secret.get("location").getAsJsonArray();
 
             Main.checkRoomData();
-            BlockPos pos = MapUtils.relativeToActual(new BlockPos(location.get(0).getAsInt(), location.get(1).getAsInt(), location.get(2).getAsInt()), RoomDetection.roomDirection(), RoomDetection.roomCorner());
+            BlockPos pos = RoomRotationUtils.relativeToActual(new BlockPos(location.get(0).getAsInt(), location.get(1).getAsInt(), location.get(2).getAsInt()), RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
 
             switch (type) {
                 case "interact":
@@ -366,7 +366,7 @@ public class SecretUtils {
                 // First secret in the route
                 JsonArray startCoords = currentSecretWaypoints.get("locations").getAsJsonArray().get(0).getAsJsonArray();
                 Main.checkRoomData();
-                BlockPos pos = MapUtils.relativeToActual(new BlockPos(startCoords.get(0).getAsInt(), startCoords.get(1).getAsInt(), startCoords.get(2).getAsInt()), RoomDetection.roomDirection(), RoomDetection.roomCorner());
+                BlockPos pos = RoomRotationUtils.relativeToActual(new BlockPos(startCoords.get(0).getAsInt(), startCoords.get(1).getAsInt(), startCoords.get(2).getAsInt()), RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
 
                 if (SRMConfig.get().startTextToggle) {
                     Text text = Text.literal(getColorCode(SRMConfig.get().startWaypointColor) + "Start");
@@ -380,7 +380,7 @@ public class SecretUtils {
                 JsonArray location = secret.get("location").getAsJsonArray();
 
                 Main.checkRoomData();
-                BlockPos pos = MapUtils.relativeToActual(new BlockPos(location.get(0).getAsInt(), location.get(1).getAsInt(), location.get(2).getAsInt()), RoomDetection.roomDirection(), RoomDetection.roomCorner());
+                BlockPos pos = RoomRotationUtils.relativeToActual(new BlockPos(location.get(0).getAsInt(), location.get(1).getAsInt(), location.get(2).getAsInt()), RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
 
                 if (SRMConfig.get().exitTextToggle && type.equals("exitroute")) {
                     Text text = Text.literal(getColorCode(SRMConfig.get().exitWaypointColor) + "Exit");
@@ -405,7 +405,7 @@ public class SecretUtils {
                     int yPos = secretInfos.get("y").getAsInt();
                     int zPos = secretInfos.get("z").getAsInt();
                     Main.checkRoomData();
-                    Triple<Double, Double, Double> abs = MapUtils.relativeToActual(xPos, yPos, zPos, RoomDetection.roomDirection(), RoomDetection.roomCorner());
+                    Triple<Double, Double, Double> abs = RoomRotationUtils.relativeToActual(xPos, yPos, zPos, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
 
                     Color color = new Color(255, 255, 255);
                     if (secretLocations.contains(BlockUtils.blockPos(new BlockPos(xPos, yPos, zPos)))) {
@@ -466,7 +466,7 @@ public class SecretUtils {
                     int y = secretInfos.get("y").getAsInt();
                     int z = secretInfos.get("z").getAsInt();
 
-                    Triple<Double, Double, Double> abs = MapUtils.relativeToActual(x, y, z, RoomDetection.roomDirection(), RoomDetection.roomCorner());
+                    Triple<Double, Double, Double> abs = RoomRotationUtils.relativeToActual(x, y, z, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
                     BlockPos pos = new BlockPos(abs.getOne().intValue(), abs.getTwo().intValue(), abs.getThree().intValue());
                     if (BlockUtils.blockPos(pos).equals(BlockUtils.blockPos(lastInteract))) {
                         leverNum = name.split(" ")[0];
@@ -510,7 +510,7 @@ public class SecretUtils {
             if (currentLeverPos == null) {
                 ChatUtils.sendChatMessage("§cLever not found :(");
             } else {
-                Triple<Double, Double, Double> abs = MapUtils.relativeToActual(currentLeverPos.getX(), currentLeverPos.getY(), currentLeverPos.getZ(), RoomDetection.roomDirection(), RoomDetection.roomCorner());
+                Triple<Double, Double, Double> abs = RoomRotationUtils.relativeToActual(currentLeverPos.getX(), currentLeverPos.getY(), currentLeverPos.getZ(), RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
                 if (SRMConfig.get().secretsInteractFullBlock) {
                     Vec3d position = new Vec3d(abs.getOne(), abs.getTwo(), abs.getThree());
                     AnotherRenderingUtil.addFilledBox(new RenderTypes.FilledBox(position, SRMConfig.get().secretsInteract, 1f, 1f, true));
@@ -548,7 +548,7 @@ public class SecretUtils {
         String roomName = Main.currentRoom.name.toLowerCase();
         if (secrets == null) {
             try {
-                try (Reader reader = new InputStreamReader(Main.class.getResourceAsStream("/assets/roomdetection/secretlocations.json"))) {
+                try (Reader reader = new InputStreamReader(Main.class.getResourceAsStream("/assets/secretroutesmod/secretlocations.json"))) {
                     JsonParser parser = new JsonParser();
                     JsonObject object = parser.parse(reader).getAsJsonObject();
                     for (String key : object.keySet()) {

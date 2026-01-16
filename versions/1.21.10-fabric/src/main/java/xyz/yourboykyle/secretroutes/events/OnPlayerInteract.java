@@ -75,7 +75,7 @@ public class OnPlayerInteract {
                 return ActionResult.PASS;
             }
 
-            if (BlockUtils.blockPos(MapUtils.actualToRelative(pos, RoomDetection.roomDirection(), RoomDetection.roomCorner())).equals(BlockUtils.blockPos(SecretUtils.currentLeverPos))) {
+            if (BlockUtils.blockPos(RoomRotationUtils.actualToRelative(pos, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner())).equals(BlockUtils.blockPos(SecretUtils.currentLeverPos))) {
                 SecretUtils.resetValues();
             }
             SecretUtils.lastInteract = pos;
@@ -86,7 +86,7 @@ public class OnPlayerInteract {
                         try {
                             JsonObject json = secret.getAsJsonObject();
                             BlockPos spos = new BlockPos(json.get("x").getAsInt(), json.get("y").getAsInt(), json.get("z").getAsInt());
-                            BlockPos rel = MapUtils.actualToRelative(pos, RoomDetection.roomDirection(), RoomDetection.roomCorner());
+                            BlockPos rel = RoomRotationUtils.actualToRelative(pos, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
                             if (BlockUtils.blockPos(spos).equals(BlockUtils.blockPos(rel))) {
                                 if (!SecretUtils.secretLocations.contains(BlockUtils.blockPos(spos))) {
                                     SecretUtils.secretLocations.add(BlockUtils.blockPos(spos));

@@ -28,9 +28,8 @@ import net.minecraft.util.math.BlockPos;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.events.OnSecretComplete;
+import xyz.yourboykyle.secretroutes.utils.dungeon.DungeonScanner;
 import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
-import xyz.yourboykyle.secretroutes.utils.skyblocker.DungeonMapUtils;
-import xyz.yourboykyle.secretroutes.utils.skyblocker.DungeonScanner;
 
 import java.io.File;
 import java.io.FileReader;
@@ -131,19 +130,14 @@ public class Room {
     }
 
     public BlockPos getSecretLocation() {
-        if (currentSecretWaypoints == null) return null;
-        if (currentSecretWaypoints.has("secret")) {
-            JsonArray location = currentSecretWaypoints.get("secret").getAsJsonObject().get("location").getAsJsonArray();
+        if (currentSecretWaypoints == null || !currentSecretWaypoints.has("secret")) return null;
+        JsonArray location = currentSecretWaypoints.get("secret").getAsJsonObject().get("location").getAsJsonArray();
 
-            if (DungeonScanner.getCurrentRoom() != null && DungeonScanner.getCurrentRoom().getDirection() != null && DungeonScanner.getCurrentRoom().getPhysicalCornerPos() != null) {
-                return DungeonMapUtils.relativeToActual(
-                        DungeonScanner.getCurrentRoom().getDirection(),
-                        DungeonScanner.getCurrentRoom().getPhysicalCornerPos(),
-                        new BlockPos(location.get(0).getAsInt(), location.get(1).getAsInt(), location.get(2).getAsInt())
-                );
-            }
-        }
-        return null;
+        return RoomRotationUtils.relativeToActual(
+                new BlockPos(location.get(0).getAsInt(), location.get(1).getAsInt(), location.get(2).getAsInt()),
+                RoomDirectionUtils.roomDirection(),
+                RoomDirectionUtils.roomCorner()
+        );
     }
 
     private ParticleEffect getParticleFromType(SRMConfig.ParticleType type) {
@@ -188,15 +182,10 @@ public class Room {
                 JsonArray lineLocations = currentSecretWaypoints.get("locations").getAsJsonArray();
 
                 for (JsonElement lineLocationElement : lineLocations) {
-                    JsonArray lineLocation = lineLocationElement.getAsJsonArray();
-
-                    if (DungeonScanner.getCurrentRoom() != null && DungeonScanner.getCurrentRoom().getPhysicalCornerPos() != null) {
-                        lines.add(DungeonMapUtils.relativeToActual(
-                                DungeonScanner.getCurrentRoom().getDirection(),
-                                DungeonScanner.getCurrentRoom().getPhysicalCornerPos(),
-                                new BlockPos(lineLocation.get(0).getAsInt(), lineLocation.get(1).getAsInt(), lineLocation.get(2).getAsInt())
-                        ));
-                    }
+                    JsonArray loc = lineLocationElement.getAsJsonArray();
+                    BlockPos relative = new BlockPos(loc.get(0).getAsInt(), loc.get(1).getAsInt(), loc.get(2).getAsInt());
+                    BlockPos actual = RoomRotationUtils.relativeToActual(relative, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
+                    lines.add(actual);
                 }
 
                 if (SRMConfig.get().lineType == SRMConfig.LineType.PARTICLES) {
@@ -221,9 +210,13 @@ public class Room {
     public void getData(String filePath) {
         new Thread(() -> {
             try {
+                if (DungeonScanner.currentRoom == null || DungeonScanner.currentRoom.getName() == null) return;
+
                 Gson gson = new GsonBuilder().create();
                 FileReader reader = new FileReader(filePath);
                 JsonObject rawData = gson.fromJson(reader, JsonObject.class);
+                reader.close();
+
                 if (rawData == null || rawData.isJsonNull()) {
                     currentSecretRoute = null;
                     return;
@@ -258,14 +251,8 @@ public class Room {
                     BlockPos pPos = p.getBlockPos();
                     if (pPos == null) continue;
 
-                    if (DungeonScanner.getCurrentRoom() == null || !DungeonScanner.getCurrentRoom().isMatched())
-                        continue;
+                    BlockPos relPos = RoomRotationUtils.actualToRelative(pPos, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
 
-                    BlockPos relPos = DungeonMapUtils.actualToRelative(
-                            DungeonScanner.getCurrentRoom().getDirection(),
-                            DungeonScanner.getCurrentRoom().getPhysicalCornerPos(),
-                            pPos
-                    );
                     double dist1 = BlockUtils.blockDistance(relPos, entry.getKey());
 
                     if (closest != null) {

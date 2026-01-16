@@ -42,6 +42,8 @@ public class OnPlayerTick {
                 return;
             }
 
+            if (Main.currentRoom == null || Main.currentRoom.name == null) return;
+
             //If all secrets in the room have been completed
         /*if(Waypoints.allFound) {
             Main.currentRoom = new Room(null);

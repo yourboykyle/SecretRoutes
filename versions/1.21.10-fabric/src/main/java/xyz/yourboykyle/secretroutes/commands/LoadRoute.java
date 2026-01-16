@@ -33,7 +33,7 @@ import net.minecraft.util.Formatting;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
-import xyz.yourboykyle.secretroutes.utils.RoomDetection;
+import xyz.yourboykyle.secretroutes.utils.RoomDirectionUtils;
 
 import java.io.File;
 import java.io.FileReader;
@@ -62,10 +62,10 @@ public class LoadRoute {
             gson.fromJson(reader, JsonObject.class);
             reader.close();
 
-            Main.currentRoom = new Room(RoomDetection.roomName(), filePath);
+            Main.currentRoom = new Room(RoomDirectionUtils.roomName(), filePath);
 
             context.getSource().sendFeedback(
-                    Text.literal("Loaded route for room: " + RoomDetection.roomName()).formatted(Formatting.GREEN)
+                    Text.literal("Loaded route for room: " + RoomDirectionUtils.roomName()).formatted(Formatting.GREEN)
             );
 
         } catch (IOException e) {
