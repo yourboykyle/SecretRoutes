@@ -35,7 +35,7 @@ import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
-import xyz.yourboykyle.secretroutes.utils.RoomDetection;
+import xyz.yourboykyle.secretroutes.utils.RoomDirectionUtils;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
@@ -88,9 +88,9 @@ public class Recording {
 
     private static int executeGetRoom(CommandContext<FabricClientCommandSource> context) {
         context.getSource().sendFeedback(
-                Text.literal("Room Name: " + RoomDetection.roomName() +
-                                ", Room Corner: " + RoomDetection.roomCorner() +
-                                ", Room Direction: " + RoomDetection.roomDirection())
+                Text.literal("Room Name: " + RoomDirectionUtils.roomName() +
+                                ", Room Corner: " + RoomDirectionUtils.roomCorner() +
+                                ", Room Direction: " + RoomDirectionUtils.roomDirection())
                         .formatted(Formatting.BLUE)
         );
         return 1;
