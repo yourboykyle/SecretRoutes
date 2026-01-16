@@ -78,7 +78,7 @@ public class Debug {
 
     private static int executeLever(CommandContext<FabricClientCommandSource> context) {
         sendChatMessage("Relative :" + BlockUtils.blockPos(SecretUtils.currentLeverPos));
-        BlockPos abs = MapUtils.relativeToActual(SecretUtils.currentLeverPos, RoomDetection.roomDirection(), RoomDetection.roomCorner());
+        BlockPos abs = RoomRotationUtils.relativeToActual(SecretUtils.currentLeverPos, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
         sendChatMessage("Abs: " + BlockUtils.blockPos(abs));
         sendChatMessage("Chest: " + SecretUtils.chestName);
         sendChatMessage("Lever: " + SecretUtils.leverName);

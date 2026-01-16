@@ -148,7 +148,7 @@ public class RouteRecording {
         sendVerboseMessage("§d Adding waypoint...", verboseTag);
         // Add a non-secret waypoint to the current secret waypoints
         Main.checkRoomData();
-        BlockPos relPos = MapUtils.actualToRelative(pos, RoomDetection.roomDirection(), RoomDetection.roomCorner());
+        BlockPos relPos = RoomRotationUtils.actualToRelative(pos, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
 
         JsonArray posArray = new JsonArray();
 
@@ -267,7 +267,7 @@ public class RouteRecording {
         Main.checkRoomData();
         JsonArray posArray = new JsonArray();
 
-        Triple<Double, Double, Double> relativePos = MapUtils.actualToRelative(player.getX(), player.getY(), player.getZ(), RoomDetection.roomDirection(), RoomDetection.roomCorner());
+        Triple<Double, Double, Double> relativePos = RoomRotationUtils.actualToRelative(player.getX(), player.getY(), player.getZ(), RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
         posArray.add(new JsonPrimitive(relativePos.getOne()));
         posArray.add(new JsonPrimitive(relativePos.getTwo()));
         posArray.add(new JsonPrimitive(relativePos.getThree()));
@@ -293,7 +293,7 @@ public class RouteRecording {
             JsonArray anglePosArray = new JsonArray();
             if (MinecraftClient.getInstance().player == null) return;
             anglePosArray.add(new JsonPrimitive(MinecraftClient.getInstance().player.getPitch()));
-            anglePosArray.add(new JsonPrimitive(RotationUtils.actualToRelativeYaw(MinecraftClient.getInstance().player.getYaw() % 360, RoomDetection.roomDirection())));
+            anglePosArray.add(new JsonPrimitive(RotationUtils.actualToRelativeYaw(MinecraftClient.getInstance().player.getYaw() % 360, RoomDirectionUtils.roomDirection())));
 
             JsonArray anglesArray = currentSecretWaypoints.get("enderpearlangles").getAsJsonArray();
             for (JsonElement element : anglesArray) {
@@ -318,7 +318,7 @@ public class RouteRecording {
     public boolean addWaypoint(SECRET_TYPES type, BlockPos pos) {
         // Add a secret waypoint to the current secret waypoints
         Main.checkRoomData();
-        BlockPos relPos = MapUtils.actualToRelative(pos, RoomDetection.roomDirection(), RoomDetection.roomCorner());
+        BlockPos relPos = RoomRotationUtils.actualToRelative(pos, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
 
         JsonArray posArray = new JsonArray();
 
@@ -383,7 +383,7 @@ public class RouteRecording {
     public void newRoute() {
         // Start a new secret route recording
         int routeNumber = SRMConfig.get().routeNumber;
-        allSecretRoutes.add(routeNumber != 0 ? RoomDetection.roomName() + ":" + routeNumber : RoomDetection.roomName(), currentSecretRoute);
+        allSecretRoutes.add(routeNumber != 0 ? RoomDirectionUtils.roomName() + ":" + routeNumber : RoomDirectionUtils.roomName(), currentSecretRoute);
         currentSecretRoute = new JsonArray();
 
         currentSecretWaypoints = new JsonObject();
