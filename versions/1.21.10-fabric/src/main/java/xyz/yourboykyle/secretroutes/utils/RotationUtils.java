@@ -22,32 +22,22 @@ package xyz.yourboykyle.secretroutes.utils;
 
 public class RotationUtils {
     public static float actualToRelativeYaw(float yaw, String direction) {
-        switch (direction) {
-            case "southwest":
-                return yaw;
-            case "northwest":
-                return yaw - 90;
-            case "northeast":
-                return yaw - 180;
-            case "southeast":
-                return yaw - 270;
-            default:
-                return yaw;
-        }
+        return switch (direction) {
+            case "S" -> yaw;
+            case "W" -> yaw - 90;
+            case "N" -> yaw - 180;
+            case "E" -> yaw - 270;
+            default -> yaw;
+        };
     }
 
     public static float relativeToActualYaw(float yaw, String direction) {
-        switch (direction) {
-            case "southwest":
-                return yaw;
-            case "northwest":
-                return yaw + 90;
-            case "northeast":
-                return yaw + 180;
-            case "southeast":
-                return yaw + 270;
-            default:
-                return yaw;
-        }
+        return switch (direction) {
+            case "S" -> yaw;
+            case "W" -> yaw + 90;
+            case "N" -> yaw + 180;
+            case "E" -> yaw + 270;
+            default -> yaw;
+        };
     }
 }

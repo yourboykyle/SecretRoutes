@@ -23,7 +23,6 @@ package xyz.yourboykyle.secretroutes.events;
 import com.google.gson.JsonArray;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
-import xyz.yourboykyle.secretroutes.events.OnChatReceive;
 import xyz.yourboykyle.secretroutes.utils.LocationUtils;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.SecretUtils;
@@ -34,8 +33,7 @@ public class OnWorldRender {
 
     public static void onRenderWorld() {
         try {
-            // Make sure the player is actually in a dungeon
-            if (!LocationUtils.isInDungeons() || !SRMConfig.get().modEnabled) {
+            if (!LocationUtils.isInDungeons() || !SRMConfig.get().modEnabled || Main.currentRoom == null) {
                 return;
             }
 
@@ -72,7 +70,6 @@ public class OnWorldRender {
                         SecretUtils.renderingCallback(csr.get(i).getAsJsonObject(), i);
                     }
                 }
-
             } else {
                 SecretUtils.renderingCallback(Main.currentRoom.currentSecretWaypoints, Main.currentRoom.currentSecretIndex);
             }

@@ -106,7 +106,9 @@ tasks {
     processResources {
         if (mcData.isForge) {
             exclude("mixins.${modData.id}.fabric.json")
-            exclude("assets/skyblocker-catacombs/**")
+            exclude("rooms.json")
+            exclude("assets/secretroutesmod/secretlocations.json")
+            exclude("LICENSE-ODIN.txt")
         } else if (mcData.isFabric) {
             exclude("mixins.${modData.id}.json")
             exclude("assets/roomdetection/**")

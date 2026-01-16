@@ -33,9 +33,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
-import xyz.yourboykyle.secretroutes.utils.MapUtils;
+import xyz.yourboykyle.secretroutes.utils.RoomRotationUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
-import xyz.yourboykyle.secretroutes.utils.RoomDetection;
+import xyz.yourboykyle.secretroutes.utils.RoomDirectionUtils;
 
 public class OnBlockBreak {
     public static void register() {
@@ -61,7 +61,7 @@ public class OnBlockBreak {
                         JsonArray waypointCoords = waypoint.getAsJsonArray();
 
                         Main.checkRoomData();
-                        BlockPos relPos = MapUtils.actualToRelative(pos, RoomDetection.roomDirection(), RoomDetection.roomCorner());
+                        BlockPos relPos = RoomRotationUtils.actualToRelative(pos, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
 
                         // Check if waypoints already has the broken block
                         if (!(relPos.getX() == waypointCoords.get(0).getAsInt() &&

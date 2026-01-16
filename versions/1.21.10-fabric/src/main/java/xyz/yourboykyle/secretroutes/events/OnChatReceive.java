@@ -93,24 +93,30 @@ public class OnChatReceive {
                     Thread.sleep(100);
                 } catch (InterruptedException ignored) {
                 }
-                SecretUtils.secretLocations.remove(BlockUtils.blockPos(SecretUtils.lastInteract));
+                if (SecretUtils.lastInteract != null) {
+                    SecretUtils.secretLocations.remove(BlockUtils.blockPos(SecretUtils.lastInteract));
+                }
             }).start();
             SecretUtils.renderLever = true;
 
-            JsonObject route = Main.currentRoom.currentSecretRoute.get(Main.currentRoom.currentSecretIndex - 1)
-                    .getAsJsonObject().get("secret").getAsJsonObject();
-            JsonArray loc = route.get("location").getAsJsonArray();
-            BlockPos pos = new BlockPos(loc.get(0).getAsInt(), loc.get(1).getAsInt(), loc.get(2).getAsInt());
+            if (Main.currentRoom.currentSecretRoute != null && Main.currentRoom.currentSecretIndex > 0) {
+                JsonObject route = Main.currentRoom.currentSecretRoute.get(Main.currentRoom.currentSecretIndex - 1)
+                        .getAsJsonObject().get("secret").getAsJsonObject();
+                JsonArray loc = route.get("location").getAsJsonArray();
+                BlockPos pos = new BlockPos(loc.get(0).getAsInt(), loc.get(1).getAsInt(), loc.get(2).getAsInt());
 
-            if (route.get("type").getAsString().equals("interact")) {
-                if (BlockUtils.compareBlocks(
-                        MapUtils.actualToRelative(SecretUtils.lastInteract, RoomDetection.roomDirection(), RoomDetection.roomCorner()),
-                        pos, 0)) {
-                    Main.currentRoom.lastSecretKeybind();
+                if (route.get("type").getAsString().equals("interact")) {
+                    if (SecretUtils.lastInteract != null && BlockUtils.compareBlocks(
+                            RoomRotationUtils.actualToRelative(SecretUtils.lastInteract, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner()),
+                            pos, 0)) {
+                        Main.currentRoom.lastSecretKeybind();
+                    }
+                    if (SecretUtils.lastInteract != null) {
+                        sendChatMessage("Distance : " + BlockUtils.blockDistance(
+                                RoomRotationUtils.actualToRelative(SecretUtils.lastInteract, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner()),
+                                pos));
+                    }
                 }
-                sendChatMessage("Distance : " + BlockUtils.blockDistance(
-                        MapUtils.actualToRelative(SecretUtils.lastInteract, RoomDetection.roomDirection(), RoomDetection.roomCorner()),
-                        pos));
             }
         }
 
