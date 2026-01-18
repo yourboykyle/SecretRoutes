@@ -20,6 +20,8 @@
 
 package xyz.yourboykyle.secretroutes.events;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -32,7 +34,6 @@ import net.minecraft.world.World;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.*;
-import xyz.yourboykyle.secretroutes.utils.skyblocker.DungeonScanner;
 
 public class OnPlayerInteract {
 
@@ -74,17 +75,18 @@ public class OnPlayerInteract {
                 return ActionResult.PASS;
             }
 
-            if (BlockUtils.blockPos(MapUtils.actualToRelative(pos, RoomDetection.roomDirection(), RoomDetection.roomCorner())).equals(BlockUtils.blockPos(SecretUtils.currentLeverPos))) {
+            if (BlockUtils.blockPos(RoomRotationUtils.actualToRelative(pos, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner())).equals(BlockUtils.blockPos(SecretUtils.currentLeverPos))) {
                 SecretUtils.resetValues();
             }
             SecretUtils.lastInteract = pos;
 
             if (SRMConfig.get().allSecrets) {
                 if (SecretUtils.secrets != null) {
-                    for (DungeonScanner.SecretWaypoint secret : SecretUtils.secrets) {
+                    for (JsonElement secret : SecretUtils.secrets) {
                         try {
-                            BlockPos spos = new BlockPos(secret.x(), secret.y(), secret.z());
-                            BlockPos rel = MapUtils.actualToRelative(pos, RoomDetection.roomDirection(), RoomDetection.roomCorner());
+                            JsonObject json = secret.getAsJsonObject();
+                            BlockPos spos = new BlockPos(json.get("x").getAsInt(), json.get("y").getAsInt(), json.get("z").getAsInt());
+                            BlockPos rel = RoomRotationUtils.actualToRelative(pos, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
                             if (BlockUtils.blockPos(spos).equals(BlockUtils.blockPos(rel))) {
                                 if (!SecretUtils.secretLocations.contains(BlockUtils.blockPos(spos))) {
                                     SecretUtils.secretLocations.add(BlockUtils.blockPos(spos));

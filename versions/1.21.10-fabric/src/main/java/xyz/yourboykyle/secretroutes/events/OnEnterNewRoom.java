@@ -2,7 +2,6 @@ package xyz.yourboykyle.secretroutes.events;
 
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.*;
-import xyz.yourboykyle.secretroutes.utils.skyblocker.DungeonScanner;
 
 import java.util.ArrayList;
 
@@ -12,7 +11,7 @@ public class OnEnterNewRoom {
     public static void checkForNewRoom() {
         if (!LocationUtils.isInDungeons()) return;
 
-        String roomName = RoomDetection.roomName();
+        String roomName = RoomDirectionUtils.roomName();
 
         if (roomName.equals("UNKNOWN")) return;
 
@@ -24,7 +23,7 @@ public class OnEnterNewRoom {
 
     public static void onEnterNewRoom(Room room) {
         try {
-            if (!LocationUtils.isInDungeons() || !DungeonScanner.isClearingDungeon()) {
+            if (!LocationUtils.isInDungeons()) {
                 return;
             }
 

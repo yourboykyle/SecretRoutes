@@ -20,6 +20,8 @@
 
 package xyz.yourboykyle.secretroutes.events;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -29,7 +31,6 @@ import net.minecraft.util.math.BlockPos;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.*;
-import xyz.yourboykyle.secretroutes.utils.skyblocker.DungeonScanner;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -98,39 +99,35 @@ public class OnItemPickedUp {
     }
 
     private static void handleItemPickup(ClientPlayerEntity player, String itemName) {
-        BlockPos playerPos = player.getBlockPos();
+        BlockPos pos = player.getBlockPos();
 
         if (SRMConfig.get().allSecrets) {
-            if (SecretUtils.secrets != null) {
-                BlockPos relPos = MapUtils.actualToRelative(playerPos, RoomDetection.roomDirection(), RoomDetection.roomCorner());
-
-                for (DungeonScanner.SecretWaypoint secret : SecretUtils.secrets) {
-                    try {
-                        int x = secret.x();
-                        int y = secret.y();
-                        int z = secret.z();
-
-                        if (relPos.getX() >= x - 10 && relPos.getX() <= x + 10 &&
-                                relPos.getY() >= y - 10 && relPos.getY() <= y + 10 &&
-                                relPos.getZ() >= z - 10 && relPos.getZ() <= z + 10) {
-
-                            String locStr = BlockUtils.blockPos(new BlockPos(x, y, z));
-                            if (!SecretUtils.secretLocations.contains(locStr)) {
-                                SecretUtils.secretLocations.add(locStr);
-                            }
+            if (SecretUtils.secrets == null) return;
+            for (JsonElement obj : SecretUtils.secrets) {
+                try {
+                    JsonObject secret = obj.getAsJsonObject();
+                    if (!secret.get("category").getAsString().equals("category")) return;
+                    int x = secret.get("x").getAsInt();
+                    int y = secret.get("y").getAsInt();
+                    int z = secret.get("z").getAsInt();
+                    if (pos.getX() >= x - 10 && pos.getX() <= x + 10 &&
+                            pos.getY() >= y - 10 && pos.getY() <= y + 10 &&
+                            pos.getZ() >= z - 10 && pos.getZ() <= z + 10) {
+                        if (!SecretUtils.secretLocations.contains(BlockUtils.blockPos(new BlockPos(x, y, z)))) {
+                            SecretUtils.secretLocations.add(BlockUtils.blockPos(new BlockPos(x, y, z)));
                         }
-                    } catch (Exception ignored) {
                     }
+                } catch (Exception ignored) {
                 }
             }
         }
 
-        if (Main.currentRoom.getSecretType() == Room.SECRET_TYPES.ITEM) {
+        if (Main.currentRoom != null && Main.currentRoom.getSecretType() == Room.SECRET_TYPES.ITEM) {
             BlockPos itemPos = Main.currentRoom.getSecretLocation();
 
-            if (playerPos.getX() >= itemPos.getX() - 10 && playerPos.getX() <= itemPos.getX() + 10 &&
-                    playerPos.getY() >= itemPos.getY() - 10 && playerPos.getY() <= itemPos.getY() + 10 &&
-                    playerPos.getZ() >= itemPos.getZ() - 10 && playerPos.getZ() <= itemPos.getZ() + 10) {
+            if (pos.getX() >= itemPos.getX() - 10 && pos.getX() <= itemPos.getX() + 10 &&
+                    pos.getY() >= itemPos.getY() - 10 && pos.getY() <= itemPos.getY() + 10 &&
+                    pos.getZ() >= itemPos.getZ() - 10 && pos.getZ() <= itemPos.getZ() + 10) {
                 Main.currentRoom.nextSecret();
                 SecretSounds.secretChime();
                 LogUtils.info("Picked up item at " + itemPos);
@@ -140,7 +137,7 @@ public class OnItemPickedUp {
         // Route Recording
         if (Main.routeRecording.recording) {
             if (!itemSecretOnCooldown && isSecretItem(itemName)) {
-                Main.routeRecording.addWaypoint(Room.SECRET_TYPES.ITEM, playerPos);
+                Main.routeRecording.addWaypoint(Room.SECRET_TYPES.ITEM, pos);
                 Main.routeRecording.newSecret();
                 Main.routeRecording.setRecordingMessage("Added item secret waypoint.");
             }
