@@ -1,5 +1,6 @@
 package xyz.yourboykyle.secretroutes.utils;
 
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.hypixel.data.type.GameType;
 import net.hypixel.modapi.HypixelModAPI;
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket;
@@ -9,6 +10,8 @@ public class LocationUtils {
     private static boolean isOnSkyblock = false;
 
     public static void init() {
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> reset());
+
         HypixelModAPI.getInstance().subscribeToEventPacket(ClientboundLocationPacket.class);
 
         HypixelModAPI.getInstance().createHandler(ClientboundLocationPacket.class, packet -> {
@@ -35,7 +38,6 @@ public class LocationUtils {
         return isOnSkyblock;
     }
 
-    // TODO: Reset values on disconnect
     public static void reset() {
         inDungeons = false;
         isOnSkyblock = false;
