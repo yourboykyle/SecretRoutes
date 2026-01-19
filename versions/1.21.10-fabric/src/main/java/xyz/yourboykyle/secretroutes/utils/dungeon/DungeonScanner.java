@@ -179,27 +179,64 @@ public class DungeonScanner {
             }
             return;
         }
+
         List<Rotations> rotations = Arrays.asList(Rotations.NORTH, Rotations.SOUTH, Rotations.WEST, Rotations.EAST);
+        boolean found = false;
+
         for (Rotations rot : rotations) {
             for (RoomComponent comp : room.roomComponents) {
                 BlockPos checkPos = new BlockPos(comp.x() + rot.x, roomHeight, comp.z() + rot.z);
                 if (isBlueTerracotta(checkPos)) {
-                    boolean neighborsValid = true;
-                    if (room.roomComponents.size() > 1) {
-                        for (Direction facing : HORIZONTALS) {
-                            BlockPos neighbor = checkPos.offset(facing);
-                            if (!isBlueTerracottaOrAir(neighbor)) { neighborsValid = false; break; }
-                        }
-                    }
-                    if (neighborsValid) {
-                        room.clayPos = checkPos;
-                        room.rotation = rot;
-                        return;
-                    }
+                    room.clayPos = calculateCorner(room.roomComponents, rot);
+                    room.rotation = rot;
+                    found = true;
+                    break;
                 }
             }
+            if (found) break;
         }
-        room.rotation = Rotations.NONE;
+
+        if (!found) room.rotation = Rotations.NONE;
+
+        // Hardcoded solution to Slime-5 and Sewer-7
+        if (room.rotation != Rotations.NONE && (room.data.name().equalsIgnoreCase("Slime-5") || room.data.name().equalsIgnoreCase("Sewer-7"))) {
+            Rotations newRot = room.rotation;
+
+            switch (room.rotation) {
+                case NORTH -> newRot = Rotations.SOUTH;
+                case SOUTH -> newRot = Rotations.NORTH;
+                case EAST  -> newRot = Rotations.WEST;
+                case WEST  -> newRot = Rotations.EAST;
+            }
+
+            room.rotation = newRot;
+            room.clayPos = calculateCorner(room.roomComponents, newRot);
+
+            System.out.println("[SecretRoutes] Manually flipped " + room.data.name() + " to " + newRot);
+        }
+    }
+
+    // Calculates corner position.
+    private static BlockPos calculateCorner(Set<RoomComponent> components, Rotations rotation) {
+        int minX = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE;
+        int minZ = Integer.MAX_VALUE;
+        int maxZ = Integer.MIN_VALUE;
+
+        for (RoomComponent comp : components) {
+            if (comp.x() < minX) minX = comp.x();
+            if (comp.x() > maxX) maxX = comp.x();
+            if (comp.z() < minZ) minZ = comp.z();
+            if (comp.z() > maxZ) maxZ = comp.z();
+        }
+
+        return switch (rotation) {
+            case SOUTH -> new BlockPos(minX + rotation.x, 0, minZ + rotation.z);
+            case WEST  -> new BlockPos(maxX + rotation.x, 0, minZ + rotation.z);
+            case NORTH -> new BlockPos(maxX + rotation.x, 0, maxZ + rotation.z);
+            case EAST  -> new BlockPos(minX + rotation.x, 0, maxZ + rotation.z);
+            default    -> new BlockPos(minX, 0, minZ);
+        };
     }
 
     private static boolean isBlueTerracotta(BlockPos pos) {
