@@ -179,41 +179,42 @@ public class DungeonScanner {
             }
             return;
         }
-
         List<Rotations> rotations = Arrays.asList(Rotations.NORTH, Rotations.SOUTH, Rotations.WEST, Rotations.EAST);
-        boolean found = false;
-
         for (Rotations rot : rotations) {
             for (RoomComponent comp : room.roomComponents) {
                 BlockPos checkPos = new BlockPos(comp.x() + rot.x, roomHeight, comp.z() + rot.z);
                 if (isBlueTerracotta(checkPos)) {
-                    room.clayPos = calculateCorner(room.roomComponents, rot);
-                    room.rotation = rot;
-                    found = true;
-                    break;
+                    boolean neighborsValid = true;
+                    if (room.roomComponents.size() > 1) {
+                        for (Direction facing : HORIZONTALS) {
+                            BlockPos neighbor = checkPos.offset(facing);
+                            if (!isBlueTerracottaOrAir(neighbor)) { neighborsValid = false; break; }
+                        }
+                    }
+                    if (neighborsValid) {
+                        room.clayPos = checkPos;
+                        room.rotation = rot;
+                        if (room.rotation != Rotations.NONE && (room.data.name().equalsIgnoreCase("Slime-5") || room.data.name().equalsIgnoreCase("Sewer-7"))) {
+                            Rotations newRot = room.rotation;
+
+                            switch (room.rotation) {
+                                case NORTH -> newRot = Rotations.SOUTH;
+                                case SOUTH -> newRot = Rotations.NORTH;
+                                case EAST  -> newRot = Rotations.WEST;
+                                case WEST  -> newRot = Rotations.EAST;
+                            }
+
+                            room.rotation = newRot;
+                            room.clayPos = calculateCorner(room.roomComponents, newRot);
+
+                            System.out.println("[SecretRoutes] Manually flipped " + room.data.name() + " to " + newRot);
+                        }
+                        return;
+                    }
                 }
             }
-            if (found) break;
         }
-
-        if (!found) room.rotation = Rotations.NONE;
-
-        // Hardcoded solution to Slime-5 and Sewer-7
-        if (room.rotation != Rotations.NONE && (room.data.name().equalsIgnoreCase("Slime-5") || room.data.name().equalsIgnoreCase("Sewer-7"))) {
-            Rotations newRot = room.rotation;
-
-            switch (room.rotation) {
-                case NORTH -> newRot = Rotations.SOUTH;
-                case SOUTH -> newRot = Rotations.NORTH;
-                case EAST  -> newRot = Rotations.WEST;
-                case WEST  -> newRot = Rotations.EAST;
-            }
-
-            room.rotation = newRot;
-            room.clayPos = calculateCorner(room.roomComponents, newRot);
-
-            System.out.println("[SecretRoutes] Manually flipped " + room.data.name() + " to " + newRot);
-        }
+        room.rotation = Rotations.NONE;
     }
 
     // Calculates corner position.
