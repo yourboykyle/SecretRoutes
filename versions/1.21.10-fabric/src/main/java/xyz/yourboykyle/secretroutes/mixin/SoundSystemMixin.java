@@ -1,3 +1,4 @@
+//#if FABRIC
 package xyz.yourboykyle.secretroutes.mixin;
 
 import net.minecraft.client.sound.SoundInstance;
@@ -15,3 +16,4 @@ public class SoundSystemMixin {
         OnPlaySound.handleSoundPlayed(sound);
     }
 }
+//#endif

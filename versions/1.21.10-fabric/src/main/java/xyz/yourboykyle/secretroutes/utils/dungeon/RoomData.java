@@ -1,3 +1,4 @@
+//#if FABRIC
 package xyz.yourboykyle.secretroutes.utils.dungeon;
 
 import java.util.List;
@@ -39,3 +40,4 @@ public record RoomData(
         int secrets,
         int trappedChests
 ) {}
+//#endif

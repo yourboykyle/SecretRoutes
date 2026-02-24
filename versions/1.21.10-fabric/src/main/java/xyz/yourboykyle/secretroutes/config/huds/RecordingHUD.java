@@ -1,3 +1,4 @@
+//#if FABRIC
 package xyz.yourboykyle.secretroutes.config.huds;
 
 import net.minecraft.client.MinecraftClient;
@@ -32,3 +33,4 @@ public class RecordingHUD {
         );
     }
 }
+//#endif

@@ -1,3 +1,4 @@
+//#if FABRIC
 package xyz.yourboykyle.secretroutes.config;
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
@@ -28,3 +29,4 @@ public class ModMenuIntegration implements ModMenuApi {
         return SRMConfig::getScreen;
     }
 }
+//#endif

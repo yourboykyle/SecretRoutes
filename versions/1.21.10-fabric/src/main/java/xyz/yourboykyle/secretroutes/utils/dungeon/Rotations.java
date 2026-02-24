@@ -1,3 +1,4 @@
+//#if FABRIC
 package xyz.yourboykyle.secretroutes.utils.dungeon;
 
 /*BSD 3-Clause License
@@ -44,3 +45,4 @@ public enum Rotations {
         this.z = z;
     }
 }
+//#endif

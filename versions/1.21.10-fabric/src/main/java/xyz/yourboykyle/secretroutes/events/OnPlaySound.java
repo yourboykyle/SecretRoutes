@@ -1,3 +1,4 @@
+//#if FABRIC
 package xyz.yourboykyle.secretroutes.events;
 
 import net.minecraft.block.BlockState;
@@ -91,3 +92,4 @@ public class OnPlaySound {
         }
     }
 }
+//#endif

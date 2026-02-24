@@ -1,3 +1,4 @@
+//#if FABRIC
 package xyz.yourboykyle.secretroutes.config.huds;
 
 import net.minecraft.client.MinecraftClient;
@@ -17,3 +18,4 @@ public class CurrentRoomHUD {
         context.drawText(MinecraftClient.getInstance().textRenderer, text, x, y, 0xFFFFFF, true);
     }
 }
+//#endif

@@ -1,3 +1,4 @@
+//#if FABRIC
 package xyz.yourboykyle.secretroutes.utils;
 
 import net.minecraft.util.math.BlockPos;
@@ -76,3 +77,4 @@ public class RoomRotationUtils {
         };
     }
 }
+//#endif

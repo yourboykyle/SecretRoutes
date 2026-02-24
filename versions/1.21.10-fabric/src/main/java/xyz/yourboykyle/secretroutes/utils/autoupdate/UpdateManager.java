@@ -1,3 +1,4 @@
+//#if FABRIC
 package xyz.yourboykyle.secretroutes.utils.autoupdate;
 
 import com.google.gson.JsonElement;
@@ -167,3 +168,4 @@ public class UpdateManager {
         NONE
     }
 }
+//#endif
