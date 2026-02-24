@@ -57,11 +57,7 @@ public class AnotherRenderingUtil {
     );
     private static final RenderLayer SEE_THROUGH_LAYER = RenderLayer.of(
             "secretroutes_see_through",
-            1536,
-            SEE_THROUGH_PIPELINE,
-            RenderLayer.MultiPhaseParameters.builder()
-                    .target(RenderLayer.MAIN_TARGET)
-                    .build(false)
+            RenderSetup.builder(SEE_THROUGH_PIPELINE).build()
     );
     public static List<RenderTypes.WorldText> worldTexts = new ArrayList<>();
     public static List<RenderTypes.OutlinedBox> outlinedBoxes = new ArrayList<>();
@@ -90,7 +86,7 @@ public class AnotherRenderingUtil {
 
             consumers.draw();
 
-            RenderLayer normalLayer = RenderLayer.getDebugFilledBox();
+            RenderLayer normalLayer = RenderLayers.debugFilledBox();
 
             renderFilledBoxes(consumers, matrices, cameraPos, false, normalLayer);
             renderOutlinedBoxesAsQuads(consumers, matrices, cameraPos, false, normalLayer);
