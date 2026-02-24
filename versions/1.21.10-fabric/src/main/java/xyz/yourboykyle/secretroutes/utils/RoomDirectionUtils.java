@@ -1,3 +1,4 @@
+//#if FABRIC
 package xyz.yourboykyle.secretroutes.utils;
 
 import net.minecraft.util.math.BlockPos;
@@ -35,3 +36,4 @@ public class RoomDirectionUtils {
         return DungeonScanner.currentRoom.getName();
     }
 }
+//#endif

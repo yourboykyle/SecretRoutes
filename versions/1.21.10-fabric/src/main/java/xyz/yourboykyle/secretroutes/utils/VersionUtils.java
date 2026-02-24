@@ -1,3 +1,4 @@
+//#if FABRIC
 package xyz.yourboykyle.secretroutes.utils;
 
 import xyz.yourboykyle.secretroutes.Main;
@@ -19,3 +20,4 @@ public class VersionUtils {
         return true;
     }
 }
+//#endif

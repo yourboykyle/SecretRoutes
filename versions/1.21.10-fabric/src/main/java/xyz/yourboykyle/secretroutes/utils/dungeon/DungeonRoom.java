@@ -1,3 +1,4 @@
+//#if FABRIC
 package xyz.yourboykyle.secretroutes.utils.dungeon;
 
 import net.minecraft.util.math.BlockPos;
@@ -47,3 +48,4 @@ public class DungeonRoom {
         return data.name();
     }
 }
+//#endif

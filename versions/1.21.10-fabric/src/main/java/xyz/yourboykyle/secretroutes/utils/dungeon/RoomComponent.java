@@ -1,3 +1,4 @@
+//#if FABRIC
 package xyz.yourboykyle.secretroutes.utils.dungeon;
 
 import net.minecraft.util.math.BlockPos;
@@ -41,3 +42,4 @@ public record RoomComponent(int x, int z, int core) {
         return new BlockPos(x, 70, z);
     }
 }
+//#endif

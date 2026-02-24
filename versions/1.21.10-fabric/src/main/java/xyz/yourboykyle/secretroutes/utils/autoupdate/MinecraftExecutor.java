@@ -1,3 +1,4 @@
+//#if FABRIC
 /*
  * Copyright (C) 2022 NotEnoughUpdates contributors
  *
@@ -37,3 +38,4 @@ public class MinecraftExecutor implements Executor {
         MinecraftClient.getInstance().send(runnable);
     }
 }
+//#endif

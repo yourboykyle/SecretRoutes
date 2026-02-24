@@ -1,3 +1,4 @@
+//#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2024 yourboykyle & R-aMcC
@@ -36,3 +37,4 @@ public class Triple<X, Y, Z> extends Tuple<X, Y> {
         this.three = three;
     }
 }
+//#endif

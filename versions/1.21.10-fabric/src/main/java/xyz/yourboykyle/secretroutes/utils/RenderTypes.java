@@ -1,3 +1,4 @@
+//#if FABRIC
 /*
  * Dungeon Rooms Mod - Secret Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2021 Quantizr(_risk)
@@ -103,3 +104,4 @@ public class RenderTypes {
         }
     }
 }
+//#endif

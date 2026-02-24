@@ -1,3 +1,4 @@
+//#if FABRIC
 package xyz.yourboykyle.secretroutes.utils;
 
 import com.google.gson.Gson;
@@ -101,3 +102,4 @@ public class RouteUtils {
         }
     }
 }
+//#endif

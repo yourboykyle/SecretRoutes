@@ -1,3 +1,4 @@
+//#if FABRIC
 package xyz.yourboykyle.secretroutes.events;
 
 import net.minecraft.block.Block;
@@ -84,3 +85,4 @@ public class OnReceivePacket {
         }
     }
 }
+//#endif

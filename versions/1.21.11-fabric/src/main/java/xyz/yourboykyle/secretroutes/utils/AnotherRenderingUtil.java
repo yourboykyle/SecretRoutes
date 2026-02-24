@@ -78,7 +78,7 @@ public class AnotherRenderingUtil {
 
         MatrixStack matrices = context.matrices();
         Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
-        Vec3d cameraPos = camera.getPos();
+        Vec3d cameraPos = camera.getCameraPos();
 
         try (BufferAllocator allocator = new BufferAllocator(196608)) {
             VertexConsumerProvider.Immediate consumers = VertexConsumerProvider.immediate(allocator);

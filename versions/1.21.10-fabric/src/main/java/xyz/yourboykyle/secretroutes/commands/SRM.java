@@ -1,3 +1,4 @@
+//#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2024 yourboykyle & R-aMcC
@@ -53,3 +54,4 @@ public class SRM {
         return 1;
     }
 }
+//#endif

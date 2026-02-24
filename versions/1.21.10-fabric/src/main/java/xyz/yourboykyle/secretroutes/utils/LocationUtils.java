@@ -1,3 +1,4 @@
+//#if FABRIC
 package xyz.yourboykyle.secretroutes.utils;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -43,3 +44,4 @@ public class LocationUtils {
         isOnSkyblock = false;
     }
 }
+//#endif

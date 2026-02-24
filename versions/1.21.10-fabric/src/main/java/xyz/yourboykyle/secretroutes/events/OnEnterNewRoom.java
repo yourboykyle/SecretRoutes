@@ -1,3 +1,4 @@
+//#if FABRIC
 package xyz.yourboykyle.secretroutes.events;
 
 import xyz.yourboykyle.secretroutes.Main;
@@ -36,3 +37,4 @@ public class OnEnterNewRoom {
         }
     }
 }
+//#endif

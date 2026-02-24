@@ -1,3 +1,4 @@
+//#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2024 yourboykyle & R-aMcC
@@ -90,3 +91,4 @@ public class ChangeRoute {
         return builder.buildFuture();
     }
 }
+//#endif

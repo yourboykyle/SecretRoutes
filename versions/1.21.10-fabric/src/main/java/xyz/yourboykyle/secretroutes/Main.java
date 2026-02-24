@@ -1,3 +1,4 @@
+//#if FABRIC
 package xyz.yourboykyle.secretroutes;
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
@@ -326,3 +327,4 @@ public class Main implements ClientModInitializer {
         }
     }
 }
+//#endif

@@ -1,3 +1,4 @@
+//#if FABRIC
 package xyz.yourboykyle.secretroutes.utils.dungeon;
 
 import com.google.gson.Gson;
@@ -303,3 +304,4 @@ public class DungeonScanner {
         Main.currentRoom = null;
     }
 }
+//#endif

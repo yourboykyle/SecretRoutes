@@ -1,3 +1,4 @@
+//#if FABRIC
 package xyz.yourboykyle.secretroutes.utils;
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
@@ -276,3 +277,4 @@ public class Room {
         }).start();
     }
 }
+//#endif
