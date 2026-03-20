@@ -103,6 +103,8 @@ dependencies {
         modImplementation("net.hypixel:mod-api:1.0.1")
 
         modImplementation("com.terraformersmc:modmenu:17.0.0-beta.2")
+
+        modImplementation("maven.modrinth:iris:1.9.1+1.21.7-fabric")
     }
 
     modCompileOnly("moe.nea:libautoupdate:1.3.1") {
