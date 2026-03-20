@@ -21,11 +21,15 @@
 
 package xyz.yourboykyle.secretroutes.utils;
 
+import net.irisshaders.iris.api.v0.IrisApi;
+import net.irisshaders.iris.api.v0.IrisProgram;
+
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.DepthTestFunction;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.RenderPipelines;
@@ -67,6 +71,14 @@ public class AnotherRenderingUtil {
 
     public static void register() {
         WorldRenderEvents.END_MAIN.register(AnotherRenderingUtil::render);
+
+        if (FabricLoader.getInstance().isModLoaded("iris")) {
+            try {
+                IrisApi.getInstance().assignPipeline(SEE_THROUGH_PIPELINE, IrisProgram.BASIC);
+            } catch (Exception e) {
+                e.printStackTrace(System.err);
+            }
+        }
     }
 
     private static void render(WorldRenderContext context) {
