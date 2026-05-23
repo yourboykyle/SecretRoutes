@@ -5,7 +5,7 @@
 <div align="center">
 
 [![Modrinth Version](https://img.shields.io/modrinth/v/secret-routes-mod?style=for-the-badge&label=version)](https://modrinth.com/mod/secret-routes-mod)&nbsp;&nbsp;
-[![Discord](https://img.shields.io/discord/1111306530357256262?label=discord&color=9089DA&logo=discord&style=for-the-badge)](https://discord.gg/secretroutes)&nbsp;&nbsp;
+[![Discord](https://img.shields.io/discord/1111306530357256262?label=discord&color=9089DA&logo=discord&style=for-the-badge)](https://discord.gg/qmtQmz4V3X)&nbsp;&nbsp;
 [![Total Downloads](https://img.shields.io/github/downloads/yourboykyle/SecretRoutes/total?label=downloads&color=208a19&logo=github&style=for-the-badge)](https://github.com/yourboykyle/SecretRoutes/releases)&nbsp;&nbsp;
 [![Modrinth Downloads](https://img.shields.io/modrinth/dt/secret-routes-mod?label=downloads&color=208a19&logo=modrinth&style=for-the-badge)](https://modrinth.com/mod/secret-routes-mod)&nbsp;&nbsp;
 
@@ -162,13 +162,13 @@
 - Download the latest release: https://modrinth.com/mod/secret-routes-mod
 - Put the .jar in your `.minecraft/mods` folder
 - Watch the video for instructions: https://youtu.be/p3-KPTbXWFw
-- If you have any questions, join the discord: https://discord.gg/secretroutes
+- If you have any questions, join the discord: [https://discord.gg/qmtQmz4V3X](https://discord.gg/qmtQmz4V3X)
 ---
 ### Links:
 
 Modrinth: https://modrinth.com/mod/secret-routes-mod
 
-Discord: [discord.gg/secretroutes](https://discord.gg/secretroutes)
+Discord: [https://discord.gg/qmtQmz4V3X](https://discord.gg/qmtQmz4V3X)
 
 **Support the mod**: https://buymeacoffe.com/SecretRoutes
 
