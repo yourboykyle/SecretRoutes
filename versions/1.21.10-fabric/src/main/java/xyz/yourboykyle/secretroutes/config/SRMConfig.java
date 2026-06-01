@@ -32,458 +32,374 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
 import xyz.yourboykyle.secretroutes.Main;
-import xyz.yourboykyle.secretroutes.utils.FileUtils;
-import xyz.yourboykyle.secretroutes.utils.LogUtils;
-import xyz.yourboykyle.secretroutes.utils.Room;
+import xyz.yourboykyle.secretroutes.utils.ConfigUtils;
 import xyz.yourboykyle.secretroutes.utils.RouteUtils;
 
-import java.awt.*;
+import java.awt.Color;
 import java.io.File;
 
 public class SRMConfig {
 
-    // YACL Handler Setup
     public static final ConfigClassHandler<SRMConfig> HANDLER = ConfigClassHandler.createBuilder(SRMConfig.class)
             .id(Identifier.of(Main.MODID, "config"))
             .serializer(config -> GsonConfigSerializerBuilder.create(config)
-                    .setPath(FabricLoader.getInstance().getConfigDir().resolve("SecretRoutes/xyz.yourboykyle.secretroutes.config.json"))
+                    .setPath(FabricLoader.getInstance().getConfigDir().resolve("SecretRoutes/config.json"))
                     .appendGsonBuilder(GsonBuilder::setPrettyPrinting)
                     .setJson5(true)
                     .build())
             .build();
-    // General
-    @SerialEntry
-    public boolean modEnabled = true;
-    @SerialEntry
-    public boolean renderComplete = false;
-    @SerialEntry
-    public boolean wholeRoute = false;
-    @SerialEntry
-    public boolean allSteps = false;
-    @SerialEntry
-    public boolean allSecrets = false;
-    @SerialEntry
-    public LineType lineType = LineType.LINES;
-    @SerialEntry
-    public ParticleType particles = ParticleType.FLAME;
-    @SerialEntry
-    public int tickInterval = 1;
-    @SerialEntry
-    public int width = 5;
-    @SerialEntry
-    public int pearlLineWidth = 5;
-    @SerialEntry
-    public RouteType routeType = RouteType.PEARLS;
-    @SerialEntry
-    public String routesFileName = "routes.json";
-    @SerialEntry
-    public String pearlRoutesFileName = "pearlroutes.json";
-    @SerialEntry
-    public String copyFileName = "";
-    // Personal Bests
-    @SerialEntry
-    public boolean trackPersonalBests = true;
-    @SerialEntry
-    public boolean sendChatMessages = true;
-    // Updates
-    @SerialEntry
-    public boolean autoCheckUpdates = true;
-    @SerialEntry
-    public boolean autoDownload = false;
-    @SerialEntry
-    public boolean autoUpdateRoutes = false;
-    // Route Recording
-    @SerialEntry
-    public int routeNumber = 0;
-    @SerialEntry
-    public int etherwarpPing = 150;
-    // Profiles
-    @SerialEntry
-    public String colorProfileName = "default.json";
-    // Rendering
-    @SerialEntry
-    public float filledBoxAlpha = 0.5f;
-    @SerialEntry
-    public float boxLineWidth = 10f;
-    @SerialEntry
-    public Color lineColor = new Color(255, 0, 0);
-    @SerialEntry
-    public Color pearlLineColor = new Color(0, 255, 255);
-    @SerialEntry
-    public Color etherWarp = new Color(128, 0, 128);
-    @SerialEntry
-    public Color mine = new Color(255, 255, 0);
-    @SerialEntry
-    public Color interacts = new Color(0, 0, 255);
-    @SerialEntry
-    public Color superbooms = new Color(255, 0, 0);
-    @SerialEntry
-    public Color enderpearls = new Color(0, 255, 255);
-    @SerialEntry
-    public Color secretsItem = new Color(0, 255, 255);
-    @SerialEntry
-    public Color secretsInteract = new Color(0, 0, 255);
-    @SerialEntry
-    public Color secretsBat = new Color(0, 255, 0);
-    // Render Options
-    @SerialEntry
-    public boolean renderEtherwarps = true;
-    @SerialEntry
-    public boolean etherwarpFullBlock = false;
-    @SerialEntry
-    public boolean renderMines = true;
-    @SerialEntry
-    public boolean mineFullBlock = false;
-    @SerialEntry
-    public boolean renderInteracts = true;
-    @SerialEntry
-    public boolean interactsFullBlock = false;
-    @SerialEntry
-    public boolean renderSuperboom = true;
-    @SerialEntry
-    public boolean superboomsFullBlock = false;
-    @SerialEntry
-    public boolean renderEnderpearls = true;
-    @SerialEntry
-    public boolean enderpearlFullBlock = false;
-    @SerialEntry
-    public boolean renderSecretsItem = true;
-    @SerialEntry
-    public boolean secretsItemFullBlock = false;
-    @SerialEntry
-    public boolean renderSecretIteract = true;
-    @SerialEntry
-    public boolean secretsInteractFullBlock = false;
-    @SerialEntry
-    public boolean renderSecretBat = true;
-    @SerialEntry
-    public boolean secretsBatFullBlock = false;
-    // Start
-    @SerialEntry
-    public boolean startTextToggle = true;
 
-    // Waypoint Text Rendering
-    @SerialEntry
-    public TextColor startWaypointColor = TextColor.RED;
-    @SerialEntry
-    public float startTextSize = 3;
-    // Exit
-    @SerialEntry
-    public boolean exitTextToggle = true;
-    @SerialEntry
-    public TextColor exitWaypointColor = TextColor.RED;
-    @SerialEntry
-    public float exitTextSize = 3;
-    // Interact
-    @SerialEntry
-    public boolean interactTextToggle = true;
-    @SerialEntry
-    public TextColor interactWaypointColor = TextColor.BLUE;
-    @SerialEntry
-    public float interactTextSize = 3;
-    // Interacts
-    @SerialEntry
-    public boolean interactsTextToggle = true;
-    @SerialEntry
-    public boolean interactsEnumToggle = false;
-    @SerialEntry
-    public TextColor interactsWaypointColor = TextColor.BLUE;
-    @SerialEntry
-    public float interactsTextSize = 3;
-    // Item
-    @SerialEntry
-    public boolean itemTextToggle = true;
-    @SerialEntry
-    public TextColor itemWaypointColor = TextColor.GREEN;
-    @SerialEntry
-    public float itemTextSize = 3;
-    // Bat
-    @SerialEntry
-    public boolean batTextToggle = true;
-    @SerialEntry
-    public TextColor batWaypointColor = TextColor.GREEN;
-    @SerialEntry
-    public float batTextSize = 3;
-    // Etherwarp
-    @SerialEntry
-    public boolean etherwarpsTextToggle = false;
-    @SerialEntry
-    public boolean etherwarpsEnumToggle = false;
-    @SerialEntry
-    public TextColor etherwarpsWaypointColor = TextColor.DARK_PURPLE;
-    @SerialEntry
-    public float etherwarpsTextSize = 3;
-    // Mines
-    @SerialEntry
-    public boolean minesTextToggle = false;
-    @SerialEntry
-    public boolean minesEnumToggle = false;
-    @SerialEntry
-    public TextColor minesWaypointColor = TextColor.YELLOW;
-    @SerialEntry
-    public float minesTextSize = 3;
-    // Superbooms
-    @SerialEntry
-    public boolean superboomsTextToggle = true;
-    @SerialEntry
-    public boolean superboomsEnumToggle = false;
-    @SerialEntry
-    public TextColor superboomsWaypointColor = TextColor.RED;
-    @SerialEntry
-    public float superboomsTextSize = 3;
-    // Enderpearls
-    @SerialEntry
-    public boolean enderpearlTextToggle = true;
-    @SerialEntry
-    public boolean enderpearlEnumToggle = false;
-    @SerialEntry
-    public TextColor enderpearlWaypointColor = TextColor.AQUA;
-    @SerialEntry
-    public float enderpearlTextSize = 3;
+    // General
+    @SerialEntry public boolean modEnabled = true;
+    @SerialEntry public RouteType routeType = RouteType.PEARLS;
+    @SerialEntry public boolean renderComplete = false;
+    @SerialEntry public boolean wholeRoute = false;
+    @SerialEntry public boolean allSteps = false;
+    @SerialEntry public boolean allSecrets = false;
+    @SerialEntry public boolean trackPersonalBests = true;
+    @SerialEntry public boolean sendChatMessages = true;
+
+    // Visual
+    @SerialEntry public LineType lineType = LineType.LINES;
+    @SerialEntry public int width = 5;
+    @SerialEntry public Color lineColor = new Color(255, 0, 0);
+    @SerialEntry public boolean renderLinesThroughWalls = true;
+    @SerialEntry public ParticleType particles = ParticleType.FLAME;
+    @SerialEntry public double particleDensity = 2.0;
+    @SerialEntry public float filledBoxAlpha = 0.5f;
+    @SerialEntry public float boxLineWidth = 4f;
+    @SerialEntry public int tickInterval = 1;
+    @SerialEntry public boolean playerWaypointLine = false;
+    @SerialEntry public boolean playerToEtherwarp = false;
+
+    // Colours and toggles
+    @SerialEntry public boolean renderEtherwarps = true;
+    @SerialEntry public boolean etherwarpFullBlock = false;
+    @SerialEntry public Color etherWarp = new Color(128, 0, 128);
+
+    @SerialEntry public boolean renderMines = true;
+    @SerialEntry public boolean mineFullBlock = false;
+    @SerialEntry public Color mine = new Color(255, 255, 0);
+
+    @SerialEntry public boolean renderSuperboom = true;
+    @SerialEntry public boolean superboomsFullBlock = false;
+    @SerialEntry public Color superbooms = new Color(255, 0, 0);
+
+    @SerialEntry public boolean renderInteracts = true;
+    @SerialEntry public boolean interactsFullBlock = false;
+    @SerialEntry public Color interacts = new Color(0, 0, 255);
+
+    // Secrets
+    @SerialEntry public boolean renderSecretsItem = true;
+    @SerialEntry public boolean secretsItemFullBlock = false;
+    @SerialEntry public Color secretsItem = new Color(0, 255, 255);
+
+    @SerialEntry public boolean renderSecretIteract = true;
+    @SerialEntry public boolean secretsInteractFullBlock = false;
+    @SerialEntry public Color secretsInteract = new Color(0, 0, 255);
+
+    @SerialEntry public boolean renderSecretBat = true;
+    @SerialEntry public boolean secretsBatFullBlock = false;
+    @SerialEntry public Color secretsBat = new Color(0, 255, 0);
+
+    // Ender pearls
+    @SerialEntry public boolean renderEnderpearls = true;
+    @SerialEntry public boolean enderpearlFullBlock = false;
+    @SerialEntry public Color enderpearls = new Color(0, 255, 255);
+    @SerialEntry public int pearlLineWidth = 5;
+    @SerialEntry public Color pearlLineColor = new Color(0, 255, 255);
+
+    // text
+    @SerialEntry public boolean startTextToggle = true;
+    @SerialEntry public TextColor startWaypointColor = TextColor.RED;
+    @SerialEntry public float startTextSize = 1.0f;
+
+    @SerialEntry public boolean exitTextToggle = true;
+    @SerialEntry public TextColor exitWaypointColor = TextColor.RED;
+    @SerialEntry public float exitTextSize = 1.0f;
+
+    @SerialEntry public boolean etherwarpsTextToggle = false;
+    @SerialEntry public boolean etherwarpsEnumToggle = false;
+    @SerialEntry public TextColor etherwarpsWaypointColor = TextColor.DARK_PURPLE;
+    @SerialEntry public float etherwarpsTextSize = 1.0f;
+
+    @SerialEntry public boolean minesTextToggle = false;
+    @SerialEntry public boolean minesEnumToggle = false;
+    @SerialEntry public TextColor minesWaypointColor = TextColor.YELLOW;
+    @SerialEntry public float minesTextSize = 1.0f;
+
+    @SerialEntry public boolean interactsTextToggle = true;
+    @SerialEntry public boolean interactsEnumToggle = false;
+    @SerialEntry public TextColor interactsWaypointColor = TextColor.BLUE;
+    @SerialEntry public float interactsTextSize = 1.0f;
+
+    @SerialEntry public boolean superboomsTextToggle = true;
+    @SerialEntry public boolean superboomsEnumToggle = false;
+    @SerialEntry public TextColor superboomsWaypointColor = TextColor.RED;
+    @SerialEntry public float superboomsTextSize = 1.0f;
+
+    @SerialEntry public boolean enderpearlTextToggle = true;
+    @SerialEntry public boolean enderpearlEnumToggle = false;
+    @SerialEntry public TextColor enderpearlWaypointColor = TextColor.AQUA;
+    @SerialEntry public float enderpearlTextSize = 1.0f;
+
+    @SerialEntry public boolean interactTextToggle = true;
+    @SerialEntry public TextColor interactWaypointColor = TextColor.BLUE;
+    @SerialEntry public float interactTextSize = 1.0f;
+
+    @SerialEntry public boolean itemTextToggle = true;
+    @SerialEntry public TextColor itemWaypointColor = TextColor.GREEN;
+    @SerialEntry public float itemTextSize = 1.0f;
+
+    @SerialEntry public boolean batTextToggle = true;
+    @SerialEntry public TextColor batWaypointColor = TextColor.GREEN;
+    @SerialEntry public float batTextSize = 1.0f;
+
+    @SerialEntry public boolean autoCheckUpdates = true;
+    @SerialEntry public boolean autoDownload = false;
+    @SerialEntry public boolean autoUpdateRoutes = false;
+
+    @SerialEntry public boolean customSecretSound = false;
+    @SerialEntry public SoundType customSecretSoundType = SoundType.ZYRA_MEOW;
+    @SerialEntry public float customSecretSoundVolume = 1.0f;
+    @SerialEntry public float customSecretSoundPitch = 1.0f;
+    @SerialEntry public boolean renderBlood = false;
+    @SerialEntry public boolean bloodNotif = false;
+    @SerialEntry public String bloodReadyText = "Blood Ready";
+    @SerialEntry public TextColor bloodReadyColor = TextColor.GOLD;
+    @SerialEntry public int bloodBannerDuration = 3000;
+    @SerialEntry public int bloodScale = 2;
+    @SerialEntry public int bloodX = 0;
+    @SerialEntry public int bloodY = -100;
+
+    // Boss Hiding
+    @SerialEntry public boolean hideBossMessages = false;
+    @SerialEntry public boolean hideWatcher = true;
+    @SerialEntry public boolean hideBonzo = true;
+    @SerialEntry public boolean hideScarf = true;
+    @SerialEntry public boolean hideProfessor = true;
+    @SerialEntry public boolean hideThorn = true;
+    @SerialEntry public boolean hideLivid = true;
+    @SerialEntry public boolean hideSadan = true;
+    @SerialEntry public boolean hideWitherLords = false;
+
+    // Recording and Dev
+    @SerialEntry public int recordingHudX = 10;
+    @SerialEntry public int recordingHudY = 10;
+    @SerialEntry public Color recordingHudColor = new Color(255, 255, 255);
+    //@SerialEntry public int etherwarpPing = 150;
+
     // Dev
-    @SerialEntry
-    public boolean enableDevOptions = false;
-    @SerialEntry
-    public boolean verboseLogging = false;
-    @SerialEntry
-    public boolean verboseRecording = true;
-    @SerialEntry
-    public boolean verboseUpdating = true;
-    @SerialEntry
-    public boolean verboseInfo = false;
-    @SerialEntry
-    public boolean verboseRendering = false;
-    @SerialEntry
-    public boolean verbosePersonalBests = false;
-    @SerialEntry
-    public boolean actionbarInfo = false;
-    @SerialEntry
-    public boolean forceUpdateDEBUG = false;
-    @SerialEntry
-    public boolean warnKeybindsOutsideDungeon = true;
-    @SerialEntry
-    public boolean renderLinesThroughWalls = true;
-    @SerialEntry
-    public boolean playerWaypointLine = false;
-    @SerialEntry
-    public boolean playerToEtherwarp = false;
-    @SerialEntry
-    public boolean debug = false;
-    @SerialEntry
-    public boolean disableServerChecking = false;
-    @SerialEntry
-    public boolean bridge = false;
-    @SerialEntry
-    public boolean sendData = true;
-    // HUD
-    @SerialEntry
-    public int recordingHudX = 10;
-    @SerialEntry
-    public int recordingHudY = 10;
-    @SerialEntry
-    public Color recordingHudColor = new Color(255, 255, 255);
-    // Sound
-    @SerialEntry
-    public boolean customSecretSound = false;
-    @SerialEntry
-    public SoundType customSecretSoundType = SoundType.ZYRA_MEOW;
-    @SerialEntry
-    public float customSecretSoundVolume = 1.0f;
-    @SerialEntry
-    public float customSecretSoundPitch = 1.0f;
-    // Messages
-    @SerialEntry
-    public boolean hideBossMessages = false;
-    @SerialEntry
-    public boolean hideWatcher = true;
-    @SerialEntry
-    public boolean hideBonzo = true;
-    @SerialEntry
-    public boolean hideScarf = true;
-    @SerialEntry
-    public boolean hideProfessor = true;
-    @SerialEntry
-    public boolean hideThorn = true;
-    @SerialEntry
-    public boolean hideLivid = true;
-    @SerialEntry
-    public boolean hideSadan = true;
-    @SerialEntry
-    public boolean hideWitherLords = false;
-    @SerialEntry
-    public boolean bloodNotif = false;
-    @SerialEntry
-    public String bloodReadyText = "Blood Ready";
-    @SerialEntry
-    public TextColor bloodReadyColor = TextColor.GOLD;
-    @SerialEntry
-    public int bloodBannerDuration = 3000;
-    @SerialEntry
-    public int bloodScale = 2;
-    @SerialEntry
-    public int bloodX = 0;
-    @SerialEntry
-    public int bloodY = -100;
-    @SerialEntry
-    public boolean renderBlood = false;
+    @SerialEntry public boolean verboseLogging = false;
+    @SerialEntry public boolean verboseRecording = true;
+    @SerialEntry public boolean verboseUpdating = true;
+    @SerialEntry public boolean verboseInfo = false;
+    @SerialEntry public boolean verboseRendering = false;
+    @SerialEntry public boolean bridge = false;
+    @SerialEntry public boolean disableServerChecking = false;
+    @SerialEntry public boolean forceUpdateDEBUG = false;
+    @SerialEntry public boolean sendData = true;
+    // Unused
+    /*@SerialEntry public boolean warnKeybindsOutsideDungeon = true;
+    @SerialEntry public boolean playerWaypointLine = false;
+    @SerialEntry public boolean playerToEtherwarp = false;
+    @SerialEntry public boolean debug = false;*/
+    @SerialEntry public boolean actionbarInfo = false;
+    @SerialEntry public boolean verbosePersonalBests = false;
+
+    @SerialEntry public String routesFileName = "routes.json";
+    @SerialEntry public String pearlRoutesFileName = "pearlroutes.json";
+    @SerialEntry public String copyFileName = "default";
+    @SerialEntry public int routeNumber = 0;
+    // Unused
+    // @SerialEntry public String colorProfileName = "default.json";
 
     public static SRMConfig get() {
         return HANDLER.instance();
     }
 
-    // Enums
-
     public static Screen getScreen(Screen parent) {
-        return YetAnotherConfigLib.createBuilder()
-                .title(Text.literal("Secret Routes Config"))
-                // General
-                .category(ConfigCategory.createBuilder()
-                        .name(Text.literal("General"))
-                        .option(Option.<Boolean>createBuilder()
-                                .name(Text.literal("Render Routes"))
-                                .binding(true, () -> get().modEnabled, v -> get().modEnabled = v)
-                                .controller(TickBoxControllerBuilder::create)
-                                .build())
-                        .option(Option.<Boolean>createBuilder()
-                                .name(Text.literal("Render Complete"))
-                                .description(OptionDescription.of(Text.literal("Renders secrets even if the room is completed")))
-                                .binding(false, () -> get().renderComplete, v -> get().renderComplete = v)
-                                .controller(TickBoxControllerBuilder::create)
-                                .build())
-                        .option(Option.<LineType>createBuilder()
-                                .name(Text.literal("Line Type"))
-                                .binding(LineType.LINES, () -> get().lineType, v -> get().lineType = v)
-                                .controller(opt -> EnumControllerBuilder.create(opt).enumClass(LineType.class))
-                                .build())
+        var builder = YetAnotherConfigLib.createBuilder()
+                .title(Text.literal("Secret Routes Config"));
+
+        // General
+        builder.category(ConfigCategory.createBuilder()
+                .name(Text.literal("General"))
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.literal("Mod Enabled"))
+                        .binding(true, () -> get().modEnabled, v -> get().modEnabled = v)
+                        .controller(TickBoxControllerBuilder::create)
+                        .build())
+                .option(Option.<RouteType>createBuilder()
+                        .name(Text.literal("Route Type"))
+                        .binding(RouteType.PEARLS, () -> get().routeType, v -> get().routeType = v)
+                        .controller(opt -> EnumControllerBuilder.create(opt).enumClass(RouteType.class))
+                        .build())
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.literal("Render Completed Rooms"))
+                        .description(OptionDescription.of(Text.literal("Renders secrets even if the room is cleared.")))
+                        .binding(false, () -> get().renderComplete, v -> get().renderComplete = v)
+                        .controller(TickBoxControllerBuilder::create)
+                        .build())
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.literal("Show Whole Route"))
+                        .description(OptionDescription.of(Text.literal("Render all steps at once instead of sequential.")))
+                        .binding(false, () -> get().wholeRoute, v -> get().wholeRoute = v)
+                        .controller(TickBoxControllerBuilder::create)
+                        .build())
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.literal("Show All Secrets"))
+                        .description(OptionDescription.of(Text.literal("Highlight all secrets in the room, not just the route.")))
+                        .binding(false, () -> get().allSecrets, v -> get().allSecrets = v)
+                        .controller(TickBoxControllerBuilder::create)
+                        .build())
+                .option(ButtonOption.createBuilder()
+                        .name(Text.literal("Update Routes"))
+                        .text(Text.literal("Download"))
+                        .action((yacl, opt) -> {
+                            if (get().routeType == RouteType.PEARLS) RouteUtils.updatePearlRoutes();
+                            else RouteUtils.updateRoutes();
+                        })
+                        .build())
+                .build());
+
+        // Visuals
+        builder.category(ConfigCategory.createBuilder()
+                .name(Text.literal("Visuals"))
+                .option(Option.<LineType>createBuilder()
+                        .name(Text.literal("Line Style"))
+                        .binding(LineType.LINES, () -> get().lineType, v -> get().lineType = v)
+                        .controller(opt -> EnumControllerBuilder.create(opt).enumClass(LineType.class))
+                        .build())
+                .option(Option.<Integer>createBuilder()
+                        .name(Text.literal("Line Width"))
+                        .binding(5, () -> get().width, v -> get().width = v)
+                        .controller(opt -> IntegerSliderControllerBuilder.create(opt).range(1, 10).step(1))
+                        .build())
+                .option(Option.<Color>createBuilder()
+                        .name(Text.literal("Line Color"))
+                        .binding(Color.RED, () -> get().lineColor, v -> get().lineColor = v)
+                        .controller(ColorControllerBuilder::create)
+                        .build())
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.literal("See Through Walls"))
+                        .binding(true, () -> get().renderLinesThroughWalls, v -> get().renderLinesThroughWalls = v)
+                        .controller(TickBoxControllerBuilder::create)
+                        .build())
+                .group(OptionGroup.createBuilder()
+                        .name(Text.literal("Particles"))
                         .option(Option.<ParticleType>createBuilder()
-                                .name(Text.literal("Particle Type"))
+                                .name(Text.literal("Type"))
                                 .binding(ParticleType.FLAME, () -> get().particles, v -> get().particles = v)
                                 .controller(opt -> EnumControllerBuilder.create(opt).enumClass(ParticleType.class))
                                 .build())
-                        .option(Option.<Integer>createBuilder()
-                                .name(Text.literal("Line Width"))
-                                .binding(5, () -> get().width, v -> get().width = v)
-                                .controller(opt -> IntegerSliderControllerBuilder.create(opt).range(1, 10).step(1))
-                                .build())
-                        .option(Option.<Float>createBuilder()
-                                .name(Text.literal("Box Line Width"))
-                                .binding(4f, () -> get().boxLineWidth, v -> get().boxLineWidth = v)
-                                .controller(opt -> FloatSliderControllerBuilder.create(opt).range(0f, 10f).step(0.5f))
-                                .build())
-                        .group(OptionGroup.createBuilder()
-                                .name(Text.literal("Routes Data"))
-                                .option(Option.<RouteType>createBuilder()
-                                        .name(Text.literal("Route Type"))
-                                        .binding(RouteType.PEARLS, () -> get().routeType, v -> get().routeType = v)
-                                        .controller(opt -> EnumControllerBuilder.create(opt).enumClass(RouteType.class))
-                                        .build())
-                                .option(ButtonOption.createBuilder()
-                                        .name(Text.literal("Update Routes"))
-                                        .text(Text.literal("Download"))
-                                        .action((yacl, opt) -> {
-                                            if (get().routeType == RouteType.PEARLS) RouteUtils.updatePearlRoutes();
-                                            else RouteUtils.updateRoutes();
-                                        })
-                                        .build())
-                                .option(ButtonOption.createBuilder()
-                                        .name(Text.literal("Import Routes"))
-                                        .text(Text.literal("Import"))
-                                        .action((yacl, opt) -> {
-                                            try {
-                                                File file = FileUtils.promptUserForFile();
-                                                if (file != null) FileUtils.copyFileToDirectory(file, Main.ROUTES_PATH);
-                                            } catch (Exception e) {
-                                                LogUtils.error(e);
-                                            }
-                                        })
-                                        .build())
+                        .option(Option.<Double>createBuilder()
+                                .name(Text.literal("Density"))
+                                .binding(2.0, () -> get().particleDensity, v -> get().particleDensity = v)
+                                .controller(opt -> DoubleSliderControllerBuilder.create(opt).range(0.1, 10.0).step(0.1))
                                 .build())
                         .build())
-                // Rendering
-                .category(ConfigCategory.createBuilder()
-                        .name(Text.literal("Rendering"))
-                        .group(OptionGroup.createBuilder()
-                                .name(Text.literal("Colors"))
-                                .option(Option.<Color>createBuilder()
-                                        .name(Text.literal("Line Color"))
-                                        .binding(Color.RED, () -> get().lineColor, v -> get().lineColor = v)
-                                        .controller(ColorControllerBuilder::create)
-                                        .build())
-                                .option(Option.<Color>createBuilder()
-                                        .name(Text.literal("Pearl Line Color"))
-                                        .binding(Color.CYAN, () -> get().pearlLineColor, v -> get().pearlLineColor = v)
-                                        .controller(ColorControllerBuilder::create)
-                                        .build())
-                                .option(Option.<Color>createBuilder()
-                                        .name(Text.literal("Etherwarp Color"))
-                                        .binding(new Color(128, 0, 128), () -> get().etherWarp, v -> get().etherWarp = v)
-                                        .controller(ColorControllerBuilder::create)
-                                        .build())
-                                .build())
-                        .group(OptionGroup.createBuilder()
-                                .name(Text.literal("Toggles"))
-                                .option(Option.<Boolean>createBuilder()
-                                        .name(Text.literal("Render Etherwarps"))
-                                        .binding(true, () -> get().renderEtherwarps, v -> get().renderEtherwarps = v)
-                                        .controller(TickBoxControllerBuilder::create)
-                                        .build())
-                                .option(Option.<Boolean>createBuilder()
-                                        .name(Text.literal("Render Enderpearls"))
-                                        .binding(true, () -> get().renderEnderpearls, v -> get().renderEnderpearls = v)
-                                        .controller(TickBoxControllerBuilder::create)
-                                        .build())
-                                .build())
+                .build());
+
+        // Components
+        builder.category(ConfigCategory.createBuilder()
+                .name(Text.literal("Components"))
+                .group(OptionGroup.createBuilder()
+                        .name(Text.literal("Etherwarps"))
+                        .option(Option.<Boolean>createBuilder().name(Text.literal("Enabled")).binding(true, () -> get().renderEtherwarps, v -> get().renderEtherwarps = v).controller(TickBoxControllerBuilder::create).build())
+                        .option(Option.<Color>createBuilder().name(Text.literal("Color")).binding(new Color(128, 0, 128), () -> get().etherWarp, v -> get().etherWarp = v).controller(ColorControllerBuilder::create).build())
+                        .option(Option.<Boolean>createBuilder().name(Text.literal("Full Block")).binding(false, () -> get().etherwarpFullBlock, v -> get().etherwarpFullBlock = v).controller(TickBoxControllerBuilder::create).build())
                         .build())
-                // Recording
-                .category(ConfigCategory.createBuilder()
-                        .name(Text.literal("Recording"))
-                        .option(ButtonOption.createBuilder()
-                                .name(Text.literal("Start Recording"))
-                                .action((yacl, opt) -> Main.routeRecording.startRecording())
-                                .build())
-                        .option(ButtonOption.createBuilder()
-                                .name(Text.literal("Stop Recording"))
-                                .action((yacl, opt) -> Main.routeRecording.stopRecording())
-                                .build())
-                        .option(ButtonOption.createBuilder()
-                                .name(Text.literal("Set Bat Waypoint"))
-                                .action((yacl, opt) -> {
-                                    if (Main.routeRecording.recording) {
-                                        var player = MinecraftClient.getInstance().player;
-                                        if (player != null) {
-                                            BlockPos targetPos = player.getBlockPos().add(-1, 2, -1);
-                                            Main.routeRecording.addWaypoint(Room.SECRET_TYPES.BAT, targetPos);
-                                            Main.routeRecording.newSecret();
-                                            Main.routeRecording.setRecordingMessage("Added bat secret waypoint.");
-                                        }
-                                    }
-                                })
-                                .build())
+                .group(OptionGroup.createBuilder()
+                        .name(Text.literal("Secrets"))
+                        .option(Option.<Boolean>createBuilder().name(Text.literal("Items")).binding(true, () -> get().renderSecretsItem, v -> get().renderSecretsItem = v).controller(TickBoxControllerBuilder::create).build())
+                        .option(Option.<Color>createBuilder().name(Text.literal("Item Color")).binding(new Color(0, 255, 255), () -> get().secretsItem, v -> get().secretsItem = v).controller(ColorControllerBuilder::create).build())
+                        .option(Option.<Boolean>createBuilder().name(Text.literal("Interacts")).binding(true, () -> get().renderSecretIteract, v -> get().renderSecretIteract = v).controller(TickBoxControllerBuilder::create).build())
+                        .option(Option.<Color>createBuilder().name(Text.literal("Interact Color")).binding(new Color(0, 0, 255), () -> get().secretsInteract, v -> get().secretsInteract = v).controller(ColorControllerBuilder::create).build())
                         .build())
-                // Hud
-                .category(ConfigCategory.createBuilder()
-                        .name(Text.literal("HUD Locations"))
-                        .option(Option.<Integer>createBuilder()
-                                .name(Text.literal("Recording HUD X"))
-                                .binding(10, () -> get().recordingHudX, v -> get().recordingHudX = v)
-                                .controller(IntegerFieldControllerBuilder::create)
-                                .build())
-                        .option(Option.<Integer>createBuilder()
-                                .name(Text.literal("Recording HUD Y"))
-                                .binding(10, () -> get().recordingHudY, v -> get().recordingHudY = v)
-                                .controller(IntegerFieldControllerBuilder::create)
-                                .build())
-                        .option(Option.<Color>createBuilder()
-                                .name(Text.literal("Recording HUD Color"))
-                                .binding(Color.WHITE, () -> get().recordingHudColor, v -> get().recordingHudColor = v)
-                                .controller(ColorControllerBuilder::create)
-                                .build())
+                .group(OptionGroup.createBuilder()
+                        .name(Text.literal("Mines"))
+                        .option(Option.<Boolean>createBuilder().name(Text.literal("Enabled")).binding(true, () -> get().renderMines, v -> get().renderMines = v).controller(TickBoxControllerBuilder::create).build())
+                        .option(Option.<Color>createBuilder().name(Text.literal("Color")).binding(new Color(255, 255, 0), () -> get().mine, v -> get().mine = v).controller(ColorControllerBuilder::create).build())
+                        .option(Option.<Boolean>createBuilder().name(Text.literal("Full Block")).binding(false, () -> get().mineFullBlock, v -> get().mineFullBlock = v).controller(TickBoxControllerBuilder::create).build())
                         .build())
-                .save(HANDLER::save)
-                .build()
-                .generateScreen(parent);
+                .group(OptionGroup.createBuilder()
+                        .name(Text.literal("Superbooms"))
+                        .option(Option.<Boolean>createBuilder().name(Text.literal("Enabled")).binding(true, () -> get().renderSuperboom, v -> get().renderSuperboom = v).controller(TickBoxControllerBuilder::create).build())
+                        .option(Option.<Color>createBuilder().name(Text.literal("Color")).binding(new Color(255, 0, 0), () -> get().superbooms, v -> get().superbooms = v).controller(ColorControllerBuilder::create).build())
+                        .option(Option.<Boolean>createBuilder().name(Text.literal("Full Block")).binding(false, () -> get().superboomsFullBlock, v -> get().superboomsFullBlock = v).controller(TickBoxControllerBuilder::create).build())
+                        .build())
+                .build());
+
+        // Text Settings
+        builder.category(ConfigCategory.createBuilder()
+                .name(Text.literal("Text Settings"))
+                .group(OptionGroup.createBuilder()
+                        .name(Text.literal("Etherwarps Text"))
+                        .option(Option.<Boolean>createBuilder().name(Text.literal("Show")).binding(false, () -> get().etherwarpsTextToggle, v -> get().etherwarpsTextToggle = v).controller(TickBoxControllerBuilder::create).build())
+                        .option(Option.<Boolean>createBuilder().name(Text.literal("Numbering")).binding(false, () -> get().etherwarpsEnumToggle, v -> get().etherwarpsEnumToggle = v).controller(TickBoxControllerBuilder::create).build())
+                        .option(Option.<TextColor>createBuilder().name(Text.literal("Color")).binding(TextColor.DARK_PURPLE, () -> get().etherwarpsWaypointColor, v -> get().etherwarpsWaypointColor = v).controller(opt -> EnumControllerBuilder.create(opt).enumClass(TextColor.class)).build())
+                        .option(Option.<Float>createBuilder().name(Text.literal("Size")).binding(1.0f, () -> get().etherwarpsTextSize, v -> get().etherwarpsTextSize = v).controller(opt -> FloatSliderControllerBuilder.create(opt).range(0.1f, 5f).step(0.1f)).build())
+                        .build())
+                .group(OptionGroup.createBuilder()
+                        .name(Text.literal("Interacts Text"))
+                        .option(Option.<Boolean>createBuilder().name(Text.literal("Show")).binding(true, () -> get().interactsTextToggle, v -> get().interactsTextToggle = v).controller(TickBoxControllerBuilder::create).build())
+                        .option(Option.<TextColor>createBuilder().name(Text.literal("Color")).binding(TextColor.BLUE, () -> get().interactsWaypointColor, v -> get().interactsWaypointColor = v).controller(opt -> EnumControllerBuilder.create(opt).enumClass(TextColor.class)).build())
+                        .build())
+                .group(OptionGroup.createBuilder()
+                        .name(Text.literal("Start/Exit"))
+                        .option(Option.<Boolean>createBuilder().name(Text.literal("Show Start")).binding(true, () -> get().startTextToggle, v -> get().startTextToggle = v).controller(TickBoxControllerBuilder::create).build())
+                        .option(Option.<TextColor>createBuilder().name(Text.literal("Start Color")).binding(TextColor.RED, () -> get().startWaypointColor, v -> get().startWaypointColor = v).controller(opt -> EnumControllerBuilder.create(opt).enumClass(TextColor.class)).build())
+                        .option(Option.<Boolean>createBuilder().name(Text.literal("Show Exit")).binding(true, () -> get().exitTextToggle, v -> get().exitTextToggle = v).controller(TickBoxControllerBuilder::create).build())
+                        .option(Option.<TextColor>createBuilder().name(Text.literal("Exit Color")).binding(TextColor.RED, () -> get().exitWaypointColor, v -> get().exitWaypointColor = v).controller(opt -> EnumControllerBuilder.create(opt).enumClass(TextColor.class)).build())
+                        .build())
+                .build());
+
+        var profilesGroup = OptionGroup.createBuilder()
+                .name(Text.literal("Load Existing Profile"));
+
+        File[] profileFiles = ConfigUtils.COLOR_PROFILE_DIR.listFiles((dir, name) -> name.endsWith(".json"));
+        if (profileFiles != null) {
+            for (File file : profileFiles) {
+                String profileName = file.getName().replace(".json", "");
+                profilesGroup.option(ButtonOption.createBuilder()
+                        .name(Text.literal("Load: " + profileName))
+                        .description(OptionDescription.of(Text.literal("Loads " + profileName + ".json and closes menu.")))
+                        .action((yacl, opt) -> {
+                            ConfigUtils.loadColorConfig(profileName);
+                            MinecraftClient.getInstance().setScreen(null);
+                        })
+                        .build());
+            }
+        }
+
+        builder.category(ConfigCategory.createBuilder()
+                .name(Text.literal("Profiles"))
+                .option(Option.<String>createBuilder()
+                        .name(Text.literal("Profile Name"))
+                        .description(OptionDescription.of(Text.literal("Enter name to Save/Load a specific profile.")))
+                        .binding("default", () -> get().copyFileName, v -> get().copyFileName = v)
+                        .controller(StringControllerBuilder::create)
+                        .build())
+                .option(ButtonOption.createBuilder()
+                        .name(Text.literal("Save Current Profile"))
+                        .description(OptionDescription.of(Text.literal("Saves current settings to the filename above.")))
+                        .action((yacl, opt) -> {
+                            ConfigUtils.writeColorConfig(get().copyFileName);
+                        })
+                        .build())
+                .option(ButtonOption.createBuilder()
+                        .name(Text.literal("Load From Text Input"))
+                        .action((yacl, opt) -> {
+                            ConfigUtils.loadColorConfig(get().copyFileName);
+                            MinecraftClient.getInstance().setScreen(null);
+                        })
+                        .build())
+                .group(profilesGroup.build())
+                .build());
+
+        return builder.save(HANDLER::save).build().generateScreen(parent);
     }
 
     public enum LineType implements NameableEnum {
