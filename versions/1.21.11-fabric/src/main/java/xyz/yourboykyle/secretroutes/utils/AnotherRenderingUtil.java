@@ -48,6 +48,7 @@ import xyz.yourboykyle.secretroutes.events.OnWorldRender;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import org.joml.Quaternionf;
 
 public class AnotherRenderingUtil {
     private static final float THICKNESS_MULTIPLIER = 0.01f;
@@ -105,6 +106,8 @@ public class AnotherRenderingUtil {
             renderLinesAsQuads(consumers, matrices, cameraPos, false, normalLayer);
             renderLinesFromCursorAsQuads(consumers, matrices, cameraPos, false, normalLayer);
 
+            renderText(consumers, matrices, cameraPos);
+
             consumers.draw();
         }
 
@@ -112,8 +115,6 @@ public class AnotherRenderingUtil {
         filledBoxes.clear();
         lines.clear();
         linesFromCursor.clear();
-
-        renderText(matrices, cameraPos);
         worldTexts.clear();
     }
 
@@ -201,16 +202,17 @@ public class AnotherRenderingUtil {
         }
     }
 
-    private static void renderText(MatrixStack matrices, Vec3d camPos) {
+    private static void renderText(VertexConsumerProvider.Immediate consumers, MatrixStack matrices, Vec3d camPos) {
+        if (worldTexts.isEmpty()) return;
+
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-        Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
-        VertexConsumerProvider consumers = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
+        Quaternionf cameraRotation = MinecraftClient.getInstance().gameRenderer.getCamera().getRotation();
 
         for (RenderTypes.WorldText wt : worldTexts) {
             matrices.push();
-            Vec3d pos = wt.position.subtract(camPos);
-            matrices.translate(pos.x, pos.y, pos.z);
-            matrices.multiply(camera.getRotation());
+            matrices.translate(wt.position);
+            matrices.translate(-camPos.x, -camPos.y, -camPos.z);
+            matrices.multiply(cameraRotation);
             matrices.scale(-0.025f, -0.025f, 0.025f);
 
             Matrix4f matrix = matrices.peek().getPositionMatrix();
@@ -220,9 +222,7 @@ public class AnotherRenderingUtil {
                     ? TextRenderer.TextLayerType.SEE_THROUGH
                     : TextRenderer.TextLayerType.NORMAL;
 
-            textRenderer.draw(wt.text, xOffset, 0, 0xFFFFFFFF, false, matrix,
-                    consumers, layerType, 0, 15728880);
-
+            textRenderer.draw(wt.text, xOffset, 0, 0xFFFFFFFF, true, matrix, consumers, layerType, 0, 0xF000F0);
             matrices.pop();
         }
     }
