@@ -87,15 +87,7 @@ repositories {
 dependencies {
     // Fabric API - only for Fabric 1.21.10 build
     // Other Fabric versions don't load Fabric API to avoid compatibility issues
-    if (mcData.isFabric && project.name == "1.21.10-fabric") {
-        modImplementation("net.fabricmc.fabric-api:fabric-api:0.138.4+1.21.10")
-
-        modImplementation("dev.isxander:yet-another-config-lib:3.8.1+1.21.10-fabric")
-
-        modImplementation("net.hypixel:mod-api:1.0.1")
-
-        modImplementation("com.terraformersmc:modmenu:16.0.0-rc.2")
-    } else if (mcData.isFabric && project.name == "1.21.11-fabric") {
+    if (mcData.isFabric && project.name == "1.21.11-fabric") {
         modImplementation("net.fabricmc.fabric-api:fabric-api:0.141.3+1.21.11")
 
         modImplementation("dev.isxander:yet-another-config-lib:3.8.1+1.21.11-fabric")
@@ -105,6 +97,16 @@ dependencies {
         modImplementation("com.terraformersmc:modmenu:17.0.0-beta.2")
 
         modImplementation("maven.modrinth:iris:1.9.1+1.21.7-fabric")
+    } else if (mcData.isFabric && project.name == "26.1-fabric") {
+        modImplementation("net.fabricmc.fabric-api:fabric-api:0.144.4+26.1")
+
+        modImplementation("dev.isxander:yet-another-config-lib:3.9.4+26.1-fabric")
+
+        modImplementation("net.hypixel:mod-api:1.0.2+build.1+mc26.1")
+
+        modImplementation("com.terraformersmc:modmenu:18.0.0-beta.1")
+
+        modImplementation("maven.modrinth:iris:1.10.9+26.1-fabric")
     }
 
     modCompileOnly("moe.nea:libautoupdate:1.3.1") {
