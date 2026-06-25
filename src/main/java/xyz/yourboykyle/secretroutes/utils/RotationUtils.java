@@ -1,4 +1,4 @@
-//#if FORGE && MC == 1.8.9
+//#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -23,33 +23,23 @@ package xyz.yourboykyle.secretroutes.utils;
 
 public class RotationUtils {
     public static float actualToRelativeYaw(float yaw, String direction) {
-        switch(direction) {
-            case "SW":
-                return yaw;
-            case "NW":
-                return yaw - 90;
-            case "NE":
-                return yaw - 180;
-            case "SE":
-                return yaw - 270;
-            default:
-                return yaw;
-        }
+        return switch (direction) {
+            case "S" -> yaw;
+            case "W" -> yaw - 90;
+            case "N" -> yaw - 180;
+            case "E" -> yaw - 270;
+            default -> yaw;
+        };
     }
 
     public static float relativeToActualYaw(float yaw, String direction) {
-        switch(direction) {
-            case "SW":
-                return yaw;
-            case "NW":
-                return yaw + 90;
-            case "NE":
-                return yaw + 180;
-            case "SE":
-                return yaw + 270;
-            default:
-                return yaw;
-        }
+        return switch (direction) {
+            case "S" -> yaw;
+            case "W" -> yaw + 90;
+            case "N" -> yaw + 180;
+            case "E" -> yaw + 270;
+            default -> yaw;
+        };
     }
 }
 //#endif

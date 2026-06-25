@@ -1,4 +1,4 @@
-//#if FORGE && MC == 1.8.9
+//#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2024 yourboykyle & R-aMcC
@@ -19,188 +19,217 @@
  * with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-
 package xyz.yourboykyle.secretroutes.commands;
 
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.LongArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.util.BlockPos;
-import xyz.yourboykyle.secretroutes.Main;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.MapUtils;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.events.OnGuiRender;
 import xyz.yourboykyle.secretroutes.utils.*;
 
+import java.lang.reflect.Field;
+import java.util.concurrent.CompletableFuture;
+
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.argument;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.literal;
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.IllegalFormatException;
-import java.util.List;
-
-public class Debug extends CommandBase {
-    @Override
-    public String getCommandName() {return "srmdebug";}
-
-    @Override
-    public String getCommandUsage(ICommandSender sender) {return "/srmdebug <option> <value>";}
-
-    @Override
-    public void processCommand(ICommandSender sender, String[] args) {
-        if(!sender.getName().contains("_Wyan")){
-            ChatUtils.sendChatMessage("§eAre you sure you want to do this?");
-        }
-
-        if(args.length != 0){
-            try{
-                switch (args[0].toLowerCase()) {
-                    case "lever":
-                        sendChatMessage("Relative :" + BlockUtils.blockPos(SecretUtils.currentLeverPos));
-                        BlockPos abs = MapUtils.relativeToActual(SecretUtils.currentLeverPos, RoomDetection.roomDirection, RoomDetection.roomCorner);
-                        sendChatMessage("Abs: " + BlockUtils.blockPos(abs));
-                        sendChatMessage("Chest: " + SecretUtils.chestName);
-                        sendChatMessage("Lever: " + SecretUtils.leverName);
-                        sendChatMessage("Num: " + SecretUtils.leverNumber);
-                        break;
-                    case "pos":
-                        EntityPlayerSP p = Minecraft.getMinecraft().thePlayer;
-                        sendChatMessage("Relative: " + p.getPosition());
-                        sendChatMessage("Abs: " + BlockUtils.blockPos(p.getPosition()));
-                    case "bloodtime":
-                        if(args.length >= 2){
-                            try {
-                                OnGuiRender.spawnNotifTime = System.currentTimeMillis()+Long.parseLong(args[1]);
-                            }catch (NumberFormatException e){
-                                ChatUtils.sendChatMessage("Please make sure the value is a number");
-                            }
-                        }else{
-                            OnGuiRender.spawnNotifTime = System.currentTimeMillis()+3000;
-                        }
-
-                        break;
-                    case "cr":
-                        if(args.length >= 2){
-                            switch (args[1].toLowerCase()){
-                                case "f":
-
-                                    Main.currentRoom.currentSecretRoute = Main.currentRoom.arrays.get(Main.currentRoom.closest.getTwo()+1);
-                                case "b":
-                                    Main.currentRoom.currentSecretRoute = Main.currentRoom.arrays.get(Main.currentRoom.closest.getTwo()-1);
-                            }
-                        }
-                        sendChatMessage("Current index: " + Main.currentRoom.closest.getTwo());
-                        break;
-                    case "apicall":
-                        APIUtils.addMember();
-                        break;
-                    case "var":
-                        if(args.length == 1){
-                            sendChatMessage("Missing argument after \"var\"");
-                        }else{
-                            try {
-                                Field field = Constants.class.getDeclaredField(args[1]);
-                                String type = field.getAnnotatedType().getType().getTypeName();
-                                field.setAccessible(true);
-                                Object currentValue = field.get(null);
-                                if (args.length == 2) {
-                                    ChatUtils.sendChatMessage("§b" + args[1] + ": " + currentValue);
-                                } else {
-                                    switch (type) {
-                                        case "int":
-                                            field.set(null, Integer.valueOf(args[2]));
-                                            break;
-                                        case "float":
-                                            field.set(null, Float.valueOf(args[2]));
-                                            break;
-                                        case "boolean":
-                                            field.set(null, Boolean.valueOf(args[2]));
-                                            break;
-                                        case "double":
-                                            field.set(null, Double.valueOf(args[2]));
-                                            break;
-                                        case "String":
-                                            field.set(null, args[2]);
-                                            break;
-                                    }
-                                    ChatUtils.sendChatMessage("§bChanged [" + args[1] + "] from " + currentValue + " to " + args[2]);
-                                }
-
-
-                            } catch (NoSuchFieldException e) {
-                                sendChatMessage("§cInvalid argument: " + args[1]);
-                            } catch (IllegalAccessException e) {
-                                sendChatMessage("§cIllegal access (Most likely private");
-                                LogUtils.error(e);
-                            } catch (IllegalFormatException e) {
-                                sendChatMessage("§cWrong type");
-                                LogUtils.error(e);
-                            } catch (Exception e) {
-                                LogUtils.error(e);
-                                sendChatMessage("§cSomething went wrong... Command [/srmdebug " + args[1] + " " + args[2] + "]");
-                            }
-                            break;
-                        }
-
-                }
-            }catch(Exception e){
-                LogUtils.error(e);
-            }
-
-
-
-
-
-        }
+public class Debug {
+    public static void register() {
+        ClientCommandRegistrationCallback.EVENT.register(Debug::registerCommands);
     }
 
-    @Override
-    public int getRequiredPermissionLevel() {return 0;}
+    private static void registerCommands(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandBuildContext registryAccess) {
+        dispatcher.register(literal("srmdebug")
+                .then(literal("lever")
+                        .executes(Debug::executeLever))
+                .then(literal("pos")
+                        .executes(Debug::executePos))
+                .then(literal("bloodtime")
+                        .executes(ctx -> executeBloodtime(ctx, 3000L))
+                        .then(argument("time", LongArgumentType.longArg(0))
+                                .executes(ctx -> executeBloodtime(ctx, LongArgumentType.getLong(ctx, "time")))))
+                .then(literal("cr")
+                        .executes(Debug::executeCr)
+                        .then(literal("f")
+                                .executes(ctx -> executeCrDirection(ctx, true)))
+                        .then(literal("b")
+                                .executes(ctx -> executeCrDirection(ctx, false))))
+                .then(literal("apicall")
+                        .executes(Debug::executeApiCall))
+                .then(literal("var")
+                        .then(argument("field", StringArgumentType.word())
+                                .suggests(Debug::suggestFields)
+                                .executes(Debug::executeVarGet)
+                                .then(argument("value", StringArgumentType.word())
+                                        .executes(Debug::executeVarSet)))));
+    }
 
-    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
-        List<String> completions = new ArrayList<>();
-        List<String> basicOptions = new ArrayList<>();
-        basicOptions.add("lever");
-        basicOptions.add("pos");
-        basicOptions.add("var");
-        basicOptions.add("bloodTime");
-        basicOptions.add("cr");
+    private static int executeLever(CommandContext<FabricClientCommandSource> context) {
+        sendChatMessage("Relative :" + BlockUtils.blockPos(SecretUtils.currentLeverPos));
+        BlockPos abs = RoomRotationUtils.relativeToActual(SecretUtils.currentLeverPos, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
+        sendChatMessage("Abs: " + BlockUtils.blockPos(abs));
+        sendChatMessage("Chest: " + SecretUtils.chestName);
+        sendChatMessage("Lever: " + SecretUtils.leverName);
+        sendChatMessage("Num: " + SecretUtils.leverNumber);
+        return 1;
+    }
 
-       switch (args.length) {
-           case 0:
-            completions.addAll(basicOptions);
-           case 1:
-                completions.addAll(basicOptions);
-                completions.removeIf(completion -> !(completion.toLowerCase().startsWith(args[0].toLowerCase())));
-           case 2:
-               try {
-                   switch (args[0].toLowerCase()) {
-                       case "lever":
-                       case "pos":
-                       case "bloodtime":
-                       case "cr":
-                           break;
-                       case "var":
-                           //Idk why this can happen, but it does... There goes 3 hrs of my time
-                           if(args.length == 1) return completions;
-                           // In this one line. Right here. Checking a value after JUST CHECKING IT
-                           Field[] fields = Constants.class.getDeclaredFields();
-
-                           for (Field field : fields) {
-                               if (field.getName().toLowerCase().startsWith(args[1].toLowerCase())) {
-                                   completions.add(field.getName());
-                               }
-                           }
-                   }
-               }catch (Exception e){
-                   ChatUtils.sendChatMessage("Error happened again");
-                   e.printStackTrace();
-               }
+    private static int executePos(CommandContext<FabricClientCommandSource> context) {
+        LocalPlayer player = Minecraft.getInstance().player;
+        if (player == null) {
+            context.getSource().sendError(Component.literal("Player not found"));
+            return 0;
         }
 
-        return completions;
+        BlockPos pos = player.blockPosition();
+        context.getSource().sendFeedback(Component.literal("Position: " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ()));
+
+        return 1;
+    }
+
+    private static int executeBloodtime(CommandContext<FabricClientCommandSource> context, long time) {
+        OnGuiRender.spawnNotifTime = System.currentTimeMillis() + time;
+        context.getSource().sendFeedback(Component.literal("Blood spawn notification set for " + time + "ms from now").withStyle(ChatFormatting.GREEN));
+        return 1;
+    }
+
+    private static int executeCr(CommandContext<FabricClientCommandSource> context) {
+        context.getSource().sendFeedback(
+                Component.literal("Current index: " + xyz.yourboykyle.secretroutes.Main.currentRoom.closest.getTwo())
+                        .withStyle(ChatFormatting.AQUA)
+        );
+        return 1;
+    }
+
+    private static int executeCrDirection(CommandContext<FabricClientCommandSource> context, boolean forward) {
+        try {
+            int currentIndex = xyz.yourboykyle.secretroutes.Main.currentRoom.closest.getTwo();
+            int newIndex = forward ? currentIndex + 1 : currentIndex - 1;
+
+            if (newIndex >= 0 && newIndex < xyz.yourboykyle.secretroutes.Main.currentRoom.arrays.size()) {
+                xyz.yourboykyle.secretroutes.Main.currentRoom.currentSecretRoute =
+                        xyz.yourboykyle.secretroutes.Main.currentRoom.arrays.get(newIndex);
+                context.getSource().sendFeedback(
+                        Component.literal("Changed to index: " + newIndex).withStyle(ChatFormatting.GREEN)
+                );
+            } else {
+                context.getSource().sendError(Component.literal("Index out of bounds"));
+            }
+        } catch (Exception e) {
+            context.getSource().sendError(Component.literal("Error changing route: " + e.getMessage()));
+            LogUtils.error(e);
+        }
+        return 1;
+    }
+
+    private static int executeApiCall(CommandContext<FabricClientCommandSource> context) {
+        try {
+            APIUtils.addMember();
+            context.getSource().sendFeedback(Component.literal("API call executed").withStyle(ChatFormatting.GREEN));
+        } catch (Exception e) {
+            context.getSource().sendError(Component.literal("API call failed: " + e.getMessage()));
+            LogUtils.error(e);
+        }
+        return 1;
+    }
+
+    private static int executeVarGet(CommandContext<FabricClientCommandSource> context) {
+        String fieldName = StringArgumentType.getString(context, "field");
+        try {
+            Field field = SRMConfig.class.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            Object currentValue = field.get(SRMConfig.get());
+            context.getSource().sendFeedback(
+                    Component.literal(fieldName + ": " + currentValue).withStyle(ChatFormatting.AQUA)
+            );
+        } catch (NoSuchFieldException e) {
+            context.getSource().sendError(Component.literal("Invalid field: " + fieldName));
+        } catch (IllegalAccessException e) {
+            context.getSource().sendError(Component.literal("Illegal access (most likely private)"));
+            LogUtils.error(e);
+        } catch (Exception e) {
+            context.getSource().sendError(Component.literal("Error accessing field: " + e.getMessage()));
+            LogUtils.error(e);
+        }
+        return 1;
+    }
+
+    private static int executeVarSet(CommandContext<FabricClientCommandSource> context) {
+        String fieldName = StringArgumentType.getString(context, "field");
+        String value = StringArgumentType.getString(context, "value");
+
+        try {
+            Field field = SRMConfig.class.getDeclaredField(fieldName);
+            String type = field.getAnnotatedType().getType().getTypeName();
+            field.setAccessible(true);
+
+            Object currentValue = field.get(SRMConfig.get());
+
+            switch (type) {
+                case "int":
+                    field.set(SRMConfig.get(), Integer.valueOf(value));
+                    break;
+                case "float":
+                    field.set(SRMConfig.get(), Float.valueOf(value));
+                    break;
+                case "boolean":
+                    field.set(SRMConfig.get(), Boolean.valueOf(value));
+                    break;
+                case "double":
+                    field.set(SRMConfig.get(), Double.valueOf(value));
+                    break;
+                case "java.lang.String":
+                    field.set(SRMConfig.get(), value);
+                    break;
+                default:
+                    context.getSource().sendError(Component.literal("Unsupported type: " + type));
+                    return 0;
+            }
+
+            SRMConfig.HANDLER.save();
+
+            context.getSource().sendFeedback(
+                    Component.literal("Changed [" + fieldName + "] from " + currentValue + " to " + value)
+                            .withStyle(ChatFormatting.AQUA)
+            );
+        } catch (NoSuchFieldException e) {
+            context.getSource().sendError(Component.literal("Invalid field: " + fieldName));
+        } catch (IllegalAccessException e) {
+            context.getSource().sendError(Component.literal("Illegal access (most likely private)"));
+            LogUtils.error(e);
+        } catch (NumberFormatException e) {
+            context.getSource().sendError(Component.literal("Wrong type - cannot parse value"));
+            LogUtils.error(e);
+        } catch (Exception e) {
+            context.getSource().sendError(Component.literal("Something went wrong: " + e.getMessage()));
+            LogUtils.error(e);
+        }
+        return 1;
+    }
+
+    private static CompletableFuture<Suggestions> suggestFields(CommandContext<FabricClientCommandSource> context, SuggestionsBuilder builder) {
+        try {
+            Field[] fields = SRMConfig.class.getDeclaredFields();
+            for (Field field : fields) {
+                builder.suggest(field.getName());
+            }
+        } catch (Exception e) {
+            LogUtils.error(e);
+        }
+        return builder.buildFuture();
     }
 }
 //#endif

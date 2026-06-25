@@ -1,4 +1,4 @@
-//#if FORGE && MC == 1.8.9
+//#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -25,92 +25,89 @@ package xyz.yourboykyle.secretroutes.utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpVersion;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPatch;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 
 public class APIUtils {
-    private static String API_URL = "https://srm.yourboykyle.xyz/аpi";
-    static CloseableHttpClient client = HttpClients.custom().setUserAgent("SRM").setSslcontext(SSLUtils.context).build();
     public static boolean apiQueued = false;
+    private static final HttpClient client = HttpClient.newBuilder()
+            .sslContext(SSLUtils.context)
+            .build();
+    private static final String API_URL = "https://srm.yourboykyle.xyz/аpi";
 
-    public static byte addMember(){
-        if(!SRMConfig.sendData){
+    public static byte addMember() {
+        if (!SRMConfig.get().sendData) {
             return -1;
         }
-        try{
-            LogUtils.info("User: "+Minecraft.getMinecraft().thePlayer.getUniqueID());
-            HttpPost request = new HttpPost(new URL(API_URL+"/users").toURI());
-            request.setProtocolVersion(HttpVersion.HTTP_1_1);
-            request.setHeader("x-uuid", HashingUtils.getHashedUUID().toString());
-            request.setHeader("x-version", Main.VERSION);
-            request.setHeader("x-timestamp", String.valueOf(System.currentTimeMillis()));
+        try {
+            LogUtils.info("User: " + Minecraft.getInstance().player.getStringUUID());
 
-            try(CloseableHttpResponse response = client.execute(request)){
-                HttpEntity entity = response.getEntity();
-                int statusCode = response.getStatusLine().getStatusCode();
-                try (BufferedReader in = new BufferedReader(new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8))) {
-                    Gson gson = new Gson();
-                    JsonObject out = gson.fromJson(in, JsonObject.class);
-                    if(statusCode == 200){
-                        LogUtils.info("Successfully added user to the database");
-                        if(out.get("first").getAsBoolean()){
-                            return 1;
-                        }else{
-                            return 0;
-                        }
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(API_URL + "/users"))
+                    .header("User-Agent", "SRM")
+                    .header("x-uuid", HashingUtils.getHashedUUID().toString())
+                    .header("x-version", Main.VERSION)
+                    .header("x-timestamp", String.valueOf(System.currentTimeMillis()))
+                    .POST(HttpRequest.BodyPublishers.noBody())
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+            int statusCode = response.statusCode();
+
+            try {
+                Gson gson = new Gson();
+                JsonObject out = gson.fromJson(response.body(), JsonObject.class);
+                if (statusCode == 200) {
+                    LogUtils.info("Successfully added user to the database");
+                    if (out.get("first").getAsBoolean()) {
+                        return 1;
+                    } else {
+                        return 0;
                     }
-                }catch (Exception e){
-                    ChatUtils.sendChatMessage("§cSomething went wrong adding user to DB.");
-                    LogUtils.errorNoShout(e);
                 }
-
-            }catch (Exception e){
-                ChatUtils.sendChatMessage("§cSomething went wrong adding user to DB.");
+            } catch (Exception e) {
+                //ChatUtils.sendChatMessage("§cSomething went wrong adding user to DB.");
                 LogUtils.errorNoShout(e);
             }
 
-        }catch (Exception e){
-            ChatUtils.sendChatMessage("§cSomething went wrong adding user to DB.");
+        } catch (Exception e) {
+            //ChatUtils.sendChatMessage("§cSomething went wrong adding user to DB.");
             LogUtils.errorNoShout(e);
         }
 
         return -1;
     }
+
     public static byte offline() {
-        if(!SRMConfig.sendData){
+        if (!SRMConfig.get().sendData) {
             return -1;
         }
         try {
-            HttpPatch request = new HttpPatch(new URL(API_URL + "/users/offline").toURI());
-            request.setProtocolVersion(HttpVersion.HTTP_1_1);
-            request.setHeader("x-uuid", HashingUtils.getHashedUUID().toString());
-            try (CloseableHttpResponse response = client.execute(request)) {
-                HttpEntity entity = response.getEntity();
-                int statusCode = response.getStatusLine().getStatusCode();
-                try (BufferedReader in = new BufferedReader(new InputStreamReader(entity.getContent(), StandardCharsets.UTF_8))) {
-                    Gson gson = new Gson();
-                    JsonObject out = gson.fromJson(in, JsonObject.class);
-                    if (statusCode == 200) {
-                        LogUtils.info("Successfully set user to offline");
-                        return 1;
-                    } else {
-                        LogUtils.info("Failed to set user to offline");
-                        return 0;
-                    }
-                } catch (Exception e) {
-                    LogUtils.info(e.getLocalizedMessage());
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(API_URL + "/users/offline"))
+                    .header("User-Agent", "SRM")
+                    .header("x-uuid", HashingUtils.getHashedUUID().toString())
+                    .method("PATCH", HttpRequest.BodyPublishers.noBody())
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+            int statusCode = response.statusCode();
+
+            try {
+                Gson gson = new Gson();
+                JsonObject out = gson.fromJson(response.body(), JsonObject.class);
+                if (statusCode == 200) {
+                    LogUtils.info("Successfully set user to offline");
+                    return 1;
+                } else {
+                    LogUtils.info("Failed to set user to offline");
+                    return 0;
                 }
             } catch (Exception e) {
                 LogUtils.info(e.getLocalizedMessage());

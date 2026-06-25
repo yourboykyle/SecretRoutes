@@ -1,4 +1,4 @@
-//#if FORGE && MC == 1.8.9
+//#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -20,35 +20,44 @@
  */
 
 package xyz.yourboykyle.secretroutes.events;
+// I have no idea to what this would translate to in 26.1 but its not important
 
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+/*
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.RenderTickCounter;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.GuiUtils;
 import xyz.yourboykyle.secretroutes.utils.SecretRoutesRenderUtils;
-
+*/
 import static xyz.yourboykyle.secretroutes.utils.SecretUtils.removeBannerTime;
 
 public class OnGuiRender {
     public static Long spawnNotifTime = null;
 
-    @SubscribeEvent
-    public void onGuiRender(RenderGameOverlayEvent.Text event) {
+    public static void register() {
+        //HudRenderCallback.EVENT.register(OnGuiRender::onHudRender);
+    }
 
-
-        if(removeBannerTime != null && System.currentTimeMillis()<removeBannerTime){
-            GuiUtils.displayText("§bSet waypoint at lever", 0, -100, 2);
+    /*private static void onHudRender(DrawContext drawContext, RenderTickCounter tickCounter) {
+        if (removeBannerTime != null && System.currentTimeMillis() < removeBannerTime) {
+            GuiUtils.displayText(drawContext, "§bSet waypoint at lever", 0, -100, 2);
         }
 
-        if(spawnNotifTime != null || SRMConfig.renderBlood){
-            if(SRMConfig.renderBlood || System.currentTimeMillis()<spawnNotifTime){
-                GuiUtils.displayText(SecretRoutesRenderUtils.getTextColor(SRMConfig.bloodReadyColor)+SRMConfig.bloodReadyText, SRMConfig.bloodX, SRMConfig.bloodY, SRMConfig.bloodScale);
-            }else{
+        if (spawnNotifTime != null || SRMConfig.get().renderBlood) {
+            if (SRMConfig.get().renderBlood || System.currentTimeMillis() < spawnNotifTime) {
+                GuiUtils.displayText(
+                        drawContext,
+                        SecretRoutesRenderUtils.getTextColor(SRMConfig.get().bloodReadyColor) + SRMConfig.get().bloodReadyText,
+                        SRMConfig.get().bloodX,
+                        SRMConfig.get().bloodY,
+                        SRMConfig.get().bloodScale
+                );
+            } else {
                 spawnNotifTime = null;
             }
         }
-
-    }
+    }*/
 
 }
 //#endif

@@ -1,4 +1,4 @@
-//#if FORGE && MC == 1.8.9
+//#if FABRIC
 /*
  * Copyright (C) 2022 NotEnoughUpdates contributors
  *
@@ -19,8 +19,10 @@
  */
 
 package xyz.yourboykyle.secretroutes.utils.autoupdate;
+
 import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.NotNull;
+
 import java.util.concurrent.Executor;
 
 
@@ -28,11 +30,12 @@ public class MinecraftExecutor implements Executor {
 
     public static MinecraftExecutor INSTANCE = new MinecraftExecutor();
 
-    private MinecraftExecutor() {}
+    private MinecraftExecutor() {
+    }
 
     @Override
     public void execute(@NotNull Runnable runnable) {
-        Minecraft.getMinecraft().addScheduledTask(runnable);
+        Minecraft.getInstance().execute(runnable);
     }
 }
 //#endif

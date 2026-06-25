@@ -1,4 +1,4 @@
-//#if FORGE && MC == 1.8.9
+//#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -19,66 +19,116 @@
  * with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 package xyz.yourboykyle.secretroutes.events;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.util.BlockPos;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import xyz.yourboykyle.secretroutes.utils.*;
 
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class OnItemPickedUp {
-    public static boolean itemSecretOnCooldown = false; // True: do not add item secret waypoint, False: add item secret waypoint
-    public static final String[] validItems ={
-        "Decoy",
-        "Defuse Kit",
-        "Dungeon Chest Key",
-        "Healing VIII",
-        "Inflatable Jerry",
-        "Spirit Leap",
-        "Training Weights",
-        "Trap",
-        "Treasure Talisman"
+    public static final String[] validItems = {
+            "Decoy",
+            "Defuse Kit",
+            "Dungeon Chest Key",
+            "Healing VIII",
+            "Inflatable Jerry",
+            "Spirit Leap",
+            "Training Weights",
+            "Trap",
+            "Treasure Talisman"
     };
+    private static final Map<String, Integer> previousInventory = new HashMap<>();
+    public static boolean itemSecretOnCooldown = false;
+    private static int tickCounter = 0;
 
-    @SubscribeEvent
-    public void onPickupItem(PlayerEvent.ItemPickupEvent e) {
-        Utils.checkForCatacombs();
-        if(!Utils.inCatacombs){return;}
-        if(!isSecretItem(e.pickedUp.getEntityItem().getDisplayName())){return;}
+    public static void register() {
+        ClientTickEvents.END_CLIENT_TICK.register(OnItemPickedUp::onClientTick);
+    }
 
-        if(SRMConfig.allSecrets){
-            if(SecretUtils.secrets == null){return;}
-            for(JsonElement obj : SecretUtils.secrets){
-                try{
-                    JsonObject secret = obj.getAsJsonObject();
-                    if(!secret.get("category").getAsString().equals("category")){return;}
-                    int x = secret.get("x").getAsInt();
-                    int y = secret.get("y").getAsInt();
-                    int z = secret.get("z").getAsInt();
-                    BlockPos pos = e.player.getPosition();
-                    if (pos.getX() >= x - 10 && pos.getX() <= x + 10 && pos.getY() >= y - 10 && pos.getY() <= y + 10 && pos.getZ() >= z - 10 && pos.getZ() <= z + 10) {
-                        if(!SecretUtils.secretLocations.contains(BlockUtils.blockPos(new BlockPos(x, y, z)))){
-                            SecretUtils.secretLocations.add(BlockUtils.blockPos(new BlockPos(x, y, z)));
-                        }
-                    }
-                }catch (Exception ignored){}
+    private static void onClientTick(Minecraft client) {
+        LocalPlayer player = client.player;
+        if (player == null) return;
+
+        // Only check every 5 ticks to reduce overhead
+        if (++tickCounter % 5 != 0) return;
+
+        if (!LocationUtils.isInDungeons()) return;
+
+        // Track inventory changes to detect item pickups
+        Map<String, Integer> currentInventory = new HashMap<>();
+        for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+            ItemStack stack = player.getInventory().getItem(i);
+            if (stack != null && !stack.isEmpty()) {
+                String itemName = stack.getItemName().getString();
+                currentInventory.put(itemName, currentInventory.getOrDefault(itemName, 0) + stack.getCount());
             }
         }
 
+        // Check for newly added items
+        for (Map.Entry<String, Integer> entry : currentInventory.entrySet()) {
+            String itemName = entry.getKey();
+            int currentCount = entry.getValue();
+            int previousCount = previousInventory.getOrDefault(itemName, 0);
 
-        if(Main.currentRoom.getSecretType() == Room.SECRET_TYPES.ITEM) {
-            BlockPos pos = e.player.getPosition();
+            if (currentCount > previousCount && isSecretItem(itemName)) {
+                handleItemPickup(player, itemName);
+            }
+        }
+
+        previousInventory.clear();
+        previousInventory.putAll(currentInventory);
+    }
+
+    // Overload for packet-based item pickup detection
+    public static void handleItemPickup(LocalPlayer player, ItemEntity itemEntity) {
+        ItemStack stack = itemEntity.getItem();
+        if (stack == null || stack.isEmpty()) return;
+
+        String itemName = stack.getItemName().getString();
+        handleItemPickup(player, itemName);
+    }
+
+    private static void handleItemPickup(LocalPlayer player, String itemName) {
+        BlockPos pos = player.blockPosition();
+
+        if (SRMConfig.get().allSecrets) {
+            if (SecretUtils.secrets == null) return;
+            for (JsonElement obj : SecretUtils.secrets) {
+                try {
+                    JsonObject secret = obj.getAsJsonObject();
+                    if (!secret.get("category").getAsString().equals("category")) return;
+                    int x = secret.get("x").getAsInt();
+                    int y = secret.get("y").getAsInt();
+                    int z = secret.get("z").getAsInt();
+                    if (pos.getX() >= x - 10 && pos.getX() <= x + 10 &&
+                            pos.getY() >= y - 10 && pos.getY() <= y + 10 &&
+                            pos.getZ() >= z - 10 && pos.getZ() <= z + 10) {
+                        if (!SecretUtils.secretLocations.contains(BlockUtils.blockPos(new BlockPos(x, y, z)))) {
+                            SecretUtils.secretLocations.add(BlockUtils.blockPos(new BlockPos(x, y, z)));
+                        }
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+        }
+
+        if (Main.currentRoom != null && Main.currentRoom.getSecretType() == Room.SECRET_TYPES.ITEM) {
             BlockPos itemPos = Main.currentRoom.getSecretLocation();
 
-            if (pos.getX() >= itemPos.getX() - 10 && pos.getX() <= itemPos.getX() + 10 && pos.getY() >= itemPos.getY() - 10 && pos.getY() <= itemPos.getY() + 10 && pos.getZ() >= itemPos.getZ() - 10 && pos.getZ() <= itemPos.getZ() + 10) {
+            if (pos.getX() >= itemPos.getX() - 10 && pos.getX() <= itemPos.getX() + 10 &&
+                    pos.getY() >= itemPos.getY() - 10 && pos.getY() <= itemPos.getY() + 10 &&
+                    pos.getZ() >= itemPos.getZ() - 10 && pos.getZ() <= itemPos.getZ() + 10) {
                 Main.currentRoom.nextSecret();
                 SecretSounds.secretChime();
                 LogUtils.info("Picked up item at " + itemPos);
@@ -86,18 +136,20 @@ public class OnItemPickedUp {
         }
 
         // Route Recording
-        if(Main.routeRecording.recording) {
-            String itemName = e.pickedUp.getEntityItem().getDisplayName();
+        if (Main.routeRecording.recording) {
             if (!itemSecretOnCooldown && isSecretItem(itemName)) {
-                Main.routeRecording.addWaypoint(Room.SECRET_TYPES.ITEM, e.player.getPosition());
+                Main.routeRecording.addWaypoint(Room.SECRET_TYPES.ITEM, pos);
                 Main.routeRecording.newSecret();
                 Main.routeRecording.setRecordingMessage("Added item secret waypoint.");
             }
         }
     }
-    public static boolean isSecretItem(String itemName){
-        for(String item : validItems){
-            if(itemName.contains(item)){return true;}
+
+    public static boolean isSecretItem(String itemName) {
+        for (String item : validItems) {
+            if (itemName.contains(item)) {
+                return true;
+            }
         }
         return false;
     }
