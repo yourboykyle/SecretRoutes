@@ -1,4 +1,4 @@
-//#if FORGE && MC == 1.8.9
+//#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2024 yourboykyle & R-aMcC
@@ -25,17 +25,25 @@ public class Tuple<Y, Z> {
     private Y one;
     private Z two;
 
-    public Tuple(Y one, Z two){
+    public Tuple(Y one, Z two) {
         this.one = one;
         this.two = two;
     }
 
-    public Y getOne() {return one;}
+    public Y getOne() {
+        return one;
+    }
 
-    public Z getTwo() {return two;}
+    public void setOne(Y one) {
+        this.one = one;
+    }
 
-    public void setOne(Y one) {this.one = one;}
+    public Z getTwo() {
+        return two;
+    }
 
-    public void setTwo(Z two) {this.two = two;}
+    public void setTwo(Z two) {
+        this.two = two;
+    }
 }
 //#endif

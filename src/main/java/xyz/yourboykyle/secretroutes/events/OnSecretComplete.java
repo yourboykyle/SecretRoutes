@@ -1,4 +1,4 @@
-//#if FORGE && MC == 1.8.9
+//#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -22,9 +22,9 @@
 package xyz.yourboykyle.secretroutes.events;
 
 import xyz.yourboykyle.secretroutes.Main;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
 import xyz.yourboykyle.secretroutes.utils.ChatUtils;
 import xyz.yourboykyle.secretroutes.utils.PBUtils;
+import xyz.yourboykyle.secretroutes.utils.RoomDirectionUtils;
 import xyz.yourboykyle.secretroutes.utils.SecretSounds;
 
 public class OnSecretComplete {
@@ -32,8 +32,10 @@ public class OnSecretComplete {
         // This is where you would put your code that you want to run when a secret is completed.
         SecretSounds.secretChime();
 
+        if (Main.currentRoom.currentSecretRoute == null) return;
+
         // PB Stuff
-        if(Main.currentRoom.currentSecretIndex == 0) {
+        if (Main.currentRoom.currentSecretIndex == 0) {
             ChatUtils.sendVerboseMessage("Starting timer for " + Main.currentRoom.name, "Personal Bests");
             PBUtils.pbIsValid = true;
             PBUtils.startRoute();
@@ -42,9 +44,9 @@ public class OnSecretComplete {
             PBUtils.stopRoute();
         }
 
-        if(Main.currentRoom.currentSecretIndex <= Main.currentRoom.currentSecretRoute.size() - 1) {
+        if (Main.currentRoom.currentSecretIndex <= Main.currentRoom.currentSecretRoute.size() - 1) {
             // If the route hasn't been completed yet, log progress for debugging
-            ChatUtils.sendVerboseMessage("Secret " + (Main.currentRoom.currentSecretIndex + 1) + "/" + (Main.currentRoom.currentSecretRoute.size()) + " in " + RoomDetection.roomName + " completed in §a" + ((Main.currentRoom.currentSecretIndex > 0) ? PBUtils.formatTime(System.currentTimeMillis() - PBUtils.startTime) : "0.000s") + " §r(PB is valid: " + (PBUtils.pbIsValid ? "true" : "false") + ")", "Personal Bests");
+            ChatUtils.sendVerboseMessage("Secret " + (Main.currentRoom.currentSecretIndex + 1) + "/" + (Main.currentRoom.currentSecretRoute.size()) + " in " + RoomDirectionUtils.roomName() + " completed in §a" + ((Main.currentRoom.currentSecretIndex > 0) ? PBUtils.formatTime(System.currentTimeMillis() - PBUtils.startTime) : "0.000s") + " §r(PB is valid: " + (PBUtils.pbIsValid ? "true" : "false") + ")", "Personal Bests");
         }
     }
 }

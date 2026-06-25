@@ -1,4 +1,4 @@
-//#if FORGE && MC == 1.8.9
+//#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -21,46 +21,66 @@
 
 package xyz.yourboykyle.secretroutes.utils;
 
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.Vec3;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundSource;
+import org.joml.Vector3d;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 
-
 public class SecretSounds {
-
-    private static boolean shouldBypassVolume = false;
-    private static Minecraft mc = Minecraft.getMinecraft();
+    private static Minecraft mc = Minecraft.getInstance();
     private static long lastPlayed = System.currentTimeMillis();
-    private static String[] defaultSounds = new String[]{"mob.blaze.hit", "fire.ignite", "random.orb", "random.break", "mob.guardian.land.hit", "note.pling", "secretroutesmod:zyra.meow0"};
 
     public static void secretChime(Boolean bypass) {
-        Utils.checkForCatacombs();
-        if(!bypass &&(!SRMConfig.customSecretSound || ((System.currentTimeMillis() - lastPlayed <= 10) || !Utils.inCatacombs))){return;}
-
-        if(SRMConfig.customSecretSoundIndex == 6){
-            long test = System.currentTimeMillis()%9;
-            playLoudSound("secretroutesmod:zyra.meow"+test, SRMConfig.customSecretSoundVolume, SRMConfig.customSecretSoundPitch, mc.thePlayer.getPositionVector());
-            lastPlayed = System.currentTimeMillis();
-        }else{
-            playLoudSound(defaultSounds[SRMConfig.customSecretSoundIndex], SRMConfig.customSecretSoundVolume, SRMConfig.customSecretSoundPitch, mc.thePlayer.getPositionVector());
-            lastPlayed = System.currentTimeMillis();
+        SRMConfig config = SRMConfig.get();
+        if (!bypass && (!config.customSecretSound || ((System.currentTimeMillis() - lastPlayed <= 10) || !LocationUtils.isInDungeons()))) {
+            return;
         }
 
+        if (mc.player == null) return;
 
+        Vector3d playerPos = new Vector3d(mc.player.getX(), mc.player.getY(), mc.player.getZ());
 
+        if (config.customSecretSoundType == SRMConfig.SoundType.ZYRA_MEOW) {
+            long test = System.currentTimeMillis() % 9;
+            playLoudSound("secretroutesmod:zyra.meow" + test, config.customSecretSoundVolume, config.customSecretSoundPitch, playerPos);
+            lastPlayed = System.currentTimeMillis();
+        } else {
+            String soundName = config.customSecretSoundType.getDisplayName().getString();
+            playLoudSound(soundName, config.customSecretSoundVolume, config.customSecretSoundPitch, playerPos);
+            lastPlayed = System.currentTimeMillis();
+        }
     }
-    public static void secretChime(){
+
+    public static void secretChime() {
         secretChime(false);
     }
 
+    public static void playLoudSound(String sound, Float volume, Float pitch, Vector3d pos) {
+        mc.execute(() -> {
+            if (mc.level != null) {
+                Identifier soundId;
+                if (sound.contains(":")) {
+                    String[] parts = sound.split(":");
+                    soundId = Identifier.fromNamespaceAndPath(parts[0], parts[1]);
+                } else {
+                    soundId = Identifier.withDefaultNamespace(sound);
+                }
 
-    public static void playLoudSound(String sound, Float volume, Float pitch, Vec3 pos) {
-        //mc.getSoundHandler().sndRegistry;
-        mc.addScheduledTask(() -> {
-            shouldBypassVolume = true;
-            mc.theWorld.playSound(pos.xCoord, pos.yCoord+1.62, pos.zCoord, sound, volume, pitch, false);
-            shouldBypassVolume = false;
+                var soundEvent = BuiltInRegistries.SOUND_EVENT.get(soundId);
+
+                soundEvent.ifPresent(soundEventReference -> mc.level.playLocalSound(
+                        pos.x,
+                        pos.y + 1.62,
+                        pos.z,
+                        soundEventReference.value(),
+                        SoundSource.MASTER,
+                        volume,
+                        pitch,
+                        false
+                ));
+            }
         });
     }
 }

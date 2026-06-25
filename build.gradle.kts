@@ -1,151 +1,106 @@
-@file:Suppress("UnstableApiUsage", "PropertyName")
-
-import dev.deftu.gradle.utils.GameSide
-import groovy.lang.MissingPropertyException
-
 plugins {
-    java
-    kotlin("jvm")
-    id("dev.deftu.gradle.multiversion")
-    id("dev.deftu.gradle.tools")
-    id("dev.deftu.gradle.tools.resources")
-    id("dev.deftu.gradle.tools.bloom")
-    id("dev.deftu.gradle.tools.shadow")
-    id("dev.deftu.gradle.tools.publishing.maven")
-    id("dev.deftu.gradle.tools.minecraft.loom")
-    id("dev.deftu.gradle.tools.minecraft.api")
-    id("dev.deftu.gradle.tools.minecraft.releases-v2")
+    id("net.fabricmc.fabric-loom") version "1.17-SNAPSHOT"
+    `maven-publish`
 }
 
-loom.enableModProvidedJavadoc.set(false)
+val mod_name: String = property("mod.name").toString()
+val mod_id: String = property("mod.id").toString()
+val mod_version: String = property("mod.version").toString()
+val mod_group: String = property("mod.group").toString()
+val mod_archives_name: String = property("mod.archives_name").toString()
 
-if (mcData.isForge) {
-    toolkitLoomHelper.useForgeMixin(modData.id)
-}
+val minecraft_version: String by project
+val loader_version: String by project
+val fabric_version: String by project
+val yacl_version: String by project
+val hypixel_api_version: String by project
+val modmenu_version: String by project
+val iris_version: String by project
 
-val mod_archives_name: String = extra["mod.archives_name"]?.toString()
-    ?: throw MissingPropertyException("mod.archives_name has not been set.")
+version = mod_version
+group = mod_group
 
 base {
     archivesName.set(mod_archives_name)
 }
-
-toolkitLoomHelper {
-    if (mcData.isForge) {
-        useOneConfig {
-            version = "1.0.0-alpha.171"
-            loaderVersion = "1.1.0-alpha.53"
-
-            usePolyMixin = true
-            polyMixinVersion = "0.8.4+build.7"
-
-            applyLoaderTweaker = true
-
-            for (module in arrayOf("commands", "config", "config-impl", "events", "internal", "ui", "utils")) {
-                +module
-            }
-        }
-    }
-    useDevAuth("1.2.+")
-    useMixinExtras("0.5.0")
-
-    useProperty("mixin.debug.export", "true", GameSide.BOTH)
-
-    // Turns off the server-side run configs, as we're building a client-sided mod.
-    disableRunConfigs(GameSide.SERVER)
-
-    // Defines the name of the Mixin refmap, which is used to map the Mixin classes to the obfuscated Minecraft classes.
-    if (!mcData.isNeoForge) {
-        useMixinRefMap(modData.id)
-    }
-
-    if (mcData.isForge) {
-        // Configures the Mixin tweaker if we are building for Forge.
-        useForgeMixin(modData.id)
-    }
-}
-
 repositories {
-    maven("https://api.modrinth.com/maven") {
-        content { includeGroup("maven.modrinth") }
-    }
-    maven("https://maven.bawnorton.com/releases") {
-        content { includeGroup("com.github.bawnorton.mixinsquared") }
-    }
-    maven("https://repo.nea.moe/releases")
-
-    // YACL
-    maven("https://maven.isxander.dev/releases")
-
-    // Hypixel mod api
+    mavenCentral()
+    maven("https://api.modrinth.com/maven")
     maven("https://repo.hypixel.net/repository/Hypixel/")
-
-    // ModMenu
     maven("https://maven.terraformersmc.com/")
+    maven("https://maven.isxander.dev/releases")
+    maven("https://repo.nea.moe/releases")
 }
 
 dependencies {
-    // Fabric API - only for Fabric 1.21.10 build
-    // Other Fabric versions don't load Fabric API to avoid compatibility issues
-    if (mcData.isFabric && project.name == "1.21.11-fabric") {
-        modImplementation("net.fabricmc.fabric-api:fabric-api:0.141.3+1.21.11")
+    minecraft("com.mojang:minecraft:$minecraft_version")
+    implementation("net.fabricmc:fabric-loader:$loader_version")
+    implementation("net.fabricmc.fabric-api:fabric-api:$fabric_version")
 
-        modImplementation("dev.isxander:yet-another-config-lib:3.8.1+1.21.11-fabric")
+    implementation("dev.isxander:yet-another-config-lib:$yacl_version")
+    implementation("com.terraformersmc:modmenu:$modmenu_version")
+    implementation("maven.modrinth:iris:$iris_version")
 
-        modImplementation("net.hypixel:mod-api:1.0.1")
+    implementation("net.hypixel:mod-api:$hypixel_api_version")
 
-        modImplementation("com.terraformersmc:modmenu:17.0.0-beta.2")
+    implementation("moe.nea:libautoupdate:1.3.1")
+    include("moe.nea:libautoupdate:1.3.1")
+}
 
-        modImplementation("maven.modrinth:iris:1.9.1+1.21.7-fabric")
-    } else if (mcData.isFabric && project.name == "26.1-fabric") {
-        modImplementation("net.fabricmc.fabric-api:fabric-api:0.144.4+26.1")
+tasks.processResources {
+    inputs.property("version", project.version)
+    inputs.property("minecraft_version", minecraft_version)
+    inputs.property("loader_version", loader_version)
+    inputs.property("mod_id", mod_id)
+    inputs.property("mod_version", mod_version)
+    inputs.property("mod_name", mod_name)
+    filteringCharset = "UTF-8"
 
-        modImplementation("dev.isxander:yet-another-config-lib:3.9.4+26.1-fabric")
-
-        modImplementation("net.hypixel:mod-api:1.0.2+build.1+mc26.1")
-
-        modImplementation("com.terraformersmc:modmenu:18.0.0-beta.1")
-
-        modImplementation("maven.modrinth:iris:1.10.9+26.1-fabric")
-    }
-
-    modCompileOnly("moe.nea:libautoupdate:1.3.1") {
-        isTransitive = false
-    }
-    shade("moe.nea:libautoupdate:1.3.1") {
-        isTransitive = false
+    filesMatching("fabric.mod.json") {
+        expand(
+            mapOf(
+                "version" to project.version,
+                "mc_version" to minecraft_version,
+                "minecraft_version" to minecraft_version,
+                "loader_version" to loader_version,
+                "mod_id" to mod_id,
+                "mod_version" to mod_version,
+                "mod_name" to mod_name,
+                "mod_description" to "Secret Route Waypoints for Hypixel Skyblock Dungeons",
+                "minor_mc_version" to minecraft_version
+            )
+        )
     }
 }
 
-tasks {
-    processResources {
-        if (mcData.isForge) {
-            exclude("mixins.${modData.id}.fabric.json")
-            exclude("rooms.json")
-            exclude("assets/secretroutesmod/secretlocations.json")
-            exclude("LICENSE-ODIN.txt")
-        } else if (mcData.isFabric) {
-            exclude("mixins.${modData.id}.json")
-            exclude("assets/roomdetection/**")
+val targetJavaVersion = 25
+tasks.withType<JavaCompile>().configureEach {
+    options.encoding = "UTF-8"
+    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible) {
+        options.release.set(targetJavaVersion)
+    }
+}
+
+java {
+    val javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion.set(JavaLanguageVersion.of(targetJavaVersion))
+    }
+    withSourcesJar()
+}
+
+tasks.jar {
+    from("LICENSE") {
+        rename { "${it}_$mod_archives_name" }
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            artifactId = mod_archives_name
+            from(components["java"])
         }
     }
-    jar {
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    }
-
-    remapJar {
-        val configs = mutableListOf<String>()
-
-        if (mcData.isForge) {
-            configs.add("mixins.${modData.id}.forge.json")
-        }
-
-        if (configs.isNotEmpty()) {
-            manifest {
-                attributes(mapOf(
-                    "MixinConfigs" to configs.joinToString(",")
-                ))
-            }
-        }
-    }
+    repositories {}
 }

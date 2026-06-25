@@ -1,4 +1,4 @@
-//#if FORGE && MC == 1.8.9
+//#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -24,9 +24,8 @@ package xyz.yourboykyle.secretroutes.utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.ChatFormatting;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
 
 import java.io.*;
 import java.util.regex.Matcher;
@@ -45,8 +44,8 @@ public class PBUtils {
 
     // Load the PB data from the personal_bests.json file
     public static boolean loadPBData() {
-        if(!new File(filePath).exists()){
-            sendChatMessage(EnumChatFormatting.RED + "Personal bests file not found.");
+        if (!new File(filePath).exists()) {
+            sendChatMessage(ChatFormatting.RED + "Personal bests file not found.");
             return false;
         }
         Gson gson = new GsonBuilder().create();
@@ -54,7 +53,7 @@ public class PBUtils {
         try {
             reader = new FileReader(filePath);
             personalBests = gson.fromJson(reader, JsonObject.class);
-        } catch (FileNotFoundException e){
+        } catch (FileNotFoundException e) {
             //This should never happen...
             LogUtils.error(e);
             sendChatMessage("§4 THIS SHOULD NEVER HAVE HAPPENED... (ConfigUtils 123)");
@@ -65,14 +64,14 @@ public class PBUtils {
     }
 
     public static void setPersonalBest(String roomName, long timeInMs) {
-        if(!SRMConfig.trackPersonalBests) return;
+        if (!SRMConfig.get().trackPersonalBests) return;
         // Add the data to the json object, in the form of 2 strings. One being the room name, the other being the time formatted as a string, like: 364d 1h 10m 30.524s
         personalBests.addProperty(roomName, formatTime(timeInMs));
         writePBData();
     }
 
     public static void removePersonalBest(String roomName) {
-        if(!SRMConfig.trackPersonalBests) return;
+        if (!SRMConfig.get().trackPersonalBests) return;
         if (personalBests.has(roomName)) {
             personalBests.remove(roomName);
             writePBData();
@@ -88,7 +87,7 @@ public class PBUtils {
     }
 
     public static void writePBData() {
-        if(!SRMConfig.trackPersonalBests) return;
+        if (!SRMConfig.get().trackPersonalBests) return;
         try (FileWriter writer = new FileWriter(filePath)) {
             writer.write(personalBests.toString());
         } catch (IOException e) {
@@ -97,14 +96,14 @@ public class PBUtils {
     }
 
     public static void startRoute() {
-        if(!SRMConfig.trackPersonalBests) return;
+        if (!SRMConfig.get().trackPersonalBests) return;
         startTime = System.currentTimeMillis();
     }
 
     public static void stopRoute() {
-        if(!SRMConfig.trackPersonalBests) return;
+        if (!SRMConfig.get().trackPersonalBests) return;
 
-        if(!pbIsValid) {
+        if (!pbIsValid) {
             ChatUtils.sendVerboseMessage("PB is invalid, not saving.", "Personal Bests");
             return;
         }
@@ -112,18 +111,18 @@ public class PBUtils {
         long time = System.currentTimeMillis() - startTime;
         startTime = 0;
         // Check if it's a PB
-        long pbTime = getPBForRoom(RoomDetection.roomName);
-        ChatUtils.sendVerboseMessage("PB for " + RoomDetection.roomName + ": " + (pbTime == -1 ? "N/A" : formatTime(pbTime)), "Personal Bests");
+        long pbTime = getPBForRoom(RoomDirectionUtils.roomName());
+        ChatUtils.sendVerboseMessage("PB for " + RoomDirectionUtils.roomName() + ": " + (pbTime == -1 ? "N/A" : formatTime(pbTime)), "Personal Bests");
         if (pbTime == -1 || time < pbTime) {
             // New PB
-            if(SRMConfig.sendChatMessages) {
-                sendChatMessage("§rNew personal best for " + RoomDetection.roomName + ": §a" + formatTime(time));
+            if (SRMConfig.get().sendChatMessages) {
+                sendChatMessage("§rNew personal best for " + RoomDirectionUtils.roomName() + ": §a" + formatTime(time));
             }
-            setPersonalBest(RoomDetection.roomName, time);
+            setPersonalBest(RoomDirectionUtils.roomName(), time);
         }
 
         PBUtils.pbIsValid = false;
-        ChatUtils.sendVerboseMessage("Time for " + RoomDetection.roomName + ": §a" + formatTime(time), "Personal Bests");
+        ChatUtils.sendVerboseMessage("Time for " + RoomDirectionUtils.roomName() + ": §a" + formatTime(time), "Personal Bests");
     }
 
     public static String formatTime(long millis) {

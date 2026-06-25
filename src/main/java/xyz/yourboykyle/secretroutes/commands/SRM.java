@@ -1,4 +1,4 @@
-//#if FORGE && MC == 1.8.9
+//#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2024 yourboykyle & R-aMcC
@@ -21,59 +21,37 @@
 
 package xyz.yourboykyle.secretroutes.commands;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.util.BlockPos;
-import xyz.yourboykyle.secretroutes.Main;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.context.CommandContext;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.minecraft.client.Minecraft;
+import net.minecraft.commands.CommandBuildContext;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
-import xyz.yourboykyle.secretroutes.utils.ChatUtils;
+import xyz.yourboykyle.secretroutes.utils.LogUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.literal;
 
-public class SRM extends CommandBase {
-    @Override
-    public String getCommandName() {
-        return "srm";
+public class SRM {
+    public static void register() {
+        ClientCommandRegistrationCallback.EVENT.register(SRM::registerCommands);
     }
 
-    @Override
-    public String getCommandUsage(ICommandSender sender) {
-        return "/srm";
+    private static void registerCommands(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandBuildContext registryAccess) {
+        dispatcher.register(literal("srm")
+                .executes(SRM::executeCommand));
+
+        // Aliases
+        dispatcher.register(literal("secretroutes").redirect(dispatcher.register(literal("srm"))));
+        dispatcher.register(literal("secretroutesmod").redirect(dispatcher.register(literal("srm"))));
     }
 
-    @Override
-    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
-        SRMConfig.INSTANCE.openGui();
-    }
-
-    @Override
-    public int getRequiredPermissionLevel() {
-        return 0;
-    }
-
-    @Override
-    public List<String> getCommandAliases()
-    {
-        List<String> aliases = new ArrayList<>();
-        aliases.add("secretroutes");
-        aliases.add("secretroutesmod");
-        return aliases;
-    }
-
-    @Override
-    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
-        List<String> completions = new ArrayList<>();
-        completions.add("General");
-        completions.add("RouteRecording");
-        completions.add("HUD");
-        completions.add("Rendering");
-        completions.add("Dev");
-        completions.add("Keybinds");
-        completions.removeIf(completion -> args.length > 0 && !(completion.toLowerCase().startsWith(args[0].toLowerCase())));
-
-        return completions;
+    private static int executeCommand(CommandContext<FabricClientCommandSource> context) {
+        LogUtils.info("Opening SRM GUI (command)...");
+        Minecraft.getInstance().execute(() ->
+                Minecraft.getInstance().setScreen(SRMConfig.getScreen(Minecraft.getInstance().screen))
+        );
+        return 1;
     }
 }
 //#endif
