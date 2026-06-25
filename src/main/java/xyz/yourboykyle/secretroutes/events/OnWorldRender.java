@@ -1,4 +1,4 @@
-//#if FORGE && MC == 1.8.9
+//#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -22,30 +22,23 @@
 package xyz.yourboykyle.secretroutes.events;
 
 import com.google.gson.JsonArray;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.DungeonManager;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
-import xyz.yourboykyle.secretroutes.utils.*;
+import xyz.yourboykyle.secretroutes.utils.LocationUtils;
+import xyz.yourboykyle.secretroutes.utils.LogUtils;
+import xyz.yourboykyle.secretroutes.utils.SecretUtils;
 
 public class OnWorldRender {
     private final static String verboseTAG = "Rendering";
     public static boolean playCompleteFirst = true;
 
-    @SubscribeEvent
-    public void onRenderWorld(RenderWorldLastEvent event) {
+    public static void onRenderWorld() {
         try {
-
-
-            // Make sure the player is actually in a dungeon
-            Utils.checkForCatacombs();
-            if (!Utils.inCatacombs || DungeonManager.gameStage != 2 || !SRMConfig.modEnabled) {
+            if (!LocationUtils.isInDungeons() || !SRMConfig.get().modEnabled || Main.currentRoom == null) {
                 return;
             }
 
-            if(OnChatReceive.isAllFound()){
+            if (OnChatReceive.isAllFound()) {
                 /*
                 if(playCompleteFirst){
                     playCompleteFirst = false;
@@ -62,38 +55,35 @@ public class OnWorldRender {
                 }
 
                  */
-                if(!SRMConfig.renderComplete){
+                if (!SRMConfig.get().renderComplete) {
                     return;
                 }
-            }else{
+            } else {
                 playCompleteFirst = true;
             }
 
-            if(SRMConfig.allSecrets){
-                SecretUtils.renderSecrets(event);
-            }else if(SRMConfig.wholeRoute){
+            if (SRMConfig.get().allSecrets) {
+                SecretUtils.renderSecrets();
+            }
+
+            if (SRMConfig.get().wholeRoute) {
                 JsonArray csr = Main.currentRoom.currentSecretRoute;
-                if(csr != null){
-                    for(int i = Main.currentRoom.currentSecretIndex; i<csr.size(); i++){
-                        SecretUtils.renderingCallback(csr.get(i).getAsJsonObject(), event, i);
+                if (csr != null) {
+                    for (int i = Main.currentRoom.currentSecretIndex; i < csr.size(); i++) {
+                        SecretUtils.renderingCallback(csr.get(i).getAsJsonObject(), i);
                     }
                 }
-
-            }else{
-                SecretUtils.renderingCallback(Main.currentRoom.currentSecretWaypoints, event, Main.currentRoom.currentSecretIndex);
-            }
-            if(SecretUtils.renderLever){
-                SecretUtils.renderLever(event);
+            } else {
+                SecretUtils.renderingCallback(Main.currentRoom.currentSecretWaypoints, Main.currentRoom.currentSecretIndex);
             }
 
-
+            if (SecretUtils.renderLever) {
+                SecretUtils.renderLever();
+            }
         } catch (Exception e) {
             LogUtils.error(e);
         }
     }
-
-
-
 
 }
 //#endif

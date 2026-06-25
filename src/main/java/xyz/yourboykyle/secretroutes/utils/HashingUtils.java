@@ -1,4 +1,4 @@
-//#if FORGE && MC == 1.8.9
+//#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -31,13 +31,13 @@ import java.util.UUID;
 public class HashingUtils {
     private static UUID hashedUUID = null;
 
-    public static UUID getHashedUUID(){
-        if(hashedUUID == null) {
+    public static UUID getHashedUUID() {
+        if (hashedUUID == null) {
             try {
-                hashedUUID = bytesToUUID(computeSHA256(uuidToBytes(Minecraft.getMinecraft().thePlayer.getUniqueID())));
+                hashedUUID = bytesToUUID(computeSHA256(uuidToBytes(Minecraft.getInstance().player.getUUID())));
             } catch (NoSuchAlgorithmException e) {
                 LogUtils.error(e);
-            }catch (NullPointerException e){
+            } catch (NullPointerException e) {
                 LogUtils.info("HOW ??????");
                 LogUtils.error(e);
             }
@@ -57,10 +57,12 @@ public class HashingUtils {
         }
         return uuidBytes;
     }
+
     private static byte[] computeSHA256(byte[] input) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         return digest.digest(input);
     }
+
     private static UUID bytesToUUID(byte[] bytes) {
         long msb = 0;
         long lsb = 0;

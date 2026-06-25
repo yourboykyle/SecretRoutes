@@ -1,4 +1,4 @@
-//#if FORGE && MC == 1.8.9
+//#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2024 yourboykyle & R-aMcC
@@ -24,51 +24,59 @@ package xyz.yourboykyle.secretroutes.commands;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
-import net.minecraft.client.Minecraft;
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.util.ChatComponentText;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.context.CommandContext;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.network.chat.Component;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
+import xyz.yourboykyle.secretroutes.utils.RoomDirectionUtils;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class LoadRoute extends CommandBase {
-    @Override
-    public String getCommandName() {
-        return "loadroute";
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.literal;
+
+public class LoadRoute {
+    public static void register() {
+        ClientCommandRegistrationCallback.EVENT.register(LoadRoute::registerCommands);
     }
 
-    @Override
-    public String getCommandUsage(ICommandSender sender) {
-        return "/loadroute";
+    private static void registerCommands(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandBuildContext registryAccess) {
+        dispatcher.register(literal("loadroute")
+                .executes(LoadRoute::executeCommand));
     }
 
-    @Override
-    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
-        // Load the route
+    private static int executeCommand(CommandContext<FabricClientCommandSource> context) {
+        // Load the route from Downloads folder
         String filePath = System.getProperty("user.home") + File.separator + "Downloads" + File.separator + "routes.json";
 
         try {
             Gson gson = new GsonBuilder().create();
             FileReader reader = new FileReader(filePath);
 
-            JsonObject data = gson.fromJson(reader, JsonObject.class);
-            Main.currentRoom = new Room(RoomDetection.roomName, filePath);
-            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("Loaded Route."));
+            gson.fromJson(reader, JsonObject.class);
+            reader.close();
+
+            Main.currentRoom = new Room(RoomDirectionUtils.roomName(), filePath);
+
+            context.getSource().sendFeedback(
+                    Component.literal("Loaded route for room: " + RoomDirectionUtils.roomName()).withStyle(ChatFormatting.GREEN)
+            );
+
         } catch (IOException e) {
+            context.getSource().sendError(
+                    Component.literal("Failed to load route: " + e.getMessage())
+            );
             LogUtils.error(e);
         }
-    }
 
-    @Override
-    public int getRequiredPermissionLevel() {
-        return 0;
+        return 1;
     }
 }
 //#endif

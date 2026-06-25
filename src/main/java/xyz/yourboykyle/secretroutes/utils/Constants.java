@@ -1,4 +1,4 @@
-//#if FORGE && MC == 1.8.9
+//#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -29,7 +29,7 @@ public class Constants {
     public static float baseScale = 0.012f;
     public static boolean shadows = false;
 
-    //GUI render utils
+    //GUI render xyz.yourboykyle.secretroutes.utils
     public static int zPos = 1000;
 }
 //#endif

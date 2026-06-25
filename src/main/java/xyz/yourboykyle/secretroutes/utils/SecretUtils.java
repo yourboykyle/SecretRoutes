@@ -1,4 +1,4 @@
-//#if FORGE && MC == 1.8.9
+//#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -19,8 +19,6 @@
  * with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-
 package xyz.yourboykyle.secretroutes.utils;
 
 import com.google.gson.JsonArray;
@@ -28,19 +26,16 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.Tuple;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
-import org.polyfrost.polyui.color.ColorUtils;
-import org.polyfrost.polyui.color.PolyColor;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import org.joml.Vector3d;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.MapUtils;
 import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
+import xyz.yourboykyle.secretroutes.utils.multistorage.Tuple;
 
+import java.awt.*;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -62,7 +57,12 @@ public class SecretUtils {
     public static String leverNumber = null;
     public static ArrayList<String> secretLocations = new ArrayList<>();
 
-    public static void renderingCallback(JsonObject currentSecretWaypoints, RenderWorldLastEvent event, int index2){
+    // Helper to get color code from Enum
+    private static String getColorCode(SRMConfig.TextColor color) {
+        return color.formatting.toString();
+    }
+
+    public static void renderingCallback(JsonObject currentSecretWaypoints, int index2) {
         ArrayList<BlockPos> etherwarpPositions = new ArrayList<>();
         ArrayList<BlockPos> minesPositions = new ArrayList<>();
         ArrayList<BlockPos> interactsPositions = new ArrayList<>();
@@ -70,91 +70,100 @@ public class SecretUtils {
         ArrayList<Triple<Double, Double, Double>> enderpearlPositons = new ArrayList<>();
         ArrayList<Tuple<Float, Float>> enderpearlAngles = new ArrayList<>();
 
-        GlStateManager.disableDepth();
-        GlStateManager.disableCull();
-        ///GlStateManager.disableBlend();
-        if(SRMConfig.playerWaypointLine){
+        if (SRMConfig.get().playerWaypointLine) {
             BlockPos nextSecret = Main.currentRoom.getSecretLocation();
-            if(nextSecret!=null){
-                RenderUtils.drawFromPlayer(Minecraft.getMinecraft().thePlayer, nextSecret.getX(), nextSecret.getY(), nextSecret.getZ(), SRMConfig.lineColor, event.partialTicks, SRMConfig.width );
+            if (nextSecret != null) {
+                Vector3d point = new Vector3d(nextSecret.getX() + 0.5, nextSecret.getY() + 0.5, nextSecret.getZ() + 0.5);
+                AnotherRenderingUtil.addLineFromCursor(new RenderTypes.LineFromCursor(point, SRMConfig.get().lineColor, SRMConfig.get().width));
             }
         }
 
         // Render the etherwarps
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("etherwarps") != null && (!SRMConfig.wholeRoute || SRMConfig.allSteps || index2 == Main.currentRoom.currentSecretIndex) && SRMConfig.renderEtherwarps) {
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("etherwarps") != null && (SRMConfig.get().wholeRoute || SRMConfig.get().allSteps || index2 == Main.currentRoom.currentSecretIndex) && SRMConfig.get().renderEtherwarps) {
             JsonArray etherwarpLocations = currentSecretWaypoints.get("etherwarps").getAsJsonArray();
             for (JsonElement etherwarpLocationElement : etherwarpLocations) {
 
                 JsonArray etherwarpLocation = etherwarpLocationElement.getAsJsonArray();
 
                 Main.checkRoomData();
-                BlockPos pos = MapUtils.relativeToActual(new BlockPos(etherwarpLocation.get(0).getAsInt(), etherwarpLocation.get(1).getAsInt(), etherwarpLocation.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
-                if(!SRMConfig.wholeRoute && etherwarpLocations.get(0) == etherwarpLocationElement && SRMConfig.playerToEtherwarp){
-                    EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
-                    RenderUtils.drawFromPlayer(player, pos, ColorUtils.rgba(0, 255, 255), event.partialTicks, 1);
+                BlockPos pos = RoomRotationUtils.relativeToActual(new BlockPos(etherwarpLocation.get(0).getAsInt(), etherwarpLocation.get(1).getAsInt(), etherwarpLocation.get(2).getAsInt()), RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
+                if (!SRMConfig.get().wholeRoute && etherwarpLocations.get(0) == etherwarpLocationElement && SRMConfig.get().playerToEtherwarp) {
+                    LocalPlayer player = Minecraft.getInstance().player;
+                    if (player != null) {
+                        Vector3d point = new Vector3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+                        AnotherRenderingUtil.addLineFromCursor(new RenderTypes.LineFromCursor(point, new Color(0, 255, 255), SRMConfig.get().width));
+                    }
                 }
                 etherwarpPositions.add(pos);
-                if(SRMConfig.etherwarpFullBlock){
-                    SecretRoutesRenderUtils.drawFilledBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.etherWarp, 1, 1);
-                }else{
-                    SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.etherWarp, 1, 1);
+                if (SRMConfig.get().etherwarpFullBlock) {
+                    Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
+                    AnotherRenderingUtil.addFilledBox(new RenderTypes.FilledBox(position, SRMConfig.get().etherWarp, 1, 1, SRMConfig.get().renderLinesThroughWalls));
+                } else {
+                    Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
+                    AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, SRMConfig.get().etherWarp, 1, 1, SRMConfig.get().renderLinesThroughWalls));
                 }
             }
         }
 
         // Render the mines
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("mines") != null && (!SRMConfig.wholeRoute || SRMConfig.allSteps || index2 == Main.currentRoom.currentSecretIndex) && SRMConfig.renderMines) {
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("mines") != null && (SRMConfig.get().wholeRoute || SRMConfig.get().allSteps || index2 == Main.currentRoom.currentSecretIndex) && SRMConfig.get().renderMines) {
             JsonArray mineLocations = currentSecretWaypoints.get("mines").getAsJsonArray();
             for (JsonElement mineLocationElement : mineLocations) {
                 JsonArray mineLocation = mineLocationElement.getAsJsonArray();
 
                 Main.checkRoomData();
-                BlockPos pos = MapUtils. relativeToActual(new BlockPos(mineLocation.get(0).getAsInt(), mineLocation.get(1).getAsInt(), mineLocation.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
+                BlockPos pos = RoomRotationUtils.relativeToActual(new BlockPos(mineLocation.get(0).getAsInt(), mineLocation.get(1).getAsInt(), mineLocation.get(2).getAsInt()), RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
                 minesPositions.add(pos);
-                if(SRMConfig.mineFullBlock){
-                    SecretRoutesRenderUtils.drawFilledBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.mine, 1, 1);
-                }else {
-                    SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.mine, 1, 1);
+                if (SRMConfig.get().mineFullBlock) {
+                    Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
+                    AnotherRenderingUtil.addFilledBox(new RenderTypes.FilledBox(position, SRMConfig.get().mine, 1, 1, SRMConfig.get().renderLinesThroughWalls));
+                } else {
+                    Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
+                    AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, SRMConfig.get().mine, 1, 1, SRMConfig.get().renderLinesThroughWalls));
                 }
             }
         }
 
         // Render the interacts
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("interacts") != null && (!SRMConfig.wholeRoute || SRMConfig.allSteps || index2 == Main.currentRoom.currentSecretIndex) && SRMConfig.renderInteracts) {
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("interacts") != null && (SRMConfig.get().wholeRoute || SRMConfig.get().allSteps || index2 == Main.currentRoom.currentSecretIndex) && SRMConfig.get().renderInteracts) {
             JsonArray interactLocations = currentSecretWaypoints.get("interacts").getAsJsonArray();
             for (JsonElement interactLocationElement : interactLocations) {
                 JsonArray interactLocation = interactLocationElement.getAsJsonArray();
 
                 Main.checkRoomData();
-                BlockPos pos = MapUtils.relativeToActual(new BlockPos(interactLocation.get(0).getAsInt(), interactLocation.get(1).getAsInt(), interactLocation.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
+                BlockPos pos = RoomRotationUtils.relativeToActual(new BlockPos(interactLocation.get(0).getAsInt(), interactLocation.get(1).getAsInt(), interactLocation.get(2).getAsInt()), RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
                 interactsPositions.add(pos);
-                if(SRMConfig.interactsFullBlock) {
-                    SecretRoutesRenderUtils.drawFilledBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.interacts, 1, 1);
-                }else {
-                    SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.interacts, 1, 1);
+                if (SRMConfig.get().interactsFullBlock) {
+                    Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
+                    AnotherRenderingUtil.addFilledBox(new RenderTypes.FilledBox(position, SRMConfig.get().interacts, 1, 1, SRMConfig.get().renderLinesThroughWalls));
+                } else {
+                    Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
+                    AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, SRMConfig.get().interacts, 1, 1, SRMConfig.get().renderLinesThroughWalls));
                 }
             }
         }
 
-        // Render the tnts
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("tnts") != null && (!SRMConfig.wholeRoute || SRMConfig.allSteps || index2 == Main.currentRoom.currentSecretIndex) && SRMConfig.renderSuperboom) {
+        // Render the tnts (Superbooms)
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("tnts") != null && (SRMConfig.get().wholeRoute || SRMConfig.get().allSteps || index2 == Main.currentRoom.currentSecretIndex) && SRMConfig.get().renderSuperboom) {
             JsonArray tntLocations = currentSecretWaypoints.get("tnts").getAsJsonArray();
             for (JsonElement tntLocationElement : tntLocations) {
                 JsonArray tntLocation = tntLocationElement.getAsJsonArray();
 
                 Main.checkRoomData();
-                BlockPos pos = MapUtils.relativeToActual(new BlockPos(tntLocation.get(0).getAsInt(), tntLocation.get(1).getAsInt(), tntLocation.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
+                BlockPos pos = RoomRotationUtils.relativeToActual(new BlockPos(tntLocation.get(0).getAsInt(), tntLocation.get(1).getAsInt(), tntLocation.get(2).getAsInt()), RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
                 superboomsPositions.add(pos);
-                if(SRMConfig.superboomsFullBlock) {
-                    SecretRoutesRenderUtils.drawFilledBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.superbooms, 1, 1);
-                }else{
-                    SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.superbooms, 1, 1);
+                if (SRMConfig.get().superboomsFullBlock) {
+                    Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
+                    AnotherRenderingUtil.addFilledBox(new RenderTypes.FilledBox(position, SRMConfig.get().superbooms, 1, 1, SRMConfig.get().renderLinesThroughWalls));
+                } else {
+                    Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
+                    AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, SRMConfig.get().superbooms, 1, 1, SRMConfig.get().renderLinesThroughWalls));
                 }
             }
         }
-        // Render normal lines if config says so
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("locations") != null && SRMConfig.lineType == 1  && (!SRMConfig.wholeRoute || SRMConfig.allSteps || index2 == Main.currentRoom.currentSecretIndex)) {
-            GlStateManager.enableDepth();
+
+        // Render normal lines
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("locations") != null && SRMConfig.get().lineType == SRMConfig.LineType.LINES && (SRMConfig.get().wholeRoute || SRMConfig.get().allSteps || index2 == Main.currentRoom.currentSecretIndex)) {
             List<Triple<Double, Double, Double>> lines = new LinkedList<>();
 
             JsonArray lineLocations = currentSecretWaypoints.get("locations").getAsJsonArray();
@@ -162,25 +171,29 @@ public class SecretUtils {
                 JsonArray lineLocation = lineLocationElement.getAsJsonArray();
 
                 Main.checkRoomData();
-                Triple<Double, Double, Double> linePos = MapUtils.relativeToActual(lineLocation.get(0).getAsDouble(), lineLocation.get(1).getAsDouble(), lineLocation.get(2).getAsDouble(), RoomDetection.roomDirection, RoomDetection.roomCorner);
+                Triple<Double, Double, Double> linePos = RoomRotationUtils.relativeToActual(lineLocation.get(0).getAsDouble(), lineLocation.get(1).getAsDouble(), lineLocation.get(2).getAsDouble(), RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
                 linePos.setOne(linePos.getOne() + 0.5);
                 linePos.setTwo(linePos.getTwo() + 0.5);
                 linePos.setThree(linePos.getThree() + 0.5);
                 lines.add(linePos);
             }
 
-            if (SRMConfig.modEnabled) {
-                RenderUtils.drawMultipleNormalLines(lines, event.partialTicks, SRMConfig.lineColor, SRMConfig.width);
+            if (SRMConfig.get().modEnabled) {
+                Vector3d[] linePoints = new Vector3d[lines.size()];
+                for (int i = 0; i < lines.size(); i++) {
+                    Triple<Double, Double, Double> line = lines.get(i);
+                    linePoints[i] = new Vector3d(line.getOne(), line.getTwo(), line.getThree());
+                }
+
+                AnotherRenderingUtil.addLinesFromPoints(linePoints, SRMConfig.get().lineColor, SRMConfig.get().width, SRMConfig.get().renderLinesThroughWalls);
             }
-            GlStateManager.disableDepth();
         }
 
         // Render the ender pearls
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("enderpearls") != null && (!SRMConfig.wholeRoute || SRMConfig.allSteps || index2 == Main.currentRoom.currentSecretIndex) && SRMConfig.renderEnderpearls) {
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("enderpearls") != null && (SRMConfig.get().wholeRoute || SRMConfig.get().allSteps || index2 == Main.currentRoom.currentSecretIndex) && SRMConfig.get().renderEnderpearls) {
             JsonArray enderpearlAnglesArray = currentSecretWaypoints.get("enderpearlangles").getAsJsonArray();
             for (JsonElement pearlAngleElement : enderpearlAnglesArray) {
                 JsonArray pearlAngle = pearlAngleElement.getAsJsonArray();
-
                 Main.checkRoomData();
                 enderpearlAngles.add(new Tuple<>(pearlAngle.get(0).getAsFloat(), pearlAngle.get(1).getAsFloat()));
             }
@@ -188,35 +201,34 @@ public class SecretUtils {
             JsonArray pearlLocations = currentSecretWaypoints.get("enderpearls").getAsJsonArray();
             int index = 0;
             for (JsonElement pearlLocationElement : pearlLocations) {
-
                 JsonArray pearlLocation = pearlLocationElement.getAsJsonArray();
-
                 Main.checkRoomData();
                 double posX = pearlLocation.get(0).getAsDouble();
                 double posY = pearlLocation.get(1).getAsDouble();
                 double posZ = pearlLocation.get(2).getAsDouble();
 
-                Triple<Double, Double, Double> positions = MapUtils.relativeToActual(posX, posY, posZ, RoomDetection.roomDirection, RoomDetection.roomCorner);
+                Triple<Double, Double, Double> positions = RoomRotationUtils.relativeToActual(posX, posY, posZ, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
                 posX = positions.getOne() - 0.25;
                 posY = positions.getTwo();
                 posZ = positions.getThree() - 0.25;
-                if(SRMConfig.enderpearlFullBlock){
-                    SecretRoutesRenderUtils.drawFilledBoxAtBlock(posX, posY, posZ, SRMConfig.enderpearls, 0.5f, 0);
 
-                }else {
-                    SecretRoutesRenderUtils.drawBoxAtBlock(posX, posY, posZ, SRMConfig.enderpearls, 0.5, 0);
+                if (SRMConfig.get().enderpearlFullBlock) {
+                    Vector3d position = new Vector3d(posX, posY, posZ);
+                    AnotherRenderingUtil.addFilledBox(new RenderTypes.FilledBox(position, SRMConfig.get().enderpearls, 1, 1, SRMConfig.get().renderLinesThroughWalls));
+                } else {
+                    Vector3d position = new Vector3d(posX, posY, posZ);
+                    AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, SRMConfig.get().enderpearls, 1, 1, SRMConfig.get().renderLinesThroughWalls));
                 }
-                double yaw = RotationUtils.relativeToActualYaw(enderpearlAngles.get(index).getSecond(), RoomDetection.roomDirection);
-                double pitch = enderpearlAngles.get(index).getFirst();
 
+                double yaw = RotationUtils.relativeToActualYaw(enderpearlAngles.get(index).getTwo(), RoomDirectionUtils.roomDirection()) + 90;
+                double pitch = enderpearlAngles.get(index).getOne();
                 double yawRadians = Math.toRadians(yaw);
                 double pitchRadians = Math.toRadians(pitch);
 
-
                 double length = 10.0D;
-                double x = -Math.sin(yawRadians) * Math.cos(pitchRadians); // (z)
-                double y = -Math.sin(pitchRadians); // z
-                double z = Math.cos(yawRadians) * Math.cos(pitchRadians); // (x)
+                double x = -Math.sin(yawRadians) * Math.cos(pitchRadians);
+                double y = -Math.sin(pitchRadians);
+                double z = Math.cos(yawRadians) * Math.cos(pitchRadians);
 
                 double sideLength = Math.sqrt(x * x + y * y + z * z);
                 x /= sideLength;
@@ -226,115 +238,141 @@ public class SecretUtils {
                 double newX = posX + x * length + 0.25;
                 double newY = posY + y * length + 1.62;
                 double newZ = posZ + z * length + 0.25;
-                //sendVerboseMessage("Origin: (" + (posX +0.25f)+ ", " + (posY +1.62f) + ", " + posZ +(0.25)+") to End: (" + newX + ", " + newY + ", " + newZ + ") with a angles of ("+yaw+", "+pitch+") -> ("+yawRadians+", "+pitchRadians+")", verboseTAG);
-                //SecretRoutesRenderUtils.drawBoxAtBlock(newX, newY, newZ, SRMConfig.enderpearls, 0.03125, 0.03125);
-                RenderUtils.drawNormalLine(posX + 0.25F, posY + 1.62F, posZ + 0.25F, newX, newY, newZ, SRMConfig.pearlLineColor, event.partialTicks, !SRMConfig.renderLinesThroughWalls, SRMConfig.pearlLineWidth);
+
+                Vector3d start = new Vector3d(posX + 0.25F, posY + 1.62F, posZ + 0.25F);
+                Vector3d end = new Vector3d(newX, newY, newZ);
+                AnotherRenderingUtil.addLine(new RenderTypes.Line(start, end, SRMConfig.get().pearlLineColor, SRMConfig.get().pearlLineWidth, true));
                 enderpearlPositons.add(new Triple<>(posX, posY, posZ));
                 index++;
             }
         }
+
+        // Render Secrets (Interact, Item, Bat)
         if (currentSecretWaypoints != null && currentSecretWaypoints.get("secret") != null) {
             JsonObject secret = currentSecretWaypoints.get("secret").getAsJsonObject();
             String type = secret.get("type").getAsString();
             JsonArray location = secret.get("location").getAsJsonArray();
 
             Main.checkRoomData();
-            BlockPos pos = MapUtils.relativeToActual(new BlockPos(location.get(0).getAsInt(), location.get(1).getAsInt(), location.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
-
-            GlStateManager.disableTexture2D();
+            BlockPos pos = RoomRotationUtils.relativeToActual(new BlockPos(location.get(0).getAsInt(), location.get(1).getAsInt(), location.get(2).getAsInt()), RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
 
             switch (type) {
                 case "interact":
-                    if (SRMConfig.renderSecretIteract) {
-                        if (SRMConfig.secretsInteractFullBlock) {
-                            SecretRoutesRenderUtils.drawFilledBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsInteract, 1, 1);
+                    if (SRMConfig.get().renderSecretIteract) {
+                        if (SRMConfig.get().secretsInteractFullBlock) {
+                            Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
+                            AnotherRenderingUtil.addFilledBox(new RenderTypes.FilledBox(position, SRMConfig.get().secretsInteract, 1, 1, SRMConfig.get().renderLinesThroughWalls));
                         } else {
-                            SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsInteract, 1, 1);
+                            Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
+                            AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, SRMConfig.get().secretsInteract, 1, 1, SRMConfig.get().renderLinesThroughWalls));
                         }
-                        if (SRMConfig.interactTextToggle) {
-                            SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.interactWaypointColorIndex) + "Interact", SRMConfig.interactTextSize, event.partialTicks);
+                        if (SRMConfig.get().interactTextToggle) {
+                            net.minecraft.network.chat.Component text = Component.literal(getColorCode(SRMConfig.get().interactWaypointColor) + "Interact");
+                            Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
+                            AnotherRenderingUtil.addWorldText(new RenderTypes.WorldText(text, position, true, SRMConfig.get().interactTextSize));
                         }
                     }
                     break;
                 case "item":
-                    if (SRMConfig.renderSecretsItem) {
-                        if (SRMConfig.secretsItemFullBlock) {
-                            SecretRoutesRenderUtils.drawFilledBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsItem, 1, 1);
+                    if (SRMConfig.get().renderSecretsItem) {
+                        if (SRMConfig.get().secretsItemFullBlock) {
+                            Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
+                            AnotherRenderingUtil.addFilledBox(new RenderTypes.FilledBox(position, SRMConfig.get().secretsItem, 1, 1, SRMConfig.get().renderLinesThroughWalls));
                         } else {
-                            SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsItem, 1, 1);
+                            Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
+                            AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, SRMConfig.get().secretsItem, 1, 1, SRMConfig.get().renderLinesThroughWalls));
                         }
 
-                        if (SRMConfig.itemTextToggle) {
-                            SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.itemWaypointColorIndex) + "Item", SRMConfig.itemTextSize, event.partialTicks);
+                        if (SRMConfig.get().itemTextToggle) {
+                            net.minecraft.network.chat.Component text = Component.literal(getColorCode(SRMConfig.get().itemWaypointColor) + "Item");
+                            Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
+                            AnotherRenderingUtil.addWorldText(new RenderTypes.WorldText(text, position, true, SRMConfig.get().itemTextSize));
                         }
                     }
                     break;
                 case "bat":
-                    if (SRMConfig.renderSecretBat) {
-                        if (SRMConfig.secretsBatFullBlock) {
-                            SecretRoutesRenderUtils.drawFilledBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsBat, 1, 1);
+                    if (SRMConfig.get().renderSecretBat) {
+                        if (SRMConfig.get().secretsBatFullBlock) {
+                            Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
+                            AnotherRenderingUtil.addFilledBox(new RenderTypes.FilledBox(position, SRMConfig.get().secretsBat, 1, 1, SRMConfig.get().renderLinesThroughWalls));
                         } else {
-                            SecretRoutesRenderUtils.drawBoxAtBlock(pos.getX(), pos.getY(), pos.getZ(), SRMConfig.secretsBat, 1, 1);
+                            Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
+                            AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, SRMConfig.get().secretsBat, 1, 1, SRMConfig.get().renderLinesThroughWalls));
                         }
-                        if (SRMConfig.batTextToggle) {
-                            SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.batWaypointColorIndex) + "Bat", SRMConfig.batTextSize, event.partialTicks);
+                        if (SRMConfig.get().batTextToggle) {
+                            net.minecraft.network.chat.Component text = Component.literal(getColorCode(SRMConfig.get().batWaypointColor) + "Bat");
+                            Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
+                            AnotherRenderingUtil.addWorldText(new RenderTypes.WorldText(text, position, true, SRMConfig.get().batTextSize));
                         }
                     }
                     break;
             }
-            if (SRMConfig.etherwarpsTextToggle) {
-                int iEtherwarp = 1;
-                for (BlockPos etherwarpPos : etherwarpPositions) {
-                    String text = SRMConfig.etherwarpsEnumToggle ? "etherwarp" : "etherwarp " + iEtherwarp++;
-                    SecretRoutesRenderUtils.drawText(etherwarpPos.getX(), etherwarpPos.getY(), etherwarpPos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.etherwarpsWaypointColorIndex) + text, SRMConfig.etherwarpsTextSize, event.partialTicks);
-                }
-            }
-            if (SRMConfig.minesTextToggle) {
-                int iMine = 1;
-                for (BlockPos minePos : minesPositions) {
-                    String text = SRMConfig.minesEnumToggle ? "mine" : "mine " + iMine++;
-                    SecretRoutesRenderUtils.drawText(minePos.getX(), minePos.getY(), minePos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.minesWaypointColorIndex) + text, SRMConfig.minesTextSize, event.partialTicks);
-                }
-            }
-            if (SRMConfig.interactsTextToggle) {
-                int iInteract = 1;
-                for (BlockPos interactPos : interactsPositions) {
-                    String text = SRMConfig.interactsEnumToggle ? "interact" : "interact " + iInteract;
-                    SecretRoutesRenderUtils.drawText(interactPos.getX(), interactPos.getY(), interactPos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.interactsWaypointColorIndex) + text, SRMConfig.interactsTextSize, event.partialTicks);
-                }
-            }
-            if (SRMConfig.superboomsTextToggle) {
-                int iSuperboom = 1;
-                for (BlockPos superboomPos : superboomsPositions) {
-                    String text = SRMConfig.superboomsEnumToggle ? "superboom" : "superboom " + iSuperboom++;
-                    SecretRoutesRenderUtils.drawText(superboomPos.getX(), superboomPos.getY(), superboomPos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.superboomsWaypointColorIndex) + text, SRMConfig.superboomsTextSize, event.partialTicks);
-                }
-            }
-            if (SRMConfig.enderpearlTextToggle) {
-                int iEnderpearl = 1;
-                for (Triple<Double, Double, Double> enderpearlPos : enderpearlPositons) {
-                    String text = SRMConfig.enderpearlEnumToggle ? "ender pearl" : "ender pearl " + iEnderpearl++;
-                    SecretRoutesRenderUtils.drawText(enderpearlPos.getOne(), enderpearlPos.getTwo(), enderpearlPos.getThree(), SecretRoutesRenderUtils.getTextColor(SRMConfig.enderpearlWaypointColorIndex) + text, SRMConfig.enderpearlTextSize, event.partialTicks);
-                }
-            }
-            GlStateManager.enableTexture2D();
         }
 
-        // Render the secret
+        // Render Labels for Etherwarps
+        if (SRMConfig.get().etherwarpsTextToggle) {
+            int iEtherwarp = 1;
+            for (BlockPos etherwarpPos : etherwarpPositions) {
+                String colorFormatter = getColorCode(SRMConfig.get().etherwarpsWaypointColor);
+                net.minecraft.network.chat.Component text = Component.literal(colorFormatter + (SRMConfig.get().etherwarpsEnumToggle ? "etherwarp" : "etherwarp " + iEtherwarp++));
+                Vector3d position = new Vector3d(etherwarpPos.getX(), etherwarpPos.getY(), etherwarpPos.getZ());
+                AnotherRenderingUtil.addWorldText(new RenderTypes.WorldText(text, position, true, SRMConfig.get().etherwarpsTextSize));
+            }
+        }
+        // Render Labels for Mines
+        if (SRMConfig.get().minesTextToggle) {
+            int iMine = 1;
+            for (BlockPos minePos : minesPositions) {
+                String colorFormatter = getColorCode(SRMConfig.get().minesWaypointColor);
+                net.minecraft.network.chat.Component text = Component.literal(colorFormatter + (SRMConfig.get().minesEnumToggle ? "mine" : "mine " + iMine++));
+                Vector3d position = new Vector3d(minePos.getX(), minePos.getY(), minePos.getZ());
+                AnotherRenderingUtil.addWorldText(new RenderTypes.WorldText(text, position, true, SRMConfig.get().minesTextSize));
+            }
+        }
+
+        if (SRMConfig.get().interactsTextToggle) {
+            int iInteract = 1;
+            for (BlockPos interactPos : interactsPositions) {
+                String colorFormatter = getColorCode(SRMConfig.get().interactWaypointColor); // Reused singular color
+                net.minecraft.network.chat.Component text = Component.literal(colorFormatter + (SRMConfig.get().interactsEnumToggle ? "interact" : "interact " + iInteract++));
+                Vector3d position = new Vector3d(interactPos.getX(), interactPos.getY(), interactPos.getZ());
+                AnotherRenderingUtil.addWorldText(new RenderTypes.WorldText(text, position, true, SRMConfig.get().interactsTextSize));
+            }
+        }
+        // Render Labels for Superbooms
+        if (SRMConfig.get().superboomsTextToggle) {
+            int iSuperboom = 1;
+            for (BlockPos superboomPos : superboomsPositions) {
+                String colorFormatter = getColorCode(SRMConfig.get().superboomsWaypointColor);
+                net.minecraft.network.chat.Component text = Component.literal(colorFormatter + (SRMConfig.get().superboomsEnumToggle ? "superboom" : "superboom " + iSuperboom++));
+                Vector3d position = new Vector3d(superboomPos.getX(), superboomPos.getY(), superboomPos.getZ());
+                AnotherRenderingUtil.addWorldText(new RenderTypes.WorldText(text, position, true, SRMConfig.get().superboomsTextSize));
+            }
+        }
+        // Render Labels for Enderpearls
+        if (SRMConfig.get().enderpearlTextToggle) {
+            int iEnderpearl = 1;
+            for (Triple<Double, Double, Double> enderpearlPos : enderpearlPositons) {
+                String colorFormatter = getColorCode(SRMConfig.get().enderpearlWaypointColor); // Reused singular color field name if applicable, or add new one
+                net.minecraft.network.chat.Component text = Component.literal(colorFormatter + (SRMConfig.get().enderpearlEnumToggle ? "ender pearl" : "ender pearl " + iEnderpearl++));
+                Vector3d position = new Vector3d(enderpearlPos.getOne(), enderpearlPos.getTwo(), enderpearlPos.getThree());
+                AnotherRenderingUtil.addWorldText(new RenderTypes.WorldText(text, position, true, SRMConfig.get().enderpearlTextSize));
+            }
+        }
 
         // Render the start / end waypoint text
         JsonObject waypoints = currentSecretWaypoints;
-        if (waypoints != null && waypoints.get("locations") != null && waypoints.get("locations").getAsJsonArray().size() >0 && waypoints.get("locations").getAsJsonArray().get(0) != null) {
+        if (waypoints != null && waypoints.get("locations") != null && waypoints.get("locations").getAsJsonArray().size() > 0 && waypoints.get("locations").getAsJsonArray().get(0) != null) {
             if (index2 == 0) {
-                // First secret in the route (the start)
+                // First secret in the route
                 JsonArray startCoords = currentSecretWaypoints.get("locations").getAsJsonArray().get(0).getAsJsonArray();
-
                 Main.checkRoomData();
-                BlockPos pos = MapUtils.relativeToActual(new BlockPos(startCoords.get(0).getAsInt(), startCoords.get(1).getAsInt(), startCoords.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
+                BlockPos pos = RoomRotationUtils.relativeToActual(new BlockPos(startCoords.get(0).getAsInt(), startCoords.get(1).getAsInt(), startCoords.get(2).getAsInt()), RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
 
-                // Render the text
-                if (SRMConfig.startTextToggle) {
-                    SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.startWaypointColorIndex) + "Start", SRMConfig.startTextSize, event.partialTicks);
+                if (SRMConfig.get().startTextToggle) {
+                    net.minecraft.network.chat.Component text = Component.literal(getColorCode(SRMConfig.get().startWaypointColor) + "Start");
+                    Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
+                    AnotherRenderingUtil.addWorldText(new RenderTypes.WorldText(text, position, true, SRMConfig.get().startTextSize));
                 }
             }
             if (index2 == Main.currentRoom.currentSecretRoute.getAsJsonArray().size() - 1) {
@@ -343,107 +381,107 @@ public class SecretUtils {
                 JsonArray location = secret.get("location").getAsJsonArray();
 
                 Main.checkRoomData();
-                BlockPos pos = MapUtils.relativeToActual(new BlockPos(location.get(0).getAsInt(), location.get(1).getAsInt(), location.get(2).getAsInt()), RoomDetection.roomDirection, RoomDetection.roomCorner);
+                BlockPos pos = RoomRotationUtils.relativeToActual(new BlockPos(location.get(0).getAsInt(), location.get(1).getAsInt(), location.get(2).getAsInt()), RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
 
-                // Render the text
-                if (SRMConfig.exitTextToggle && type.equals("exitroute")) {
-                    SecretRoutesRenderUtils.drawText(pos.getX(), pos.getY(), pos.getZ(), SecretRoutesRenderUtils.getTextColor(SRMConfig.exitWaypointColorIndex) + "Exit", SRMConfig.exitTextSize, event.partialTicks);
+                if (SRMConfig.get().exitTextToggle && type.equals("exitroute")) {
+                    net.minecraft.network.chat.Component text = Component.literal(getColorCode(SRMConfig.get().exitWaypointColor) + "Exit");
+                    Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
+                    AnotherRenderingUtil.addWorldText(new RenderTypes.WorldText(text, position, true, SRMConfig.get().exitTextSize));
                 }
             }
         }
-        //GlStateManager.enableBlend();
-        GlStateManager.enableCull();
-        GlStateManager.enableDepth();
     }
 
-    public static void renderSecrets(RenderWorldLastEvent event){
-
+    public static void renderSecrets() {
         secrets = getSecrets();
 
-
-        if(secrets != null){
-            for(JsonElement secret : secrets){
+        if (secrets != null) {
+            for (JsonElement secret : secrets) {
                 JsonObject secretInfos = secret.getAsJsonObject();
                 String name = secretInfos.get("secretName").getAsString();
-                String type = secretInfos.get("category").getAsString();
-                if(name.contains("Chest") || name.contains("Bat") || name.contains("Wither Essence") || name.contains("Lever") || name.contains("Item")){
+                // String type = secretInfos.get("category").getAsString();
 
+                if (name.contains("Chest") || name.contains("Bat") || name.contains("Wither Essence") || name.contains("Lever") || name.contains("Item")) {
                     int xPos = secretInfos.get("x").getAsInt();
                     int yPos = secretInfos.get("y").getAsInt();
                     int zPos = secretInfos.get("z").getAsInt();
                     Main.checkRoomData();
-                    Triple<Double, Double, Double> abs = MapUtils.relativeToActual(xPos, yPos, zPos, RoomDetection.roomDirection, RoomDetection.roomCorner);
-                    PolyColor color = ColorUtils.rgba(255, 255, 255);
-                    if(secretLocations.contains(BlockUtils.blockPos(new BlockPos(xPos, yPos, zPos)))){continue;}
-                    if(name.contains("Chest") || name.contains("Wither Essence")) {
-                        color = SRMConfig.secretsInteract;
-                        if(SRMConfig.interactTextToggle){
-                            SecretRoutesRenderUtils.drawText(abs.getOne(), abs.getTwo(), abs.getThree(), SecretRoutesRenderUtils.getTextColor(SRMConfig.interactWaypointColorIndex) + "Interact", SRMConfig.interactTextSize, event.partialTicks);
+                    Triple<Double, Double, Double> abs = RoomRotationUtils.relativeToActual(xPos, yPos, zPos, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
+
+                    Color color = new Color(255, 255, 255);
+                    if (secretLocations.contains(BlockUtils.blockPos(new BlockPos(xPos, yPos, zPos)))) {
+                        continue;
+                    }
+
+                    if (name.contains("Chest") || name.contains("Wither Essence")) {
+                        color = SRMConfig.get().secretsInteract;
+                        if (SRMConfig.get().interactTextToggle) {
+                            net.minecraft.network.chat.Component text = Component.literal(getColorCode(SRMConfig.get().interactWaypointColor) + "Interact");
+                            Vector3d position = new Vector3d(abs.getOne() + 0.5, abs.getTwo() + 0.5, abs.getThree() + 0.5);
+                            AnotherRenderingUtil.addWorldText(new RenderTypes.WorldText(text, position, true, SRMConfig.get().interactTextSize));
                         }
-                    }else if(name.contains("Bat")){
-                        color = SRMConfig.secretsBat;
-                        if(SRMConfig.batTextToggle) {
-                            SecretRoutesRenderUtils.drawText(abs.getOne(), abs.getTwo(), abs.getThree(), SecretRoutesRenderUtils.getTextColor(SRMConfig.batWaypointColorIndex) + "Bat", SRMConfig.batTextSize, event.partialTicks);
+                    } else if (name.contains("Bat")) {
+                        color = SRMConfig.get().secretsBat;
+                        if (SRMConfig.get().batTextToggle) {
+                            net.minecraft.network.chat.Component text = Component.literal(getColorCode(SRMConfig.get().batWaypointColor) + "Bat");
+                            Vector3d position = new Vector3d(abs.getOne() + 0.5, abs.getTwo() + 0.5, abs.getThree() + 0.5);
+                            AnotherRenderingUtil.addWorldText(new RenderTypes.WorldText(text, position, true, SRMConfig.get().batTextSize));
                         }
-                    }else if (name.contains("Lever")){
-                        color = SRMConfig.interacts;
-                        if(SRMConfig.interactsTextToggle){
-                            SecretRoutesRenderUtils.drawText(abs.getOne(), abs.getTwo(), abs.getThree(), SecretRoutesRenderUtils.getTextColor(SRMConfig.interactsWaypointColorIndex)+"Interact", SRMConfig.interactsTextSize, event.partialTicks);
+                    } else if (name.contains("Lever")) {
+                        color = SRMConfig.get().interacts;
+                        if (SRMConfig.get().interactsTextToggle) {
+                            net.minecraft.network.chat.Component text = Component.literal(getColorCode(SRMConfig.get().interactWaypointColor) + "Interact");
+                            Vector3d position = new Vector3d(abs.getOne() + 0.5, abs.getTwo() + 0.5, abs.getThree() + 0.5);
+                            AnotherRenderingUtil.addWorldText(new RenderTypes.WorldText(text, position, true, SRMConfig.get().interactsTextSize));
                         }
-                    }else if (name.contains("Item")){
-                        color = SRMConfig.secretsItem;
-                        if(SRMConfig.itemTextToggle) {
-                            SecretRoutesRenderUtils.drawText(abs.getOne(), abs.getTwo(), abs.getThree(), SecretRoutesRenderUtils.getTextColor(SRMConfig.itemWaypointColorIndex) + "Item", SRMConfig.itemTextSize, event.partialTicks);
+                    } else if (name.contains("Item")) {
+                        color = SRMConfig.get().secretsItem;
+                        if (SRMConfig.get().itemTextToggle) {
+                            net.minecraft.network.chat.Component text = Component.literal(getColorCode(SRMConfig.get().itemWaypointColor) + "Item");
+                            Vector3d position = new Vector3d(abs.getOne() + 0.5, abs.getTwo() + 0.5, abs.getThree() + 0.5);
+                            AnotherRenderingUtil.addWorldText(new RenderTypes.WorldText(text, position, true, SRMConfig.get().itemTextSize));
                         }
                     }
-                    SecretRoutesRenderUtils.drawBoxAtBlock(abs.getOne(), abs.getTwo(), abs.getThree(), color, 1, 1, 1);
+                    Vector3d position = new Vector3d(abs.getOne(), abs.getTwo(), abs.getThree());
+                    AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, color, 1f, 1f, true));
                 }
-
-
-
-
             }
 
         }
     }
 
-    public static void renderLever(RenderWorldLastEvent e){
+    public static void renderLever() {
         ArrayList<JsonElement> levers = new ArrayList<>();
         JsonArray csr = getSecrets();
         String leverNum = null;
-        if(csr == null){
+        if (csr == null) {
             SecretUtils.renderLever = false;
         }
-        if(currentLeverPos == null && csr != null){
-            for(JsonElement secret : csr){
+        if (currentLeverPos == null && csr != null) {
+            for (JsonElement secret : csr) {
                 JsonObject secretInfos = secret.getAsJsonObject();
                 String name = secretInfos.get("secretName").getAsString();
                 String category = secretInfos.get("category").getAsString();
-                if(category.equals("chest") && leverNum == null){
+                if (category.equals("chest") && leverNum == null) {
                     int x = secretInfos.get("x").getAsInt();
                     int y = secretInfos.get("y").getAsInt();
                     int z = secretInfos.get("z").getAsInt();
 
-                    Triple<Double, Double, Double> abs = MapUtils.relativeToActual(x, y, z, RoomDetection.roomDirection, RoomDetection.roomCorner);
-                    BlockPos pos = new BlockPos(abs.getOne(), abs.getTwo(), abs.getThree());
-                    //ChatUtils.sendChatMessage(Utils.blockPos(pos));
-                    //ChatUtils.sendChatMessage(Utils.blockPos(lastInteract));
-                    if(BlockUtils.blockPos(pos).equals(BlockUtils.blockPos(lastInteract))){
+                    Triple<Double, Double, Double> abs = RoomRotationUtils.relativeToActual(x, y, z, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
+                    BlockPos pos = new BlockPos(abs.getOne().intValue(), abs.getTwo().intValue(), abs.getThree().intValue());
+                    if (BlockUtils.blockPos(pos).equals(BlockUtils.blockPos(lastInteract))) {
                         leverNum = name.split(" ")[0];
                         leverNumber = leverNum;
                         chestName = name;
-                        //ChatUtils.sendChatMessage("Found lever, defined num");
                     }
                 }
-                if(category.equals("lever")){
-                    if(leverNum == null){
+                if (category.equals("lever")) {
+                    if (leverNum == null) {
                         levers.add(secret);
-                        //ChatUtils.sendChatMessage("Adding lever to lists");
-                    }else{
+                    } else {
                         String[] nums = leverNum.split("/");
-                        for(String num : nums){
-                            if(name.contains(num)){
-                                //ChatUtils.sendChatMessage("Found right lever. Setting pos");
+                        for (String num : nums) {
+                            if (name.contains(num)) {
                                 currentLeverPos = new BlockPos(secretInfos.get("x").getAsInt(), secretInfos.get("y").getAsInt(), secretInfos.get("z").getAsInt());
                                 leverName = name;
                             }
@@ -456,83 +494,83 @@ public class SecretUtils {
         }
 
 
-        if(currentLeverPos != null || !levers.isEmpty()){
-            if(currentLeverPos == null && leverNum != null){
-                for(JsonElement secret : levers){
+        if (currentLeverPos != null || !levers.isEmpty()) {
+            if (currentLeverPos == null && leverNum != null) {
+                for (JsonElement secret : levers) {
                     JsonObject secretInfos = secret.getAsJsonObject();
                     String name = secretInfos.get("secretName").getAsString();
                     String[] nums = leverNum.split("/");
-                    for(String num : nums){
-                        if(name.contains(num)){
-                            //ChatUtils.sendChatMessage("Found right lever (iteration). Setting pos");
+                    for (String num : nums) {
+                        if (name.contains(num)) {
                             currentLeverPos = new BlockPos(secretInfos.get("x").getAsInt(), secretInfos.get("y").getAsInt(), secretInfos.get("z").getAsInt());
                             leverName = name;
                         }
                     }
                 }
             }
-            if(currentLeverPos == null){ChatUtils.sendChatMessage("§cLever not found :(");}else{
-                Triple<Double, Double, Double> abs = MapUtils.relativeToActual(currentLeverPos.getX(), currentLeverPos.getY(), currentLeverPos.getZ(), RoomDetection.roomDirection, RoomDetection.roomCorner);
-                if(SRMConfig.secretsInteractFullBlock){
-                    SecretRoutesRenderUtils.drawFilledBoxAtBlock(abs.getOne(), abs.getTwo(), abs.getThree(), SRMConfig.secretsInteract, 1, 1, 1);
-
-                }else{
-                    SecretRoutesRenderUtils.drawBoxAtBlock(abs.getOne(), abs.getTwo(), abs.getThree(), SRMConfig.secretsInteract, 1, 1, 1);
+            if (currentLeverPos == null) {
+                ChatUtils.sendChatMessage("§cLever not found :(");
+            } else {
+                Triple<Double, Double, Double> abs = RoomRotationUtils.relativeToActual(currentLeverPos.getX(), currentLeverPos.getY(), currentLeverPos.getZ(), RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
+                if (SRMConfig.get().secretsInteractFullBlock) {
+                    Vector3d position = new Vector3d(abs.getOne(), abs.getTwo(), abs.getThree());
+                    AnotherRenderingUtil.addFilledBox(new RenderTypes.FilledBox(position, SRMConfig.get().secretsInteract, 1f, 1f, SRMConfig.get().renderLinesThroughWalls));
+                } else {
+                    Vector3d position = new Vector3d(abs.getOne(), abs.getTwo(), abs.getThree());
+                    AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, SRMConfig.get().secretsInteract, 1f, 1f, SRMConfig.get().renderLinesThroughWalls));
                 }
-                SecretRoutesRenderUtils.drawText(abs.getOne(), abs.getTwo(), abs.getThree(), SecretRoutesRenderUtils.getTextColor(SRMConfig.interactsWaypointColorIndex) + "Locked chest lever", SRMConfig.interactsTextSize, e.partialTicks);
-                if(first){
+
+                // Using interactWaypointColor for lever
+                Component text = Component.literal(getColorCode(SRMConfig.get().interactWaypointColor) + "Locked chest lever");
+                Vector3d position = new Vector3d(abs.getOne(), abs.getTwo(), abs.getThree());
+                AnotherRenderingUtil.addWorldText(new RenderTypes.WorldText(text, position, true, SRMConfig.get().interactsTextSize)); // Assuming interactsTextSize exists
+
+                if (first) {
                     removeBannerTime = System.currentTimeMillis() + 5000;
-                    new Thread(()-> {
-                        try{
+                    new Thread(() -> {
+                        try {
                             Thread.sleep(5000);
                             removeBannerTime = null;
-                        }catch (InterruptedException ignored){
-
+                        } catch (InterruptedException ignored) {
                         }
-
-
                     }).start();
                     first = false;
                 }
-
-
-
             }
-
-        }else{
+        } else {
             ChatUtils.sendChatMessage("§cLever not found :(");
         }
-
-
-
     }
 
-
-
-    public static JsonArray getSecrets(){
+    public static JsonArray getSecrets() {
         Main.checkRoomData();
-        String roomName = Main.currentRoom.name;
-        if(secrets == null){
-            try{
-                try (Reader reader  = new InputStreamReader(Main.class.getResourceAsStream("/assets/roomdetection/secretlocations.json"))) {
+        if (Main.currentRoom == null || Main.currentRoom.name == null) return null;
+
+        String roomName = Main.currentRoom.name.toLowerCase();
+        if (secrets == null) {
+            try {
+                try (Reader reader = new InputStreamReader(Main.class.getResourceAsStream("/assets/secretroutesmod/secretlocations.json"))) {
                     JsonParser parser = new JsonParser();
                     JsonObject object = parser.parse(reader).getAsJsonObject();
-                    if(object.has(roomName)){
-                        secrets = object.getAsJsonArray(roomName);
-
+                    for (String key : object.keySet()) {
+                        if (key.equalsIgnoreCase(roomName)) {
+                            secrets = object.getAsJsonArray(key);
+                            break;
+                        }
                     }
                     return secrets;
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 LogUtils.error(e);
             }
             return null;
-        }else{
+        } else {
             return secrets;
         }
 
     }
-    public static void resetValues(){
+
+    public static void resetValues() {
         renderLever = false;
         currentLeverPos = null;
         removeBannerTime = null;
@@ -541,6 +579,5 @@ public class SecretUtils {
         leverName = null;
         leverNumber = null;
     }
-
 }
 //#endif

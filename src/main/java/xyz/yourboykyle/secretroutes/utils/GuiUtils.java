@@ -1,4 +1,4 @@
-//#if FORGE && MC == 1.8.9
+//#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -22,43 +22,24 @@
 package xyz.yourboykyle.secretroutes.utils;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.renderer.GlStateManager;
-
+// I have idea to what this would translate to in 26.1 but its not important
 public class GuiUtils {
-    public static void displayText(String text, float posx, float posy, float scale) {
+    /*public static void displayText(DrawContext context, String text, float posx, float posy, float scale) {
         try {
-            FontRenderer fr = Minecraft.getMinecraft().fontRendererObj;
-            ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
+            Minecraft mc = Minecraft.getInstance();
 
-            int screenWidth = scaledResolution.getScaledWidth();
-            int screenHeight = scaledResolution.getScaledHeight();
+            int screenWidth = mc.getWindow().getGuiScaledWidth();
+            int screenHeight = mc.getWindow().getGuiScaledHeight();
 
-            int textWidth = fr.getStringWidth(text);
-            float x = (screenWidth/2.0f-((textWidth*scale)/ 2.0f))+posx;
-            float y = screenHeight/2.0f+posy;
+            int textWidth = mc.textRenderer.getWidth(text);
+            int x = (int) ((screenWidth / 2.0f - ((textWidth * scale) / 2.0f)) + posx);
+            int y = (int) (screenHeight / 2.0f + posy);
 
-            GlStateManager.pushMatrix();
-
-            GlStateManager.enableBlend();
-            GlStateManager.disableDepth();
-
-            GlStateManager.translate(x, y, Constants.zPos);
-            GlStateManager.scale(scale, scale, 1f);
-
-
-
-            fr.drawString(text, 0, 0, 0xFFFFFF, true);
-
-            GlStateManager.enableDepth();
-            GlStateManager.disableBlend();
-
-            GlStateManager.popMatrix();
+            // TODO: Check that the text rendering actually works
+            context.drawText(mc.textRenderer, text, x, y, 0xFFFFFF, true);
         } catch (Exception e) {
-           LogUtils.error(e);
+            LogUtils.error(e);
         }
-
-    }
+    }*/
 }
 //#endif

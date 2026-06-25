@@ -1,4 +1,4 @@
-//#if FORGE && MC == 1.8.9
+//#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -19,27 +19,16 @@
  * with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-
 package xyz.yourboykyle.secretroutes.events;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import net.minecraft.util.BlockPos;
-import scala.runtime.BooleanRef;
+import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import xyz.yourboykyle.secretroutes.Main;
-import xyz.yourboykyle.secretroutes.commands.SRM;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.MapUtils;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.Utils;
-import net.minecraftforge.client.event.ClientChatReceivedEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import xyz.yourboykyle.secretroutes.utils.BlockUtils;
-import xyz.yourboykyle.secretroutes.utils.LogUtils;
-import xyz.yourboykyle.secretroutes.utils.RouteRecording;
-import xyz.yourboykyle.secretroutes.utils.SecretUtils;
+import xyz.yourboykyle.secretroutes.utils.*;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -51,67 +40,96 @@ import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
 
 public class OnChatReceive {
-    Long lastSent = System.currentTimeMillis();
-    private static String[] sections = null;
-    private static String unformated = "";
+    private static final HashMap<String, String> msgMap = new HashMap<>();
     private static boolean allFound = false;
-    private static HashMap<String, String> msgMap = new HashMap<>();
 
+    public static void register() {
+        OnChatReceive instance = new OnChatReceive();
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    public void onChatReceive(ClientChatReceivedEvent e) {
-        Utils.checkForSkyblock();
-        Utils.checkForCatacombs();
-        if (!Utils.inSkyblock) {
-            return;
+        // Register high priority handler for secrets tracking
+        ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
+            return instance.handleChatReceive(message, overlay);
+        });
+
+        // Register low priority handler for boss message hiding
+        ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
+            return instance.handleBossMessages(message, overlay);
+        });
+    }
+
+    public static boolean isAllFound() {
+        return allFound;
+    }
+
+    private boolean handleChatReceive(Component message, boolean overlay) {
+        if (!LocationUtils.isOnSkyblock()) {
+            return true;
         }
-        String unformatted = e.message.getUnformattedText();
-        String secrets = "";
-        if (e.type == 2) {
+
+        String unformatted = message.getString();
+
+        // Handle overlay/actionbar messages
+        if (overlay) {
             Matcher matcher = Pattern.compile("§7(?<roomCollectedSecrets>\\d+)/(?<roomTotalSecrets>\\d+) Secrets").matcher(unformatted);
             if (matcher.find()) {
                 int roomSecrets = Integer.parseInt(matcher.group("roomTotalSecrets"));
                 int secretsFound = Integer.parseInt(matcher.group("roomCollectedSecrets"));
                 if (roomSecrets == secretsFound) {
                     sendVerboseMessage("§aAll secrets found!", "Actionbar");
-                    allFound  = true;
+                    allFound = true;
                 } else {
                     sendVerboseMessage("§9(" + secretsFound + "/" + roomSecrets + ")", "Actionbar");
                     allFound = false;
                 }
             }
-        }else{
-            if(e.message.getFormattedText().startsWith("§r§cThat chest is locked")){
-                LogUtils.info("§aLocked chest detected!");
-                new Thread(() ->{
-                    try{
-                        Thread.sleep(100);
-                    }catch (InterruptedException ignored){}
+            return true;
+        }
+
+        // Handle regular chat messages
+        String formatted = getFormattedText(message);
+        if (formatted.startsWith("§r§cThat chest is locked")) {
+            LogUtils.info("§aLocked chest detected!");
+            new Thread(() -> {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ignored) {
+                }
+                if (SecretUtils.lastInteract != null) {
                     SecretUtils.secretLocations.remove(BlockUtils.blockPos(SecretUtils.lastInteract));
-                }).start();
-                SecretUtils.renderLever = true;
-                JsonObject route = Main.currentRoom.currentSecretRoute.get(Main.currentRoom.currentSecretIndex-1).getAsJsonObject().get("secret").getAsJsonObject();
+                }
+            }).start();
+            SecretUtils.renderLever = true;
+
+            if (Main.currentRoom.currentSecretRoute != null && Main.currentRoom.currentSecretIndex > 0) {
+                JsonObject route = Main.currentRoom.currentSecretRoute.get(Main.currentRoom.currentSecretIndex - 1)
+                        .getAsJsonObject().get("secret").getAsJsonObject();
                 JsonArray loc = route.get("location").getAsJsonArray();
                 BlockPos pos = new BlockPos(loc.get(0).getAsInt(), loc.get(1).getAsInt(), loc.get(2).getAsInt());
-                if(route.get("type").getAsString().equals("interact")){
-                    if(BlockUtils.compareBlocks(MapUtils.actualToRelative(SecretUtils.lastInteract, RoomDetection.roomDirection, RoomDetection.roomCorner), pos, 0)){
+
+                if (route.get("type").getAsString().equals("interact")) {
+                    if (SecretUtils.lastInteract != null && BlockUtils.compareBlocks(
+                            RoomRotationUtils.actualToRelative(SecretUtils.lastInteract, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner()),
+                            pos, 0)) {
                         Main.currentRoom.lastSecretKeybind();
                     }
-                    sendChatMessage("Distance : "+BlockUtils.blockDistance(MapUtils.actualToRelative(SecretUtils.lastInteract, RoomDetection.roomDirection, RoomDetection.roomCorner), pos));
+                    if (SecretUtils.lastInteract != null) {
+                        sendChatMessage("Distance : " + BlockUtils.blockDistance(
+                                RoomRotationUtils.actualToRelative(SecretUtils.lastInteract, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner()),
+                                pos));
+                    }
                 }
             }
         }
 
-    }
-    public static boolean isAllFound() {
-        return allFound;
+        return true;
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void hideBossMessages(ClientChatReceivedEvent e) {
-        if(e.type == 2){return;}
-        if(SRMConfig.hideBossMessages){
-            if(msgMap.isEmpty()){
+    private boolean handleBossMessages(Component message, boolean overlay) {
+        // Don't process overlay messages
+        if (overlay) return true;
+
+        if (SRMConfig.get().hideBossMessages) {
+            if (msgMap.isEmpty()) {
                 msgMap.put("§r§c[BOSS] The Watcher", "hideWatcher");
                 msgMap.put("§r§c[BOSS] Bonzo", "hideBonzo");
                 msgMap.put("§r§c[BOSS] Scarf", "hideScarf");
@@ -124,32 +142,40 @@ public class OnChatReceive {
                 msgMap.put("§r§4[BOSS] Goldor", "hideWitherLords");
                 msgMap.put("§r§4[BOSS] Necron", "hideWitherLords");
             }
-            String formated = e.message.getFormattedText();
-            if(!formated.contains("BOSS")){return;}
-            if(SRMConfig.bloodNotif){
-                if(formated.equals("§r§c[BOSS] The Watcher§r§f: That will be enough for now.§r")){
-                    sendChatMessage("KILL BLOOD");
-                    OnGuiRender.spawnNotifTime = System.currentTimeMillis()+SRMConfig.bloodBannerDuration;
 
+            String formatted = getFormattedText(message);
+            if (!formatted.contains("BOSS")) return true;
+
+            if (SRMConfig.get().bloodNotif) {
+                if (formatted.equals("§r§c[BOSS] The Watcher§r§f: That will be enough for now.§r")) {
+                    sendChatMessage("KILL BLOOD");
+                    OnGuiRender.spawnNotifTime = System.currentTimeMillis() + SRMConfig.get().bloodBannerDuration;
                 }
             }
-            for(Map.Entry<String, String> entry : msgMap.entrySet()){
-                try{
+
+            for (Map.Entry<String, String> entry : msgMap.entrySet()) {
+                try {
                     Field field = SRMConfig.class.getField(entry.getValue());
                     field.setAccessible(true);
-                    if(formated.startsWith(entry.getKey()) && field.getBoolean(null)){
-                        e.setCanceled(true);
+                    if (formatted.startsWith(entry.getKey()) && field.getBoolean(null)) {
+                        return false; // Cancel the message
                     }
-                }catch (NoSuchFieldException ex){
-                    LogUtils.info("I (_Wyan) screwed up. No filed : "+entry.getValue());
-                }catch (IllegalAccessException ex){
-                    LogUtils.info("I (_Wyan) screwed up. Field not accessible: "+entry.getValue());
+                } catch (NoSuchFieldException ex) {
+                    LogUtils.info("I (_Wyan) screwed up. No field: " + entry.getValue());
+                } catch (IllegalAccessException ex) {
+                    LogUtils.info("I (_Wyan) screwed up. Field not accessible: " + entry.getValue());
                 }
-
             }
         }
+
+        return true;
     }
 
-
+    // Helper method to get formatted text from Text component
+    private String getFormattedText(Component text) {
+        // Convert Text to formatted string with color codes
+        // This does work, I think
+        return text.getString();
+    }
 }
 //#endif
