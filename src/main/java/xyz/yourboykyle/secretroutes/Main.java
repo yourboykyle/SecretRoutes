@@ -1,4 +1,5 @@
-//#if FORGE && MC == 1.8.9
+//#if FABRIC
+package xyz.yourboykyle.secretroutes;
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -19,31 +20,24 @@
  * with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-package xyz.yourboykyle.secretroutes;
-
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraftforge.client.ClientCommandHandler;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.network.FMLNetworkEvent;
-import org.polyfrost.oneconfig.api.hud.v1.HudManager;
+import net.minecraft.resources.Identifier;
+import org.lwjgl.glfw.GLFW;
 import xyz.yourboykyle.secretroutes.commands.*;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
+import xyz.yourboykyle.secretroutes.config.SRMKeybinds;
 import xyz.yourboykyle.secretroutes.config.huds.CurrentRoomHUD;
 import xyz.yourboykyle.secretroutes.config.huds.RecordingHUD;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.DungeonRooms;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.handlers.PacketHandler;
 import xyz.yourboykyle.secretroutes.events.*;
 import xyz.yourboykyle.secretroutes.utils.*;
 import xyz.yourboykyle.secretroutes.utils.autoupdate.UpdateManager;
+import xyz.yourboykyle.secretroutes.utils.dungeon.DungeonScanner;
 
-import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -51,37 +45,171 @@ import java.text.SimpleDateFormat;
 
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 
-@Mod(modid = Main.MODID, name = Main.NAME, version = Main.VERSION)
-public class Main {
+public class Main implements ClientModInitializer {
     public static final String MODID = "secretroutesmod";
     public static final String NAME = "SecretRoutes";
-    public static final String VERSION = "1.0.0-beta3";
-    public static final String CONFIG_FOLDER_PATH = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes";
-    public static final String ROUTES_PATH = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes"+File.separator+"routes";
-    public static final String COLOR_PROFILE_PATH = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "config" + File.separator + "SecretRoutes"+File.separator+"colorprofiles";
-    public static final String tmpDir = Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "SecretRoutes" + File.separator + "tmp";
+    public static final String VERSION = "1.0.0-beta2";
+    public static String CONFIG_FOLDER_PATH;
+    public static String ROUTES_PATH;
+    public static String COLOR_PROFILE_PATH;
+    public static String tmpDir;
+    public static File logDir;
     private final static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    public final static File logDir = new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + File.separator + "logs" + File.separator + "SecretRoutes");
     public static File outputLogs;
 
     public static Room currentRoom = new Room(null);
     public static RouteRecording routeRecording = null;
     public static UpdateManager updateManager = new UpdateManager();
-    private static DungeonRooms dungeonRooms = new DungeonRooms();
 
     public static Main instance;
-    //public static SRMConfig config; - oneconfig v0
 
     // HUD instances
     public static RecordingHUD recordingHUD;
     public static CurrentRoomHUD currentRoomHUD;
 
-    @Mod.EventHandler
-    public void preInit(FMLPreInitializationEvent e) {
-        dungeonRooms.preInit(e);
+    // Keybinds
+    public static KeyMapping nextSecretKey;
+    public static KeyMapping lastSecretKey;
+    public static KeyMapping toggleSecretsKey;
+
+    public static void checkRoomData() {
+        // Old method, kept for compatibility
     }
-    @Mod.EventHandler
-    public void init(FMLInitializationEvent e) {
+
+    public static void checkProfilesData() {
+        try {
+            String filePath = "default.json";
+
+            File colorProfileDir = new File(COLOR_PROFILE_PATH);
+            if (!colorProfileDir.exists()) {
+                colorProfileDir.mkdirs();
+            }
+            if (FileUtils.getFileNames(COLOR_PROFILE_PATH).isEmpty()) {
+                ConfigUtils.writeColorConfig(filePath);
+            }
+            //Implement logic for writing to file
+        } catch (Exception e) {
+            LogUtils.error(e);
+        }
+    }
+
+    public static void checkRoutesData() {
+        try {
+            String filePath = ROUTES_PATH + File.separator + "routes.json";
+
+            // Check if the xyz.yourboykyle.secretroutes.config directory exists
+            File configDir = new File(ROUTES_PATH);
+            if (!configDir.exists()) {
+                configDir.mkdirs();
+            }
+
+            File configFile = new File(filePath);
+            File configFilePearl = new File(ROUTES_PATH + File.separator + "pearlroutes.json");
+            if (!configFile.exists()) {
+                RouteUtils.updateRoutes(configFile);
+            }
+            if (!configFilePearl.exists()) {
+                RouteUtils.updatePearlRoutes();
+            }
+        } catch (Exception e) {
+            LogUtils.error(e);
+        }
+    }
+
+    public static void checkPBData() {
+        try {
+            String filePath = CONFIG_FOLDER_PATH + File.separator + "personal_bests.json";
+
+            // Check if the xyz.yourboykyle.secretroutes.config directory exists
+            File configDir = new File(CONFIG_FOLDER_PATH);
+            if (!configDir.exists()) {
+                configDir.mkdirs();
+            }
+
+            File configFile = new File(filePath);
+            if (!configFile.exists()) {
+                configFile.createNewFile();
+                FileWriter pbWriter = new FileWriter(configFile);
+                pbWriter.write("{}");
+                pbWriter.close();
+            }
+        } catch (Exception e) {
+            LogUtils.error(e);
+        }
+    }
+
+    private static void onServerConnect() {
+        new Thread(() -> {
+            try {
+                Thread.sleep(3000);
+            } catch (Exception e) {
+                // nothing needed, literally just waiting
+            }
+
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.getCurrentServer() == null) return;
+            String serverName = mc.getCurrentServer().ip.toLowerCase();
+            if (serverName.contains("hypixel.") || serverName.contains("fakepixel.") || SRMConfig.get().disableServerChecking) {
+
+                if (SRMConfig.get().autoCheckUpdates) {
+                    new Thread(() -> {
+                        try {
+                            Main.updateManager.checkUpdate(false);
+                        } catch (Exception e) {
+                            LogUtils.error(e);
+                        }
+                    }).start();
+                }
+
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(3000);
+                    } catch (Exception ignored) {
+                    }
+                    byte res = APIUtils.addMember();
+                    if (res == 1) {
+                        sendChatMessage("§aFirst logon detected... things work");
+                    } else if (res == 0) {
+                        sendChatMessage("§aWelcome back!");
+                    }
+                }).start();
+
+                if (!APIUtils.apiQueued) {
+                    Runtime.getRuntime().addShutdownHook(new Thread(APIUtils::offline));
+                    APIUtils.apiQueued = true;
+                }
+
+                LogUtils.info("RouteRecording json status: " + RouteRecording.malformed);
+                if (RouteRecording.malformed) {
+                    sendChatMessage("[ERROR] The JSON file in downloads is malformed. Check the file or delete it.", ChatFormatting.RED);
+                }
+            }
+        }).start();
+    }
+
+    public static void toggleSecretsKeybind() {
+        if (SRMConfig.get().modEnabled) {
+            SRMConfig.get().modEnabled = false;
+            sendChatMessage(ChatFormatting.RED + "Secret Routes Mod secret rendering has been disabled.");
+        } else {
+            SRMConfig.get().modEnabled = true;
+            sendChatMessage(ChatFormatting.GREEN + "Secret Routes Mod secret rendering has been enabled.");
+        }
+    }
+
+    @Override
+    public void onInitializeClient() {
+        instance = this;
+
+        String gameDir = Minecraft.getInstance().gameDirectory.getAbsolutePath();
+        CONFIG_FOLDER_PATH = gameDir + File.separator + "config" + File.separator + "SecretRoutes";
+        ROUTES_PATH = CONFIG_FOLDER_PATH + File.separator + "routes";
+        COLOR_PROFILE_PATH = CONFIG_FOLDER_PATH + File.separator + "colorprofiles";
+        tmpDir = gameDir + File.separator + "SecretRoutes" + File.separator + "tmp";
+        logDir = new File(gameDir + File.separator + "logs" + File.separator + "SecretRoutes");
+
+        LocationUtils.init();
+
         String jarpath = Main.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         // Set up logging system
         String date = sdf.format(System.currentTimeMillis());
@@ -90,7 +218,7 @@ public class Main {
             logDir.mkdirs();
         } else {
             File[] files = logDir.listFiles((dir, name) -> name.startsWith("LATEST"));
-            for(File file : files) {
+            for (File file : files) {
                 File[] logFiles = logDir.listFiles((dir, name) -> name.contains(date));
                 int logsNo = logFiles == null ? 1 : logFiles.length;
                 String newName = file.getName().replaceFirst("LATEST-", "").split("\\.")[0] + "-" + logsNo + ".log";
@@ -105,216 +233,97 @@ public class Main {
             System.out.println("Secret Routes Mod logging file creation failed :(");
             e1.printStackTrace();
         }
-        LogUtils.info("Jarpath: "+jarpath);
-        if(!new File(tmpDir).exists()){
+        LogUtils.info("Jarpath: " + jarpath);
+        if (!new File(tmpDir).exists()) {
             new File(tmpDir).mkdirs();
         }
 
         File batchFile = new File(tmpDir + File.separator + "update.bat");
-        if(batchFile.exists()){
+        if (batchFile.exists()) {
             batchFile.delete();
         }
         File shellFile = new File(tmpDir + File.separator + "update.sh");
-        if(shellFile.exists()){
+        if (shellFile.exists()) {
             shellFile.delete();
         }
         LogUtils.info("§bSetting ssl certificate");
         SSLUtils.setSSlCertificate();
 
+        // Load YACL Config
+        SRMConfig.HANDLER.load();
 
-        // Set up Config
-        SRMConfig.INSTANCE.preload();
+        // Initialize HUDs
         recordingHUD = new RecordingHUD();
         currentRoomHUD = new CurrentRoomHUD();
-        HudManager.register(recordingHUD);
-        HudManager.register(currentRoomHUD);
 
-        // Initialize Other Stuff
-        instance = this;
+        // Register HUD Rendering
+        // Route recording doesnt work/I have no idea to what in 26.1 this would translate to
+        /*HudRenderCallback.EVENT.register((drawContext, tickDelta) -> {
+            recordingHUD.render(drawContext);
+            currentRoomHUD.render(drawContext);
+        });*/
+
+        // Initialize stuff
         routeRecording = new RouteRecording();
-        dungeonRooms.init(e);
         checkRoutesData();
         checkProfilesData();
         checkPBData();
         PBUtils.loadPBData();
 
-        // Register Events
-        MinecraftForge.EVENT_BUS.register(new OnBlockPlace());
-        MinecraftForge.EVENT_BUS.register(new OnItemPickedUp());
-        //MinecraftForge.EVENT_BUS.register(new OnPlayerInteract());
-        MinecraftForge.EVENT_BUS.register(new OnPlayerTick());
-        MinecraftForge.EVENT_BUS.register(new OnPlaySound());
-        MinecraftForge.EVENT_BUS.register(new OnReceivePacket());
-        MinecraftForge.EVENT_BUS.register(new OnSendPacket());
-        MinecraftForge.EVENT_BUS.register(new OnWorldRender());
-        MinecraftForge.EVENT_BUS.register(new OnMouseInput());
-        MinecraftForge.EVENT_BUS.register(new OnChatReceive());
-        MinecraftForge.EVENT_BUS.register(new OnGuiRender());
-        //MinecraftForge.EVENT_BUS.register(new OnServerTick());
-        MinecraftForge.EVENT_BUS.register(new GuildEvents());
+        // Register Keybinds
+        SRMKeybinds.init();
 
-        MinecraftForge.EVENT_BUS.register(this);
+        ClientTickEvents.END_CLIENT_TICK.register(mc -> {
 
-        // Register Commands
-        ClientCommandHandler.instance.registerCommand(new LoadRoute());
-        ClientCommandHandler.instance.registerCommand(new Recording());
-        ClientCommandHandler.instance.registerCommand(new SRM());
-        ClientCommandHandler.instance.registerCommand(new ChangeRoute());
-        ClientCommandHandler.instance.registerCommand(new ChangeColorProfile());
-        ClientCommandHandler.instance.registerCommand(new Debug());
+            while (SRMKeybinds.NEXT_SECRET.consumeClick()) {
+                if (Main.currentRoom != null) {
+                    Main.currentRoom.nextSecretKeybind();
+                }
+            }
 
-        if(SRMConfig.autoUpdateRoutes){
+            while (SRMKeybinds.LAST_SECRET.consumeClick()) {
+                if (Main.currentRoom != null) {
+                    Main.currentRoom.lastSecretKeybind();
+                }
+            }
+        });
+
+        // Fabric Events
+        GuildEvents.register();
+        OnBlockBreak.register();
+        OnChatReceive.register();
+        OnGuiRender.register();
+        OnItemPickedUp.register();
+        OnMouseInput.register();
+        OnPlayerInteract.register();
+        OnPlayerTick.register();
+
+        AnotherRenderingUtil.register();
+
+        // Server connection
+        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+            onServerConnect();
+        });
+
+        // Commands
+        ChangeColorProfile.register();
+        ChangeRoute.register();
+        Debug.register();
+        LoadRoute.register();
+        Recording.register();
+        SRM.register();
+
+        DungeonScanner.init();
+
+        if (SRMConfig.get().autoUpdateRoutes) {
             LogUtils.info("Checking for route updates...");
-            new Thread(()->{
-                try{
+            new Thread(() -> {
+                try {
                     RouteUtils.checkRoutesFiles();
-                }catch (Exception e1){
+                } catch (Exception e1) {
                     LogUtils.error(e1);
                 }
             }).start();
-        }
-
-        // Make sure room data isn't null
-        RoomDetection.roomName = "undefined";
-        RoomDetection.roomCorner = new Point(0, 0);
-        RoomDetection.roomDirection = "NW";
-    }
-
-    public static void checkRoomData() {
-        if(RoomDetection.roomName == null) {
-            RoomDetection.roomName = "undefined";
-        }
-        if(RoomDetection.roomCorner == null) {
-            RoomDetection.roomCorner = new Point(0, 0);
-        }
-        if(RoomDetection.roomDirection == null) {
-            RoomDetection.roomDirection = "NW";
-        }
-    }
-    public static void checkProfilesData(){
-        try{
-            String filePath = "default.json";
-
-            File colorProfileDir = new File(COLOR_PROFILE_PATH);
-            if(!colorProfileDir.exists()){
-                colorProfileDir.mkdirs();
-            }
-            if(FileUtils.getFileNames(COLOR_PROFILE_PATH).isEmpty()){
-                ConfigUtils.writeColorConfig(filePath);
-            }
-            //Implement logic for writing to file
-        }catch(Exception e){
-            LogUtils.error(e);
-        }
-    }
-
-    public static void checkRoutesData() {
-        try {
-            String filePath = ROUTES_PATH+File.separator+ "routes.json";
-
-            // Check if the config directory exists
-            File configDir = new File(ROUTES_PATH);
-            if (!configDir.exists()) {
-                configDir.mkdirs();
-            }
-
-            File configFile = new File(filePath);
-            File configFilePearl = new File(ROUTES_PATH+File.separator+ "pearlroutes.json");
-            if (!configFile.exists()) {
-                RouteUtils.updateRoutes(configFile);
-            }
-            if(!configFilePearl.exists()){
-                RouteUtils.updatePearlRoutes();
-            }
-        } catch(Exception e) {
-            LogUtils.error(e);
-        }
-    }
-
-    public static void checkPBData() {
-        try {
-            String filePath = CONFIG_FOLDER_PATH + File.separator + "personal_bests.json";
-
-            // Check if the config directory exists
-            File configDir = new File(CONFIG_FOLDER_PATH);
-            if (!configDir.exists()) {
-                configDir.mkdirs();
-            }
-
-            File configFile = new File(filePath);
-            if (!configFile.exists()) {
-                configFile.createNewFile();
-                FileWriter pbWriter = new FileWriter(configFile);
-                pbWriter.write("{}");
-                pbWriter.close();
-            }
-        } catch(Exception e) {
-            LogUtils.error(e);
-        }
-    }
-
-
-
-
-
-    @SubscribeEvent
-    public void onServerConnect(FMLNetworkEvent.ClientConnectedToServerEvent event) {
-        try{
-            Thread.sleep(3000);
-        }catch(Exception e){
-            //nothing needed, literally just waiting
-        }
-
-        Minecraft mc = Minecraft.getMinecraft();
-        if (mc.getCurrentServerData() == null) return;
-        String serverName  = mc.getCurrentServerData().serverIP.toLowerCase();
-        if (serverName.contains("hypixel.") || serverName.contains("fakepixel.") || SRMConfig.disableServerChecking) {
-
-            if(SRMConfig.autoCheckUpdates) {
-                new Thread(() -> {
-                    try {
-                        Main.updateManager.checkUpdate(false);
-                    } catch (Exception e) {
-                        LogUtils.error(e);
-                    }
-                }).start();
-            }
-
-            new Thread(()->{
-                try{
-                    Thread.sleep(3000);
-                }catch (Exception ignored){
-                }
-                byte res = APIUtils.addMember();
-                if(res == 1){
-                    sendChatMessage("§aFirst logon detected... things work");
-                } else if (res == 0){
-                    sendChatMessage("§aWelcome back!");
-                }
-            }).start();
-            if(!APIUtils.apiQueued){
-                Runtime.getRuntime().addShutdownHook(new Thread(APIUtils::offline));
-                APIUtils.apiQueued = true;
-            }
-
-
-
-            //Packets are used in this mod solely to detect when the player picks up an item. No packets are modified or created.
-            event.manager.channel().pipeline().addBefore("packet_handler", "secretroutes_packet_handler", new PacketHandler());
-            LogUtils.info("RouteRecording json status: " + RouteRecording.malformed);
-            if(RouteRecording.malformed){
-                sendChatMessage("[ERROR] The JSON file in downloads is malformed. Check the file or delete it.", EnumChatFormatting.RED);
-            }
-        }
-    }
-
-    public static void toggleSecretsKeybind(){
-        if(SRMConfig.modEnabled) {
-            SRMConfig.modEnabled = false;
-            sendChatMessage(EnumChatFormatting.RED + "Secret Routes Mod secret rendering has been disabled.");
-        }else{
-            SRMConfig.modEnabled = true;
-            sendChatMessage(EnumChatFormatting.GREEN + "Secret Routes Mod secret rendering has been enabled.");
         }
     }
 }

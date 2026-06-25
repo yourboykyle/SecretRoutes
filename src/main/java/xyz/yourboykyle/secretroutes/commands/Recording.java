@@ -1,4 +1,4 @@
-//#if FORGE && MC == 1.8.9
+//#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2024 yourboykyle & R-aMcC
@@ -21,84 +21,134 @@
 
 package xyz.yourboykyle.secretroutes.commands;
 
-import xyz.yourboykyle.secretroutes.config.SRMConfig;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
+import xyz.yourboykyle.secretroutes.utils.RoomDirectionUtils;
 
-import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.argument;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.literal;
 
-public class Recording extends CommandBase {
-    @Override
-    public String getCommandName() {
-        return "recording";
+public class Recording {
+    public static void register() {
+        ClientCommandRegistrationCallback.EVENT.register(Recording::registerCommands);
     }
 
-    @Override
-    public String getCommandUsage(ICommandSender sender) {
-        return "/recording start|stop|export|getroom|setbat|setexit|import <filename.json>";
+    private static void registerCommands(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandBuildContext registryAccess) {
+        dispatcher.register(literal("recording")
+                .executes(Recording::openGui)
+                .then(literal("start")
+                        .executes(Recording::executeStart))
+                .then(literal("stop")
+                        .executes(Recording::executeStop))
+                .then(literal("export")
+                        .executes(Recording::executeExport))
+                .then(literal("getroom")
+                        .executes(Recording::executeGetRoom))
+                .then(literal("setbat")
+                        .executes(Recording::executeSetBat))
+                .then(literal("setexit")
+                        .executes(Recording::executeSetExit))
+                .then(literal("import")
+                        .then(argument("filename", StringArgumentType.greedyString())
+                                .executes(Recording::executeImport))));
     }
 
-    @Override
-    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
-        if(args.length == 0){
-            SRMConfig.INSTANCE.openGui();
-        }
-        if(args[0].equalsIgnoreCase("start")) {
-            Main.routeRecording.startRecording();
-        } else if(args[0].equalsIgnoreCase("stop")) {
-            Main.routeRecording.stopRecording();
-        } else if(args[0].equalsIgnoreCase("export")) {
-            Main.routeRecording.exportAllRoutes();
-        } else if(args[0].equalsIgnoreCase("getroom")) {
-           sendChatMessage(EnumChatFormatting.BLUE+"Room Name: " + RoomDetection.roomName + ", Room Corner: " + RoomDetection.roomCorner + ", Room Direction: " + RoomDetection.roomDirection);
-        } else if(args[0].equalsIgnoreCase("setbat")) {
-            // Route Recording
-            if(Main.routeRecording.recording) {
-                BlockPos playerPos = Minecraft.getMinecraft().thePlayer.getPosition();
-                BlockPos targetPos = new BlockPos(playerPos.getX(), playerPos.getY(), playerPos.getZ());
-                targetPos = targetPos.add(-1, 2, -1); // Block above the player, the -1 on X and Z have to be like that, trust the process
+    private static int openGui(CommandContext<FabricClientCommandSource> context) {
+        Minecraft client = Minecraft.getInstance();
+        client.execute(() -> client.setScreen(SRMConfig.getScreen(client.screen)));
+        return 1;
+    }
 
-                Main.routeRecording.addWaypoint(Room.SECRET_TYPES.BAT, targetPos);
-                Main.routeRecording.newSecret();
-                Main.routeRecording.setRecordingMessage("Added bat secret waypoint.");
-            } else {
-                sendChatMessage(EnumChatFormatting.RED+"Route recording is not enabled. Run /recording start");
-            }
-        } else if(args[0].equalsIgnoreCase("setexit")) {
-            if(Main.routeRecording.recording) {
-                BlockPos playerPos = Minecraft.getMinecraft().thePlayer.getPosition();
-                BlockPos targetPos = new BlockPos(playerPos.getX(), playerPos.getY(), playerPos.getZ());
-                targetPos = targetPos.add(-1, 0, -1); // The -1 on X and Z have to be like that, trust the process
+    private static int executeStart(CommandContext<FabricClientCommandSource> context) {
+        Main.routeRecording.startRecording();
+        return 1;
+    }
 
-                Main.routeRecording.addWaypoint(Room.SECRET_TYPES.EXITROUTE, targetPos);
-                Main.routeRecording.newSecret();
-                Main.routeRecording.stopRecording(); // Exiting the route, it should be stopped
-                Main.routeRecording.setRecordingMessage("Added route exit waypoint & stopped recording.");
-                LogUtils.info("Added route exit waypoint & stopped recording.");
-            } else {
-                sendChatMessage(EnumChatFormatting.RED+"Route recording is not enabled. Run /recording start");
+    private static int executeStop(CommandContext<FabricClientCommandSource> context) {
+        Main.routeRecording.stopRecording();
+        return 1;
+    }
+
+    private static int executeExport(CommandContext<FabricClientCommandSource> context) {
+        Main.routeRecording.exportAllRoutes();
+        return 1;
+    }
+
+    private static int executeGetRoom(CommandContext<FabricClientCommandSource> context) {
+        context.getSource().sendFeedback(
+                Component.literal("Room Name: " + RoomDirectionUtils.roomName() +
+                                ", Room Corner: " + RoomDirectionUtils.roomCorner() +
+                                ", Room Direction: " + RoomDirectionUtils.roomDirection())
+                        .withStyle(ChatFormatting.BLUE)
+        );
+        return 1;
+    }
+
+    private static int executeSetBat(CommandContext<FabricClientCommandSource> context) {
+        if (Main.routeRecording.recording) {
+            LocalPlayer player = Minecraft.getInstance().player;
+            if (player == null) {
+                context.getSource().sendError(Component.literal("Player not found"));
+                return 0;
             }
-        } else if(args[0].equalsIgnoreCase("import")) {
-            if(args.length != 2) {
-              sendChatMessage(EnumChatFormatting.RED+"Usage: /recording import <filename.json>");
-            } else {
-                Main.routeRecording.importRoutes(args[1]);
-                sendChatMessage(EnumChatFormatting.DARK_GREEN+"Imported routes from " + EnumChatFormatting.GREEN + args[1]);
-            }
+
+            BlockPos playerPos = player.blockPosition();
+            BlockPos targetPos = new BlockPos(playerPos.getX(), playerPos.getY(), playerPos.getZ());
+            targetPos = targetPos.offset(-1, 2, -1); // Block above the player, the -1 on X and Z have to be like that, trust the process
+
+            Main.routeRecording.addWaypoint(Room.SECRET_TYPES.BAT, targetPos);
+            Main.routeRecording.newSecret();
+            Main.routeRecording.setRecordingMessage("Added bat secret waypoint.");
         } else {
-           sendChatMessage(EnumChatFormatting.RED + "Usage: " + getCommandUsage(sender));
+            context.getSource().sendError(Component.literal("Route recording is not enabled. Run /recording start"));
         }
+        return 1;
     }
 
-    @Override
-    public int getRequiredPermissionLevel() {return 0;}
+    private static int executeSetExit(CommandContext<FabricClientCommandSource> context) {
+        if (Main.routeRecording.recording) {
+            LocalPlayer player = Minecraft.getInstance().player;
+            if (player == null) {
+                context.getSource().sendError(Component.literal("Player not found"));
+                return 0;
+            }
+
+            BlockPos playerPos = player.blockPosition();
+            BlockPos targetPos = new BlockPos(playerPos.getX(), playerPos.getY(), playerPos.getZ());
+            targetPos = targetPos.offset(-1, 0, -1);
+
+            Main.routeRecording.addWaypoint(Room.SECRET_TYPES.EXITROUTE, targetPos);
+            Main.routeRecording.newSecret();
+            Main.routeRecording.stopRecording(); // Exiting the route, it should be stopped
+            Main.routeRecording.setRecordingMessage("Added route exit waypoint & stopped recording.");
+            LogUtils.info("Added route exit waypoint & stopped recording.");
+        } else {
+            context.getSource().sendError(Component.literal("Route recording is not enabled. Run /recording start"));
+        }
+        return 1;
+    }
+
+    private static int executeImport(CommandContext<FabricClientCommandSource> context) {
+        String filename = StringArgumentType.getString(context, "filename");
+        Main.routeRecording.importRoutes(filename);
+        context.getSource().sendFeedback(
+                Component.literal("Imported routes from ").withStyle(ChatFormatting.DARK_GREEN)
+                        .append(Component.literal(filename).withStyle(ChatFormatting.GREEN))
+        );
+        return 1;
+    }
 }
 //#endif

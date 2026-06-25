@@ -1,4 +1,4 @@
-//#if FORGE && MC == 1.8.9
+//#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -23,36 +23,53 @@ package xyz.yourboykyle.secretroutes.events;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.dungeons.catacombs.RoomDetection;
-import xyz.yourboykyle.secretroutes.deps.dungeonrooms.utils.MapUtils;
+import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.minecraft.client.Minecraft;
-import net.minecraft.item.ItemPickaxe;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
-import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.vehicle.minecart.Minecart;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.Room;
+import xyz.yourboykyle.secretroutes.utils.RoomDirectionUtils;
+import xyz.yourboykyle.secretroutes.utils.RoomRotationUtils;
 
 public class OnBlockBreak {
-    @SubscribeEvent
-    public void onBlockBreak(BlockEvent.BreakEvent e) {
+    public static void register() {
+        PlayerBlockBreakEvents.AFTER.register(OnBlockBreak::onBlockBreak);
+    }
+
+    public static void handleBlockBreak(Level world, BlockPos pos, BlockState state, LocalPlayer player) {
+        onBlockBreak(world, player, pos, state, null);
+    }
+
+    private static void onBlockBreak(Level world, Player player, BlockPos pos, BlockState state, BlockEntity blockEntity) {
         try {
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.player == null) return;
+
             // Route Recording
-            if(e.getPlayer().getUniqueID() == Minecraft.getMinecraft().thePlayer.getUniqueID() && Main.routeRecording.recording) {
+            if (player.getUUID().equals(mc.player.getUUID()) && Main.routeRecording.recording) {
                 boolean shouldAddWaypoint = false;
 
                 JsonArray waypoints = Main.routeRecording.currentSecretWaypoints.get("mines").getAsJsonArray();
-                if(waypoints.size() > 1) {
+                if (waypoints.size() > 1) {
                     for (JsonElement waypoint : waypoints) {
                         JsonArray waypointCoords = waypoint.getAsJsonArray();
 
                         Main.checkRoomData();
-                        BlockPos relPos = MapUtils.actualToRelative(e.pos, RoomDetection.roomDirection, RoomDetection.roomCorner);
+                        BlockPos relPos = RoomRotationUtils.actualToRelative(pos, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
 
                         // Check if waypoints already has the broken block
-                        if (!(relPos.getX() == waypointCoords.get(0).getAsInt() && relPos.getY() == waypointCoords.get(1).getAsInt() && relPos.getZ() == waypointCoords.get(2).getAsInt())) {
+                        if (!(relPos.getX() == waypointCoords.get(0).getAsInt() &&
+                                relPos.getY() == waypointCoords.get(1).getAsInt() &&
+                                relPos.getZ() == waypointCoords.get(2).getAsInt())) {
                             // Waypoint doesn't exist yet
                             shouldAddWaypoint = true;
                         }
@@ -61,10 +78,12 @@ public class OnBlockBreak {
                     // Waypoint doesn't exist yet
                     shouldAddWaypoint = true;
                 }
-                ItemStack heldItem = e.getPlayer().getHeldItem();
-                if(heldItem != null) {
-                    // Check if the player is holding a pickaxe
-                    if(!(heldItem.getItem() instanceof ItemPickaxe)) {
+
+                ItemStack heldItem = player.getMainHandItem();
+                if (heldItem != null && !heldItem.isEmpty()) {
+                    // Check if the player is holding a pickaxe by checking the item's registry ID
+                    String itemId = BuiltInRegistries.ITEM.getKey(heldItem.getItem()).toString();
+                    if (!itemId.contains("pickaxe")) {
                         // Player is not holding a pickaxe, do not add waypoint
                         shouldAddWaypoint = false;
                     }
@@ -73,8 +92,8 @@ public class OnBlockBreak {
                     shouldAddWaypoint = false;
                 }
 
-                if(shouldAddWaypoint) {
-                    Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.MINES, e.pos);
+                if (shouldAddWaypoint) {
+                    Main.routeRecording.addWaypoint(Room.WAYPOINT_TYPES.MINES, pos);
                     Main.routeRecording.setRecordingMessage("Added mine waypoint.");
                 }
             }
@@ -83,4 +102,5 @@ public class OnBlockBreak {
         }
     }
 }
+
 //#endif

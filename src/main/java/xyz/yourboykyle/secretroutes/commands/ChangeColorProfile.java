@@ -1,4 +1,4 @@
-//#if FORGE && MC == 1.8.9
+//#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2024 yourboykyle & R-aMcC
@@ -19,117 +19,111 @@
  * with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 package xyz.yourboykyle.secretroutes.commands;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumChatFormatting;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.network.chat.Component;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.ConfigUtils;
 import xyz.yourboykyle.secretroutes.utils.FileUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
-import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.argument;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.literal;
 
-public class ChangeColorProfile extends CommandBase {
-    List<String> aliases = new ArrayList<>();
-    public boolean loadDefault = false;
-    @Override
-    public String getCommandName() {
-        return "changecolorprofile";
+public class ChangeColorProfile {
+    private static boolean loadDefault = false;
+
+    public static void register() {
+        ClientCommandRegistrationCallback.EVENT.register(ChangeColorProfile::registerCommands);
     }
 
-    @Override
-    public String getCommandUsage(ICommandSender sender) {
-        return "/changecolorprofile [list|load|save] [profile]";
+    private static void registerCommands(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandBuildContext registryAccess) {
+        var mainCommand = dispatcher.register(literal("changecolorprofile")
+                .executes(ChangeColorProfile::openGui)
+                .then(literal("list")
+                        .executes(ChangeColorProfile::listProfiles))
+                .then(literal("load")
+                        .executes(ChangeColorProfile::loadDefaultProfile)
+                        .then(argument("profile", StringArgumentType.string())
+                                .suggests(ChangeColorProfile::suggestProfiles)
+                                .executes(ChangeColorProfile::loadProfile)))
+                .then(literal("save")
+                        .then(argument("profile", StringArgumentType.string())
+                                .executes(ChangeColorProfile::saveProfile))));
+
+        // Aliases
+        dispatcher.register(literal("ccp").redirect(mainCommand));
+        dispatcher.register(literal("changeclrp").redirect(mainCommand));
+        dispatcher.register(literal("changecolourprofile").redirect(mainCommand));
     }
 
-    @Override
-    public void processCommand(ICommandSender sender, String[] args) throws CommandException {
-       if(args.length == 0){
-           SRMConfig.INSTANCE.openGui();
-       } else if (args.length == 1) {
-           if(args[0].equals("list")){
-               sendChatMessage(EnumChatFormatting.DARK_AQUA+"Color Profiles:");
-               for(String profile : FileUtils.getFileNames(Main.COLOR_PROFILE_PATH)){
-                   sendChatMessage(EnumChatFormatting.AQUA+" - "+profile);
-               }
-           }else if(args[0].equals("load")){
-               if(!loadDefault) {
-                   sendChatMessage(EnumChatFormatting.RED + "Incorrect usage: /changecolorprofile load [profile]. Run again to load default");
-                   loadDefault = true;
-               }else{
-                   sendChatMessage(EnumChatFormatting.DARK_GREEN+"Loaded default color profile");
-               }
-           } else if (args[0].equals("save")) {
-               sendChatMessage(EnumChatFormatting.RED+"Incorrect usage: /changecolorprofile save [profile]");
-           } else{
-               sendChatMessage(EnumChatFormatting.RED+"Incorrect usage: /changecolorprofile [list|load|save] [profile]");
-           }
-
-       } else if (args.length == 2) {
-           if(args[0].equals("load")){
-                 if(ConfigUtils.loadColorConfig(args[1])){
-                     sendChatMessage(EnumChatFormatting.DARK_GREEN+"Loaded "+EnumChatFormatting.GREEN+args[1]+EnumChatFormatting.DARK_GREEN+" as color profile");
-                 }
-
-
-           }else if(args[0].equals("save")){
-                ConfigUtils.writeColorConfig(args[1]);
-           }else{
-               sendChatMessage(EnumChatFormatting.RED+"Incorrect usage: /changecolorprofile [list|load|save] [profile]");
-           }
-
-       }
+    private static int openGui(CommandContext<FabricClientCommandSource> context) {
+        Minecraft client = Minecraft.getInstance();
+        client.execute(() -> client.setScreen(SRMConfig.getScreen(client.screen)));
+        return 1;
     }
 
-    @Override
-    public int getRequiredPermissionLevel() {
-        return 0;
-    }
-
-    @Override
-    public List<String> getCommandAliases()
-    {
-        List<String> aliases = new ArrayList<>();
-        aliases.add("ccp");
-        aliases.add("changeclrp");
-        aliases.add("changecolourprofile");
-        return aliases;
-    }
-
-    @Override
-    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
-        List<String> completions = new ArrayList<>();
-        List<String> basicOptions = new ArrayList<>();
-        basicOptions.add("list");
-        basicOptions.add("load");
-        basicOptions.add("save");
-        switch (args.length) {
-            case 0:
-                completions.addAll(basicOptions);
-            case 1:
-                completions.addAll(basicOptions);
-                completions.removeIf(completion -> !(completion.toLowerCase().startsWith(args[0].toLowerCase())));
-            case 2:
-                if(args[0].equalsIgnoreCase("load")) {
-                    completions.addAll(FileUtils.getFileNames(Main.COLOR_PROFILE_PATH));
-                }
-            case 3:
-                if(args[0].equalsIgnoreCase("load")) {
-                    completions.addAll(FileUtils.getFileNames(Main.COLOR_PROFILE_PATH));
-                    completions.removeIf(completion -> !(completion.toLowerCase().startsWith(args[1].toLowerCase())));
-                }
+    private static int listProfiles(CommandContext<FabricClientCommandSource> context) {
+        context.getSource().sendFeedback(Component.literal("Color Profiles:").withStyle(ChatFormatting.DARK_AQUA));
+        for (String profile : FileUtils.getFileNames(Main.COLOR_PROFILE_PATH)) {
+            context.getSource().sendFeedback(Component.literal(" - " + profile).withStyle(ChatFormatting.AQUA));
         }
-
-        return completions;
+        return 1;
     }
 
+    private static int loadDefaultProfile(CommandContext<FabricClientCommandSource> context) {
+        if (!loadDefault) {
+            context.getSource().sendError(Component.literal("Incorrect usage: /changecolorprofile load [profile]. Run again to load default"));
+            loadDefault = true;
+        } else {
+            context.getSource().sendFeedback(Component.literal("Loaded default color profile").withStyle(ChatFormatting.DARK_GREEN));
+            loadDefault = false;
+        }
+        return 1;
+    }
+
+    private static int loadProfile(CommandContext<FabricClientCommandSource> context) {
+        String profile = StringArgumentType.getString(context, "profile");
+        if (ConfigUtils.loadColorConfig(profile)) {
+            context.getSource().sendFeedback(
+                    Component.literal("Loaded ").withStyle(ChatFormatting.DARK_GREEN)
+                            .append(Component.literal(profile).withStyle(ChatFormatting.GREEN))
+                            .append(Component.literal(" as color profile").withStyle(ChatFormatting.DARK_GREEN))
+            );
+        } else {
+            context.getSource().sendError(Component.literal("Failed to load color profile: " + profile));
+        }
+        loadDefault = false;
+        return 1;
+    }
+
+    private static int saveProfile(CommandContext<FabricClientCommandSource> context) {
+        String profile = StringArgumentType.getString(context, "profile");
+        ConfigUtils.writeColorConfig(profile);
+        context.getSource().sendFeedback(
+                Component.literal("Saved color profile: ").withStyle(ChatFormatting.DARK_GREEN)
+                        .append(Component.literal(profile).withStyle(ChatFormatting.GREEN))
+        );
+        return 1;
+    }
+
+    private static CompletableFuture<Suggestions> suggestProfiles(CommandContext<FabricClientCommandSource> context, SuggestionsBuilder builder) {
+        for (String profile : FileUtils.getFileNames(Main.COLOR_PROFILE_PATH)) {
+            builder.suggest(profile);
+        }
+        return builder.buildFuture();
+    }
 }
 //#endif

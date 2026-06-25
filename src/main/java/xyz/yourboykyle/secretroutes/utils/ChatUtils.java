@@ -1,4 +1,4 @@
-//#if FORGE && MC == 1.8.9
+//#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -21,98 +21,118 @@
 
 package xyz.yourboykyle.secretroutes.utils;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.event.ClickEvent;
-import net.minecraft.event.HoverEvent;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChatStyle;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
 public class ChatUtils {
-    public static void sendChatMessage(String message, EnumChatFormatting color) {
-        if(Minecraft.getMinecraft().thePlayer == null){
+    public static void sendChatMessage(String message, ChatFormatting color) {
+        if (Minecraft.getInstance().player == null) {
             return;
         }
-        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(message).setChatStyle(new ChatStyle().setColor(color)));
+        Minecraft.getInstance().player.sendSystemMessage(Component.literal(message).withStyle(color));
         LogUtils.info("Sent chat message: " + message);
     }
+
     public static void sendChatMessage(String message) {
-        if(Minecraft.getMinecraft().thePlayer == null){
+        if (Minecraft.getInstance().player == null) {
             return;
         }
-        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(message));
+        Minecraft.getInstance().player.sendSystemMessage(Component.literal(message));
 
         LogUtils.info("Sent chat message: " + message);
-
-
     }
 
-    public static void sendVerboseMessage(String message){
-        if(SRMConfig.verboseLogging){
+    public static void sendVerboseMessage(String message) {
+        if (SRMConfig.get().verboseLogging) {
             sendChatMessage(message);
         }
     }
-    public static boolean sendVerboseMessage(String message, String TAG){
-        if(Minecraft.getMinecraft().thePlayer == null){
+
+    public static boolean sendVerboseMessage(String message, String TAG) {
+        if (Minecraft.getInstance().player == null) {
             return false;
         }
-        switch(TAG){
+        switch (TAG) {
             case "Recording":
-                if(SRMConfig.verboseRecording){
+                if (SRMConfig.get().verboseRecording) {
                     sendVerboseMessage("§d[Recording] " + message);
                     return true;
                 }
                 return false;
             case "Update":
-                if(SRMConfig.verboseUpdating){
+                if (SRMConfig.get().verboseUpdating) {
                     sendVerboseMessage("§d[Update] " + message);
                     return true;
                 }
                 return false;
             case "Info":
-                if(SRMConfig.verboseInfo && !message.contains("Sent chat message")){
+                if (SRMConfig.get().verboseInfo && !message.contains("Sent chat message")) {
                     sendVerboseMessage("§d[Info] " + message);
                     return true;
                 }
                 return false;
             case "Rendering":
-                if(SRMConfig.verboseRendering){
+                if (SRMConfig.get().verboseRendering) {
                     sendVerboseMessage("§5[Rendering] " + message);
                     return true;
                 }
                 return false;
             case "Actionbar":
-                if(SRMConfig.actionbarInfo){
-                    sendVerboseMessage("§3[ActionBar] §a "+message);
+                if (SRMConfig.get().actionbarInfo) {
+                    sendVerboseMessage("§3[ActionBar] §a " + message);
                     return true;
                 }
                 return false;
             case "Personal Bests":
-                if(SRMConfig.verbosePersonalBests){
+                if (SRMConfig.get().verbosePersonalBests) {
                     sendVerboseMessage("§d[Personal Bests] " + message);
                     return true;
                 }
                 return false;
             default:
-                if(SRMConfig.verboseLogging){
+                if (SRMConfig.get().verboseLogging) {
                     sendChatMessage("§d[" + TAG + "] " + message);
                     return true;
                 }
                 return false;
         }
     }
-    public static void sendClickableMessage(String text, String link){
-        if(Minecraft.getMinecraft().thePlayer == null){
+
+    /*public static void sendClickableMessage(String text, String link){
+        if(MinecraftClient.getInstance().player == null){
             return;
         }
         ChatComponentText component = new ChatComponentText(text);
         component.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, link));
         component.getChatStyle().setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText("Click to open link")));
-        Minecraft.getMinecraft().thePlayer.addChatMessage(component);
+        MinecraftClient.getInstance().player.sendMessage(component);
+    }*/
+
+    public static void sendClickableMessage(String text, String link) {
+        if (Minecraft.getInstance().player == null) {
+            return;
+        }
+        Minecraft.getInstance().player.sendSystemMessage(
+                Component.literal(text)
+                        .withStyle(style -> {
+                                    try {
+                                        return style
+                                                .withClickEvent(new ClickEvent.OpenUrl(new URI(link)))
+                                                .withHoverEvent(new HoverEvent.ShowText(Component.literal("Click to open link")));
+                                    } catch (URISyntaxException e) {
+                                        e.printStackTrace();
+                                        return style;
+                                    }
+                                }
+                        )
+        );
     }
 }
 //#endif
