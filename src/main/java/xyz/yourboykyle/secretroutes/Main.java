@@ -48,7 +48,7 @@ import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 public class Main implements ClientModInitializer {
     public static final String MODID = "secretroutesmod";
     public static final String NAME = "SecretRoutes";
-    public static final String VERSION = "1.0.0-beta2";
+    public static final String VERSION = "1.0.0-beta3";
     public static String CONFIG_FOLDER_PATH;
     public static String ROUTES_PATH;
     public static String COLOR_PROFILE_PATH;
