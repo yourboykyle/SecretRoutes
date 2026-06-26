@@ -19,20 +19,7 @@ out
 .gradle
 
 # versions directory
-versions/*
-!versions/mainProject
-!versions/1.8.9-forge/
-!versions/1.21.10-fabric/
-!versions/1.21.11-fabric/
-
-versions/1.8.9-forge/*
-!versions/1.8.9-forge/src/
-
-versions/1.21.10-fabric/*
-!versions/1.21.10-fabric/src/
-
-versions/1.21.11-fabric/*
-!versions/1.21.11-fabric/src/
+versions
 
 # other
 eclipse
