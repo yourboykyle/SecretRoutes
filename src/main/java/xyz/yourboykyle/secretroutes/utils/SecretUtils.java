@@ -62,6 +62,12 @@ public class SecretUtils {
         return color.formatting.toString();
     }
 
+    private static boolean shouldRenderRouteStep(int stepIndex) {
+        int visibleRouteSteps = Math.max(1, Math.min(5, SRMConfig.get().visibleRouteSteps));
+        int currentStepIndex = Main.currentRoom.currentSecretIndex;
+        return SRMConfig.get().wholeRoute || SRMConfig.get().allSteps || (stepIndex >= currentStepIndex && stepIndex < currentStepIndex + visibleRouteSteps);
+    }
+
     public static void renderingCallback(JsonObject currentSecretWaypoints, int index2) {
         ArrayList<BlockPos> etherwarpPositions = new ArrayList<>();
         ArrayList<BlockPos> minesPositions = new ArrayList<>();
@@ -79,7 +85,7 @@ public class SecretUtils {
         }
 
         // Render the etherwarps
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("etherwarps") != null && (SRMConfig.get().wholeRoute || SRMConfig.get().allSteps || index2 == Main.currentRoom.currentSecretIndex) && SRMConfig.get().renderEtherwarps) {
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("etherwarps") != null && shouldRenderRouteStep(index2) && SRMConfig.get().renderEtherwarps) {
             JsonArray etherwarpLocations = currentSecretWaypoints.get("etherwarps").getAsJsonArray();
             for (JsonElement etherwarpLocationElement : etherwarpLocations) {
 
@@ -106,7 +112,7 @@ public class SecretUtils {
         }
 
         // Render the mines
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("mines") != null && (SRMConfig.get().wholeRoute || SRMConfig.get().allSteps || index2 == Main.currentRoom.currentSecretIndex) && SRMConfig.get().renderMines) {
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("mines") != null && shouldRenderRouteStep(index2) && SRMConfig.get().renderMines) {
             JsonArray mineLocations = currentSecretWaypoints.get("mines").getAsJsonArray();
             for (JsonElement mineLocationElement : mineLocations) {
                 JsonArray mineLocation = mineLocationElement.getAsJsonArray();
@@ -125,7 +131,7 @@ public class SecretUtils {
         }
 
         // Render the interacts
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("interacts") != null && (SRMConfig.get().wholeRoute || SRMConfig.get().allSteps || index2 == Main.currentRoom.currentSecretIndex) && SRMConfig.get().renderInteracts) {
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("interacts") != null && shouldRenderRouteStep(index2) && SRMConfig.get().renderInteracts) {
             JsonArray interactLocations = currentSecretWaypoints.get("interacts").getAsJsonArray();
             for (JsonElement interactLocationElement : interactLocations) {
                 JsonArray interactLocation = interactLocationElement.getAsJsonArray();
@@ -144,7 +150,7 @@ public class SecretUtils {
         }
 
         // Render the tnts (Superbooms)
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("tnts") != null && (SRMConfig.get().wholeRoute || SRMConfig.get().allSteps || index2 == Main.currentRoom.currentSecretIndex) && SRMConfig.get().renderSuperboom) {
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("tnts") != null && shouldRenderRouteStep(index2) && SRMConfig.get().renderSuperboom) {
             JsonArray tntLocations = currentSecretWaypoints.get("tnts").getAsJsonArray();
             for (JsonElement tntLocationElement : tntLocations) {
                 JsonArray tntLocation = tntLocationElement.getAsJsonArray();
@@ -163,7 +169,7 @@ public class SecretUtils {
         }
 
         // Render normal lines
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("locations") != null && SRMConfig.get().lineType == SRMConfig.LineType.LINES && (SRMConfig.get().wholeRoute || SRMConfig.get().allSteps || index2 == Main.currentRoom.currentSecretIndex)) {
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("locations") != null && SRMConfig.get().lineType == SRMConfig.LineType.LINES && shouldRenderRouteStep(index2)) {
             List<Triple<Double, Double, Double>> lines = new LinkedList<>();
 
             JsonArray lineLocations = currentSecretWaypoints.get("locations").getAsJsonArray();
@@ -190,7 +196,7 @@ public class SecretUtils {
         }
 
         // Render the ender pearls
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("enderpearls") != null && (SRMConfig.get().wholeRoute || SRMConfig.get().allSteps || index2 == Main.currentRoom.currentSecretIndex) && SRMConfig.get().renderEnderpearls) {
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("enderpearls") != null && shouldRenderRouteStep(index2) && SRMConfig.get().renderEnderpearls) {
             JsonArray enderpearlAnglesArray = currentSecretWaypoints.get("enderpearlangles").getAsJsonArray();
             for (JsonElement pearlAngleElement : enderpearlAnglesArray) {
                 JsonArray pearlAngle = pearlAngleElement.getAsJsonArray();
