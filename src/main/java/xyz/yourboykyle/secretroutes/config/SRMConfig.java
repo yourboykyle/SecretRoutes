@@ -56,6 +56,7 @@ public class SRMConfig {
     @SerialEntry public RouteType routeType = RouteType.PEARLS;
     @SerialEntry public boolean renderComplete = false;
     @SerialEntry public boolean wholeRoute = false;
+    @SerialEntry public int visibleRouteSteps = 1;
     @SerialEntry public boolean allSteps = false;
     @SerialEntry public boolean allSecrets = false;
     @SerialEntry public boolean trackPersonalBests = true;
@@ -241,6 +242,12 @@ public class SRMConfig {
                         .binding(false, () -> get().wholeRoute, v -> get().wholeRoute = v)
                         .controller(TickBoxControllerBuilder::create)
                         .build())
+                .option(Option.<Integer>createBuilder()
+                        .name(Component.literal("Visible Route Steps"))
+                        .description(OptionDescription.of(Component.literal("How many route steps to show at once when Show Whole Route is off.")))
+                        .binding(1, () -> get().visibleRouteSteps, v -> get().visibleRouteSteps = v)
+                        .controller(opt -> IntegerSliderControllerBuilder.create(opt).range(1, 5).step(1))
+                        .build())
                 .option(Option.<Boolean>createBuilder()
                         .name(Component.literal("Show All Secrets"))
                         .description(OptionDescription.of(Component.literal("Highlight all secrets in the room, not just the route.")))
@@ -404,9 +411,9 @@ public class SRMConfig {
         @Override
         public Component getDisplayName() { return Component.literal(name); }
     }
-
+    // Ill add 3ppopka routes once I can figure out how to make Odin Dungeon Waypoints visible, I cant really record them without an overlay right now
     public enum RouteType implements NameableEnum {
-        NO_PEARLS("No Pearls"), PEARLS("Pearls");
+        NO_PEARLS("3ppopka (coming soon)"), PEARLS("FlameOfWar");
         private final String name;
 
         RouteType(String name) { this.name = name; }
