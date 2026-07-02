@@ -56,6 +56,7 @@ public class ConfigUtils {
             "interactsTextSize",
             "itemTextSize", "batTextSize", "etherwarpsTextSize",
             "minesTextSize", "superboomsTextSize", "enderpearlTextSize",
+            "pearlLineWidth",
 
             // Toggles
             "startTextToggle", "exitTextToggle",
@@ -74,7 +75,9 @@ public class ConfigUtils {
 
             // Colors
             "lineColor", "etherWarp", "mine", "interacts", "superbooms", "enderpearls",
-            "secretsItem", "secretsInteract", "secretsBat", "pearlLineColor"
+            "secretsItem", "secretsInteract", "secretsBat", "pearlLineColor",
+            "secondStepEtherWarp", "secondStepMine", "secondStepInteracts", "secondStepSuperbooms",
+            "secondStepEnderpearls", "secondStepSecretsItem", "secondStepSecretsInteract", "secondStepSecretsBat"
     };
 
     public static void init() {

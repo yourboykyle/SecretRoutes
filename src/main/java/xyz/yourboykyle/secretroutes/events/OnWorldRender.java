@@ -74,7 +74,16 @@ public class OnWorldRender {
                     }
                 }
             } else {
-                SecretUtils.renderingCallback(Main.currentRoom.currentSecretWaypoints, Main.currentRoom.currentSecretIndex);
+                JsonArray csr = Main.currentRoom.currentSecretRoute;
+                int visibleRouteSteps = Math.max(1, Math.min(5, SRMConfig.get().visibleRouteSteps));
+                if (csr != null) {
+                    int lastVisibleStep = Math.min(csr.size(), Main.currentRoom.currentSecretIndex + visibleRouteSteps);
+                    for (int i = Main.currentRoom.currentSecretIndex; i < lastVisibleStep; i++) {
+                        SecretUtils.renderingCallback(csr.get(i).getAsJsonObject(), i);
+                    }
+                } else {
+                    SecretUtils.renderingCallback(Main.currentRoom.currentSecretWaypoints, Main.currentRoom.currentSecretIndex);
+                }
             }
 
             if (SecretUtils.renderLever) {
