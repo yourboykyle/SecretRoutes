@@ -62,6 +62,16 @@ public class SecretUtils {
         return color.formatting.toString();
     }
 
+    private static boolean shouldRenderRouteStep(int stepIndex) {
+        int visibleRouteSteps = Math.max(1, Math.min(5, SRMConfig.get().visibleRouteSteps));
+        int currentStepIndex = Main.currentRoom.currentSecretIndex;
+        return SRMConfig.get().wholeRoute || SRMConfig.get().allSteps || (stepIndex >= currentStepIndex && stepIndex < currentStepIndex + visibleRouteSteps);
+    }
+
+    private static Color colorForRouteStep(int stepIndex, Color currentColor, Color secondStepColor) {
+        return stepIndex == Main.currentRoom.currentSecretIndex ? currentColor : secondStepColor;
+    }
+
     public static void renderingCallback(JsonObject currentSecretWaypoints, int index2) {
         ArrayList<BlockPos> etherwarpPositions = new ArrayList<>();
         ArrayList<BlockPos> minesPositions = new ArrayList<>();
@@ -79,7 +89,7 @@ public class SecretUtils {
         }
 
         // Render the etherwarps
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("etherwarps") != null && (SRMConfig.get().wholeRoute || SRMConfig.get().allSteps || index2 == Main.currentRoom.currentSecretIndex) && SRMConfig.get().renderEtherwarps) {
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("etherwarps") != null && shouldRenderRouteStep(index2) && SRMConfig.get().renderEtherwarps) {
             JsonArray etherwarpLocations = currentSecretWaypoints.get("etherwarps").getAsJsonArray();
             for (JsonElement etherwarpLocationElement : etherwarpLocations) {
 
@@ -95,18 +105,19 @@ public class SecretUtils {
                     }
                 }
                 etherwarpPositions.add(pos);
+                Color etherwarpColor = colorForRouteStep(index2, SRMConfig.get().etherWarp, SRMConfig.get().secondStepEtherWarp);
                 if (SRMConfig.get().etherwarpFullBlock) {
                     Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
-                    AnotherRenderingUtil.addFilledBox(new RenderTypes.FilledBox(position, SRMConfig.get().etherWarp, 1, 1, SRMConfig.get().renderLinesThroughWalls));
+                    AnotherRenderingUtil.addFilledBox(new RenderTypes.FilledBox(position, etherwarpColor, 1, 1, SRMConfig.get().renderLinesThroughWalls));
                 } else {
                     Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
-                    AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, SRMConfig.get().etherWarp, 1, 1, SRMConfig.get().renderLinesThroughWalls));
+                    AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, etherwarpColor, 1, 1, SRMConfig.get().renderLinesThroughWalls));
                 }
             }
         }
 
         // Render the mines
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("mines") != null && (SRMConfig.get().wholeRoute || SRMConfig.get().allSteps || index2 == Main.currentRoom.currentSecretIndex) && SRMConfig.get().renderMines) {
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("mines") != null && shouldRenderRouteStep(index2) && SRMConfig.get().renderMines) {
             JsonArray mineLocations = currentSecretWaypoints.get("mines").getAsJsonArray();
             for (JsonElement mineLocationElement : mineLocations) {
                 JsonArray mineLocation = mineLocationElement.getAsJsonArray();
@@ -114,18 +125,19 @@ public class SecretUtils {
                 Main.checkRoomData();
                 BlockPos pos = RoomRotationUtils.relativeToActual(new BlockPos(mineLocation.get(0).getAsInt(), mineLocation.get(1).getAsInt(), mineLocation.get(2).getAsInt()), RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
                 minesPositions.add(pos);
+                Color mineColor = colorForRouteStep(index2, SRMConfig.get().mine, SRMConfig.get().secondStepMine);
                 if (SRMConfig.get().mineFullBlock) {
                     Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
-                    AnotherRenderingUtil.addFilledBox(new RenderTypes.FilledBox(position, SRMConfig.get().mine, 1, 1, SRMConfig.get().renderLinesThroughWalls));
+                    AnotherRenderingUtil.addFilledBox(new RenderTypes.FilledBox(position, mineColor, 1, 1, SRMConfig.get().renderLinesThroughWalls));
                 } else {
                     Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
-                    AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, SRMConfig.get().mine, 1, 1, SRMConfig.get().renderLinesThroughWalls));
+                    AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, mineColor, 1, 1, SRMConfig.get().renderLinesThroughWalls));
                 }
             }
         }
 
         // Render the interacts
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("interacts") != null && (SRMConfig.get().wholeRoute || SRMConfig.get().allSteps || index2 == Main.currentRoom.currentSecretIndex) && SRMConfig.get().renderInteracts) {
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("interacts") != null && shouldRenderRouteStep(index2) && SRMConfig.get().renderInteracts) {
             JsonArray interactLocations = currentSecretWaypoints.get("interacts").getAsJsonArray();
             for (JsonElement interactLocationElement : interactLocations) {
                 JsonArray interactLocation = interactLocationElement.getAsJsonArray();
@@ -133,18 +145,19 @@ public class SecretUtils {
                 Main.checkRoomData();
                 BlockPos pos = RoomRotationUtils.relativeToActual(new BlockPos(interactLocation.get(0).getAsInt(), interactLocation.get(1).getAsInt(), interactLocation.get(2).getAsInt()), RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
                 interactsPositions.add(pos);
+                Color interactColor = colorForRouteStep(index2, SRMConfig.get().interacts, SRMConfig.get().secondStepInteracts);
                 if (SRMConfig.get().interactsFullBlock) {
                     Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
-                    AnotherRenderingUtil.addFilledBox(new RenderTypes.FilledBox(position, SRMConfig.get().interacts, 1, 1, SRMConfig.get().renderLinesThroughWalls));
+                    AnotherRenderingUtil.addFilledBox(new RenderTypes.FilledBox(position, interactColor, 1, 1, SRMConfig.get().renderLinesThroughWalls));
                 } else {
                     Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
-                    AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, SRMConfig.get().interacts, 1, 1, SRMConfig.get().renderLinesThroughWalls));
+                    AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, interactColor, 1, 1, SRMConfig.get().renderLinesThroughWalls));
                 }
             }
         }
 
         // Render the tnts (Superbooms)
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("tnts") != null && (SRMConfig.get().wholeRoute || SRMConfig.get().allSteps || index2 == Main.currentRoom.currentSecretIndex) && SRMConfig.get().renderSuperboom) {
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("tnts") != null && shouldRenderRouteStep(index2) && SRMConfig.get().renderSuperboom) {
             JsonArray tntLocations = currentSecretWaypoints.get("tnts").getAsJsonArray();
             for (JsonElement tntLocationElement : tntLocations) {
                 JsonArray tntLocation = tntLocationElement.getAsJsonArray();
@@ -152,18 +165,19 @@ public class SecretUtils {
                 Main.checkRoomData();
                 BlockPos pos = RoomRotationUtils.relativeToActual(new BlockPos(tntLocation.get(0).getAsInt(), tntLocation.get(1).getAsInt(), tntLocation.get(2).getAsInt()), RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
                 superboomsPositions.add(pos);
+                Color superboomColor = colorForRouteStep(index2, SRMConfig.get().superbooms, SRMConfig.get().secondStepSuperbooms);
                 if (SRMConfig.get().superboomsFullBlock) {
                     Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
-                    AnotherRenderingUtil.addFilledBox(new RenderTypes.FilledBox(position, SRMConfig.get().superbooms, 1, 1, SRMConfig.get().renderLinesThroughWalls));
+                    AnotherRenderingUtil.addFilledBox(new RenderTypes.FilledBox(position, superboomColor, 1, 1, SRMConfig.get().renderLinesThroughWalls));
                 } else {
                     Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
-                    AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, SRMConfig.get().superbooms, 1, 1, SRMConfig.get().renderLinesThroughWalls));
+                    AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, superboomColor, 1, 1, SRMConfig.get().renderLinesThroughWalls));
                 }
             }
         }
 
         // Render normal lines
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("locations") != null && SRMConfig.get().lineType == SRMConfig.LineType.LINES && (SRMConfig.get().wholeRoute || SRMConfig.get().allSteps || index2 == Main.currentRoom.currentSecretIndex)) {
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("locations") != null && SRMConfig.get().lineType == SRMConfig.LineType.LINES && shouldRenderRouteStep(index2)) {
             List<Triple<Double, Double, Double>> lines = new LinkedList<>();
 
             JsonArray lineLocations = currentSecretWaypoints.get("locations").getAsJsonArray();
@@ -190,7 +204,7 @@ public class SecretUtils {
         }
 
         // Render the ender pearls
-        if (currentSecretWaypoints != null && currentSecretWaypoints.get("enderpearls") != null && (SRMConfig.get().wholeRoute || SRMConfig.get().allSteps || index2 == Main.currentRoom.currentSecretIndex) && SRMConfig.get().renderEnderpearls) {
+        if (currentSecretWaypoints != null && currentSecretWaypoints.get("enderpearls") != null && shouldRenderRouteStep(index2) && SRMConfig.get().renderEnderpearls) {
             JsonArray enderpearlAnglesArray = currentSecretWaypoints.get("enderpearlangles").getAsJsonArray();
             for (JsonElement pearlAngleElement : enderpearlAnglesArray) {
                 JsonArray pearlAngle = pearlAngleElement.getAsJsonArray();
@@ -212,12 +226,13 @@ public class SecretUtils {
                 posY = positions.getTwo();
                 posZ = positions.getThree() - 0.25;
 
+                Color enderpearlColor = colorForRouteStep(index2, SRMConfig.get().enderpearls, SRMConfig.get().secondStepEnderpearls);
                 if (SRMConfig.get().enderpearlFullBlock) {
                     Vector3d position = new Vector3d(posX, posY, posZ);
-                    AnotherRenderingUtil.addFilledBox(new RenderTypes.FilledBox(position, SRMConfig.get().enderpearls, 1, 1, SRMConfig.get().renderLinesThroughWalls));
+                    AnotherRenderingUtil.addFilledBox(new RenderTypes.FilledBox(position, enderpearlColor, 1, 1, SRMConfig.get().renderLinesThroughWalls));
                 } else {
                     Vector3d position = new Vector3d(posX, posY, posZ);
-                    AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, SRMConfig.get().enderpearls, 1, 1, SRMConfig.get().renderLinesThroughWalls));
+                    AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, enderpearlColor, 1, 1, SRMConfig.get().renderLinesThroughWalls));
                 }
 
                 double yaw = RotationUtils.relativeToActualYaw(enderpearlAngles.get(index).getTwo(), RoomDirectionUtils.roomDirection()) + 90;
@@ -259,12 +274,13 @@ public class SecretUtils {
             switch (type) {
                 case "interact":
                     if (SRMConfig.get().renderSecretIteract) {
+                        Color secretInteractColor = colorForRouteStep(index2, SRMConfig.get().secretsInteract, SRMConfig.get().secondStepSecretsInteract);
                         if (SRMConfig.get().secretsInteractFullBlock) {
                             Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
-                            AnotherRenderingUtil.addFilledBox(new RenderTypes.FilledBox(position, SRMConfig.get().secretsInteract, 1, 1, SRMConfig.get().renderLinesThroughWalls));
+                            AnotherRenderingUtil.addFilledBox(new RenderTypes.FilledBox(position, secretInteractColor, 1, 1, SRMConfig.get().renderLinesThroughWalls));
                         } else {
                             Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
-                            AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, SRMConfig.get().secretsInteract, 1, 1, SRMConfig.get().renderLinesThroughWalls));
+                            AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, secretInteractColor, 1, 1, SRMConfig.get().renderLinesThroughWalls));
                         }
                         if (SRMConfig.get().interactTextToggle) {
                             net.minecraft.network.chat.Component text = Component.literal(getColorCode(SRMConfig.get().interactWaypointColor) + "Interact");
@@ -275,12 +291,13 @@ public class SecretUtils {
                     break;
                 case "item":
                     if (SRMConfig.get().renderSecretsItem) {
+                        Color secretItemColor = colorForRouteStep(index2, SRMConfig.get().secretsItem, SRMConfig.get().secondStepSecretsItem);
                         if (SRMConfig.get().secretsItemFullBlock) {
                             Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
-                            AnotherRenderingUtil.addFilledBox(new RenderTypes.FilledBox(position, SRMConfig.get().secretsItem, 1, 1, SRMConfig.get().renderLinesThroughWalls));
+                            AnotherRenderingUtil.addFilledBox(new RenderTypes.FilledBox(position, secretItemColor, 1, 1, SRMConfig.get().renderLinesThroughWalls));
                         } else {
                             Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
-                            AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, SRMConfig.get().secretsItem, 1, 1, SRMConfig.get().renderLinesThroughWalls));
+                            AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, secretItemColor, 1, 1, SRMConfig.get().renderLinesThroughWalls));
                         }
 
                         if (SRMConfig.get().itemTextToggle) {
@@ -292,12 +309,13 @@ public class SecretUtils {
                     break;
                 case "bat":
                     if (SRMConfig.get().renderSecretBat) {
+                        Color secretBatColor = colorForRouteStep(index2, SRMConfig.get().secretsBat, SRMConfig.get().secondStepSecretsBat);
                         if (SRMConfig.get().secretsBatFullBlock) {
                             Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
-                            AnotherRenderingUtil.addFilledBox(new RenderTypes.FilledBox(position, SRMConfig.get().secretsBat, 1, 1, SRMConfig.get().renderLinesThroughWalls));
+                            AnotherRenderingUtil.addFilledBox(new RenderTypes.FilledBox(position, secretBatColor, 1, 1, SRMConfig.get().renderLinesThroughWalls));
                         } else {
                             Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
-                            AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, SRMConfig.get().secretsBat, 1, 1, SRMConfig.get().renderLinesThroughWalls));
+                            AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, secretBatColor, 1, 1, SRMConfig.get().renderLinesThroughWalls));
                         }
                         if (SRMConfig.get().batTextToggle) {
                             net.minecraft.network.chat.Component text = Component.literal(getColorCode(SRMConfig.get().batWaypointColor) + "Bat");
@@ -333,7 +351,7 @@ public class SecretUtils {
         if (SRMConfig.get().interactsTextToggle) {
             int iInteract = 1;
             for (BlockPos interactPos : interactsPositions) {
-                String colorFormatter = getColorCode(SRMConfig.get().interactWaypointColor); // Reused singular color
+                String colorFormatter = getColorCode(SRMConfig.get().interactsWaypointColor);
                 net.minecraft.network.chat.Component text = Component.literal(colorFormatter + (SRMConfig.get().interactsEnumToggle ? "interact" : "interact " + iInteract++));
                 Vector3d position = new Vector3d(interactPos.getX(), interactPos.getY(), interactPos.getZ());
                 AnotherRenderingUtil.addWorldText(new RenderTypes.WorldText(text, position, true, SRMConfig.get().interactsTextSize));
@@ -430,7 +448,7 @@ public class SecretUtils {
                     } else if (name.contains("Lever")) {
                         color = SRMConfig.get().interacts;
                         if (SRMConfig.get().interactsTextToggle) {
-                            net.minecraft.network.chat.Component text = Component.literal(getColorCode(SRMConfig.get().interactWaypointColor) + "Interact");
+                            net.minecraft.network.chat.Component text = Component.literal(getColorCode(SRMConfig.get().interactsWaypointColor) + "Interact");
                             Vector3d position = new Vector3d(abs.getOne() + 0.5, abs.getTwo() + 0.5, abs.getThree() + 0.5);
                             AnotherRenderingUtil.addWorldText(new RenderTypes.WorldText(text, position, true, SRMConfig.get().interactsTextSize));
                         }
@@ -520,10 +538,11 @@ public class SecretUtils {
                     AnotherRenderingUtil.addOutlinedBox(new RenderTypes.OutlinedBox(position, SRMConfig.get().secretsInteract, 1f, 1f, SRMConfig.get().renderLinesThroughWalls));
                 }
 
-                // Using interactWaypointColor for lever
-                Component text = Component.literal(getColorCode(SRMConfig.get().interactWaypointColor) + "Locked chest lever");
-                Vector3d position = new Vector3d(abs.getOne(), abs.getTwo(), abs.getThree());
-                AnotherRenderingUtil.addWorldText(new RenderTypes.WorldText(text, position, true, SRMConfig.get().interactsTextSize)); // Assuming interactsTextSize exists
+                if (SRMConfig.get().interactsTextToggle) {
+                    Component text = Component.literal(getColorCode(SRMConfig.get().interactsWaypointColor) + "Locked chest lever");
+                    Vector3d position = new Vector3d(abs.getOne(), abs.getTwo(), abs.getThree());
+                    AnotherRenderingUtil.addWorldText(new RenderTypes.WorldText(text, position, true, SRMConfig.get().interactsTextSize));
+                }
 
                 if (first) {
                     removeBannerTime = System.currentTimeMillis() + 5000;
