@@ -28,8 +28,8 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
-import xyz.yourboykyle.secretroutes.utils.Room.SECRET_TYPES;
-import xyz.yourboykyle.secretroutes.utils.Room.WAYPOINT_TYPES;
+import xyz.yourboykyle.secretroutes.dungeons.Room.SECRET_TYPES;
+import xyz.yourboykyle.secretroutes.dungeons.Room.WAYPOINT_TYPES;
 import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 
 import java.io.File;
@@ -148,7 +148,6 @@ public class RouteRecording {
     public void addWaypoint(WAYPOINT_TYPES type, BlockPos pos) {
         sendVerboseMessage("§d Adding waypoint...", verboseTag);
         // Add a non-secret waypoint to the current secret waypoints
-        Main.checkRoomData();
         BlockPos relPos = RoomRotationUtils.actualToRelative(pos, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
 
         JsonArray posArray = new JsonArray();
@@ -265,7 +264,6 @@ public class RouteRecording {
     public void addWaypoint(WAYPOINT_TYPES type, LocalPlayer player) {
         sendVerboseMessage("§d Adding waypoint...", verboseTag);
         // Add a non-secret waypoint to the current secret waypoints
-        Main.checkRoomData();
         JsonArray posArray = new JsonArray();
 
         Triple<Double, Double, Double> relativePos = RoomRotationUtils.actualToRelative(player.getX(), player.getY(), player.getZ(), RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
@@ -318,7 +316,6 @@ public class RouteRecording {
 
     public boolean addWaypoint(SECRET_TYPES type, BlockPos pos) {
         // Add a secret waypoint to the current secret waypoints
-        Main.checkRoomData();
         BlockPos relPos = RoomRotationUtils.actualToRelative(pos, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
 
         JsonArray posArray = new JsonArray();

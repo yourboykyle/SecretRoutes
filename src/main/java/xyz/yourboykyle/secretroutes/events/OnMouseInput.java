@@ -27,7 +27,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.item.ItemStack;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
-import xyz.yourboykyle.secretroutes.utils.Room;
+import xyz.yourboykyle.secretroutes.dungeons.Room;
 
 public class OnMouseInput {
 

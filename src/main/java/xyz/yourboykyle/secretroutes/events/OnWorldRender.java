@@ -26,7 +26,7 @@ import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.LocationUtils;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
-import xyz.yourboykyle.secretroutes.utils.SecretUtils;
+import xyz.yourboykyle.secretroutes.dungeons.SecretUtils;
 
 public class OnWorldRender {
     private final static String verboseTAG = "Rendering";

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package xyz.yourboykyle.secretroutes.utils;
+package xyz.yourboykyle.secretroutes.dungeons.rendering;
 
 import net.minecraft.network.chat.Component;
 import org.joml.Vector3d;

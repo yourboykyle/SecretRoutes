@@ -35,7 +35,7 @@ import net.minecraft.network.chat.Component;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
-import xyz.yourboykyle.secretroutes.utils.Room;
+import xyz.yourboykyle.secretroutes.dungeons.Room;
 import xyz.yourboykyle.secretroutes.utils.RoomDirectionUtils;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.argument;

@@ -1,5 +1,5 @@
 //#if FABRIC
-package xyz.yourboykyle.secretroutes.utils.dungeon;
+package xyz.yourboykyle.secretroutes.dungeons.detection;
 
 import java.util.List;
 
