@@ -71,7 +71,7 @@ public class ChangeColorProfile {
 
     private static int openGui(CommandContext<FabricClientCommandSource> context) {
         Minecraft client = Minecraft.getInstance();
-        client.execute(() -> client.setScreen(SRMConfig.getScreen(client.screen)));
+        client.execute(() -> client.setScreenAndShow(SRMConfig.getScreen(client.gui.screen())));
         return 1;
     }
 
