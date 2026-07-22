@@ -26,17 +26,17 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.Identifier;
-import org.lwjgl.glfw.GLFW;
 import xyz.yourboykyle.secretroutes.commands.*;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.config.SRMKeybinds;
 import xyz.yourboykyle.secretroutes.config.huds.CurrentRoomHUD;
 import xyz.yourboykyle.secretroutes.config.huds.RecordingHUD;
+import xyz.yourboykyle.secretroutes.dungeons.Room;
+import xyz.yourboykyle.secretroutes.dungeons.rendering.RenderingBackend;
 import xyz.yourboykyle.secretroutes.events.*;
 import xyz.yourboykyle.secretroutes.utils.*;
 import xyz.yourboykyle.secretroutes.utils.autoupdate.UpdateManager;
-import xyz.yourboykyle.secretroutes.utils.dungeon.DungeonScanner;
+import xyz.yourboykyle.secretroutes.dungeons.detection.DungeonScanner;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -67,15 +67,6 @@ public class Main implements ClientModInitializer {
     public static RecordingHUD recordingHUD;
     public static CurrentRoomHUD currentRoomHUD;
 
-    // Keybinds
-    public static KeyMapping nextSecretKey;
-    public static KeyMapping lastSecretKey;
-    public static KeyMapping toggleSecretsKey;
-
-    public static void checkRoomData() {
-        // Old method, kept for compatibility
-    }
-
     public static void checkProfilesData() {
         try {
             String filePath = "default.json";
@@ -95,7 +86,7 @@ public class Main implements ClientModInitializer {
 
     public static void checkRoutesData() {
         try {
-            String filePath = ROUTES_PATH + File.separator + "routes.json";
+            String filePath = ROUTES_PATH + File.separator + "3ppopkaroutes.json";
 
             // Check if the xyz.yourboykyle.secretroutes.config directory exists
             File configDir = new File(ROUTES_PATH);
@@ -104,12 +95,12 @@ public class Main implements ClientModInitializer {
             }
 
             File configFile = new File(filePath);
-            File configFilePearl = new File(ROUTES_PATH + File.separator + "pearlroutes.json");
+            File configFilePearl = new File(ROUTES_PATH + File.separator + "fowroutes.json");
             if (!configFile.exists()) {
-                RouteUtils.updateRoutes(configFile);
+                RouteUtils.checkRoutesFiles();
             }
             if (!configFilePearl.exists()) {
-                RouteUtils.updatePearlRoutes();
+                RouteUtils.checkRoutesFiles();
             }
         } catch (Exception e) {
             LogUtils.error(e);
@@ -185,16 +176,6 @@ public class Main implements ClientModInitializer {
                 }
             }
         }).start();
-    }
-
-    public static void toggleSecretsKeybind() {
-        if (SRMConfig.get().modEnabled) {
-            SRMConfig.get().modEnabled = false;
-            sendChatMessage(ChatFormatting.RED + "Secret Routes Mod secret rendering has been disabled.");
-        } else {
-            SRMConfig.get().modEnabled = true;
-            sendChatMessage(ChatFormatting.GREEN + "Secret Routes Mod secret rendering has been enabled.");
-        }
     }
 
     @Override
@@ -286,6 +267,16 @@ public class Main implements ClientModInitializer {
                     Main.currentRoom.lastSecretKeybind();
                 }
             }
+
+            while (SRMKeybinds.TOGGLE_MOD.consumeClick()) {
+                if (SRMConfig.get().modEnabled) {
+                    SRMConfig.get().modEnabled = false;
+                    sendChatMessage(ChatFormatting.RED + "Secret Routes Mod secret rendering has been disabled.");
+                } else {
+                    SRMConfig.get().modEnabled = true;
+                    sendChatMessage(ChatFormatting.GREEN + "Secret Routes Mod secret rendering has been enabled.");
+                }
+            }
         });
 
         // Fabric Events
@@ -298,7 +289,7 @@ public class Main implements ClientModInitializer {
         OnPlayerInteract.register();
         OnPlayerTick.register();
 
-        AnotherRenderingUtil.register();
+        RenderingBackend.register();
 
         // Server connection
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {

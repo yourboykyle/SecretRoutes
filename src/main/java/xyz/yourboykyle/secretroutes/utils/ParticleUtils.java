@@ -25,10 +25,48 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import xyz.yourboykyle.secretroutes.config.SRMConfig;
 
 import java.util.List;
 
-public class RenderUtils {
+public class ParticleUtils {
+
+    public static ParticleOptions getParticleFromType(SRMConfig.ParticleType type) {
+        return switch (type) {
+            case EXPLOSION_NORMAL -> ParticleTypes.EXPLOSION;
+            case EXPLOSION_LARGE, EXPLOSION_HUGE -> ParticleTypes.EXPLOSION_EMITTER;
+            case FIREWORKS_SPARK -> ParticleTypes.FIREWORK;
+            case BUBBLE -> ParticleTypes.BUBBLE;
+            case WATER_SPLASH -> ParticleTypes.SPLASH;
+            case WATER_WAKE -> ParticleTypes.FISHING;
+            case SUSPENDED_DEPTH -> ParticleTypes.UNDERWATER;
+            case CRIT -> ParticleTypes.CRIT;
+            case MAGIC_CRIT -> ParticleTypes.ENCHANTED_HIT;
+            case SMOKE_NORMAL -> ParticleTypes.SMOKE;
+            case SMOKE_LARGE -> ParticleTypes.LARGE_SMOKE;
+            case WITCH_MAGIC -> ParticleTypes.WITCH;
+            case DRIP_WATER -> ParticleTypes.DRIPPING_WATER;
+            case DRIP_LAVA -> ParticleTypes.DRIPPING_LAVA;
+            case VILLAGER_ANGRY -> ParticleTypes.ANGRY_VILLAGER;
+            case VILLAGER_HAPPY -> ParticleTypes.HAPPY_VILLAGER;
+            case TOWN_AURA -> ParticleTypes.MYCELIUM;
+            case NOTE -> ParticleTypes.NOTE;
+            case PORTAL -> ParticleTypes.PORTAL;
+            case ENCHANTMENT_TABLE -> ParticleTypes.ENCHANT;
+            case FLAME -> ParticleTypes.FLAME;
+            case LAVA -> ParticleTypes.LAVA;
+            case FOOTSTEP, CLOUD -> ParticleTypes.CLOUD;
+            case SNOWBALL, SNOW_SHOVEL -> ParticleTypes.ITEM_SNOWBALL;
+            case SLIME -> ParticleTypes.ITEM_SLIME;
+            case HEART -> ParticleTypes.HEART;
+            case WATER_DROP -> ParticleTypes.RAIN;
+            case ITEM_TAKE -> ParticleTypes.POOF;
+            case MOB_APPEARANCE -> ParticleTypes.ELDER_GUARDIAN;
+            default -> ParticleTypes.FLAME;
+        };
+    }
+
     public static void spawnParticleAtLocation(BlockPos loc, BlockPos offset, ParticleOptions particle) {
         ClientLevel world = Minecraft.getInstance().level;
 
@@ -91,5 +129,5 @@ public class RenderUtils {
             }
         }
     }
+
 }
-//#endif
