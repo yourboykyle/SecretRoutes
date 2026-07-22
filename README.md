@@ -1,5 +1,5 @@
 <h1 align="center">
-  Secret Routes Mod - Now on 1.21!
+  Secret Routes Mod
 </h1>
 
 <div align="center">
