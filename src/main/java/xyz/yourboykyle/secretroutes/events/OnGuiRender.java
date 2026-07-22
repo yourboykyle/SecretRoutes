@@ -30,7 +30,6 @@ import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.GuiUtils;
 import xyz.yourboykyle.secretroutes.utils.SecretRoutesRenderUtils;
 */
-import static xyz.yourboykyle.secretroutes.utils.SecretUtils.removeBannerTime;
 
 public class OnGuiRender {
     public static Long spawnNotifTime = null;

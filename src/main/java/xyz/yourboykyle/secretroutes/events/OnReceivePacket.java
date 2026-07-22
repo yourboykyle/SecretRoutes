@@ -15,7 +15,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.ChatUtils;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
-import xyz.yourboykyle.secretroutes.utils.Room;
+import xyz.yourboykyle.secretroutes.dungeons.Room;
 
 public class OnReceivePacket {
     public static boolean firstBlockBreakPacket = true;

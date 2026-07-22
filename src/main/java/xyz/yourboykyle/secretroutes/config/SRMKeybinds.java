@@ -31,6 +31,15 @@ public class SRMKeybinds {
             )
     );
 
+    public static final KeyMapping TOGGLE_MOD = KeyMappingHelper.registerKeyMapping(
+            new KeyMapping(
+                    "key.secretroutes.toggle_mod",
+                    InputConstants.Type.KEYSYM,
+                    GLFW.GLFW_KEY_UNKNOWN,
+                    CATEGORY
+            )
+    );
+
     public static void init() {
     }
 }

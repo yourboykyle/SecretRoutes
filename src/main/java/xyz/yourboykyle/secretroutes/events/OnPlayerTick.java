@@ -28,7 +28,7 @@ import net.minecraft.core.BlockPos;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
-import xyz.yourboykyle.secretroutes.utils.Room;
+import xyz.yourboykyle.secretroutes.dungeons.Room;
 
 public class OnPlayerTick {
 

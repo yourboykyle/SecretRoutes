@@ -53,7 +53,7 @@ public class SRMConfig {
 
     // General
     @SerialEntry public boolean modEnabled = true;
-    @SerialEntry public RouteType routeType = RouteType.PEARLS;
+    @SerialEntry public RouteType routeType = RouteType.ROUTE_FOW;
     @SerialEntry public boolean renderComplete = false;
     @SerialEntry public boolean wholeRoute = false;
     @SerialEntry public int visibleRouteSteps = 1;
@@ -130,7 +130,7 @@ public class SRMConfig {
     @SerialEntry public float exitTextSize = 1.0f;
 
     @SerialEntry public boolean etherwarpsTextToggle = false;
-    @SerialEntry public boolean etherwarpsEnumToggle = false;
+    @SerialEntry public boolean etherwarpNumberingToggle = false;
     @SerialEntry public TextColor etherwarpsWaypointColor = TextColor.DARK_PURPLE;
     @SerialEntry public float etherwarpsTextSize = 1.0f;
 
@@ -212,8 +212,8 @@ public class SRMConfig {
     @SerialEntry public boolean actionbarInfo = false;
     @SerialEntry public boolean verbosePersonalBests = false;
 
-    @SerialEntry public String routesFileName = "routes.json";
-    @SerialEntry public String pearlRoutesFileName = "pearlroutes.json";
+    public String route3ppopkaFileName = "3ppopkaroutes.json";
+    public String routeFOWFileName = "fowroutes.json";
     @SerialEntry public String copyFileName = "default";
     @SerialEntry public int routeNumber = 0;
 
@@ -236,7 +236,7 @@ public class SRMConfig {
                 .option(Option.<RouteType>createBuilder()
                         .name(Component.literal("Route Type"))
                         .description(OptionDescription.of(Component.literal("A toggle between different routes\n\n§n§6FlameOfWar: Routes by FlameOfWar.§r§f\nRecorded Videos of each route can be found here: §nhypixeldungeons.com§r\n\n§n§b3ppopka: Routes by 3ppopka.§n§f\nInstructions of Routes can be found when using Odin Dungeon Waypoints, found in the Odin Discord Server")))
-                        .binding(RouteType.PEARLS, () -> get().routeType, v -> get().routeType = v)
+                        .binding(RouteType.ROUTE_FOW, () -> get().routeType, v -> get().routeType = v)
                         .controller(opt -> EnumControllerBuilder.create(opt).enumClass(RouteType.class))
                         .build())
                 .option(Option.<Boolean>createBuilder()
@@ -267,8 +267,7 @@ public class SRMConfig {
                         .name(Component.literal("Update Routes"))
                         .text(Component.literal("Download"))
                         .action((screen, opt) -> {
-                            if (get().routeType == RouteType.PEARLS) RouteUtils.updatePearlRoutes();
-                            else RouteUtils.updateRoutes();
+                            RouteUtils.checkRoutesFiles();
                         })
                         .build())
                 .build());
@@ -286,10 +285,25 @@ public class SRMConfig {
                         .binding(5, () -> get().width, v -> get().width = v)
                         .controller(opt -> IntegerSliderControllerBuilder.create(opt).range(1, 10).step(1))
                         .build())
+                .option(Option.<Boolean>createBuilder()
+                        .name(Component.literal("Player to Secret Line"))
+                        .binding(false, () -> get().playerWaypointLine, v -> get().playerWaypointLine = v)
+                        .controller(TickBoxControllerBuilder::create)
+                        .build())
+                .option(Option.<Boolean>createBuilder()
+                        .name(Component.literal("Player to Etherwarp Line"))
+                        .binding(false, () -> get().playerToEtherwarp, v -> get().playerToEtherwarp = v)
+                        .controller(TickBoxControllerBuilder::create)
+                        .build())
+                .option(Option.<Float>createBuilder()
+                        .name(Component.literal("Box Line Width"))
+                        .binding(4.0f, () -> get().boxLineWidth, v -> get().boxLineWidth = v)
+                        .controller(opt -> FloatSliderControllerBuilder.create(opt).range(1.0f, 10.0f).step(0.5f))
+                        .build())
                 .option(Option.<Color>createBuilder()
                         .name(Component.literal("Line Color"))
                         .binding(Color.RED, () -> get().lineColor, v -> get().lineColor = v)
-                        .controller(ColorControllerBuilder::create)
+                        .controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true))
                         .build())
                 .option(Option.<Boolean>createBuilder()
                         .name(Component.literal("See Through Walls"))
@@ -317,17 +331,17 @@ public class SRMConfig {
                 .group(OptionGroup.createBuilder()
                         .name(Component.literal("Etherwarps"))
                         .option(Option.<Boolean>createBuilder().name(Component.literal("Enabled")).binding(true, () -> get().renderEtherwarps, v -> get().renderEtherwarps = v).controller(TickBoxControllerBuilder::create).build())
-                        .option(Option.<Color>createBuilder().name(Component.literal("Color")).binding(new Color(128, 0, 128), () -> get().etherWarp, v -> get().etherWarp = v).controller(ColorControllerBuilder::create).build())
+                        .option(Option.<Color>createBuilder().name(Component.literal("Color")).binding(new Color(128, 0, 128), () -> get().etherWarp, v -> get().etherWarp = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
                         .option(Option.<Color>createBuilder().name(Component.literal("Second Step Color")).description(OptionDescription.of(Component.literal("Used for etherwarp waypoints in the second and later visible route steps."))).binding(new Color(95, 61, 97), () -> get().secondStepEtherWarp, v -> get().secondStepEtherWarp = v).controller(ColorControllerBuilder::create).build())
                         .option(Option.<Boolean>createBuilder().name(Component.literal("Full Block")).binding(false, () -> get().etherwarpFullBlock, v -> get().etherwarpFullBlock = v).controller(TickBoxControllerBuilder::create).build())
                         .build())
                 .group(OptionGroup.createBuilder()
                         .name(Component.literal("Secrets"))
                         .option(Option.<Boolean>createBuilder().name(Component.literal("Items")).binding(true, () -> get().renderSecretsItem, v -> get().renderSecretsItem = v).controller(TickBoxControllerBuilder::create).build())
-                        .option(Option.<Color>createBuilder().name(Component.literal("Item Color")).binding(new Color(0, 255, 255), () -> get().secretsItem, v -> get().secretsItem = v).controller(ColorControllerBuilder::create).build())
+                        .option(Option.<Color>createBuilder().name(Component.literal("Item Color")).binding(new Color(0, 255, 255), () -> get().secretsItem, v -> get().secretsItem = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
                         .option(Option.<Color>createBuilder().name(Component.literal("Item Second Step Color")).description(OptionDescription.of(Component.literal("Used for item secret waypoints in the second and later visible route steps."))).binding(new Color(95, 167, 167), () -> get().secondStepSecretsItem, v -> get().secondStepSecretsItem = v).controller(ColorControllerBuilder::create).build())
                         .option(Option.<Boolean>createBuilder().name(Component.literal("Interacts")).binding(true, () -> get().renderSecretIteract, v -> get().renderSecretIteract = v).controller(TickBoxControllerBuilder::create).build())
-                        .option(Option.<Color>createBuilder().name(Component.literal("Interact Color")).binding(new Color(0, 0, 255), () -> get().secretsInteract, v -> get().secretsInteract = v).controller(ColorControllerBuilder::create).build())
+                        .option(Option.<Color>createBuilder().name(Component.literal("Interact Color")).binding(new Color(0, 0, 255), () -> get().secretsInteract, v -> get().secretsInteract = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
                         .option(Option.<Color>createBuilder().name(Component.literal("Interact Second Step Color")).description(OptionDescription.of(Component.literal("Used for interact secret waypoints in the second and later visible route steps."))).binding(new Color(73, 82, 149), () -> get().secondStepSecretsInteract, v -> get().secondStepSecretsInteract = v).controller(ColorControllerBuilder::create).build())
                         .option(Option.<Boolean>createBuilder().name(Component.literal("Bats")).binding(true, () -> get().renderSecretBat, v -> get().renderSecretBat = v).controller(TickBoxControllerBuilder::create).build())
                         .option(Option.<Color>createBuilder().name(Component.literal("Bat Color")).binding(new Color(0, 255, 0), () -> get().secretsBat, v -> get().secretsBat = v).controller(ColorControllerBuilder::create).build())
@@ -336,14 +350,14 @@ public class SRMConfig {
                 .group(OptionGroup.createBuilder()
                         .name(Component.literal("Mines"))
                         .option(Option.<Boolean>createBuilder().name(Component.literal("Enabled")).binding(true, () -> get().renderMines, v -> get().renderMines = v).controller(TickBoxControllerBuilder::create).build())
-                        .option(Option.<Color>createBuilder().name(Component.literal("Color")).binding(new Color(255, 255, 0), () -> get().mine, v -> get().mine = v).controller(ColorControllerBuilder::create).build())
+                        .option(Option.<Color>createBuilder().name(Component.literal("Color")).binding(new Color(255, 255, 0), () -> get().mine, v -> get().mine = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
                         .option(Option.<Color>createBuilder().name(Component.literal("Second Step Color")).description(OptionDescription.of(Component.literal("Used for mine waypoints in the second and later visible route steps."))).binding(new Color(177, 173, 97), () -> get().secondStepMine, v -> get().secondStepMine = v).controller(ColorControllerBuilder::create).build())
                         .option(Option.<Boolean>createBuilder().name(Component.literal("Full Block")).binding(false, () -> get().mineFullBlock, v -> get().mineFullBlock = v).controller(TickBoxControllerBuilder::create).build())
                         .build())
                 .group(OptionGroup.createBuilder()
                         .name(Component.literal("Superbooms"))
                         .option(Option.<Boolean>createBuilder().name(Component.literal("Enabled")).binding(true, () -> get().renderSuperboom, v -> get().renderSuperboom = v).controller(TickBoxControllerBuilder::create).build())
-                        .option(Option.<Color>createBuilder().name(Component.literal("Color")).binding(new Color(255, 0, 0), () -> get().superbooms, v -> get().superbooms = v).controller(ColorControllerBuilder::create).build())
+                        .option(Option.<Color>createBuilder().name(Component.literal("Color")).binding(new Color(255, 0, 0), () -> get().superbooms, v -> get().superbooms = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
                         .option(Option.<Color>createBuilder().name(Component.literal("Second Step Color")).description(OptionDescription.of(Component.literal("Used for superboom waypoints in the second and later visible route steps."))).binding(new Color(168, 90, 90), () -> get().secondStepSuperbooms, v -> get().secondStepSuperbooms = v).controller(ColorControllerBuilder::create).build())
                         .option(Option.<Boolean>createBuilder().name(Component.literal("Full Block")).binding(false, () -> get().superboomsFullBlock, v -> get().superboomsFullBlock = v).controller(TickBoxControllerBuilder::create).build())
                         .build())
@@ -364,7 +378,7 @@ public class SRMConfig {
                 .group(OptionGroup.createBuilder()
                         .name(Component.literal("Etherwarps Text"))
                         .option(Option.<Boolean>createBuilder().name(Component.literal("Show")).binding(false, () -> get().etherwarpsTextToggle, v -> get().etherwarpsTextToggle = v).controller(TickBoxControllerBuilder::create).build())
-                        .option(Option.<Boolean>createBuilder().name(Component.literal("Numbering")).binding(false, () -> get().etherwarpsEnumToggle, v -> get().etherwarpsEnumToggle = v).controller(TickBoxControllerBuilder::create).build())
+                        .option(Option.<Boolean>createBuilder().name(Component.literal("Numbering")).binding(false, () -> get().etherwarpNumberingToggle, v -> get().etherwarpNumberingToggle = v).controller(TickBoxControllerBuilder::create).build())
                         .option(Option.<TextColor>createBuilder().name(Component.literal("Color")).binding(TextColor.DARK_PURPLE, () -> get().etherwarpsWaypointColor, v -> get().etherwarpsWaypointColor = v).controller(opt -> EnumControllerBuilder.create(opt).enumClass(TextColor.class)).build())
                         .option(Option.<Float>createBuilder().name(Component.literal("Size")).binding(1.0f, () -> get().etherwarpsTextSize, v -> get().etherwarpsTextSize = v).controller(opt -> FloatSliderControllerBuilder.create(opt).range(0.1f, 5f).step(0.1f)).build())
                         .build())
@@ -440,7 +454,7 @@ public class SRMConfig {
         public Component getDisplayName() { return Component.literal(name); }
     }
     public enum RouteType implements NameableEnum {
-        NO_PEARLS("3ppopka"), PEARLS("FlameOfWar");
+        ROUTE_3ppopka("3ppopka"), ROUTE_FOW("FlameOfWar");
         private final String name;
 
         RouteType(String name) { this.name = name; }

@@ -72,7 +72,7 @@ public class ChangeRoute {
         String routeName = StringArgumentType.getString(context, "route");
 
         if (FileUtils.doesFileExist(Main.ROUTES_PATH + File.separator + routeName)) {
-            SRMConfig.get().routesFileName = routeName;
+            SRMConfig.get().route3ppopkaFileName = routeName;
             context.getSource().sendFeedback(
                     Component.literal("Loaded ").withStyle(ChatFormatting.DARK_GREEN)
                             .append(Component.literal(routeName).withStyle(ChatFormatting.GREEN))

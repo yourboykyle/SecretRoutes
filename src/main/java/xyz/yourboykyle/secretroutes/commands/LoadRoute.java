@@ -33,7 +33,7 @@ import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.network.chat.Component;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
-import xyz.yourboykyle.secretroutes.utils.Room;
+import xyz.yourboykyle.secretroutes.dungeons.Room;
 import xyz.yourboykyle.secretroutes.utils.RoomDirectionUtils;
 
 import java.io.File;

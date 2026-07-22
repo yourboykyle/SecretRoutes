@@ -2,7 +2,7 @@
 package xyz.yourboykyle.secretroutes.utils;
 
 import net.minecraft.core.BlockPos;
-import xyz.yourboykyle.secretroutes.utils.dungeon.DungeonScanner;
+import xyz.yourboykyle.secretroutes.dungeons.detection.DungeonScanner;
 
 import java.awt.*;
 

@@ -29,14 +29,13 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.vehicle.minecart.Minecart;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
-import xyz.yourboykyle.secretroutes.utils.Room;
+import xyz.yourboykyle.secretroutes.dungeons.Room;
 import xyz.yourboykyle.secretroutes.utils.RoomDirectionUtils;
 import xyz.yourboykyle.secretroutes.utils.RoomRotationUtils;
 
@@ -63,7 +62,6 @@ public class OnBlockBreak {
                     for (JsonElement waypoint : waypoints) {
                         JsonArray waypointCoords = waypoint.getAsJsonArray();
 
-                        Main.checkRoomData();
                         BlockPos relPos = RoomRotationUtils.actualToRelative(pos, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
 
                         // Check if waypoints already has the broken block

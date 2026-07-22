@@ -1,5 +1,5 @@
 //#if FABRIC
-package xyz.yourboykyle.secretroutes.utils.dungeon;
+package xyz.yourboykyle.secretroutes.dungeons.detection;
 
 /*BSD 3-Clause License
 
