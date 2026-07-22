@@ -74,9 +74,9 @@ public class BlockUtils {
 
     public static Triple<Integer, Integer, Integer> playerToWorld(int worldX, int worldY, int worldZ) {
         Minecraft mc = Minecraft.getInstance();
-        int playerX = (int) mc.gameRenderer.getMainCamera().position().x;
-        int playerY = (int) mc.gameRenderer.getMainCamera().position().y;
-        int playerZ = (int) mc.gameRenderer.getMainCamera().position().z;
+        int playerX = (int) mc.gameRenderer.mainCamera().position().x;
+        int playerY = (int) mc.gameRenderer.mainCamera().position().y;
+        int playerZ = (int) mc.gameRenderer.mainCamera().position().z;
 
         return new Triple<>(worldX - playerX, worldY - playerY, worldZ - playerZ);
     }

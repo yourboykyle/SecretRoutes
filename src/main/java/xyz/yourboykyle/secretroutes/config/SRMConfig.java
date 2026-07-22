@@ -410,7 +410,7 @@ public class SRMConfig {
                         .description(OptionDescription.of(Component.literal("Loads " + profileName + ".json and closes menu.")))
                         .action((screen, opt) -> {
                             ConfigUtils.loadColorConfig(profileName);
-                            Minecraft.getInstance().setScreen(null);
+                            Minecraft.getInstance().setScreenAndShow(null);
                         })
                         .build());
             }
@@ -435,7 +435,7 @@ public class SRMConfig {
                         .name(Component.literal("Load From Text Input"))
                         .action((screen, opt) -> {
                             ConfigUtils.loadColorConfig(get().copyFileName);
-                            Minecraft.getInstance().setScreen(null);
+                            Minecraft.getInstance().setScreenAndShow(null);
                         })
                         .build())
                 .group(profilesGroup.build())
