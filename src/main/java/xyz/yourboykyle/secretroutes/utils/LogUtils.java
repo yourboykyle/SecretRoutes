@@ -46,9 +46,9 @@ public class LogUtils {
         if (Minecraft.getInstance().player != null) {
             switch (error.getClass().getTypeName()) {
                 case "java.io.FileNotFoundException":
-                    String fileName = (SRMConfig.get().routeType == SRMConfig.RouteType.PEARLS)
-                            ? SRMConfig.get().pearlRoutesFileName
-                            : SRMConfig.get().routesFileName;
+                    String fileName = (SRMConfig.get().routeType == SRMConfig.RouteType.ROUTE_FOW)
+                            ? SRMConfig.get().routeFOWFileName
+                            : SRMConfig.get().route3ppopkaFileName;
 
                     sendChatMessage(ChatFormatting.DARK_RED + "The system cannot find the file specified. Please ensure that this is the correct file name §c\"" + fileName + "\"§4 and that it exists in §c" + Main.ROUTES_PATH);
                     break;

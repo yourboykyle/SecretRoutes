@@ -1,5 +1,4 @@
 //#if FABRIC
-package xyz.yourboykyle.secretroutes.utils;
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC
@@ -20,21 +19,25 @@ package xyz.yourboykyle.secretroutes.utils;
  * with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+package xyz.yourboykyle.secretroutes.dungeons;
+
 import com.google.gson.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.particles.ParticleTypes;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.events.OnSecretComplete;
-import xyz.yourboykyle.secretroutes.utils.dungeon.DungeonScanner;
+import xyz.yourboykyle.secretroutes.dungeons.detection.DungeonScanner;
+import xyz.yourboykyle.secretroutes.utils.*;
 import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 
 import java.io.File;
 import java.io.FileReader;
 import java.util.*;
+
+import static xyz.yourboykyle.secretroutes.utils.ParticleUtils.getParticleFromType;
 
 public class Room {
     public enum WAYPOINT_TYPES { LOCATIONS, ETHERWARPS, MINES, INTERACTS, TNTS, ENDERPEARLS }
@@ -53,15 +56,18 @@ public class Room {
         try {
             name = roomName;
             if (roomName != null) {
-                String filePath;
-                if (SRMConfig.get().routeType == SRMConfig.RouteType.PEARLS) {
-                    String fileName = SRMConfig.get().pearlRoutesFileName;
-                    filePath = Main.ROUTES_PATH + File.separator + (!fileName.equals("") ? fileName : "pearlroutes.json");
-                } else {
-                    String fileName = SRMConfig.get().routesFileName;
-                    filePath = Main.ROUTES_PATH + File.separator + (!fileName.equals("") ? fileName : "routes.json");
+                String filePath = "";
+                if (SRMConfig.get().routeType == SRMConfig.RouteType.ROUTE_FOW) {
+                    String fileName = SRMConfig.get().routeFOWFileName;
+                    filePath = Main.ROUTES_PATH + File.separator + (!fileName.equals("") ? fileName : "fowroutes.json");
+                } else if (SRMConfig.get().routeType == SRMConfig.RouteType.ROUTE_3ppopka) {
+                    String fileName = SRMConfig.get().route3ppopkaFileName;
+                    filePath = Main.ROUTES_PATH + File.separator + (!fileName.equals("") ? fileName : "3ppopkaroutes.json");
                 }
-                getData(filePath);
+
+                if (!filePath.isEmpty()) {
+                    getData(filePath);
+                }
             } else {
                 currentSecretRoute = null;
             }
@@ -141,41 +147,6 @@ public class Room {
         );
     }
 
-    private ParticleOptions getParticleFromType(SRMConfig.ParticleType type) {
-        return switch (type) {
-            case EXPLOSION_NORMAL -> ParticleTypes.EXPLOSION;
-            case EXPLOSION_LARGE, EXPLOSION_HUGE -> ParticleTypes.EXPLOSION_EMITTER;
-            case FIREWORKS_SPARK -> ParticleTypes.FIREWORK;
-            case BUBBLE -> ParticleTypes.BUBBLE;
-            case WATER_SPLASH -> ParticleTypes.SPLASH;
-            case WATER_WAKE -> ParticleTypes.FISHING;
-            case SUSPENDED_DEPTH -> ParticleTypes.UNDERWATER;
-            case CRIT -> ParticleTypes.CRIT;
-            case MAGIC_CRIT -> ParticleTypes.ENCHANTED_HIT;
-            case SMOKE_NORMAL -> ParticleTypes.SMOKE;
-            case SMOKE_LARGE -> ParticleTypes.LARGE_SMOKE;
-            case WITCH_MAGIC -> ParticleTypes.WITCH;
-            case DRIP_WATER -> ParticleTypes.DRIPPING_WATER;
-            case DRIP_LAVA -> ParticleTypes.DRIPPING_LAVA;
-            case VILLAGER_ANGRY -> ParticleTypes.ANGRY_VILLAGER;
-            case VILLAGER_HAPPY -> ParticleTypes.HAPPY_VILLAGER;
-            case TOWN_AURA -> ParticleTypes.MYCELIUM;
-            case NOTE -> ParticleTypes.NOTE;
-            case PORTAL -> ParticleTypes.PORTAL;
-            case ENCHANTMENT_TABLE -> ParticleTypes.ENCHANT;
-            case FLAME -> ParticleTypes.FLAME;
-            case LAVA -> ParticleTypes.LAVA;
-            case FOOTSTEP, CLOUD -> ParticleTypes.CLOUD;
-            case SNOWBALL, SNOW_SHOVEL -> ParticleTypes.ITEM_SNOWBALL;
-            case SLIME -> ParticleTypes.ITEM_SLIME;
-            case HEART -> ParticleTypes.HEART;
-            case WATER_DROP -> ParticleTypes.RAIN;
-            case ITEM_TAKE -> ParticleTypes.POOF;
-            case MOB_APPEARANCE -> ParticleTypes.ELDER_GUARDIAN;
-            default -> ParticleTypes.FLAME;
-        };
-    }
-
     public void renderLines() {
         try {
             if (currentSecretWaypoints != null && currentSecretWaypoints.has("locations")) {
@@ -197,7 +168,7 @@ public class Room {
                     c = 0;
                     try {
                         ParticleOptions particle = getParticleFromType(SRMConfig.get().particles);
-                        RenderUtils.drawLineMultipleParticles(particle, lines);
+                        ParticleUtils.drawLineMultipleParticles(particle, lines);
                     } catch (Exception e) {
                         LogUtils.error(e);
                     }
