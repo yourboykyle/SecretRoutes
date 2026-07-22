@@ -27,7 +27,7 @@ repositories {
     mavenCentral()
     maven("https://api.modrinth.com/maven")
     maven("https://repo.hypixel.net/repository/Hypixel/")
-    maven("https://maven.terraformersmc.com/")
+    maven("https://maven.terraformersmc.com/repository/maven-terraformers")
     maven("https://maven.isxander.dev/releases")
     maven("https://repo.nea.moe/releases")
 }
