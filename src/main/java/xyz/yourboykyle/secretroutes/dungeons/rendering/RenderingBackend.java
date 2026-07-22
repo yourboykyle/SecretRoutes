@@ -21,6 +21,7 @@
 
 package xyz.yourboykyle.secretroutes.dungeons.rendering;
 
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -57,7 +58,8 @@ public class RenderingBackend {
     private static final RenderPipeline SEE_THROUGH_PIPELINE = RenderPipelines.register(
             RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
                     .withLocation(Identifier.fromNamespaceAndPath(Main.MODID, "see_through_overlay"))
-                    .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
+                    .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR)
+                    .withPrimitiveTopology(PrimitiveTopology.QUADS)
                     .withDepthStencilState(Optional.empty())
                     .withCull(false)
                     .build()
@@ -69,7 +71,8 @@ public class RenderingBackend {
     private static final RenderPipeline NORMAL_PIPELINE = RenderPipelines.register(
             RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
                     .withLocation(Identifier.fromNamespaceAndPath(Main.MODID, "normal_overlay"))
-                    .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
+                    .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR)
+                    .withPrimitiveTopology(PrimitiveTopology.QUADS)
                     .withCull(false)
                     .build()
     );
@@ -106,7 +109,7 @@ public class RenderingBackend {
         OnWorldRender.onRenderWorld();
 
         PoseStack poseStack = context.poseStack();
-        Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
+        Camera camera = Minecraft.getInstance().gameRenderer.mainCamera();
         Vec3 camPos = camera.position();
         OrderedSubmitNodeCollector collector = context.submitNodeCollector();
 
@@ -224,7 +227,7 @@ public class RenderingBackend {
         if (linesFromCursor.isEmpty()) return;
 
         Minecraft mc = Minecraft.getInstance();
-        Camera camera = mc.gameRenderer.getMainCamera();
+        Camera camera = mc.gameRenderer.mainCamera();
 
         Quaternionf rot = camera.rotation();
         Vector3f forward = new Vector3f(0, 0, -1);
