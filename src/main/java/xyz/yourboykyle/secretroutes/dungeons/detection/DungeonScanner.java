@@ -1,26 +1,4 @@
 //#if FABRIC
-package xyz.yourboykyle.secretroutes.utils.dungeon;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import org.joml.Vector2i;
-import xyz.yourboykyle.secretroutes.Main;
-import xyz.yourboykyle.secretroutes.events.OnEnterNewRoom;
-import xyz.yourboykyle.secretroutes.utils.LocationUtils;
-import xyz.yourboykyle.secretroutes.utils.Room;
-
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.*;
-
 /*BSD 3-Clause License
 
 Copyright (c) 2025, odtheking
@@ -49,6 +27,28 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.*/
+
+package xyz.yourboykyle.secretroutes.dungeons.detection;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import org.joml.Vector2i;
+import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.dungeons.Room;
+import xyz.yourboykyle.secretroutes.events.OnEnterNewRoom;
+import xyz.yourboykyle.secretroutes.utils.LocationUtils;
+
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.*;
 
 public class DungeonScanner {
 
@@ -195,21 +195,6 @@ public class DungeonScanner {
                     if (neighborsValid) {
                         room.clayPos = checkPos;
                         room.rotation = rot;
-                        if (room.rotation != Rotations.NONE && (room.data.name().equalsIgnoreCase("Slime-5") || room.data.name().equalsIgnoreCase("Sewer-7"))) {
-                            Rotations newRot = room.rotation;
-
-                            switch (room.rotation) {
-                                case NORTH -> newRot = Rotations.SOUTH;
-                                case SOUTH -> newRot = Rotations.NORTH;
-                                case EAST  -> newRot = Rotations.WEST;
-                                case WEST  -> newRot = Rotations.EAST;
-                            }
-
-                            room.rotation = newRot;
-                            room.clayPos = calculateCorner(room.roomComponents, newRot);
-
-                            System.out.println("[SecretRoutes] Manually flipped " + room.data.name() + " to " + newRot);
-                        }
                         return;
                     }
                 }
