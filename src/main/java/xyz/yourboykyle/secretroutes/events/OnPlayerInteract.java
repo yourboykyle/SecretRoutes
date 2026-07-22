@@ -34,6 +34,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.BlockHitResult;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
+import xyz.yourboykyle.secretroutes.dungeons.Room;
+import xyz.yourboykyle.secretroutes.dungeons.SecretUtils;
 import xyz.yourboykyle.secretroutes.utils.*;
 
 public class OnPlayerInteract {
