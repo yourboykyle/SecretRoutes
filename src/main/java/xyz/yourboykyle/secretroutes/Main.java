@@ -283,7 +283,6 @@ public class Main implements ClientModInitializer {
         GuildEvents.register();
         OnBlockBreak.register();
         OnChatReceive.register();
-        OnGuiRender.register();
         OnItemPickedUp.register();
         OnMouseInput.register();
         OnPlayerInteract.register();

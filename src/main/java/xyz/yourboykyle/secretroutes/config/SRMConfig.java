@@ -36,6 +36,7 @@ import net.minecraft.resources.Identifier;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.ConfigUtils;
 import xyz.yourboykyle.secretroutes.utils.RouteUtils;
+import xyz.yourboykyle.secretroutes.utils.SecretSounds;
 
 import java.awt.*;
 import java.io.File;
@@ -265,47 +266,11 @@ public class SRMConfig {
     @SerialEntry
     public boolean customSecretSound = false;
     @SerialEntry
-    public SoundType customSecretSoundType = SoundType.ZYRA_MEOW;
+    public SoundType customSecretSoundType = SoundType.NOTE_PLING;
     @SerialEntry
     public float customSecretSoundVolume = 1.0f;
     @SerialEntry
     public float customSecretSoundPitch = 1.0f;
-    @SerialEntry
-    public boolean renderBlood = false;
-    @SerialEntry
-    public boolean bloodNotif = false;
-    @SerialEntry
-    public String bloodReadyText = "Blood Ready";
-    @SerialEntry
-    public TextColor bloodReadyColor = TextColor.GOLD;
-    @SerialEntry
-    public int bloodBannerDuration = 3000;
-    @SerialEntry
-    public int bloodScale = 2;
-    @SerialEntry
-    public int bloodX = 0;
-    @SerialEntry
-    public int bloodY = -100;
-
-    // Boss Hiding
-    @SerialEntry
-    public boolean hideBossMessages = false;
-    @SerialEntry
-    public boolean hideWatcher = true;
-    @SerialEntry
-    public boolean hideBonzo = true;
-    @SerialEntry
-    public boolean hideScarf = true;
-    @SerialEntry
-    public boolean hideProfessor = true;
-    @SerialEntry
-    public boolean hideThorn = true;
-    @SerialEntry
-    public boolean hideLivid = true;
-    @SerialEntry
-    public boolean hideSadan = true;
-    @SerialEntry
-    public boolean hideWitherLords = false;
 
     // Recording and Dev
     @SerialEntry
@@ -371,6 +336,22 @@ public class SRMConfig {
                 }
             }
 
+            Option<SoundType> customSoundTypeOption = Option.<SoundType>createBuilder()
+                    .name(Component.literal("Sound"))
+                    .binding(SoundType.NOTE_PLING, () -> config.customSecretSoundType != null ? config.customSecretSoundType : SoundType.NOTE_PLING, v -> config.customSecretSoundType = v)
+                    .controller(opt -> EnumControllerBuilder.create(opt).enumClass(SoundType.class))
+                    .build();
+            Option<Float> customSoundVolumeOption = Option.<Float>createBuilder()
+                    .name(Component.literal("Volume"))
+                    .binding(1.0f, () -> config.customSecretSoundVolume, v -> config.customSecretSoundVolume = v)
+                    .controller(opt -> FloatSliderControllerBuilder.create(opt).range(0.0f, 5.0f).step(0.1f))
+                    .build();
+            Option<Float> customSoundPitchOption = Option.<Float>createBuilder()
+                    .name(Component.literal("Pitch"))
+                    .binding(1.0f, () -> config.customSecretSoundPitch, v -> config.customSecretSoundPitch = v)
+                    .controller(opt -> FloatSliderControllerBuilder.create(opt).range(0.5f, 2.0f).step(0.1f))
+                    .build();
+
             return builder
                     .title(Component.literal("Secret Routes Config"))
 
@@ -418,6 +399,21 @@ public class SRMConfig {
                                     .action((screen, opt) -> {
                                         RouteUtils.checkRoutesFiles();
                                     })
+                                    .build())
+                            .group(OptionGroup.createBuilder()
+                                    .name(Component.literal("Personal Bests"))
+                                    .option(Option.<Boolean>createBuilder()
+                                            .name(Component.literal("Track Personal Bests"))
+                                            .description(OptionDescription.of(Component.literal("Tracks your fastest completion time for each room route.")))
+                                            .binding(true, () -> config.trackPersonalBests, v -> config.trackPersonalBests = v)
+                                            .controller(TickBoxControllerBuilder::create)
+                                            .build())
+                                    .option(Option.<Boolean>createBuilder()
+                                            .name(Component.literal("Send Chat Messages"))
+                                            .description(OptionDescription.of(Component.literal("Sends a chat message when you set a new personal best.")))
+                                            .binding(true, () -> config.sendChatMessages, v -> config.sendChatMessages = v)
+                                            .controller(TickBoxControllerBuilder::create)
+                                            .build())
                                     .build())
                             .build())
 
@@ -519,6 +515,25 @@ public class SRMConfig {
                                     .option(Option.<Color>createBuilder().name(Component.literal("Line Color")).binding(new Color(0, 255, 255), () -> config.pearlLineColor != null ? config.pearlLineColor : new Color(0, 255, 255), v -> config.pearlLineColor = v).controller(ColorControllerBuilder::create).build())
                                     .option(Option.<Integer>createBuilder().name(Component.literal("Line Width")).binding(5, () -> config.pearlLineWidth, v -> config.pearlLineWidth = v).controller(opt -> IntegerSliderControllerBuilder.create(opt).range(1, 10).step(1)).build())
                                     .build())
+                            .group(OptionGroup.createBuilder()
+                                    .name(Component.literal("Custom Secret Sound"))
+                                    .option(Option.<Boolean>createBuilder()
+                                            .name(Component.literal("Enabled"))
+                                            .binding(false, () -> config.customSecretSound, v -> config.customSecretSound = v)
+                                            .controller(TickBoxControllerBuilder::create)
+                                            .build())
+                                    .option(customSoundTypeOption)
+                                    .option(customSoundVolumeOption)
+                                    .option(customSoundPitchOption)
+                                    .option(ButtonOption.createBuilder()
+                                            .name(Component.literal("Preview Sound"))
+                                            .text(Component.literal("Play"))
+                                            .action((screen, opt) -> SecretSounds.preview(
+                                                    customSoundTypeOption.pendingValue(),
+                                                    customSoundVolumeOption.pendingValue(),
+                                                    customSoundPitchOption.pendingValue()))
+                                            .build())
+                                    .build())
                             .build())
 
                     // Text Settings
@@ -605,13 +620,19 @@ public class SRMConfig {
     }
 
     public enum SoundType implements NameableEnum {
-        MOB_BLAZE_HIT("mob.blaze.hit"), FIRE_IGNITE("fire.ignite"), RANDOM_ORB("random.orb"),
-        RANDOM_BREAK("random.break"), MOB_GUARDIAN_LAND_HIT("mob.guardian.land.hit"),
-        NOTE_PLING("note.pling"), ZYRA_MEOW("zyra.meow");
+        MOB_BLAZE_HIT("Blaze Hit", "entity.blaze.hurt"),
+        FIRE_IGNITE("Fire Ignite", "item.flintandsteel.use"),
+        RANDOM_ORB("Experience Orb", "entity.experience_orb.pickup"),
+        RANDOM_BREAK("Item Break", "entity.item.break"),
+        MOB_GUARDIAN_LAND_HIT("Guardian Land Hit", "entity.guardian.hurt_land"),
+        NOTE_PLING("Note Pling", "block.note_block.pling");
+        // ZYRA_MEOW("Zyra Meow", null);
         private final String name;
+        public final String soundId;
 
-        SoundType(String name) {
+        SoundType(String name, String soundId) {
             this.name = name;
+            this.soundId = soundId;
         }
 
         @Override

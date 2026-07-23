@@ -22,7 +22,6 @@
 package xyz.yourboykyle.secretroutes.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.LongArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.Suggestions;
@@ -37,7 +36,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.dungeons.SecretUtils;
-import xyz.yourboykyle.secretroutes.events.OnGuiRender;
 import xyz.yourboykyle.secretroutes.utils.*;
 
 import java.lang.reflect.Field;
@@ -58,10 +56,6 @@ public class Debug {
                         .executes(Debug::executeLever))
                 .then(literal("pos")
                         .executes(Debug::executePos))
-                .then(literal("bloodtime")
-                        .executes(ctx -> executeBloodtime(ctx, 3000L))
-                        .then(argument("time", LongArgumentType.longArg(0))
-                                .executes(ctx -> executeBloodtime(ctx, LongArgumentType.getLong(ctx, "time")))))
                 .then(literal("cr")
                         .executes(Debug::executeCr)
                         .then(literal("f")
@@ -98,12 +92,6 @@ public class Debug {
         BlockPos pos = player.blockPosition();
         context.getSource().sendFeedback(Component.literal("Position: " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ()));
 
-        return 1;
-    }
-
-    private static int executeBloodtime(CommandContext<FabricClientCommandSource> context, long time) {
-        OnGuiRender.spawnNotifTime = System.currentTimeMillis() + time;
-        context.getSource().sendFeedback(Component.literal("Blood spawn notification set for " + time + "ms from now").withStyle(ChatFormatting.GREEN));
         return 1;
     }
 
