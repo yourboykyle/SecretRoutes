@@ -7,7 +7,7 @@
 [![Modrinth Version](https://img.shields.io/modrinth/v/secret-routes-mod?style=for-the-badge&label=version)](https://modrinth.com/mod/secret-routes-mod)&nbsp;&nbsp;
 [![Discord](https://img.shields.io/discord/1111306530357256262?label=discord&color=9089DA&logo=discord&style=for-the-badge)](https://discord.gg/qmtQmz4V3X)&nbsp;&nbsp;
 [![Total Downloads](https://img.shields.io/github/downloads/yourboykyle/SecretRoutes/total?label=downloads&color=208a19&logo=github&style=for-the-badge)](https://github.com/yourboykyle/SecretRoutes/releases)&nbsp;&nbsp;
-[![Modrinth Downloads](https://img.shields.io/modrinth/dt/secret-routes-mod?label=downloads&color=208a19&logo=modrinth&style=for-the-badge)](https://modrinth.com/mod/secret-routes-mod)&nbsp;&nbsp;
+[![Modrinth Downloads](https://img.shields.io/modrinth/dt/secret-routes-mod?label=downloads&color=208a19&logo=modrinth&style=for-the-badge)](https://modrinth.com/mod/secret-routes-mod)&nbsp;&nbsp;t
 
 </div>
 
@@ -32,29 +32,25 @@
         <li>Ender pearl waypoints/ Pearl launch angle lines </li>
         <li>Render entire route (instead of just one secret at a time)</li>
         <li>Render all secrets (Renders all secrets and levers in the room) </li>
-        <li><strong><em>(NEW)</em></strong> Supports multiple routes in the same room (picks closest one)</li>
-        <li> 
-            <details>
-                <summary><strong>Custom Routes</strong></summary>
-                <ul>
-                    <li>Record your own custom routes mostly automatically</li>
-                    <li>Easy HUD display for some recording information</li>
-                    <li>Easily import routes created by others</li>
-                </ul>
-            </details>
+        <li>Supports multiple routes in the same room (picks closest one)</li>
+        <li>Render multiple steps at the same time</li>
+        <li>Custom secret completion sounds</li>
+        <li><strong>Custom Routes</strong>
+            <ul>
+                <li>Record your own custom routes: <a href="https://github.com/ChrisTechs/SRM-Route-Recorder">ChrisTechs/SRM-Route-Recorder</a></li>
+                <li>Easy Scoreboard display for some recording information</li>
+                <li>Easily import routes created by others</li>
+            </ul>
         </li>
-        <li>
-            <details>
-                <summary><strong>Customizable</strong></summary>
-                <ul>
-                    <li>Recolor every single OpenGL rendering item</li>
-                    <li>Toggle on/off all waypoint types individually</li>
-                    <li>Recolor all text boxes to any of Minecraft's 16 colors</li>
-                    <li>Change between particle lines, OpenGL rendered line, or no lines</li>
-                    <li>Save and load different color profiles</li>
-                    <li>Import profiles from others easily</li>
-                </ul>
-            </details>
+        <li><strong>Customizable</strong>
+            <ul>
+                <li>Recolor every single OpenGL rendering item</li>
+                <li>Toggle on/off all waypoint types individually</li>
+                <li>Recolor all text boxes to any of Minecraft's 16 colors</li>
+                <li>Change between particle lines, OpenGL rendered line, or no lines</li>
+                <li>Save and load different color profiles</li>
+                <li>Import profiles from others easily</li>
+            </ul>
         </li>
     </ul>
 </details>
@@ -62,40 +58,18 @@
 <details>
     <summary><strong>Interface</strong></summary>
     <ul>
-        <li>Configurable with a beautifully organised OneConfig interface to easily find all features</li>
+        <li>Configurable with an organised YetAnotherConfigLib interface to easily find all features</li>
     </ul>
 </details>
 
 <details>
-    <summary><strong>QOL</strong></summary>
+    <summary><strong>General</strong></summary>
     <ul>
+        <li>Personal best tracking for room routes</li>
         <li>Auto inform new updates (Toggle on by default)</li>
         <li>Auto download new updates (Toggled off by default)</li>
     </ul>
 </details>
-<details>
-    <summary><strong>Messages</strong></summary>
-    <ul>
-        <details>
-            <summary>Boss message hider</summary>
-            <ul>
-                <li>Individually control which boss' messages to hide and show</li>
-                <li><Strong>Does not impact other mods that use boss messages for timing</Strong></li>
-            </ul>
-        </details>
-         <details>
-            <summary>Blood spawned notification</summary>
-            <ul>
-                <li>Customizable message to display when all blood mobs have spawned</li>
-                <li>Custom color</li>
-                <li>Custom duration</li>
-                <li>Custom position</li>
-                <li>Custom text</li>
-            </ul>
-        </details>
-    </ul>
-</details>
-
 <details>
     <summary><strong>Bridge</strong></summary>
     <ul>
@@ -150,7 +124,6 @@
             <ul>
                 <li><strong>lever</strong> -> Sends some info about the rendered locked chest lever</li>
                 <li><strong>pos</strong> -> Send info about current player position</li>
-                <li><strong>bloodtime</strong> -> display blood ready message for that many milis</li>
                 <li><strong>var</strong> -> print the current value of a variable, or change it to the value of the next argument</li>
             </ul>
         </details> 
