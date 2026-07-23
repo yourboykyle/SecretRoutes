@@ -38,23 +38,22 @@ public class SecretSounds {
             return;
         }
 
-        if (mc.player == null) return;
-
-        Vector3d playerPos = new Vector3d(mc.player.getX(), mc.player.getY(), mc.player.getZ());
-
-        if (config.customSecretSoundType == SRMConfig.SoundType.ZYRA_MEOW) {
-            long test = System.currentTimeMillis() % 9;
-            playLoudSound("secretroutesmod:zyra.meow" + test, config.customSecretSoundVolume, config.customSecretSoundPitch, playerPos);
-            lastPlayed = System.currentTimeMillis();
-        } else {
-            String soundName = config.customSecretSoundType.getDisplayName().getString();
-            playLoudSound(soundName, config.customSecretSoundVolume, config.customSecretSoundPitch, playerPos);
-            lastPlayed = System.currentTimeMillis();
-        }
+        SRMConfig.SoundType soundType = config.customSecretSoundType != null
+                ? config.customSecretSoundType
+                : SRMConfig.SoundType.NOTE_PLING;
+        preview(soundType, config.customSecretSoundVolume, config.customSecretSoundPitch);
+        lastPlayed = System.currentTimeMillis();
     }
 
     public static void secretChime() {
         secretChime(false);
+    }
+
+    public static void preview(SRMConfig.SoundType soundType, float volume, float pitch) {
+        if (mc.player == null || soundType == null) return;
+
+        Vector3d playerPos = new Vector3d(mc.player.getX(), mc.player.getY(), mc.player.getZ());
+        playLoudSound(soundType.soundId, volume, pitch, playerPos);
     }
 
     public static void playLoudSound(String sound, Float volume, Float pitch, Vector3d pos) {

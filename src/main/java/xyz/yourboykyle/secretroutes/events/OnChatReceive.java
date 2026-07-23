@@ -27,13 +27,9 @@ import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import xyz.yourboykyle.secretroutes.Main;
-import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.dungeons.SecretUtils;
 import xyz.yourboykyle.secretroutes.utils.*;
 
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,7 +37,6 @@ import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendVerboseMessage;
 
 public class OnChatReceive {
-    private static final HashMap<String, String> msgMap = new HashMap<>();
     private static boolean allFound = false;
 
     public static void register() {
@@ -50,11 +45,6 @@ public class OnChatReceive {
         // Register high priority handler for secrets tracking
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
             return instance.handleChatReceive(message, overlay);
-        });
-
-        // Register low priority handler for boss message hiding
-        ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
-            return instance.handleBossMessages(message, overlay);
         });
     }
 
@@ -118,53 +108,6 @@ public class OnChatReceive {
                                 RoomRotationUtils.actualToRelative(SecretUtils.lastInteract, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner()),
                                 pos));
                     }
-                }
-            }
-        }
-
-        return true;
-    }
-
-    private boolean handleBossMessages(Component message, boolean overlay) {
-        // Don't process overlay messages
-        if (overlay) return true;
-
-        if (SRMConfig.get().hideBossMessages) {
-            if (msgMap.isEmpty()) {
-                msgMap.put("§r§c[BOSS] The Watcher", "hideWatcher");
-                msgMap.put("§r§c[BOSS] Bonzo", "hideBonzo");
-                msgMap.put("§r§c[BOSS] Scarf", "hideScarf");
-                msgMap.put("§r§c[BOSS] The Professor", "hideProfessor");
-                msgMap.put("§r§c[BOSS] Thorn", "hideThorn");
-                msgMap.put("§r§c[BOSS] Livid", "hideLivid");
-                msgMap.put("§r§c[BOSS] Sadan", "hideSadan");
-                msgMap.put("§r§4[BOSS] Maxor", "hideWitherLords");
-                msgMap.put("§r§4[BOSS] Storm", "hideWitherLords");
-                msgMap.put("§r§4[BOSS] Goldor", "hideWitherLords");
-                msgMap.put("§r§4[BOSS] Necron", "hideWitherLords");
-            }
-
-            String formatted = getFormattedText(message);
-            if (!formatted.contains("BOSS")) return true;
-
-            if (SRMConfig.get().bloodNotif) {
-                if (formatted.equals("§r§c[BOSS] The Watcher§r§f: That will be enough for now.§r")) {
-                    sendChatMessage("KILL BLOOD");
-                    OnGuiRender.spawnNotifTime = System.currentTimeMillis() + SRMConfig.get().bloodBannerDuration;
-                }
-            }
-
-            for (Map.Entry<String, String> entry : msgMap.entrySet()) {
-                try {
-                    Field field = SRMConfig.class.getField(entry.getValue());
-                    field.setAccessible(true);
-                    if (formatted.startsWith(entry.getKey()) && field.getBoolean(null)) {
-                        return false; // Cancel the message
-                    }
-                } catch (NoSuchFieldException ex) {
-                    LogUtils.info("I (_Wyan) screwed up. No field: " + entry.getValue());
-                } catch (IllegalAccessException ex) {
-                    LogUtils.info("I (_Wyan) screwed up. Field not accessible: " + entry.getValue());
                 }
             }
         }
