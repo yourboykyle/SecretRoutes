@@ -48,7 +48,6 @@ public class ConfigUtils {
             "etherwarpsWaypointColor", "minesWaypointColor",
             "interactsWaypointColor",
             "superboomsWaypointColor", "enderpearlWaypointColor",
-            "bloodReadyColor",
 
             // Sizes
             "startTextSize", "exitTextSize",
