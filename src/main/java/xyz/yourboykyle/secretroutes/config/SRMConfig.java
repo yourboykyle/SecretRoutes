@@ -137,7 +137,7 @@ public class SRMConfig {
     @SerialEntry
     public float mineBoxLineWidth = 5f;
     @SerialEntry
-    public Color mine = new Color(255, 255, 0);
+    public Color mine = new Color(255, 236, 0, 82);
     @SerialEntry
     public Color secondStepMine = new Color(177, 173, 97);
 
@@ -675,7 +675,7 @@ public class SRMConfig {
                                     .description(OptionDescription.of(Component.literal("Controls the visuals of mine waypoints")))
                                     .collapsed(true)
                                     .option(Option.<Boolean>createBuilder().name(Component.literal("Enabled")).description(OptionDescription.of(Component.literal("Shows mine waypoint boxes"))).binding(true, () -> config.renderMines, v -> config.renderMines = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<Color>createBuilder().name(Component.literal("Color")).description(OptionDescription.of(Component.literal("Sets the color of mines in the current route step"))).binding(new Color(255, 255, 0), () -> config.mine != null ? config.mine : new Color(255, 255, 0), v -> config.mine = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
+                                    .option(Option.<Color>createBuilder().name(Component.literal("Color")).description(OptionDescription.of(Component.literal("Sets the color of mines in the current route step"))).binding(new Color(255, 236, 0, 82), () -> config.mine != null ? config.mine : new Color(255, 236, 0, 82), v -> config.mine = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
                                     .option(Option.<Color>createBuilder().name(Component.literal("Second Step Color")).description(OptionDescription.of(Component.literal("Used for mine waypoints in the second and later visible route steps"))).binding(new Color(177, 173, 97), () -> config.secondStepMine != null ? config.secondStepMine : new Color(177, 173, 97), v -> config.secondStepMine = v).controller(ColorControllerBuilder::create).build())
                                     .option(Option.<Boolean>createBuilder().name(Component.literal("Full Block")).description(OptionDescription.of(Component.literal("Renders mines as filled blocks instead of outlines"))).binding(false, () -> config.mineFullBlock, v -> config.mineFullBlock = v).controller(TickBoxControllerBuilder::create).build())
                                     .option(Option.<Float>createBuilder().name(Component.literal("Box Line Width")).description(OptionDescription.of(Component.literal("Controls the mine outline thickness when Full Block is disabled"))).binding(5.0f, () -> config.mineBoxLineWidth, v -> config.mineBoxLineWidth = v).controller(opt -> FloatSliderControllerBuilder.create(opt).range(1.0f, 10.0f).step(0.5f)).build())
