@@ -89,6 +89,31 @@ java {
     withSourcesJar()
 }
 
+val testItemSecretProximityTracker by tasks.registering(JavaExec::class) {
+    group = "verification"
+    description = "Runs the item-secret proximity state-machine regression tests"
+    dependsOn(tasks.testClasses)
+    classpath = sourceSets["test"].runtimeClasspath
+    mainClass.set("xyz.yourboykyle.secretroutes.events.ItemSecretProximityTrackerTest")
+}
+
+val testBoxMeshGeometry by tasks.registering(JavaExec::class) {
+    group = "verification"
+    description = "Runs the unified box-mesh geometry regression tests"
+    dependsOn(tasks.testClasses)
+    classpath = sourceSets["test"].runtimeClasspath
+    mainClass.set("xyz.yourboykyle.secretroutes.dungeons.rendering.BoxMeshGeometryTest")
+}
+
+tasks.test {
+    failOnNoDiscoveredTests = false
+}
+
+tasks.check {
+    dependsOn(testItemSecretProximityTracker)
+    dependsOn(testBoxMeshGeometry)
+}
+
 tasks.jar {
     from("LICENSE") {
         rename { "${it}_$mod_archives_name" }
