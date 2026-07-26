@@ -63,6 +63,7 @@ public class SecretUtils {
 
     public static int activeEtherwarpStep = -1;
     public static int targetEtherwarpIndex = 0;
+    private static BlockPos currentEtherwarpTarget;
 
     private static String getColorCode(SRMConfig.TextColor color) {
         return color.formatting.toString();
@@ -78,6 +79,81 @@ public class SecretUtils {
         return stepIndex == Main.currentRoom.currentSecretIndex ? currentColor : secondStepColor;
     }
 
+    private static BlockPos getActualWaypointPosition(JsonElement element) {
+        JsonArray loc = element.getAsJsonArray();
+        return RoomRotationUtils.relativeToActual(
+                new BlockPos(loc.get(0).getAsInt(), loc.get(1).getAsInt(), loc.get(2).getAsInt()),
+                RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner()
+        );
+    }
+
+    private static boolean isPlayerNearEtherwarp(LocalPlayer player, BlockPos pos) {
+        double dx = player.getX() - (pos.getX() + 0.5);
+        double dy = player.getY() - (pos.getY() + 1.0);
+        double dz = player.getZ() - (pos.getZ() + 0.5);
+        double distance = SRMConfig.get().etherwarpDetectionDistance;
+        return (dx * dx + dy * dy + dz * dz) <= distance * distance;
+    }
+
+    private static void updateEtherwarpTarget(JsonArray locations, LocalPlayer player) {
+        if (SRMConfig.get().autoSkipEtherwarps) {
+            int furthestNearbyIndex = -1;
+            for (int i = targetEtherwarpIndex + 1; i < locations.size(); i++) {
+                BlockPos pos = getActualWaypointPosition(locations.get(i));
+                if (!brokenBlocks.contains(pos) && isPlayerNearEtherwarp(player, pos)) {
+                    furthestNearbyIndex = i;
+                }
+            }
+
+            if (furthestNearbyIndex >= 0) {
+                targetEtherwarpIndex = furthestNearbyIndex + 1;
+                return;
+            }
+        }
+
+        if (targetEtherwarpIndex < locations.size()) {
+            BlockPos pos = getActualWaypointPosition(locations.get(targetEtherwarpIndex));
+            if (!brokenBlocks.contains(pos) && isPlayerNearEtherwarp(player, pos)) {
+                targetEtherwarpIndex++;
+            }
+        }
+    }
+
+    public static BlockPos updateCurrentEtherwarpTarget(LocalPlayer player) {
+        SRMConfig config = SRMConfig.get();
+        boolean needsTarget = config.etherwarpAimSound || (config.playerToEtherwarp && !config.wholeRoute);
+
+        if (!needsTarget || player == null || Main.currentRoom == null || Main.currentRoom.currentSecretWaypoints == null
+                || !Main.currentRoom.currentSecretWaypoints.has("etherwarps")) {
+            clearEtherwarpTargetTracking();
+            return null;
+        }
+
+        int activeStep = Main.currentRoom.currentSecretIndex;
+        if (activeEtherwarpStep != activeStep) {
+            activeEtherwarpStep = activeStep;
+            targetEtherwarpIndex = 0;
+        }
+
+        JsonArray locations = Main.currentRoom.currentSecretWaypoints.getAsJsonArray("etherwarps");
+        updateEtherwarpTarget(locations, player);
+
+        if (targetEtherwarpIndex >= locations.size()) {
+            currentEtherwarpTarget = null;
+            return null;
+        }
+
+        BlockPos target = getActualWaypointPosition(locations.get(targetEtherwarpIndex));
+        currentEtherwarpTarget = brokenBlocks.contains(target) ? null : target;
+        return currentEtherwarpTarget;
+    }
+
+    public static void clearEtherwarpTargetTracking() {
+        activeEtherwarpStep = -1;
+        targetEtherwarpIndex = 0;
+        currentEtherwarpTarget = null;
+    }
+
     public static void renderingCallback(JsonObject waypoints, int index2) {
         if (waypoints == null) return;
         if (!shouldRenderRouteStep(index2)) return;
@@ -87,29 +163,28 @@ public class SecretUtils {
             BlockPos nextSecret = Main.currentRoom.getSecretLocation();
             if (nextSecret != null) {
                 Vector3d point = new Vector3d(nextSecret.getX() + 0.5, nextSecret.getY() + 0.5, nextSecret.getZ() + 0.5);
-                Color semiTransparent = new Color(SRMConfig.get().lineColor.getRed(), SRMConfig.get().lineColor.getGreen(), SRMConfig.get().lineColor.getBlue(), 127);
-                RenderingBackend.addLineFromCursor(new RenderTypes.LineFromCursor(point, semiTransparent, SRMConfig.get().width));
+                RenderingBackend.addLineFromCursor(new RenderTypes.LineFromCursor(point, SRMConfig.get().playerToSecretLineColor, SRMConfig.get().playerToSecretLineWidth));
             }
         }
 
         renderWaypointCategory(
                 waypoints, index2, "etherwarps", SRMConfig.get().renderEtherwarps, SRMConfig.get().etherWarp, SRMConfig.get().secondStepEtherWarp,
-                SRMConfig.get().etherwarpFullBlock, SRMConfig.get().etherwarpsTextToggle, SRMConfig.get().etherwarpNumberingToggle, SRMConfig.get().etherwarpsWaypointColor, "etherwarp", SRMConfig.get().etherwarpsTextSize, true
+                SRMConfig.get().etherwarpFullBlock, SRMConfig.get().etherwarpBoxLineWidth, SRMConfig.get().etherwarpsTextToggle, SRMConfig.get().etherwarpNumberingToggle, SRMConfig.get().etherwarpsWaypointColor, "etherwarp", SRMConfig.get().etherwarpsTextSize, true
         );
 
         renderWaypointCategory(
                 waypoints, index2, "mines", SRMConfig.get().renderMines, SRMConfig.get().mine, SRMConfig.get().secondStepMine,
-                SRMConfig.get().mineFullBlock, SRMConfig.get().minesTextToggle, !SRMConfig.get().minesEnumToggle, SRMConfig.get().minesWaypointColor, "mine", SRMConfig.get().minesTextSize, false
+                SRMConfig.get().mineFullBlock, SRMConfig.get().mineBoxLineWidth, SRMConfig.get().minesTextToggle, !SRMConfig.get().minesEnumToggle, SRMConfig.get().minesWaypointColor, "mine", SRMConfig.get().minesTextSize, false
         );
 
         renderWaypointCategory(
                 waypoints, index2, "interacts", SRMConfig.get().renderInteracts, SRMConfig.get().interacts, SRMConfig.get().secondStepInteracts,
-                SRMConfig.get().interactsFullBlock, SRMConfig.get().interactsTextToggle, !SRMConfig.get().interactsEnumToggle, SRMConfig.get().interactWaypointColor, "interact", SRMConfig.get().interactsTextSize, false
+                SRMConfig.get().interactsFullBlock, SRMConfig.get().leverBoxLineWidth, SRMConfig.get().interactsTextToggle, !SRMConfig.get().interactsEnumToggle, SRMConfig.get().interactWaypointColor, "interact", SRMConfig.get().interactsTextSize, false
         );
 
         renderWaypointCategory(
                 waypoints, index2, "tnts", SRMConfig.get().renderSuperboom, SRMConfig.get().superbooms, SRMConfig.get().secondStepSuperbooms,
-                SRMConfig.get().superboomsFullBlock, SRMConfig.get().superboomsTextToggle, !SRMConfig.get().superboomsEnumToggle, SRMConfig.get().superboomsWaypointColor, "superboom", SRMConfig.get().superboomsTextSize, false
+                SRMConfig.get().superboomsFullBlock, SRMConfig.get().superboomBoxLineWidth, SRMConfig.get().superboomsTextToggle, !SRMConfig.get().superboomsEnumToggle, SRMConfig.get().superboomsWaypointColor, "superboom", SRMConfig.get().superboomsTextSize, false
         );
 
         // Render Normal Lines
@@ -131,7 +206,7 @@ public class SecretUtils {
         renderStartAndExitLabels(waypoints, index2);
     }
 
-    private static void renderWaypointCategory(JsonObject waypoints, int stepIndex, String jsonKey, boolean isEnabled, Color primaryColor, Color secondaryColor, boolean isFullBlock, boolean textToggle, boolean showNumbering, SRMConfig.TextColor textColor, String textPrefix, float textSize, boolean isEtherwarp) {
+    private static void renderWaypointCategory(JsonObject waypoints, int stepIndex, String jsonKey, boolean isEnabled, Color primaryColor, Color secondaryColor, boolean isFullBlock, float boxLineWidth, boolean textToggle, boolean showNumbering, SRMConfig.TextColor textColor, String textPrefix, float textSize, boolean isEtherwarp) {
         if (!isEnabled || !waypoints.has(jsonKey)) return;
 
         JsonArray locations = waypoints.getAsJsonArray(jsonKey);
@@ -139,23 +214,13 @@ public class SecretUtils {
         Color boxColor = colorForRouteStep(stepIndex, primaryColor, secondaryColor);
 
         boolean isActiveStep = (stepIndex == Main.currentRoom.currentSecretIndex);
-
-        if (isEtherwarp && isActiveStep) {
-            if (activeEtherwarpStep != stepIndex) {
-                activeEtherwarpStep = stepIndex;
-                targetEtherwarpIndex = 0;
-            }
-        }
+        boolean renderPlayerToEtherwarp = isEtherwarp && isActiveStep && !SRMConfig.get().wholeRoute && SRMConfig.get().playerToEtherwarp;
 
         for (int i = 0; i < locations.size(); i++) {
             JsonElement element = locations.get(i);
-            JsonArray loc = element.getAsJsonArray();
             int currentNum = counter++;
 
-            BlockPos pos = RoomRotationUtils.relativeToActual(
-                    new BlockPos(loc.get(0).getAsInt(), loc.get(1).getAsInt(), loc.get(2).getAsInt()),
-                    RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner()
-            );
+            BlockPos pos = getActualWaypointPosition(element);
 
             if (brokenBlocks.contains(pos)) continue;
 
@@ -167,24 +232,10 @@ public class SecretUtils {
 
             Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
 
-            if (isEtherwarp && isActiveStep && !SRMConfig.get().wholeRoute && SRMConfig.get().playerToEtherwarp) {
-                LocalPlayer player = Minecraft.getInstance().player;
-                if (player != null) {
-                    if (i == targetEtherwarpIndex) {
-                        double dx = player.getX() - (pos.getX() + 0.5);
-                        double dy = player.getY() - (pos.getY() + 1.0);
-                        double dz = player.getZ() - (pos.getZ() + 0.5);
-
-                        if ((dx * dx + dy * dy + dz * dz) <= 2.0) {
-                            targetEtherwarpIndex++;
-                        }
-                    }
-
-                    if (i == targetEtherwarpIndex) {
-                        Vector3d point = new Vector3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
-                        RenderingBackend.addLineFromCursor(new RenderTypes.LineFromCursor(point, new Color(0, 255, 255), SRMConfig.get().width));
-                    }
-                }
+            if (renderPlayerToEtherwarp && pos.equals(currentEtherwarpTarget)) {
+                Vector3d point = new Vector3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+                Color lineColor = SRMConfig.get().useEtherwarpColorForLine ? SRMConfig.get().etherWarp : SRMConfig.get().playerToEtherwarpLineColor;
+                RenderingBackend.addLineFromCursor(new RenderTypes.LineFromCursor(point, lineColor, SRMConfig.get().playerToEtherwarpLineWidth));
             }
 
             String textContent = null;
@@ -192,7 +243,7 @@ public class SecretUtils {
                 textContent = showNumbering ? textPrefix + " " + currentNum : textPrefix;
             }
 
-            submitBoxAndText(position, boxColor, isFullBlock, textToggle, textColor, textContent, textSize, false);
+            submitBoxAndText(position, boxColor, isFullBlock, boxLineWidth, textToggle, textColor, textContent, textSize, false);
         }
     }
 
@@ -237,7 +288,7 @@ public class SecretUtils {
             String textContent = SRMConfig.get().enderpearlEnumToggle ? "ender pearl" : "ender pearl " + (index + 1);
 
             submitBoxAndText(boxPos, enderpearlColor, SRMConfig.get().enderpearlFullBlock,
-                    SRMConfig.get().enderpearlTextToggle, SRMConfig.get().enderpearlWaypointColor, textContent, SRMConfig.get().enderpearlTextSize, false);
+                    SRMConfig.get().enderpearlBoxLineWidth, SRMConfig.get().enderpearlTextToggle, SRMConfig.get().enderpearlWaypointColor, textContent, SRMConfig.get().enderpearlTextSize, false);
 
             double pitch = angleObj.get(0).getAsDouble();
             double yaw = RotationUtils.relativeToActualYaw(angleObj.get(1).getAsFloat(), RoomDirectionUtils.roomDirection()) + 90;
@@ -270,19 +321,19 @@ public class SecretUtils {
             case "interact":
                 if (SRMConfig.get().renderSecretIteract) {
                     Color c = colorForRouteStep(stepIndex, SRMConfig.get().secretsInteract, SRMConfig.get().secondStepSecretsInteract);
-                    submitBoxAndText(position, c, SRMConfig.get().secretsInteractFullBlock, SRMConfig.get().interactTextToggle, SRMConfig.get().interactWaypointColor, "Interact", SRMConfig.get().interactTextSize, true);
+                    submitBoxAndText(position, c, SRMConfig.get().secretsInteractFullBlock, SRMConfig.get().secretBoxLineWidth, SRMConfig.get().interactTextToggle, SRMConfig.get().interactWaypointColor, "Interact", SRMConfig.get().interactTextSize, true);
                 }
                 break;
             case "item":
                 if (SRMConfig.get().renderSecretsItem) {
                     Color c = colorForRouteStep(stepIndex, SRMConfig.get().secretsItem, SRMConfig.get().secondStepSecretsItem);
-                    submitBoxAndText(position, c, SRMConfig.get().secretsItemFullBlock, SRMConfig.get().itemTextToggle, SRMConfig.get().itemWaypointColor, "Item", SRMConfig.get().itemTextSize, true);
+                    submitBoxAndText(position, c, SRMConfig.get().secretsItemFullBlock, SRMConfig.get().secretBoxLineWidth, SRMConfig.get().itemTextToggle, SRMConfig.get().itemWaypointColor, "Item", SRMConfig.get().itemTextSize, true);
                 }
                 break;
             case "bat":
                 if (SRMConfig.get().renderSecretBat) {
                     Color c = colorForRouteStep(stepIndex, SRMConfig.get().secretsBat, SRMConfig.get().secondStepSecretsBat);
-                    submitBoxAndText(position, c, SRMConfig.get().secretsBatFullBlock, SRMConfig.get().batTextToggle, SRMConfig.get().batWaypointColor, "Bat", SRMConfig.get().batTextSize, true);
+                    submitBoxAndText(position, c, SRMConfig.get().secretsBatFullBlock, SRMConfig.get().secretBoxLineWidth, SRMConfig.get().batTextToggle, SRMConfig.get().batWaypointColor, "Bat", SRMConfig.get().batTextSize, true);
                 }
                 break;
         }
@@ -326,13 +377,13 @@ public class SecretUtils {
             Vector3d boxPos = new Vector3d(abs.getOne(), abs.getTwo(), abs.getThree());
 
             if (name.contains("Chest") || name.contains("Wither Essence")) {
-                submitBoxAndText(boxPos, SRMConfig.get().secretsInteract, false, SRMConfig.get().interactTextToggle, SRMConfig.get().interactWaypointColor, "Interact", SRMConfig.get().interactTextSize, true);
+                submitBoxAndText(boxPos, SRMConfig.get().secretsInteract, false, SRMConfig.get().secretBoxLineWidth, SRMConfig.get().interactTextToggle, SRMConfig.get().interactWaypointColor, "Interact", SRMConfig.get().interactTextSize, true);
             } else if (name.contains("Bat")) {
-                submitBoxAndText(boxPos, SRMConfig.get().secretsBat, false, SRMConfig.get().batTextToggle, SRMConfig.get().batWaypointColor, "Bat", SRMConfig.get().batTextSize, true);
+                submitBoxAndText(boxPos, SRMConfig.get().secretsBat, false, SRMConfig.get().secretBoxLineWidth, SRMConfig.get().batTextToggle, SRMConfig.get().batWaypointColor, "Bat", SRMConfig.get().batTextSize, true);
             } else if (name.contains("Lever")) {
-                submitBoxAndText(boxPos, SRMConfig.get().interacts, false, SRMConfig.get().interactsTextToggle, SRMConfig.get().interactWaypointColor, "Interact", SRMConfig.get().interactsTextSize, true);
+                submitBoxAndText(boxPos, SRMConfig.get().interacts, false, SRMConfig.get().leverBoxLineWidth, SRMConfig.get().interactsTextToggle, SRMConfig.get().interactWaypointColor, "Interact", SRMConfig.get().interactsTextSize, true);
             } else if (name.contains("Item")) {
-                submitBoxAndText(boxPos, SRMConfig.get().secretsItem, false, SRMConfig.get().itemTextToggle, SRMConfig.get().itemWaypointColor, "Item", SRMConfig.get().itemTextSize, true);
+                submitBoxAndText(boxPos, SRMConfig.get().secretsItem, false, SRMConfig.get().secretBoxLineWidth, SRMConfig.get().itemTextToggle, SRMConfig.get().itemWaypointColor, "Item", SRMConfig.get().itemTextSize, true);
             }
         }
     }
@@ -404,7 +455,7 @@ public class SecretUtils {
                     RenderingBackend.addFilledBox(new RenderTypes.FilledBox(position, SRMConfig.get().secretsInteract, 1f, 1f, SRMConfig.get().renderLinesThroughWalls));
                 } else {
                     Vector3d position = new Vector3d(abs.getOne(), abs.getTwo(), abs.getThree());
-                    RenderingBackend.addOutlinedBox(new RenderTypes.OutlinedBox(position, SRMConfig.get().secretsInteract, 1f, 1f, SRMConfig.get().renderLinesThroughWalls));
+                    RenderingBackend.addOutlinedBox(new RenderTypes.OutlinedBox(position, SRMConfig.get().secretsInteract, 1f, 1f, SRMConfig.get().secretBoxLineWidth, SRMConfig.get().renderLinesThroughWalls));
                 }
 
                 if (SRMConfig.get().interactsTextToggle) {
@@ -430,9 +481,9 @@ public class SecretUtils {
         }
     }
 
-    private static void submitBoxAndText(Vector3d pos, Color boxColor, boolean isFull, boolean textToggle, SRMConfig.TextColor textColor, String textContent, float textSize, boolean shiftTextUp) {
+    private static void submitBoxAndText(Vector3d pos, Color boxColor, boolean isFull, float boxLineWidth, boolean textToggle, SRMConfig.TextColor textColor, String textContent, float textSize, boolean shiftTextUp) {
         if (isFull) RenderingBackend.addFilledBox(new RenderTypes.FilledBox(pos, boxColor, 1, 1, SRMConfig.get().renderLinesThroughWalls));
-        else RenderingBackend.addOutlinedBox(new RenderTypes.OutlinedBox(pos, boxColor, 1, 1, SRMConfig.get().renderLinesThroughWalls));
+        else RenderingBackend.addOutlinedBox(new RenderTypes.OutlinedBox(pos, boxColor, 1, 1, boxLineWidth, SRMConfig.get().renderLinesThroughWalls));
 
         if (textToggle && textContent != null) {
             Vector3d textPos = shiftTextUp ? new Vector3d(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5) : pos;
@@ -461,6 +512,7 @@ public class SecretUtils {
     }
 
     public static void resetValues() {
+        EtherwarpAimAssist.reset();
         renderLever = false;
         currentLeverPos = null;
         removeBannerTime = null;
@@ -469,8 +521,7 @@ public class SecretUtils {
         leverName = null;
         leverNumber = null;
 
-        activeEtherwarpStep = -1;
-        targetEtherwarpIndex = 0;
+        clearEtherwarpTargetTracking();
 
         brokenBlocks.clear();
     }
