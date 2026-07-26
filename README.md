@@ -150,11 +150,9 @@ Discord: [https://discord.gg/qmtQmz4V3X](https://discord.gg/qmtQmz4V3X)
 ### Credits:
 - @yourboykyle (me) - developer (yourboykyle)
 - @wyannnnn - developer (R-aMcC)
-- @johnd_ - supplied very nice reference code for help translating to 1.21, check out his mod here: https://modrinth.com/mod/hunchclient
+- @christechs - developer (Richard Rampokker Stalman/@eskom_sa)
+- @Itplays - modern route recording + various things
 - @mrfast - help with various things
+- @johnd_ - supplied very nice reference code for help translating to 1.21, check out his mod here: https://modrinth.com/mod/hunchclient
 - @zzyyrraa - recorded routes + meows for custom secret noises
-- @itplays - modern pearlroutes
-- https://github.com/Quantizr/DungeonRoomsMod - code for room detection
-- https://github.com/Soopyboo32/SoopyV2 - code for some rendering functions (translated from JS to java)
-- https://github.com/Dungeons-Guide/Skyblock-Dungeons-Guide - code for some rendering functions
-- https://github.com/odtheking/Odin - copied a small bit of code for playing sounds cus wyan is lazy lol
+- [odtheking/Odin](https://github.com/odtheking/Odin) - code for room detection and secret sounds
