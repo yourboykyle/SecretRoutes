@@ -49,13 +49,15 @@ public class RenderTypes {
         public Color color;
         public float boxWidth;
         public float boxHeight;
+        public float lineWidth;
         public boolean throughWalls;
 
-        public OutlinedBox(Vector3d position, Color color, float boxWidth, float boxHeight, boolean throughWalls) {
+        public OutlinedBox(Vector3d position, Color color, float boxWidth, float boxHeight, float lineWidth, boolean throughWalls) {
             this.position = position;
             this.color = color;
             this.boxWidth = boxWidth;
             this.boxHeight = boxHeight;
+            this.lineWidth = lineWidth;
             this.throughWalls = throughWalls;
         }
     }

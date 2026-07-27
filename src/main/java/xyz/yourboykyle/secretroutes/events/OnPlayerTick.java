@@ -1,7 +1,7 @@
 //#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
- * Copyright 2025 yourboykyle & R-aMcC
+ * Copyright 2025 yourboykyle & R-aMcC & christechs
  *
  * <DO NOT REMOVE THIS COPYRIGHT NOTICE>
  *
@@ -31,6 +31,9 @@ import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.dungeons.Room;
 
 public class OnPlayerTick {
+    private static final long ITEM_SECRET_PROXIMITY_DELAY_NANOS = 1_500_000_000L;
+    private static final ItemSecretProximityTracker ITEM_SECRET_PROXIMITY_TRACKER =
+            new ItemSecretProximityTracker(ITEM_SECRET_PROXIMITY_DELAY_NANOS);
 
     public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(OnPlayerTick::onPlayerTick);
@@ -39,11 +42,16 @@ public class OnPlayerTick {
     private static void onPlayerTick(Minecraft client) {
         try {
             LocalPlayer player = client.player;
-            if (player == null) {
+            if (player == null || client.level == null) {
+                ITEM_SECRET_PROXIMITY_TRACKER.reset();
                 return;
             }
 
-            if (Main.currentRoom == null || Main.currentRoom.name == null) return;
+            Room room = Main.currentRoom;
+            if (room == null || room.name == null) {
+                ITEM_SECRET_PROXIMITY_TRACKER.reset();
+                return;
+            }
 
             //If all secrets in the room have been completed
         /*if(Waypoints.allFound) {
@@ -55,47 +63,20 @@ public class OnPlayerTick {
                 Main.currentRoom.renderLines();
             }
 
-            if (Main.currentRoom.getSecretType() == Room.SECRET_TYPES.BAT) {
-                BlockPos batPos = Main.currentRoom.getSecretLocation();
+            if (room.getSecretType() == Room.SECRET_TYPES.BAT) {
+                BlockPos batPos = room.getSecretLocation();
 
                 if (batPos != null) {
                     BlockPos pos = player.blockPosition();
 
                     if (pos.getX() >= batPos.getX() - 3 && pos.getX() <= batPos.getX() + 3 && pos.getY() >= batPos.getY() - 3 && pos.getY() <= batPos.getY() + 3 && pos.getZ() >= batPos.getZ() - 3 && pos.getZ() <= batPos.getZ() + 3) {
-                        Main.currentRoom.nextSecret();
+                        room.nextSecret();
                         LogUtils.info("Went by bat at " + batPos);
                     }
                 }
             }
 
-        /* This has been commented out because it is causing it to log the secret multiple times if there are 2 secrets in a row in the route.
-        This was originally added because in a specific room, you cannot get the item secret if it spawns and the velocity pushes the item away from you.
-        But you can still get the secret if you walk over to the item secret, or just press the next secret keybind if you're lazy.
-        */
-            if (Main.currentRoom.getSecretType() == Room.SECRET_TYPES.ITEM) {
-                BlockPos itemPos = Main.currentRoom.getSecretLocation();
-
-                if (itemPos != null) {
-                    BlockPos pos = player.blockPosition();
-
-                    if (pos.getX() >= itemPos.getX() - 2 && pos.getX() <= itemPos.getX() + 2 && pos.getY() >= itemPos.getY() - 2 && pos.getY() <= itemPos.getY() + 2 && pos.getZ() >= itemPos.getZ() - 2 && pos.getZ() <= itemPos.getZ() + 2) {
-                        new Thread(() -> {
-                            try {
-
-                                Thread.sleep(1500);
-                                BlockPos currentItemPos = Main.currentRoom.getSecretLocation();
-                                if (Main.currentRoom.getSecretType() == Room.SECRET_TYPES.ITEM && currentItemPos != null && itemPos.getX() == currentItemPos.getX() && itemPos.getY() == currentItemPos.getY() && itemPos.getZ() == currentItemPos.getZ()) {
-
-                                    Main.currentRoom.nextSecret();
-                                    LogUtils.info("Picked up item at " + itemPos + " (Auto)");
-                                }
-                            } catch (InterruptedException e1) {
-                                LogUtils.error(e1);
-                            }
-                        }).start();
-                    }
-                }
-            }
+            handleItemSecretProximity(player, room);
 
 
             // Route Recording
@@ -119,8 +100,28 @@ public class OnPlayerTick {
                 }
             }
         } catch (Exception e) {
+            ITEM_SECRET_PROXIMITY_TRACKER.reset();
             LogUtils.error(e);
             e.printStackTrace();
+        }
+    }
+
+    private static void handleItemSecretProximity(LocalPlayer player, Room room) {
+        boolean isItemSecret = room.getSecretType() == Room.SECRET_TYPES.ITEM;
+        BlockPos itemPos = isItemSecret ? room.getSecretLocation() : null;
+        boolean shouldAdvance = ITEM_SECRET_PROXIMITY_TRACKER.update(
+                room,
+                room.currentSecretRoute,
+                room.currentSecretIndex,
+                isItemSecret,
+                itemPos,
+                player.blockPosition(),
+                System.nanoTime()
+        );
+
+        if (shouldAdvance) {
+            room.nextSecret();
+            LogUtils.info("Picked up item at " + itemPos + " (Auto)");
         }
     }
 }
