@@ -28,6 +28,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.dungeons.SecretUtils;
+import xyz.yourboykyle.secretroutes.dungeons.detection.DungeonScanner;
 import xyz.yourboykyle.secretroutes.utils.*;
 
 import java.util.regex.Matcher;
@@ -78,6 +79,9 @@ public class OnChatReceive {
 
         // Handle regular chat messages
         String formatted = getFormattedText(message);
+        if (!DungeonScanner.isPlayerInCurrentRoom() && formatted.contains("That chest is locked")) {
+            return true;
+        }
         if (formatted.startsWith("§r§cThat chest is locked")) {
             LogUtils.info("§aLocked chest detected!");
             new Thread(() -> {

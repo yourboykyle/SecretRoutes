@@ -257,13 +257,13 @@ public class Main implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(mc -> {
 
             while (SRMKeybinds.NEXT_SECRET.consumeClick()) {
-                if (Main.currentRoom != null) {
+                if (Main.currentRoom != null && DungeonScanner.isPlayerInCurrentRoom()) {
                     Main.currentRoom.nextSecretKeybind();
                 }
             }
 
             while (SRMKeybinds.LAST_SECRET.consumeClick()) {
-                if (Main.currentRoom != null) {
+                if (Main.currentRoom != null && DungeonScanner.isPlayerInCurrentRoom()) {
                     Main.currentRoom.lastSecretKeybind();
                 }
             }
