@@ -33,6 +33,7 @@ import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.dungeons.Room;
 import xyz.yourboykyle.secretroutes.dungeons.SecretUtils;
+import xyz.yourboykyle.secretroutes.dungeons.detection.DungeonScanner;
 import xyz.yourboykyle.secretroutes.utils.*;
 
 import java.util.HashMap;
@@ -103,8 +104,9 @@ public class OnItemPickedUp {
 
     private static void handleItemPickup(LocalPlayer player, String itemName) {
         BlockPos pos = player.blockPosition();
+        boolean playerInCurrentRoom = DungeonScanner.isPlayerInCurrentRoom();
 
-        if (SRMConfig.get().allSecrets) {
+        if (playerInCurrentRoom && SRMConfig.get().allSecrets) {
             if (SecretUtils.secrets == null) return;
             for (JsonElement obj : SecretUtils.secrets) {
                 try {
@@ -125,7 +127,7 @@ public class OnItemPickedUp {
             }
         }
 
-        if (Main.currentRoom != null && Main.currentRoom.getSecretType() == Room.SECRET_TYPES.ITEM) {
+        if (playerInCurrentRoom && Main.currentRoom != null && Main.currentRoom.getSecretType() == Room.SECRET_TYPES.ITEM) {
             BlockPos itemPos = Main.currentRoom.getSecretLocation();
 
             if (pos.getX() >= itemPos.getX() - 10 && pos.getX() <= itemPos.getX() + 10 &&
