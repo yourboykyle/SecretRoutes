@@ -26,6 +26,7 @@ import net.minecraft.client.Minecraft;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.dungeons.SecretUtils;
+import xyz.yourboykyle.secretroutes.dungeons.detection.DungeonScanner;
 import xyz.yourboykyle.secretroutes.utils.EtherwarpAimAssist;
 import xyz.yourboykyle.secretroutes.utils.LocationUtils;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
@@ -36,9 +37,15 @@ public class OnWorldRender {
 
     public static void onRenderWorld() {
         try {
-            if (!LocationUtils.isInDungeons() || !SRMConfig.get().modEnabled || Main.currentRoom == null) {
+            if (!LocationUtils.isInDungeons() || !SRMConfig.get().modEnabled || Main.currentRoom == null
+                    || !DungeonScanner.shouldRenderCurrentRoom()) {
                 resetEtherwarpAimState();
                 return;
+            }
+
+            boolean playerInCurrentRoom = DungeonScanner.isPlayerInCurrentRoom();
+            if (!playerInCurrentRoom) {
+                resetEtherwarpAimState();
             }
 
             boolean allSecretsFound = OnChatReceive.isAllFound();
@@ -67,7 +74,7 @@ public class OnWorldRender {
                 playCompleteFirst = true;
             }
 
-            if (!allSecretsFound) {
+            if (!allSecretsFound && playerInCurrentRoom) {
                 EtherwarpAimAssist.update(SecretUtils.updateCurrentEtherwarpTarget(Minecraft.getInstance().player));
             }
 

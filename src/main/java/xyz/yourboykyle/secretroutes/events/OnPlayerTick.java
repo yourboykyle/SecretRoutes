@@ -27,6 +27,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
+import xyz.yourboykyle.secretroutes.dungeons.detection.DungeonScanner;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.dungeons.Room;
 
@@ -58,12 +59,14 @@ public class OnPlayerTick {
             Main.currentRoom = new Room(null);
         }*/
 
-            // Draw Lines
-            if (SRMConfig.get().modEnabled) {
-                Main.currentRoom.renderLines();
+            boolean playerInCurrentRoom = DungeonScanner.isPlayerInCurrentRoom();
+
+            // Keep the previous route's particle visuals during the room-transition grace.
+            if (SRMConfig.get().modEnabled && DungeonScanner.shouldRenderCurrentRoom()) {
+                room.renderLines();
             }
 
-            if (room.getSecretType() == Room.SECRET_TYPES.BAT) {
+            if (playerInCurrentRoom && room.getSecretType() == Room.SECRET_TYPES.BAT) {
                 BlockPos batPos = room.getSecretLocation();
 
                 if (batPos != null) {
@@ -76,7 +79,11 @@ public class OnPlayerTick {
                 }
             }
 
-            handleItemSecretProximity(player, room);
+            if (playerInCurrentRoom) {
+                handleItemSecretProximity(player, room);
+            } else {
+                ITEM_SECRET_PROXIMITY_TRACKER.reset();
+            }
 
 
             // Route Recording
