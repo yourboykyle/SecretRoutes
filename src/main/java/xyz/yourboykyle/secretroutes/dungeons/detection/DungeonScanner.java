@@ -296,13 +296,13 @@ public class DungeonScanner {
 
     private static boolean isBlueTerracotta(BlockPos pos) {
         if (client.level == null) return false;
-        return client.level.getBlockState(pos).getBlock() == Blocks.DYED_TERRACOTTA.blue();
+        return client.level.getBlockState(pos).getBlock() == Blocks.BLUE_TERRACOTTA;
     }
 
     private static boolean isBlueTerracottaOrAir(BlockPos pos) {
         if (client.level == null) return false;
         Block b = client.level.getBlockState(pos).getBlock();
-        return b == Blocks.AIR || b == Blocks.DYED_TERRACOTTA.blue();
+        return b == Blocks.AIR || b == Blocks.BLUE_TERRACOTTA;
     }
 
     public static Vector2i getRoomCentre(int posX, int posZ) {

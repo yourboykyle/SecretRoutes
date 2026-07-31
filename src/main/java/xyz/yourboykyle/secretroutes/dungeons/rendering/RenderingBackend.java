@@ -21,11 +21,11 @@
 
 package xyz.yourboykyle.secretroutes.dungeons.rendering;
 
-import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.fabricmc.loader.api.FabricLoader;
@@ -56,8 +56,7 @@ public class RenderingBackend {
     private static final RenderPipeline SEE_THROUGH_PIPELINE = RenderPipelines.register(
             RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
                     .withLocation(Identifier.fromNamespaceAndPath(Main.MODID, "see_through_overlay"))
-                    .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR)
-                    .withPrimitiveTopology(PrimitiveTopology.QUADS)
+                    .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
                     .withDepthStencilState(Optional.empty())
                     .withCull(false)
                     .build()
@@ -69,8 +68,7 @@ public class RenderingBackend {
     private static final RenderPipeline NORMAL_PIPELINE = RenderPipelines.register(
             RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
                     .withLocation(Identifier.fromNamespaceAndPath(Main.MODID, "normal_overlay"))
-                    .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR)
-                    .withPrimitiveTopology(PrimitiveTopology.QUADS)
+                    .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
                     .withCull(false)
                     .build()
     );
@@ -81,8 +79,7 @@ public class RenderingBackend {
     private static final RenderPipeline CURSOR_LINE_PIPELINE = RenderPipelines.register(
             RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
                     .withLocation(Identifier.fromNamespaceAndPath(Main.MODID, "cursor_lines_xray"))
-                    .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH)
-                    .withPrimitiveTopology(PrimitiveTopology.LINES)
+                    .withVertexFormat(DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH, VertexFormat.Mode.LINES)
                     .withDepthStencilState(Optional.empty())
                     .build()
     );
@@ -121,7 +118,7 @@ public class RenderingBackend {
         OnWorldRender.onRenderWorld();
 
         PoseStack poseStack = context.poseStack();
-        Camera camera = Minecraft.getInstance().gameRenderer.mainCamera();
+        Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
         Vec3 camPos = camera.position();
         OrderedSubmitNodeCollector collector = context.submitNodeCollector();
 

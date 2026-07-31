@@ -38,7 +38,7 @@ dependencies {
     implementation("net.fabricmc.fabric-api:fabric-api:$fabric_version")
 
     implementation("dev.isxander:yet-another-config-lib:$yacl_version")
-    implementation("com.terraformersmc:modmenu:$modmenu_version")
+    implementation("maven.modrinth:mOgUt4GM:$modmenu_version")
     implementation("maven.modrinth:iris:$iris_version")
 
     implementation("net.hypixel:mod-api:$hypixel_api_version")

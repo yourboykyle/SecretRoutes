@@ -49,7 +49,7 @@ public class SRM {
     private static int executeCommand(CommandContext<FabricClientCommandSource> context) {
         LogUtils.info("Opening SRM GUI (command)...");
         Minecraft.getInstance().execute(() ->
-                Minecraft.getInstance().setScreenAndShow(SRMConfig.getScreen(Minecraft.getInstance().gui.screen()))
+                Minecraft.getInstance().setScreen(SRMConfig.getScreen(Minecraft.getInstance().screen))
         );
         return 1;
     }
