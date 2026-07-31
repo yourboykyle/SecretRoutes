@@ -1,7 +1,7 @@
 //#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
- * Copyright 2025 yourboykyle & R-aMcC
+ * Copyright 2025 yourboykyle & R-aMcC & christechs
  *
  * <DO NOT REMOVE THIS COPYRIGHT NOTICE>
  *
@@ -48,7 +48,6 @@ public class ConfigUtils {
             "etherwarpsWaypointColor", "minesWaypointColor",
             "interactsWaypointColor",
             "superboomsWaypointColor", "enderpearlWaypointColor",
-            "bloodReadyColor",
 
             // Sizes
             "startTextSize", "exitTextSize",
@@ -56,7 +55,9 @@ public class ConfigUtils {
             "interactsTextSize",
             "itemTextSize", "batTextSize", "etherwarpsTextSize",
             "minesTextSize", "superboomsTextSize", "enderpearlTextSize",
-            "pearlLineWidth",
+            "pearlLineWidth", "playerToSecretLineWidth", "playerToEtherwarpLineWidth", "etherwarpDetectionDistance",
+            "etherwarpBoxLineWidth", "secretBoxLineWidth", "mineBoxLineWidth",
+            "leverBoxLineWidth", "superboomBoxLineWidth", "enderpearlBoxLineWidth",
 
             // Toggles
             "startTextToggle", "exitTextToggle",
@@ -72,10 +73,12 @@ public class ConfigUtils {
 
             "renderEtherwarps", "renderMines", "renderInteracts", "renderSuperboom",
             "renderEnderpearls", "renderSecretsItem", "renderSecretIteract", "renderSecretBat",
+            "useEtherwarpColorForLine", "autoSkipEtherwarps",
 
             // Colors
             "lineColor", "etherWarp", "mine", "interacts", "superbooms", "enderpearls",
             "secretsItem", "secretsInteract", "secretsBat", "pearlLineColor",
+            "playerToSecretLineColor", "playerToEtherwarpLineColor",
             "secondStepEtherWarp", "secondStepMine", "secondStepInteracts", "secondStepSuperbooms",
             "secondStepEnderpearls", "secondStepSecretsItem", "secondStepSecretsInteract", "secondStepSecretsBat"
     };

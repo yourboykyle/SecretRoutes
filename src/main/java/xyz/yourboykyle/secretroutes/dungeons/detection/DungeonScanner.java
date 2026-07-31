@@ -43,6 +43,7 @@ import net.minecraft.world.level.block.Blocks;
 import org.joml.Vector2i;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.dungeons.Room;
+import xyz.yourboykyle.secretroutes.dungeons.SecretUtils;
 import xyz.yourboykyle.secretroutes.events.OnEnterNewRoom;
 import xyz.yourboykyle.secretroutes.utils.LocationUtils;
 
@@ -59,10 +60,14 @@ public class DungeonScanner {
 
     public static DungeonRoom currentRoom = null;
     public static final Set<DungeonRoom> passedRooms = new HashSet<>();
-    private static Vector2i lastRoomCentre = new Vector2i(0, 0);
+    private static Vector2i scanRoomCentre = null;
+    private static long visualGraceDeadlineNanos = -1L;
+    private static long nextScanAttemptNanos = 0L;
 
     private static final int ROOM_SIZE_SHIFT = 5;
     private static final int START_COORDINATE = -185;
+    private static final long ROOM_VISUAL_GRACE_NANOS = 1_000_000_000L;
+    private static final long ROOM_SCAN_RETRY_NANOS = 250_000_000L;
     private static final List<Direction> HORIZONTALS = Arrays.stream(Direction.values())
             .filter(d -> d.getAxis().isHorizontal()).toList();
 
@@ -72,12 +77,12 @@ public class DungeonScanner {
         ClientPlayConnectionEvents.DISCONNECT.register((h, c) -> reset());
 
         ClientTickEvents.END_CLIENT_TICK.register(mc -> {
-            if (mc.player == null || mc.level == null) return;
+            if (mc.player == null || mc.level == null) {
+                clearScannerState();
+                return;
+            }
             if (!LocationUtils.isInDungeons()) {
-                if (currentRoom != null) {
-                    currentRoom = null;
-                    Main.currentRoom = new Room(null);
-                }
+                clearScannerState();
                 return;
             }
             tick();
@@ -103,26 +108,49 @@ public class DungeonScanner {
         int playerX = (int) client.player.getX();
         int playerZ = (int) client.player.getZ();
         Vector2i roomCentre = getRoomCentre(playerX, playerZ);
+        long now = System.nanoTime();
 
-        if (roomCentre.equals(lastRoomCentre)) return;
-        lastRoomCentre = roomCentre;
+        if (currentRoom != null && hasComponent(currentRoom, roomCentre)) {
+            clearTransitionState();
+            return;
+        }
+
+        if (currentRoom != null && visualGraceDeadlineNanos < 0L) {
+            visualGraceDeadlineNanos = now + ROOM_VISUAL_GRACE_NANOS;
+        }
+
+        if (scanRoomCentre == null || !scanRoomCentre.equals(roomCentre)) {
+            scanRoomCentre = new Vector2i(roomCentre);
+            nextScanAttemptNanos = 0L;
+        }
 
         for (DungeonRoom passed : passedRooms) {
             for (RoomComponent comp : passed.roomComponents) {
                 if (comp.vec2().equals(roomCentre)) {
-                    if (currentRoom == null || !hasComponent(currentRoom, roomCentre)) enterRoom(passed);
+                    enterRoom(passed);
                     return;
                 }
             }
         }
 
-        if (!client.level.getChunkSource().hasChunk(roomCentre.x >> 4, roomCentre.y >> 4)) return;
+        if (client.level.getChunkSource().hasChunk(roomCentre.x >> 4, roomCentre.y >> 4)
+                && now - nextScanAttemptNanos >= 0L) {
+            DungeonRoom newRoom = scanRoom(roomCentre);
+            if (newRoom != null && newRoom.rotation != Rotations.NONE) {
+                enterRoom(newRoom);
+                return;
+            }
+            nextScanAttemptNanos = now + ROOM_SCAN_RETRY_NANOS;
+        }
 
-        DungeonRoom newRoom = scanRoom(roomCentre);
-        if (newRoom != null && newRoom.rotation != Rotations.NONE) enterRoom(newRoom);
+        if (currentRoom != null && visualGraceDeadlineNanos >= 0L
+                && now - visualGraceDeadlineNanos >= 0L) {
+            invalidateActiveRoom();
+        }
     }
 
     private static void enterRoom(DungeonRoom room) {
+        clearTransitionState();
         currentRoom = room;
         boolean exists = false;
         for(DungeonRoom r : passedRooms) {
@@ -135,6 +163,47 @@ public class DungeonScanner {
         Room newRoomObj = new Room(room.data.name());
         Main.currentRoom = newRoomObj;
         OnEnterNewRoom.onEnterNewRoom(newRoomObj);
+    }
+
+    public static boolean isPlayerInCurrentRoom() {
+        if (!LocationUtils.isInDungeons() || client.player == null || client.level == null || currentRoom == null) {
+            return false;
+        }
+        Vector2i playerRoomCentre = getRoomCentre((int) client.player.getX(), (int) client.player.getZ());
+        return hasComponent(currentRoom, playerRoomCentre);
+    }
+
+    public static boolean shouldRenderCurrentRoom() {
+        if (!LocationUtils.isInDungeons() || client.player == null || client.level == null
+                || currentRoom == null || Main.currentRoom == null || Main.currentRoom.name == null) {
+            return false;
+        }
+        if (isPlayerInCurrentRoom()) {
+            return true;
+        }
+        return visualGraceDeadlineNanos < 0L || System.nanoTime() - visualGraceDeadlineNanos < 0L;
+    }
+
+    private static void invalidateActiveRoom() {
+        currentRoom = null;
+        Main.currentRoom = new Room(null);
+        SecretUtils.secrets = null;
+        SecretUtils.secretLocations = new ArrayList<>();
+        SecretUtils.resetValues();
+        visualGraceDeadlineNanos = -1L;
+    }
+
+    private static void clearTransitionState() {
+        scanRoomCentre = null;
+        visualGraceDeadlineNanos = -1L;
+        nextScanAttemptNanos = 0L;
+    }
+
+    private static void clearScannerState() {
+        if (currentRoom != null || (Main.currentRoom != null && Main.currentRoom.name != null)) {
+            invalidateActiveRoom();
+        }
+        clearTransitionState();
     }
 
     private static boolean hasComponent(DungeonRoom room, Vector2i target) {
@@ -282,10 +351,13 @@ public class DungeonScanner {
     }
 
     private static void reset() {
-        lastRoomCentre = new Vector2i(0, 0);
         currentRoom = null;
         passedRooms.clear();
         Main.currentRoom = null;
+        SecretUtils.secrets = null;
+        SecretUtils.secretLocations = new ArrayList<>();
+        SecretUtils.resetValues();
+        clearTransitionState();
     }
 }
 //#endif

@@ -1,5 +1,5 @@
 <h1 align="center">
-  Secret Routes Mod - Now on 1.21!
+  Secret Routes Mod
 </h1>
 
 <div align="center">
@@ -32,29 +32,25 @@
         <li>Ender pearl waypoints/ Pearl launch angle lines </li>
         <li>Render entire route (instead of just one secret at a time)</li>
         <li>Render all secrets (Renders all secrets and levers in the room) </li>
-        <li><strong><em>(NEW)</em></strong> Supports multiple routes in the same room (picks closest one)</li>
-        <li> 
-            <details>
-                <summary><strong>Custom Routes</strong></summary>
-                <ul>
-                    <li>Record your own custom routes mostly automatically</li>
-                    <li>Easy HUD display for some recording information</li>
-                    <li>Easily import routes created by others</li>
-                </ul>
-            </details>
+        <li>Supports multiple routes in the same room (picks closest one)</li>
+        <li>Render multiple steps at the same time</li>
+        <li>Custom secret completion sounds</li>
+        <li><strong>Custom Routes</strong>
+            <ul>
+                <li>Record your own custom routes: <a href="https://github.com/ChrisTechs/SRM-Route-Recorder">ChrisTechs/SRM-Route-Recorder</a></li>
+                <li>Easy Scoreboard display for some recording information</li>
+                <li>Easily import routes created by others</li>
+            </ul>
         </li>
-        <li>
-            <details>
-                <summary><strong>Customizable</strong></summary>
-                <ul>
-                    <li>Recolor every single OpenGL rendering item</li>
-                    <li>Toggle on/off all waypoint types individually</li>
-                    <li>Recolor all text boxes to any of Minecraft's 16 colors</li>
-                    <li>Change between particle lines, OpenGL rendered line, or no lines</li>
-                    <li>Save and load different color profiles</li>
-                    <li>Import profiles from others easily</li>
-                </ul>
-            </details>
+        <li><strong>Customizable</strong>
+            <ul>
+                <li>Recolor every single OpenGL rendering item</li>
+                <li>Toggle on/off all waypoint types individually</li>
+                <li>Recolor all text boxes to any of Minecraft's 16 colors</li>
+                <li>Change between particle lines, OpenGL rendered line, or no lines</li>
+                <li>Save and load different color profiles</li>
+                <li>Import profiles from others easily</li>
+            </ul>
         </li>
     </ul>
 </details>
@@ -62,40 +58,18 @@
 <details>
     <summary><strong>Interface</strong></summary>
     <ul>
-        <li>Configurable with a beautifully organised OneConfig interface to easily find all features</li>
+        <li>Configurable with an organised YetAnotherConfigLib interface to easily find all features</li>
     </ul>
 </details>
 
 <details>
-    <summary><strong>QOL</strong></summary>
+    <summary><strong>General</strong></summary>
     <ul>
+        <li>Personal best tracking for room routes</li>
         <li>Auto inform new updates (Toggle on by default)</li>
         <li>Auto download new updates (Toggled off by default)</li>
     </ul>
 </details>
-<details>
-    <summary><strong>Messages</strong></summary>
-    <ul>
-        <details>
-            <summary>Boss message hider</summary>
-            <ul>
-                <li>Individually control which boss' messages to hide and show</li>
-                <li><Strong>Does not impact other mods that use boss messages for timing</Strong></li>
-            </ul>
-        </details>
-         <details>
-            <summary>Blood spawned notification</summary>
-            <ul>
-                <li>Customizable message to display when all blood mobs have spawned</li>
-                <li>Custom color</li>
-                <li>Custom duration</li>
-                <li>Custom position</li>
-                <li>Custom text</li>
-            </ul>
-        </details>
-    </ul>
-</details>
-
 <details>
     <summary><strong>Bridge</strong></summary>
     <ul>
@@ -150,7 +124,6 @@
             <ul>
                 <li><strong>lever</strong> -> Sends some info about the rendered locked chest lever</li>
                 <li><strong>pos</strong> -> Send info about current player position</li>
-                <li><strong>bloodtime</strong> -> display blood ready message for that many milis</li>
                 <li><strong>var</strong> -> print the current value of a variable, or change it to the value of the next argument</li>
             </ul>
         </details> 
@@ -177,11 +150,9 @@ Discord: [https://discord.gg/qmtQmz4V3X](https://discord.gg/qmtQmz4V3X)
 ### Credits:
 - @yourboykyle (me) - developer (yourboykyle)
 - @wyannnnn - developer (R-aMcC)
-- @johnd_ - supplied very nice reference code for help translating to 1.21, check out his mod here: https://modrinth.com/mod/hunchclient
+- @christechs - developer (Richard Rampokker Stalman/@eskom_sa)
+- @Itplays - modern route recording + various things
 - @mrfast - help with various things
+- @johnd_ - supplied very nice reference code for help translating to 1.21, check out his mod here: https://modrinth.com/mod/hunchclient
 - @zzyyrraa - recorded routes + meows for custom secret noises
-- @itplays - modern pearlroutes
-- https://github.com/Quantizr/DungeonRoomsMod - code for room detection
-- https://github.com/Soopyboo32/SoopyV2 - code for some rendering functions (translated from JS to java)
-- https://github.com/Dungeons-Guide/Skyblock-Dungeons-Guide - code for some rendering functions
-- https://github.com/odtheking/Odin - copied a small bit of code for playing sounds cus wyan is lazy lol
+- [odtheking/Odin](https://github.com/odtheking/Odin) - code for room detection and secret sounds

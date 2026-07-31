@@ -1,7 +1,7 @@
 //#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
- * Copyright 2025 yourboykyle & R-aMcC
+ * Copyright 2025 yourboykyle & R-aMcC & christechs
  *
  * <DO NOT REMOVE THIS COPYRIGHT NOTICE>
  *
@@ -44,7 +44,6 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import xyz.yourboykyle.secretroutes.Main;
-import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.events.OnWorldRender;
 
 import java.awt.*;
@@ -77,6 +76,17 @@ public class RenderingBackend {
             "secretroutes_normal",
             RenderSetup.builder(NORMAL_PIPELINE).createRenderSetup()
     );
+    private static final RenderPipeline CURSOR_LINE_PIPELINE = RenderPipelines.register(
+            RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
+                    .withLocation(Identifier.fromNamespaceAndPath(Main.MODID, "cursor_lines_xray"))
+                    .withVertexFormat(DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH, VertexFormat.Mode.LINES)
+                    .withDepthStencilState(Optional.empty())
+                    .build()
+    );
+    private static final RenderType CURSOR_LINE_LAYER = RenderType.create(
+            "secretroutes_cursor_lines_xray",
+            RenderSetup.builder(CURSOR_LINE_PIPELINE).createRenderSetup()
+    );
 
     public static List<RenderTypes.WorldText> worldTexts = new ArrayList<>();
     public static List<RenderTypes.OutlinedBox> outlinedBoxes = new ArrayList<>();
@@ -87,6 +97,7 @@ public class RenderingBackend {
     private static final Vector3f SCRATCH_LINE_DIR = new Vector3f();
     private static final Vector3f SCRATCH_CAM_DIR = new Vector3f();
     private static final Vector3f SCRATCH_WIDTH_DIR = new Vector3f();
+    private static final BoxMeshCache BOX_MESH_CACHE = new BoxMeshCache();
 
     public static void register() {
         LevelRenderEvents.COLLECT_SUBMITS.register(RenderingBackend::render);
@@ -96,6 +107,7 @@ public class RenderingBackend {
             try {
                 IrisApi.getInstance().assignPipeline(SEE_THROUGH_PIPELINE, IrisProgram.BASIC);
                 IrisApi.getInstance().assignPipeline(NORMAL_PIPELINE, IrisProgram.BASIC);
+                IrisApi.getInstance().assignPipeline(CURSOR_LINE_PIPELINE, IrisProgram.LINES);
             } catch (Exception e) {
                 e.printStackTrace(System.err);
             }
@@ -128,17 +140,12 @@ public class RenderingBackend {
             if (line.throughWalls) hasSeeThrough = true;
             else hasNormal = true;
         }
-        if (!linesFromCursor.isEmpty()) {
-            hasSeeThrough = true;
-        }
-
         if (hasSeeThrough) {
             collector.submitCustomGeometry(poseStack, SEE_THROUGH_LAYER, (pose, buffer) -> {
                 Matrix4f matrix = pose.pose();
                 renderFilledBoxes(buffer, matrix, camPos, true);
                 renderOutlinedBoxesAsQuads(buffer, matrix, camPos, true);
                 renderLinesAsQuads(buffer, matrix, camPos, true);
-                renderLinesFromCursorAsQuads(buffer, matrix, camPos, true);
             });
         }
 
@@ -148,8 +155,13 @@ public class RenderingBackend {
                 renderFilledBoxes(buffer, matrix, camPos, false);
                 renderOutlinedBoxesAsQuads(buffer, matrix, camPos, false);
                 renderLinesAsQuads(buffer, matrix, camPos, false);
-                renderLinesFromCursorAsQuads(buffer, matrix, camPos, false);
             });
+        }
+
+        if (!linesFromCursor.isEmpty()) {
+            collector.submitCustomGeometry(poseStack, CURSOR_LINE_LAYER, (pose, buffer) ->
+                    renderLinesFromCursor(buffer, pose, camPos)
+            );
         }
 
         if (!worldTexts.isEmpty()) {
@@ -197,13 +209,28 @@ public class RenderingBackend {
 
     private static void renderOutlinedBoxesAsQuads(VertexConsumer buffer, Matrix4f mat, Vec3 camPos, boolean throughWalls) {
         float cx = (float) camPos.x, cy = (float) camPos.y, cz = (float) camPos.z;
-        float thickness = Math.max(0.002f, SRMConfig.get().boxLineWidth * THICKNESS_MULTIPLIER);
+
         for (RenderTypes.OutlinedBox ob : outlinedBoxes) {
             if (ob.throughWalls != throughWalls) continue;
+            float thickness = Math.max(0.002f, ob.lineWidth * THICKNESS_MULTIPLIER);
             float minX = (float) ob.position.x - cx, minY = (float) ob.position.y - cy, minZ = (float) ob.position.z - cz;
-            float maxX = minX + (float) ob.boxWidth, maxY = minY + (float) ob.boxHeight, maxZ = minZ + (float) ob.boxWidth;
-            drawBoxEdgesPrimitive(buffer, mat, minX, minY, minZ, maxX, maxY, maxZ,
-                    ob.color.getRed() / 255f, ob.color.getGreen() / 255f, ob.color.getBlue() / 255f, ob.color.getAlpha() / 255f, thickness);
+            float width = (float) ob.boxWidth;
+            float height = (float) ob.boxHeight;
+            float r = ob.color.getRed() / 255f;
+            float g = ob.color.getGreen() / 255f;
+            float b = ob.color.getBlue() / 255f;
+            float a = ob.color.getAlpha() / 255f;
+
+            drawCachedMesh(buffer, mat, BOX_MESH_CACHE.get(width, height, thickness), minX, minY, minZ, r, g, b, a);
+        }
+    }
+
+    private static void drawCachedMesh(VertexConsumer buffer, Matrix4f mat, float[] vertices, float offsetX, float offsetY, float offsetZ, float r, float g, float b, float a) {
+        int light = 15728880;
+        for (int i = 0; i < vertices.length; i += 3) {
+            buffer.addVertex(mat, vertices[i] + offsetX, vertices[i + 1] + offsetY, vertices[i + 2] + offsetZ)
+                    .setColor(r, g, b, a)
+                    .setLight(light);
         }
     }
 
@@ -219,51 +246,38 @@ public class RenderingBackend {
         }
     }
 
-    private static void renderLinesFromCursorAsQuads(VertexConsumer buffer, Matrix4f mat, Vec3 camPos, boolean throughWalls) {
-        if (!throughWalls) return;
-        if (linesFromCursor.isEmpty()) return;
-
+    private static void renderLinesFromCursor(VertexConsumer buffer, PoseStack.Pose pose, Vec3 camPos) {
         Minecraft mc = Minecraft.getInstance();
-        Camera camera = mc.gameRenderer.getMainCamera();
+        if (mc.player == null) return;
 
-        Quaternionf rot = camera.rotation();
-        Vector3f forward = new Vector3f(0, 0, -1);
-        rot.transform(forward);
-
-        Vector3f up = new Vector3f(0, 1, 0);
-        rot.transform(up);
-
+        float partialTick = mc.getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        Vec3 start = mc.player.getEyePosition(partialTick).add(mc.player.getLookAngle().scale(2.0));
+        float sx = (float) (start.x - camPos.x);
+        float sy = (float) (start.y - camPos.y);
+        float sz = (float) (start.z - camPos.z);
+        Matrix4f mat = pose.pose();
         for (RenderTypes.LineFromCursor line : linesFromCursor) {
-            float ex = (float)(line.point.x - camPos.x);
-            float ey = (float)(line.point.y - camPos.y);
-            float ez = (float)(line.point.z - camPos.z);
+            float ex = (float) (line.point.x - camPos.x);
+            float ey = (float) (line.point.y - camPos.y);
+            float ez = (float) (line.point.z - camPos.z);
+            SCRATCH_LINE_DIR.set(ex - sx, ey - sy, ez - sz);
+            if (SCRATCH_LINE_DIR.lengthSquared() < 0.0001f) continue;
+            SCRATCH_LINE_DIR.normalize();
 
-            float startDist = 0.5f;
-            float sx = forward.x * startDist;
-            float sy = forward.y * startDist;
-            float sz = forward.z * startDist;
-
-            SCRATCH_LINE_DIR.set(ex - sx, ey - sy, ez - sz).normalize();
-
-            SCRATCH_LINE_DIR.cross(forward, SCRATCH_WIDTH_DIR);
-            if (SCRATCH_WIDTH_DIR.lengthSquared() < 0.0001f) {
-                SCRATCH_LINE_DIR.cross(up, SCRATCH_WIDTH_DIR);
-            }
-
-            float thickness = Math.max(0.002f, line.lineWidth * THICKNESS_MULTIPLIER);
-            SCRATCH_WIDTH_DIR.normalize().mul(thickness / 2.0f);
-            float wx = SCRATCH_WIDTH_DIR.x, wy = SCRATCH_WIDTH_DIR.y, wz = SCRATCH_WIDTH_DIR.z;
-
-            float r = line.color.getRed()   / 255f;
+            float r = line.color.getRed() / 255f;
             float g = line.color.getGreen() / 255f;
-            float b = line.color.getBlue()  / 255f;
+            float b = line.color.getBlue() / 255f;
             float a = line.color.getAlpha() / 255f;
-            int light = 15728880;
+            float width = Math.max(1.0f, line.lineWidth);
 
-            buffer.addVertex(mat, sx - wx, sy - wy, sz - wz).setColor(r, g, b, a).setLight(light);
-            buffer.addVertex(mat, sx + wx, sy + wy, sz + wz).setColor(r, g, b, a).setLight(light);
-            buffer.addVertex(mat, ex + wx, ey + wy, ez + wz).setColor(r, g, b, a).setLight(light);
-            buffer.addVertex(mat, ex - wx, ey - wy, ez - wz).setColor(r, g, b, a).setLight(light);
+            buffer.addVertex(mat, sx, sy, sz)
+                    .setNormal(pose, SCRATCH_LINE_DIR.x, SCRATCH_LINE_DIR.y, SCRATCH_LINE_DIR.z)
+                    .setColor(r, g, b, a)
+                    .setLineWidth(width);
+            buffer.addVertex(mat, ex, ey, ez)
+                    .setNormal(pose, SCRATCH_LINE_DIR.x, SCRATCH_LINE_DIR.y, SCRATCH_LINE_DIR.z)
+                    .setColor(r, g, b, a)
+                    .setLineWidth(width);
         }
     }
 
@@ -287,21 +301,6 @@ public class RenderingBackend {
         buffer.addVertex(mat, sx + wx, sy + wy, sz + wz).setColor(r, g, b, a).setLight(light);
         buffer.addVertex(mat, ex + wx, ey + wy, ez + wz).setColor(r, g, b, a).setLight(light);
         buffer.addVertex(mat, ex - wx, ey - wy, ez - wz).setColor(r, g, b, a).setLight(light);
-    }
-
-    private static void drawBoxEdgesPrimitive(VertexConsumer buffer, Matrix4f mat, float minX, float minY, float minZ, float maxX, float maxY, float maxZ, float r, float g, float b, float a, float t) {
-        drawBillboardLinePrimitive(buffer, mat, minX, minY, minZ, maxX, minY, minZ, r, g, b, a, t);
-        drawBillboardLinePrimitive(buffer, mat, maxX, minY, minZ, maxX, minY, maxZ, r, g, b, a, t);
-        drawBillboardLinePrimitive(buffer, mat, maxX, minY, maxZ, minX, minY, maxZ, r, g, b, a, t);
-        drawBillboardLinePrimitive(buffer, mat, minX, minY, maxZ, minX, minY, minZ, r, g, b, a, t);
-        drawBillboardLinePrimitive(buffer, mat, minX, maxY, minZ, maxX, maxY, minZ, r, g, b, a, t);
-        drawBillboardLinePrimitive(buffer, mat, maxX, maxY, minZ, maxX, maxY, maxZ, r, g, b, a, t);
-        drawBillboardLinePrimitive(buffer, mat, maxX, maxY, maxZ, minX, maxY, maxZ, r, g, b, a, t);
-        drawBillboardLinePrimitive(buffer, mat, minX, maxY, maxZ, minX, maxY, minZ, r, g, b, a, t);
-        drawBillboardLinePrimitive(buffer, mat, minX, minY, minZ, minX, maxY, minZ, r, g, b, a, t);
-        drawBillboardLinePrimitive(buffer, mat, maxX, minY, minZ, maxX, maxY, minZ, r, g, b, a, t);
-        drawBillboardLinePrimitive(buffer, mat, minX, minY, maxZ, minX, maxY, maxZ, r, g, b, a, t);
-        drawBillboardLinePrimitive(buffer, mat, maxX, minY, maxZ, maxX, maxY, maxZ, r, g, b, a, t);
     }
 
     private static void drawBoxFacesPrimitive(VertexConsumer buffer, Matrix4f mat, float x1, float y1, float z1, float x2, float y2, float z2, float r, float g, float b, float a) {
@@ -363,5 +362,6 @@ public class RenderingBackend {
     public static void addLineFromCursor(RenderTypes.LineFromCursor lineFromCursor) {
         if (!linesFromCursor.contains(lineFromCursor)) linesFromCursor.add(lineFromCursor);
     }
+
 }
 //#endif

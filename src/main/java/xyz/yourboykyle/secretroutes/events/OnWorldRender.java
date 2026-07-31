@@ -1,7 +1,7 @@
 //#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
- * Copyright 2025 yourboykyle & R-aMcC
+ * Copyright 2025 yourboykyle & R-aMcC & christechs
  *
  * <DO NOT REMOVE THIS COPYRIGHT NOTICE>
  *
@@ -22,11 +22,14 @@
 package xyz.yourboykyle.secretroutes.events;
 
 import com.google.gson.JsonArray;
+import net.minecraft.client.Minecraft;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
+import xyz.yourboykyle.secretroutes.dungeons.SecretUtils;
+import xyz.yourboykyle.secretroutes.dungeons.detection.DungeonScanner;
+import xyz.yourboykyle.secretroutes.utils.EtherwarpAimAssist;
 import xyz.yourboykyle.secretroutes.utils.LocationUtils;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
-import xyz.yourboykyle.secretroutes.dungeons.SecretUtils;
 
 public class OnWorldRender {
     private final static String verboseTAG = "Rendering";
@@ -34,11 +37,20 @@ public class OnWorldRender {
 
     public static void onRenderWorld() {
         try {
-            if (!LocationUtils.isInDungeons() || !SRMConfig.get().modEnabled || Main.currentRoom == null) {
+            if (!LocationUtils.isInDungeons() || !SRMConfig.get().modEnabled || Main.currentRoom == null
+                    || !DungeonScanner.shouldRenderCurrentRoom()) {
+                resetEtherwarpAimState();
                 return;
             }
 
-            if (OnChatReceive.isAllFound()) {
+            boolean playerInCurrentRoom = DungeonScanner.isPlayerInCurrentRoom();
+            if (!playerInCurrentRoom) {
+                resetEtherwarpAimState();
+            }
+
+            boolean allSecretsFound = OnChatReceive.isAllFound();
+            if (allSecretsFound) {
+                resetEtherwarpAimState();
                 /*
                 if(playCompleteFirst){
                     playCompleteFirst = false;
@@ -54,12 +66,16 @@ public class OnWorldRender {
                     }).start();
                 }
 
-                 */
+                */
                 if (!SRMConfig.get().renderComplete) {
                     return;
                 }
             } else {
                 playCompleteFirst = true;
+            }
+
+            if (!allSecretsFound && playerInCurrentRoom) {
+                EtherwarpAimAssist.update(SecretUtils.updateCurrentEtherwarpTarget(Minecraft.getInstance().player));
             }
 
             if (SRMConfig.get().allSecrets) {
@@ -90,8 +106,14 @@ public class OnWorldRender {
                 SecretUtils.renderLever();
             }
         } catch (Exception e) {
+            resetEtherwarpAimState();
             LogUtils.error(e);
         }
+    }
+
+    private static void resetEtherwarpAimState() {
+        SecretUtils.clearEtherwarpTargetTracking();
+        EtherwarpAimAssist.reset();
     }
 
 }

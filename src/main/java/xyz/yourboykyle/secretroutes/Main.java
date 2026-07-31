@@ -2,7 +2,7 @@
 package xyz.yourboykyle.secretroutes;
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
- * Copyright 2025 yourboykyle & R-aMcC
+ * Copyright 2025 yourboykyle & R-aMcC & christechs
  *
  * <DO NOT REMOVE THIS COPYRIGHT NOTICE>
  *
@@ -257,13 +257,13 @@ public class Main implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(mc -> {
 
             while (SRMKeybinds.NEXT_SECRET.consumeClick()) {
-                if (Main.currentRoom != null) {
+                if (Main.currentRoom != null && DungeonScanner.isPlayerInCurrentRoom()) {
                     Main.currentRoom.nextSecretKeybind();
                 }
             }
 
             while (SRMKeybinds.LAST_SECRET.consumeClick()) {
-                if (Main.currentRoom != null) {
+                if (Main.currentRoom != null && DungeonScanner.isPlayerInCurrentRoom()) {
                     Main.currentRoom.lastSecretKeybind();
                 }
             }
@@ -283,7 +283,6 @@ public class Main implements ClientModInitializer {
         GuildEvents.register();
         OnBlockBreak.register();
         OnChatReceive.register();
-        OnGuiRender.register();
         OnItemPickedUp.register();
         OnMouseInput.register();
         OnPlayerInteract.register();

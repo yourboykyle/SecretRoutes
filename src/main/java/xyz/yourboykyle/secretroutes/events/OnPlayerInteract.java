@@ -1,7 +1,7 @@
 //#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
- * Copyright 2025 yourboykyle & R-aMcC
+ * Copyright 2025 yourboykyle & R-aMcC & christechs
  *
  * <DO NOT REMOVE THIS COPYRIGHT NOTICE>
  *
@@ -36,6 +36,7 @@ import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.dungeons.Room;
 import xyz.yourboykyle.secretroutes.dungeons.SecretUtils;
+import xyz.yourboykyle.secretroutes.dungeons.detection.DungeonScanner;
 import xyz.yourboykyle.secretroutes.utils.*;
 
 public class OnPlayerInteract {
@@ -78,36 +79,38 @@ public class OnPlayerInteract {
                 return InteractionResult.PASS;
             }
 
-            if (BlockUtils.blockPos(RoomRotationUtils.actualToRelative(pos, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner())).equals(BlockUtils.blockPos(SecretUtils.currentLeverPos))) {
-                SecretUtils.resetValues();
-            }
-            SecretUtils.lastInteract = pos;
+            if (DungeonScanner.isPlayerInCurrentRoom()) {
+                if (BlockUtils.blockPos(RoomRotationUtils.actualToRelative(pos, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner())).equals(BlockUtils.blockPos(SecretUtils.currentLeverPos))) {
+                    SecretUtils.resetValues();
+                }
+                SecretUtils.lastInteract = pos;
 
-            if (SRMConfig.get().allSecrets) {
-                if (SecretUtils.secrets != null) {
-                    for (JsonElement secret : SecretUtils.secrets) {
-                        try {
-                            JsonObject json = secret.getAsJsonObject();
-                            BlockPos spos = new BlockPos(json.get("x").getAsInt(), json.get("y").getAsInt(), json.get("z").getAsInt());
-                            BlockPos rel = RoomRotationUtils.actualToRelative(pos, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
-                            if (BlockUtils.blockPos(spos).equals(BlockUtils.blockPos(rel))) {
-                                if (!SecretUtils.secretLocations.contains(BlockUtils.blockPos(spos))) {
-                                    SecretUtils.secretLocations.add(BlockUtils.blockPos(spos));
+                if (SRMConfig.get().allSecrets) {
+                    if (SecretUtils.secrets != null) {
+                        for (JsonElement secret : SecretUtils.secrets) {
+                            try {
+                                JsonObject json = secret.getAsJsonObject();
+                                BlockPos spos = new BlockPos(json.get("x").getAsInt(), json.get("y").getAsInt(), json.get("z").getAsInt());
+                                BlockPos rel = RoomRotationUtils.actualToRelative(pos, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
+                                if (BlockUtils.blockPos(spos).equals(BlockUtils.blockPos(rel))) {
+                                    if (!SecretUtils.secretLocations.contains(BlockUtils.blockPos(spos))) {
+                                        SecretUtils.secretLocations.add(BlockUtils.blockPos(spos));
+                                    }
                                 }
+                            } catch (Exception ex) {
+                                LogUtils.error(ex);
                             }
-                        } catch (Exception ex) {
-                            LogUtils.error(ex);
                         }
                     }
                 }
-            }
 
-            if (Main.currentRoom.getSecretType() == Room.SECRET_TYPES.INTERACT) {
-                BlockPos interactPos = Main.currentRoom.getSecretLocation();
-                SecretSounds.secretChime();
-                if (pos.getX() == interactPos.getX() && pos.getY() == interactPos.getY() && pos.getZ() == interactPos.getZ()) {
-                    Main.currentRoom.nextSecret();
-                    LogUtils.info("Interacted with block at " + interactPos);
+                if (Main.currentRoom != null && Main.currentRoom.getSecretType() == Room.SECRET_TYPES.INTERACT) {
+                    BlockPos interactPos = Main.currentRoom.getSecretLocation();
+                    SecretSounds.secretChime();
+                    if (pos.getX() == interactPos.getX() && pos.getY() == interactPos.getY() && pos.getZ() == interactPos.getZ()) {
+                        Main.currentRoom.nextSecret();
+                        LogUtils.info("Interacted with block at " + interactPos);
+                    }
                 }
             }
 
