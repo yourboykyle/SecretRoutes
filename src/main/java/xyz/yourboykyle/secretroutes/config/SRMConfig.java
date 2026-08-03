@@ -86,8 +86,6 @@ public class SRMConfig {
     @SerialEntry
     public double particleDensity = 2.0;
     @SerialEntry
-    public float filledBoxAlpha = 0.5f;
-    @SerialEntry
     public int tickInterval = 1;
     @SerialEntry
     public boolean playerWaypointLine = false;
@@ -118,7 +116,7 @@ public class SRMConfig {
     @SerialEntry
     public Color playerToEtherwarpLineColor = new Color(128, 0, 128);
 
-    // Colours and toggles
+    // Color and toggles (dude what was that british spelling "colour" doing out of here)
     @SerialEntry
     public boolean renderEtherwarps = true;
     @SerialEntry
@@ -350,7 +348,7 @@ public class SRMConfig {
     }
 
     public static Screen getScreen(Screen parent) {
-        return YetAnotherConfigLib.create(HANDLER, (defaults, config, builder) -> {
+        return YetAnotherConfigLib.create(HANDLER, (_, config, builder) -> {
 
             var colorProfilesGroup = OptionGroup.createBuilder()
                     .name(Component.literal("Color Profiles"))
@@ -365,25 +363,25 @@ public class SRMConfig {
                     .option(ButtonOption.createBuilder()
                             .name(Component.literal("Save Current Profile"))
                             .description(OptionDescription.of(Component.literal("Saves current settings to the filename above")))
-                            .action((screen, opt) -> ConfigUtils.writeColorConfig(config.copyFileName))
+                            .action((_, _) -> ConfigUtils.writeColorConfig(config.copyFileName))
                             .build())
                     .option(ButtonOption.createBuilder()
                             .name(Component.literal("Load From Json"))
                             .description(OptionDescription.of(Component.literal("Loads the profile named above from its JSON file and closes the menu")))
-                            .action((screen, opt) -> {
+                            .action((_, _) -> {
                                 ConfigUtils.loadColorConfig(config.copyFileName);
                                 GuiUtils.setScreen(null);
                             })
                             .build());
 
-            File[] profileFiles = ConfigUtils.COLOR_PROFILE_DIR.listFiles((dir, name) -> name.endsWith(".json"));
+            File[] profileFiles = ConfigUtils.COLOR_PROFILE_DIR.listFiles((_, name) -> name.endsWith(".json"));
             if (profileFiles != null) {
                 for (File file : profileFiles) {
                     String profileName = file.getName().replace(".json", "");
                     colorProfilesGroup.option(ButtonOption.createBuilder()
                             .name(Component.literal(profileName.equalsIgnoreCase("default") ? "Restore to Default" : "Load: " + profileName))
                             .description(OptionDescription.of(Component.literal("Loads " + profileName + ".json and closes menu")))
-                            .action((screen, opt) -> {
+                            .action((_, _) -> {
                                 ConfigUtils.loadColorConfig(profileName);
                                 GuiUtils.setScreen(null);
                             })
@@ -474,9 +472,7 @@ public class SRMConfig {
                                     .name(Component.literal("Update Routes"))
                                     .description(OptionDescription.of(Component.literal("Updates to the latest route files from GitHub, overwriting the old routes")))
                                     .text(Component.literal("Download"))
-                                    .action((screen, opt) -> {
-                                        RouteUtils.checkRoutesFiles();
-                                    })
+                                    .action((_, _) -> RouteUtils.checkRoutesFiles())
                                     .build())
                             .group(OptionGroup.createBuilder()
                                     .name(Component.literal("Line to Etherwarp"))
@@ -542,7 +538,7 @@ public class SRMConfig {
                                             .name(Component.literal("Preview Aim Sound"))
                                             .description(OptionDescription.of(Component.literal("Plays the selected aim sound using the current volume and pitch")))
                                             .text(Component.literal("Play"))
-                                            .action((screen, opt) -> SecretSounds.preview(
+                                            .action((_, _) -> SecretSounds.preview(
                                                     etherwarpAimSoundTypeOption.pendingValue(),
                                                     etherwarpAimSoundVolumeOption.pendingValue(),
                                                     etherwarpAimSoundPitchOption.pendingValue()))
@@ -729,7 +725,7 @@ public class SRMConfig {
                                             .name(Component.literal("Preview Sound"))
                                             .description(OptionDescription.of(Component.literal("Plays the selected sound using the current volume and pitch")))
                                             .text(Component.literal("Play"))
-                                            .action((screen, opt) -> SecretSounds.preview(
+                                            .action((_, _) -> SecretSounds.preview(
                                                     customSoundTypeOption.pendingValue(),
                                                     customSoundVolumeOption.pendingValue(),
                                             customSoundPitchOption.pendingValue()))
