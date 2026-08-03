@@ -96,26 +96,26 @@ public class Debug {
     }
 
     private static int executeCr(CommandContext<FabricClientCommandSource> context) {
-        context.getSource().sendFeedback(
-                Component.literal("Current index: " + xyz.yourboykyle.secretroutes.Main.currentRoom.closest.getTwo())
-                        .withStyle(ChatFormatting.AQUA)
-        );
+        var room = xyz.yourboykyle.secretroutes.Main.currentRoom;
+        if (room == null || room.getSelectedRouteIndex() < 0) {
+            context.getSource().sendError(Component.literal("No route selected"));
+            return 0;
+        }
+
+        context.getSource().sendFeedback(Component.literal(
+                "Current route: " + room.getSelectedRouteStatus()).withStyle(ChatFormatting.AQUA));
         return 1;
     }
 
     private static int executeCrDirection(CommandContext<FabricClientCommandSource> context, boolean forward) {
         try {
-            int currentIndex = xyz.yourboykyle.secretroutes.Main.currentRoom.closest.getTwo();
-            int newIndex = forward ? currentIndex + 1 : currentIndex - 1;
-
-            if (newIndex >= 0 && newIndex < xyz.yourboykyle.secretroutes.Main.currentRoom.arrays.size()) {
-                xyz.yourboykyle.secretroutes.Main.currentRoom.currentSecretRoute =
-                        xyz.yourboykyle.secretroutes.Main.currentRoom.arrays.get(newIndex);
+            var room = xyz.yourboykyle.secretroutes.Main.currentRoom;
+            if (room != null && room.cycleRoute(forward ? 1 : -1)) {
                 context.getSource().sendFeedback(
-                        Component.literal("Changed to index: " + newIndex).withStyle(ChatFormatting.GREEN)
+                        Component.literal("Changed to " + room.getSelectedRouteStatus()).withStyle(ChatFormatting.GREEN)
                 );
             } else {
-                context.getSource().sendError(Component.literal("Index out of bounds"));
+                context.getSource().sendError(Component.literal("No alternative routes are available"));
             }
         } catch (Exception e) {
             context.getSource().sendError(Component.literal("Error changing route: " + e.getMessage()));

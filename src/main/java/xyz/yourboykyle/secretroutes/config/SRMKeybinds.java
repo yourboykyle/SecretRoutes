@@ -40,6 +40,15 @@ public class SRMKeybinds {
             )
     );
 
+    public static final KeyMapping CYCLE_ROUTE = KeyMappingHelper.registerKeyMapping(
+            new KeyMapping(
+                    "key.secretroutes.cycle_route",
+                    InputConstants.Type.KEYSYM,
+                    GLFW.GLFW_KEY_UNKNOWN,
+                    CATEGORY
+            )
+    );
+
     public static void init() {
     }
 }

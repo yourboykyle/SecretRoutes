@@ -31,7 +31,6 @@ import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.events.OnSecretComplete;
 import xyz.yourboykyle.secretroutes.dungeons.detection.DungeonScanner;
 import xyz.yourboykyle.secretroutes.utils.*;
-import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 
 import java.io.File;
 import java.io.FileReader;
@@ -47,8 +46,9 @@ public class Room {
     public JsonArray currentSecretRoute;
     public int currentSecretIndex = 0;
     public JsonObject currentSecretWaypoints;
-    public ArrayList<JsonArray> arrays = new ArrayList<>();
-    public Triple<String, Integer, Double> closest = null;
+    private List<RouteVariantSelector.RouteVariant> routeVariants = List.of();
+    private int selectedRouteIndex = -1;
+    private double selectedRouteDistanceSquared = Double.POSITIVE_INFINITY;
     int c = 0;
 
     public Room(String roomName) {
@@ -118,6 +118,40 @@ public class Room {
         }
     }
 
+    public boolean cycleRoute(int direction) {
+        if (routeVariants.size() <= 1) return false;
+
+        int newIndex = RouteVariantSelector.cycleIndex(selectedRouteIndex, routeVariants.size(), direction);
+        return selectRoute(newIndex, true);
+    }
+
+    public int getSelectedRouteIndex() {
+        return selectedRouteIndex;
+    }
+
+    public int getRouteVariantCount() {
+        return routeVariants.size();
+    }
+
+    public String getSelectedRouteStatus() {
+        if (selectedRouteIndex < 0 || selectedRouteIndex >= routeVariants.size()) return "No route selected";
+        return routeVariants.get(selectedRouteIndex).jsonKey() + " (" + (selectedRouteIndex + 1) + "/" + routeVariants.size() + ")";
+    }
+
+    private boolean selectRoute(int routeIndex, boolean manual) {
+        if (routeIndex < 0 || routeIndex >= routeVariants.size()) return false;
+
+        RouteVariantSelector.RouteVariant route = routeVariants.get(routeIndex);
+        selectedRouteIndex = routeIndex;
+        currentSecretRoute = route.steps();
+        currentSecretIndex = 0;
+        updateWaypoints();
+        SecretUtils.clearEtherwarpTargetTracking();
+
+        if (manual) PBUtils.pbIsValid = false;
+        return true;
+    }
+
     public SECRET_TYPES getSecretType() {
         try {
             if (currentSecretWaypoints != null && currentSecretWaypoints.has("secret")) {
@@ -182,70 +216,49 @@ public class Room {
     public void getData(String filePath) {
         new Thread(() -> {
             try {
-                if (DungeonScanner.currentRoom == null || DungeonScanner.currentRoom.getName() == null) return;
-
                 Gson gson = new GsonBuilder().create();
-                FileReader reader = new FileReader(filePath);
-                JsonObject rawData = gson.fromJson(reader, JsonObject.class);
-                reader.close();
-
-                if (rawData == null || rawData.isJsonNull()) {
-                    currentSecretRoute = null;
-                    return;
+                JsonObject rawData;
+                try (FileReader reader = new FileReader(filePath)) {
+                    rawData = gson.fromJson(reader, JsonObject.class);
                 }
 
-                Map<String, JsonElement> data = new HashMap<>();
-                for (Map.Entry<String, JsonElement> entry : rawData.entrySet()) {
-                    data.put(entry.getKey().toLowerCase(Locale.ROOT), entry.getValue());
-                }
-
-                HashMap<String, Integer> map = new HashMap<>();
-
-                for (int i = 0; i <= 10; i++) {
-                    String path = (i == 0 ? name : name + ":" + i).toLowerCase(Locale.ROOT);
-                    JsonElement element = data.get(path);
-                    if (element == null || element.isJsonNull()) {
-                        if (i == 0) currentSecretRoute = null;
-                        continue;
-                    }
-
-                    JsonArray route = element.getAsJsonArray();
-                    arrays.add(route);
-                    JsonArray starPoseArray = route.get(0).getAsJsonObject().get("locations").getAsJsonArray().get(0).getAsJsonArray();
-                    BlockPos startPos = new BlockPos(starPoseArray.get(0).getAsInt(), starPoseArray.get(1).getAsInt(), starPoseArray.get(2).getAsInt());
-                    map.put(BlockUtils.blockPos(startPos), i);
-                }
-
-                int i = 0;
-                for (Map.Entry<String, Integer> entry : map.entrySet()) {
-                    LocalPlayer p = Minecraft.getInstance().player;
-                    if (p == null) continue;
-                    BlockPos pPos = p.blockPosition();
-                    if (pPos == null) continue;
-
-                    BlockPos relPos = RoomRotationUtils.actualToRelative(pPos, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
-
-                    double dist1 = BlockUtils.blockDistance(relPos, entry.getKey());
-
-                    if (closest != null) {
-                        double dist2 = closest.getThree();
-                        if (dist1 > dist2) continue;
-                    }
-
-                    closest = new Triple<>(entry.getKey(), i, dist1);
-                    i++;
-                }
-
-                if (closest != null) {
-                    currentSecretRoute = arrays.get(closest.getTwo());
-                    currentSecretWaypoints = currentSecretRoute.get(currentSecretIndex).getAsJsonObject();
-                    System.out.println("route: " + currentSecretRoute);
-                    System.out.println("waypoints: " + currentSecretWaypoints);
-                }
+                List<RouteVariantSelector.RouteVariant> loadedVariants =
+                        RouteVariantSelector.parseVariants(rawData, name);
+                Minecraft.getInstance().execute(() -> installLoadedVariants(loadedVariants));
             } catch (Exception e) {
                 LogUtils.error(e);
             }
-        }).start();
+        }, "SecretRoutes-RouteLoader").start();
+    }
+
+    private void installLoadedVariants(List<RouteVariantSelector.RouteVariant> loadedVariants) {
+        if (Main.currentRoom != this || DungeonScanner.currentRoom == null) return;
+
+        LocalPlayer player = Minecraft.getInstance().player;
+        if (player == null) return;
+
+        routeVariants = loadedVariants;
+        if (routeVariants.isEmpty()) {
+            selectedRouteIndex = -1;
+            selectedRouteDistanceSquared = Double.POSITIVE_INFINITY;
+            currentSecretRoute = null;
+            currentSecretWaypoints = null;
+            return;
+        }
+
+        BlockPos relativePlayerPosition = RoomRotationUtils.actualToRelative(
+                player.blockPosition(),
+                RoomDirectionUtils.roomDirection(),
+                RoomDirectionUtils.roomCorner()
+        );
+        RouteVariantSelector.Selection selection =
+                RouteVariantSelector.selectClosest(routeVariants, relativePlayerPosition);
+        if (selection == null) return;
+
+        selectedRouteDistanceSquared = selection.distanceSquared();
+        selectRoute(selection.index(), false);
+        LogUtils.info("Selected route " + getSelectedRouteStatus()
+                + " at distance " + String.format(Locale.ROOT, "%.2f", Math.sqrt(selectedRouteDistanceSquared)));
     }
 }
 //#endif

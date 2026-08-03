@@ -268,6 +268,16 @@ public class Main implements ClientModInitializer {
                 }
             }
 
+            while (SRMKeybinds.CYCLE_ROUTE.consumeClick()) {
+                if (Main.currentRoom != null && DungeonScanner.isPlayerInCurrentRoom()) {
+                    if (Main.currentRoom.cycleRoute(1)) {
+                        sendChatMessage(ChatFormatting.GREEN + "Secret Routes: " + Main.currentRoom.getSelectedRouteStatus());
+                    } else {
+                        sendChatMessage(ChatFormatting.YELLOW + "No alternative routes are available for this room.");
+                    }
+                }
+            }
+
             while (SRMKeybinds.TOGGLE_MOD.consumeClick()) {
                 if (SRMConfig.get().modEnabled) {
                     SRMConfig.get().modEnabled = false;
