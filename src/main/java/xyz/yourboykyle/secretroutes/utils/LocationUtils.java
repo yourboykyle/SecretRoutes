@@ -19,6 +19,9 @@ public class LocationUtils {
             if (packet.getMode().isPresent()) {
                 String mode = packet.getMode().get();
                 inDungeons = mode.equalsIgnoreCase("dungeon");
+                if (inDungeons)  {
+                    DungeonUtil.reset();
+                }
             } else {
                 inDungeons = false;
             }

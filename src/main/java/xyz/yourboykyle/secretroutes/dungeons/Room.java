@@ -28,8 +28,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
-import xyz.yourboykyle.secretroutes.events.OnSecretComplete;
 import xyz.yourboykyle.secretroutes.dungeons.detection.DungeonScanner;
+import xyz.yourboykyle.secretroutes.events.OnSecretComplete;
 import xyz.yourboykyle.secretroutes.utils.*;
 import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 
@@ -120,15 +120,18 @@ public class Room {
 
     public SECRET_TYPES getSecretType() {
         try {
-            if (currentSecretWaypoints != null && currentSecretWaypoints.has("secret")) {
-                String type = currentSecretWaypoints.get("secret").getAsJsonObject().get("type").getAsString();
-                return switch (type) {
-                    case "interact" -> SECRET_TYPES.INTERACT;
-                    case "item" -> SECRET_TYPES.ITEM;
-                    case "bat" -> SECRET_TYPES.BAT;
-                    case "exitroute" -> SECRET_TYPES.EXITROUTE;
-                    default -> null;
-                };
+            if (currentSecretWaypoints != null && currentSecretWaypoints.has("secret") && !currentSecretWaypoints.get("secret").isJsonNull()) {
+                JsonObject secretObj = currentSecretWaypoints.getAsJsonObject("secret");
+                if (secretObj.has("type")) {
+                    String type = secretObj.get("type").getAsString();
+                    return switch (type) {
+                        case "interact" -> SECRET_TYPES.INTERACT;
+                        case "item" -> SECRET_TYPES.ITEM;
+                        case "bat" -> SECRET_TYPES.BAT;
+                        case "exitroute" -> SECRET_TYPES.EXITROUTE;
+                        default -> null;
+                    };
+                }
             }
         } catch (Exception e) {
             LogUtils.error(e);
@@ -137,11 +140,18 @@ public class Room {
     }
 
     public BlockPos getSecretLocation() {
-        if (currentSecretWaypoints == null || !currentSecretWaypoints.has("secret")) return null;
-        JsonArray location = currentSecretWaypoints.get("secret").getAsJsonObject().get("location").getAsJsonArray();
+        if (currentSecretWaypoints == null || !currentSecretWaypoints.has("secret") || currentSecretWaypoints.get("secret").isJsonNull()) return null;
+
+        JsonObject secretObj = currentSecretWaypoints.getAsJsonObject("secret");
+        if (!secretObj.has("location")) return null;
+
+        JsonArray location = secretObj.get("location").getAsJsonArray();
+
+        BlockPos relative = new BlockPos(location.get(0).getAsInt(), location.get(1).getAsInt(), location.get(2).getAsInt());
+        if ("f7boss".equals(name)) return relative;
 
         return RoomRotationUtils.relativeToActual(
-                new BlockPos(location.get(0).getAsInt(), location.get(1).getAsInt(), location.get(2).getAsInt()),
+                relative,
                 RoomDirectionUtils.roomDirection(),
                 RoomDirectionUtils.roomCorner()
         );
@@ -156,7 +166,13 @@ public class Room {
                 for (JsonElement lineLocationElement : lineLocations) {
                     JsonArray loc = lineLocationElement.getAsJsonArray();
                     BlockPos relative = new BlockPos(loc.get(0).getAsInt(), loc.get(1).getAsInt(), loc.get(2).getAsInt());
-                    BlockPos actual = RoomRotationUtils.relativeToActual(relative, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
+
+                    BlockPos actual;
+                    if ("f7boss".equals(name)) {
+                        actual = relative;
+                    } else {
+                        actual = RoomRotationUtils.relativeToActual(relative, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
+                    }
                     lines.add(actual);
                 }
 
@@ -182,7 +198,8 @@ public class Room {
     public void getData(String filePath) {
         new Thread(() -> {
             try {
-                if (DungeonScanner.currentRoom == null || DungeonScanner.currentRoom.getName() == null) return;
+                if (!"f7boss".equals(name) && (DungeonScanner.currentRoom == null || DungeonScanner.currentRoom.getName() == null))
+                    return;
 
                 Gson gson = new GsonBuilder().create();
                 FileReader reader = new FileReader(filePath);
@@ -223,7 +240,12 @@ public class Room {
                     BlockPos pPos = p.blockPosition();
                     if (pPos == null) continue;
 
-                    BlockPos relPos = RoomRotationUtils.actualToRelative(pPos, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
+                    BlockPos relPos;
+                    if ("f7boss".equals(name)) {
+                        relPos = pPos;
+                    } else {
+                        relPos = RoomRotationUtils.actualToRelative(pPos, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
+                    }
 
                     double dist1 = BlockUtils.blockDistance(relPos, entry.getKey());
 
