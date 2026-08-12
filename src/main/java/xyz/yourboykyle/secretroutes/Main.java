@@ -190,6 +190,7 @@ public class Main implements ClientModInitializer {
         logDir = new File(gameDir + File.separator + "logs" + File.separator + "SecretRoutes");
 
         LocationUtils.init();
+        DungeonUtil.init();
 
         String jarpath = Main.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         // Set up logging system
