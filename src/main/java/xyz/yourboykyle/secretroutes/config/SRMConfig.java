@@ -78,15 +78,9 @@ public class SRMConfig {
 
     // F7 Boss
     @SerialEntry
-    public boolean f7BossRoutesEnabled = false;
+    public boolean pdRoutesEnabled = false;
     @SerialEntry
-    public boolean f7Phase1Enabled = true;
-    @SerialEntry
-    public boolean f7Phase2Enabled = true;
-    @SerialEntry
-    public boolean f7Phase3Enabled = false;
-    @SerialEntry
-    public boolean f7Phase4Enabled = false;
+    public boolean pdHideAfterPhase2 = true;
 
     // Visual
     @SerialEntry
@@ -616,39 +610,20 @@ public class SRMConfig {
 
                     // F7 Boss
                     .category(ConfigCategory.createBuilder()
-                            .name(Component.literal("F7 Boss"))
+                            .name(Component.literal("Predev Routes"))
                             .option(Option.<Boolean>createBuilder()
-                                    .name(Component.literal("Enable F7 Boss Routes"))
-                                    .description(OptionDescription.of(Component.literal("Master toggle for showing routes during the F7 Boss fight.")))
-                                    .binding(false, () -> config.f7BossRoutesEnabled, v -> config.f7BossRoutesEnabled = v)
+                                    .name(Component.literal("Enable Predev Routes"))
+                                    .description(OptionDescription.of(Component.literal("Master toggle for showing predev routes during the F7 Boss fight.")))
+                                    .binding(false, () -> config.pdRoutesEnabled, v -> config.pdRoutesEnabled = v)
                                     .controller(TickBoxControllerBuilder::create)
                                     .build())
-                            .group(OptionGroup.createBuilder()
-                                    .name(Component.literal("Boss Phases"))
-                                    .description(OptionDescription.of(Component.literal("Toggle routes during specific phases of the boss fight.")))
-                                    .option(Option.<Boolean>createBuilder()
-                                            .name(Component.literal("Phase 1 (Maxor)"))
-                                            .binding(true, () -> config.f7Phase1Enabled, v -> config.f7Phase1Enabled = v)
-                                            .controller(TickBoxControllerBuilder::create)
-                                            .build())
-                                    .option(Option.<Boolean>createBuilder()
-                                            .name(Component.literal("Phase 2 (Storm)"))
-                                            .binding(true, () -> config.f7Phase2Enabled, v -> config.f7Phase2Enabled = v)
-                                            .controller(TickBoxControllerBuilder::create)
-                                            .build())
-                                    .option(Option.<Boolean>createBuilder()
-                                            .name(Component.literal("Phase 3 (Goldor)"))
-                                            .binding(false, () -> config.f7Phase3Enabled, v -> config.f7Phase3Enabled = v)
-                                            .controller(TickBoxControllerBuilder::create)
-                                            .build())
-                                    .option(Option.<Boolean>createBuilder()
-                                            .name(Component.literal("Phase 4 (Necron)"))
-                                            .binding(false, () -> config.f7Phase4Enabled, v -> config.f7Phase4Enabled = v)
-                                            .controller(TickBoxControllerBuilder::create)
-                                            .build())
+                            .option(Option.<Boolean>createBuilder()
+                                    .name(Component.literal("Hide After Phase 2"))
+                                    .description(OptionDescription.of(Component.literal("Hide predev routes when phase 2 ends.")))
+                                    .binding(true, () -> config.pdHideAfterPhase2, v -> config.pdHideAfterPhase2 = v)
+                                    .controller(TickBoxControllerBuilder::create)
                                     .build())
                             .build())
-
                     // Visuals
                     .category(ConfigCategory.createBuilder()
                             .name(Component.literal("Visuals"))

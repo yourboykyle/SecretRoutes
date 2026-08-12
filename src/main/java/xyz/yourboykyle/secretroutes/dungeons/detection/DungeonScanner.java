@@ -127,16 +127,14 @@ public class DungeonScanner {
                 playerZ >= BOSS_MIN_Z && playerZ <= BOSS_MAX_Z) {
 
             boolean shouldShow = false;
-            if (SRMConfig.get().f7BossRoutesEnabled) {
+            if (SRMConfig.get().pdRoutesEnabled) {
                 DungeonUtil.F7Phase phase = DungeonUtil.getCurrentPhase();
-                if (phase == DungeonUtil.F7Phase.NONE || phase == DungeonUtil.F7Phase.MAXOR) {
-                    shouldShow = SRMConfig.get().f7Phase1Enabled;
-                } else if (phase == DungeonUtil.F7Phase.STORM) {
-                    shouldShow = SRMConfig.get().f7Phase2Enabled;
-                } else if (phase == DungeonUtil.F7Phase.GOLDOR) {
-                    shouldShow = SRMConfig.get().f7Phase3Enabled;
-                } else if (phase == DungeonUtil.F7Phase.NECRON) {
-                    shouldShow = SRMConfig.get().f7Phase4Enabled;
+                if (SRMConfig.get().pdHideAfterPhase2) {
+                    if (phase == DungeonUtil.F7Phase.NONE || phase == DungeonUtil.F7Phase.MAXOR || phase == DungeonUtil.F7Phase.STORM) {
+                        shouldShow = true;
+                    }
+                } else {
+                    shouldShow = true;
                 }
             }
 
