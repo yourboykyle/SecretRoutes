@@ -21,7 +21,12 @@
 
 package xyz.yourboykyle.secretroutes.dungeons.rendering;
 
+//? if >=26.2
 import com.mojang.blaze3d.PrimitiveTopology;
+
+//? if <=26.1.2
+//import com.mojang.blaze3d.vertex.VertexFormat;
+
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -53,11 +58,16 @@ import java.util.Optional;
 
 public class RenderingBackend {
     private static final float THICKNESS_MULTIPLIER = 0.01f;
+
     private static final RenderPipeline SEE_THROUGH_PIPELINE = RenderPipelines.register(
             RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
                     .withLocation(Identifier.fromNamespaceAndPath(Main.MODID, "see_through_overlay"))
+                    //? if >=26.2 {
                     .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR)
                     .withPrimitiveTopology(PrimitiveTopology.QUADS)
+                    //?} elif <=26.1.2 {
+                    //.withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
+                    //?}
                     .withDepthStencilState(Optional.empty())
                     .withCull(false)
                     .build()
@@ -66,11 +76,16 @@ public class RenderingBackend {
             "secretroutes_see_through",
             RenderSetup.builder(SEE_THROUGH_PIPELINE).createRenderSetup()
     );
+
     private static final RenderPipeline NORMAL_PIPELINE = RenderPipelines.register(
             RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
                     .withLocation(Identifier.fromNamespaceAndPath(Main.MODID, "normal_overlay"))
+                    //? if >=26.2 {
                     .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR)
                     .withPrimitiveTopology(PrimitiveTopology.QUADS)
+                    //?} elif <=26.1.2 {
+                    //.withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
+                    //?}
                     .withCull(false)
                     .build()
     );
@@ -78,11 +93,16 @@ public class RenderingBackend {
             "secretroutes_normal",
             RenderSetup.builder(NORMAL_PIPELINE).createRenderSetup()
     );
+
     private static final RenderPipeline CURSOR_LINE_PIPELINE = RenderPipelines.register(
             RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
                     .withLocation(Identifier.fromNamespaceAndPath(Main.MODID, "cursor_lines_xray"))
+                    //? if >=26.2 {
                     .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH)
                     .withPrimitiveTopology(PrimitiveTopology.LINES)
+                    //?} elif <=26.1.2 {
+                    //.withVertexFormat(DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH, VertexFormat.Mode.LINES)
+                    //?}
                     .withDepthStencilState(Optional.empty())
                     .build()
     );
@@ -121,7 +141,13 @@ public class RenderingBackend {
         OnWorldRender.onRenderWorld();
 
         PoseStack poseStack = context.poseStack();
-        Camera camera = Minecraft.getInstance().gameRenderer.mainCamera();
+        Minecraft mc = Minecraft.getInstance();
+        Camera camera =
+                //? if >=26.2 {
+                mc.gameRenderer.mainCamera();
+                //?} elif <=26.1.2 {
+                //mc.gameRenderer.getMainCamera();
+                //?}
         Vec3 camPos = camera.position();
         OrderedSubmitNodeCollector collector = context.submitNodeCollector();
 

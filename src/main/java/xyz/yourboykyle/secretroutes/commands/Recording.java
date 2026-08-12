@@ -68,7 +68,13 @@ public class Recording {
 
     private static int openGui(CommandContext<FabricClientCommandSource> context) {
         Minecraft client = Minecraft.getInstance();
-        client.execute(() -> client.setScreenAndShow(SRMConfig.getScreen(client.gui.screen())));
+        client.execute(() -> client.setScreenAndShow(SRMConfig.getScreen(
+                //? if >=26.2 {
+                client.gui.screen()
+                //?} elif <=26.1.2 {
+                //client.screen
+                //?}
+        )));
         return 1;
     }
 
