@@ -30,7 +30,7 @@ import net.minecraft.commands.CommandBuildContext;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.literal;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
 public class SRM {
     public static void register() {
@@ -51,11 +51,7 @@ public class SRM {
         Minecraft client = Minecraft.getInstance();
         Minecraft.getInstance().execute(() ->
                 Minecraft.getInstance().setScreenAndShow(SRMConfig.getScreen(
-                        //? if >=26.2 {
-                        client.gui.screen()
-                        //?} elif <=26.1.2 {
-                        //client.screen
-                        //?}
+                        client.screen
                 ))
         );
         return 1;

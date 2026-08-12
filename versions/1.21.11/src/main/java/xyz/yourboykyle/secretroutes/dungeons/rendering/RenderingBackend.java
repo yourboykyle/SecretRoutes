@@ -1,4 +1,3 @@
-//#if FABRIC
 /*
  * Secret Routes Mod - Secret Route Waypoints for Hypixel Skyblock Dungeons
  * Copyright 2025 yourboykyle & R-aMcC & christechs
@@ -21,25 +20,21 @@
 
 package xyz.yourboykyle.secretroutes.dungeons.rendering;
 
-//? if >=26.2
-import com.mojang.blaze3d.PrimitiveTopology;
-
-//? if <=26.1.2
-//import com.mojang.blaze3d.vertex.VertexFormat;
-
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
-import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.platform.DepthTestFunction;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.irisshaders.iris.api.v0.IrisApi;
 import net.irisshaders.iris.api.v0.IrisProgram;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -51,10 +46,9 @@ import org.joml.Vector3f;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.events.OnWorldRender;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class RenderingBackend {
     private static final float THICKNESS_MULTIPLIER = 0.01f;
@@ -62,13 +56,8 @@ public class RenderingBackend {
     private static final RenderPipeline SEE_THROUGH_PIPELINE = RenderPipelines.register(
             RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
                     .withLocation(Identifier.fromNamespaceAndPath(Main.MODID, "see_through_overlay"))
-                    //? if >=26.2 {
-                    .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR)
-                    .withPrimitiveTopology(PrimitiveTopology.QUADS)
-                    //?} elif <=26.1.2 {
-                    //.withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
-                    //?}
-                    .withDepthStencilState(Optional.empty())
+                    .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
+                    .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
                     .withCull(false)
                     .build()
     );
@@ -80,12 +69,7 @@ public class RenderingBackend {
     private static final RenderPipeline NORMAL_PIPELINE = RenderPipelines.register(
             RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
                     .withLocation(Identifier.fromNamespaceAndPath(Main.MODID, "normal_overlay"))
-                    //? if >=26.2 {
-                    .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR)
-                    .withPrimitiveTopology(PrimitiveTopology.QUADS)
-                    //?} elif <=26.1.2 {
-                    //.withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
-                    //?}
+                    .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
                     .withCull(false)
                     .build()
     );
@@ -97,13 +81,8 @@ public class RenderingBackend {
     private static final RenderPipeline CURSOR_LINE_PIPELINE = RenderPipelines.register(
             RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
                     .withLocation(Identifier.fromNamespaceAndPath(Main.MODID, "cursor_lines_xray"))
-                    //? if >=26.2 {
-                    .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH)
-                    .withPrimitiveTopology(PrimitiveTopology.LINES)
-                    //?} elif <=26.1.2 {
-                    //.withVertexFormat(DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH, VertexFormat.Mode.LINES)
-                    //?}
-                    .withDepthStencilState(Optional.empty())
+                    .withVertexFormat(DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH, VertexFormat.Mode.LINES)
+                    .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
                     .build()
     );
     private static final RenderType CURSOR_LINE_LAYER = RenderType.create(
@@ -123,8 +102,8 @@ public class RenderingBackend {
     private static final BoxMeshCache BOX_MESH_CACHE = new BoxMeshCache();
 
     public static void register() {
-        LevelRenderEvents.COLLECT_SUBMITS.register(RenderingBackend::render);
-        LevelRenderEvents.END_MAIN.register(RenderingBackend::cleanup);
+        WorldRenderEvents.END_MAIN.register(RenderingBackend::render);
+        WorldRenderEvents.END_MAIN.register(RenderingBackend::cleanup);
 
         if (FabricLoader.getInstance().isModLoaded("iris")) {
             try {
@@ -137,19 +116,14 @@ public class RenderingBackend {
         }
     }
 
-    private static void render(LevelRenderContext context) {
+    private static void render(WorldRenderContext context) {
         OnWorldRender.onRenderWorld();
 
-        PoseStack poseStack = context.poseStack();
+        PoseStack poseStack = context.matrices();
         Minecraft mc = Minecraft.getInstance();
-        Camera camera =
-                //? if >=26.2 {
-                mc.gameRenderer.mainCamera();
-                //?} elif <=26.1.2 {
-                //mc.gameRenderer.getMainCamera();
-                //?}
+        Camera camera = mc.gameRenderer.getMainCamera();
         Vec3 camPos = camera.position();
-        OrderedSubmitNodeCollector collector = context.submitNodeCollector();
+        MultiBufferSource.BufferSource consumers = mc.renderBuffers().bufferSource();
 
         boolean hasSeeThrough = false;
         boolean hasNormal = false;
@@ -169,28 +143,29 @@ public class RenderingBackend {
             if (line.throughWalls) hasSeeThrough = true;
             else hasNormal = true;
         }
+
         if (hasSeeThrough) {
-            collector.submitCustomGeometry(poseStack, SEE_THROUGH_LAYER, (pose, buffer) -> {
-                Matrix4f matrix = pose.pose();
-                renderFilledBoxes(buffer, matrix, camPos, true);
-                renderOutlinedBoxesAsQuads(buffer, matrix, camPos, true);
-                renderLinesAsQuads(buffer, matrix, camPos, true);
-            });
+            VertexConsumer buffer = consumers.getBuffer(SEE_THROUGH_LAYER);
+            Matrix4f matrix = poseStack.last().pose();
+            renderFilledBoxes(buffer, matrix, camPos, true);
+            renderOutlinedBoxesAsQuads(buffer, matrix, camPos, true);
+            renderLinesAsQuads(buffer, matrix, camPos, true);
+            consumers.endBatch(SEE_THROUGH_LAYER);
         }
 
         if (hasNormal) {
-            collector.submitCustomGeometry(poseStack, NORMAL_LAYER, (pose, buffer) -> {
-                Matrix4f matrix = pose.pose();
-                renderFilledBoxes(buffer, matrix, camPos, false);
-                renderOutlinedBoxesAsQuads(buffer, matrix, camPos, false);
-                renderLinesAsQuads(buffer, matrix, camPos, false);
-            });
+            VertexConsumer buffer = consumers.getBuffer(NORMAL_LAYER);
+            Matrix4f matrix = poseStack.last().pose();
+            renderFilledBoxes(buffer, matrix, camPos, false);
+            renderOutlinedBoxesAsQuads(buffer, matrix, camPos, false);
+            renderLinesAsQuads(buffer, matrix, camPos, false);
+            consumers.endBatch(NORMAL_LAYER);
         }
 
         if (!linesFromCursor.isEmpty()) {
-            collector.submitCustomGeometry(poseStack, CURSOR_LINE_LAYER, (pose, buffer) ->
-                    renderLinesFromCursor(buffer, pose, camPos)
-            );
+            VertexConsumer buffer = consumers.getBuffer(CURSOR_LINE_LAYER);
+            renderLinesFromCursor(buffer, poseStack.last(), camPos);
+            consumers.endBatch(CURSOR_LINE_LAYER);
         }
 
         if (!worldTexts.isEmpty()) {
@@ -206,18 +181,19 @@ public class RenderingBackend {
                 Font.DisplayMode displayMode = wt.throughWalls ? Font.DisplayMode.SEE_THROUGH : Font.DisplayMode.NORMAL;
                 float xOffset = -font.width(wt.text) / 2f;
 
-                collector.submitText(
-                        poseStack, xOffset, 0,
+                font.drawInBatch(
                         wt.text.getVisualOrderText(),
-                        true, displayMode,
-                        0xF000F0, 0xFFFFFFFF, 0, 0
+                        xOffset, 0,
+                        0xFFFFFFFF, false, poseStack.last().pose(), consumers,
+                        displayMode, 0, 0xF000F0
                 );
+                consumers.endBatch();
                 poseStack.popPose();
             }
         }
     }
 
-    private static void cleanup(LevelRenderContext context) {
+    private static void cleanup(WorldRenderContext context) {
         outlinedBoxes.clear();
         filledBoxes.clear();
         lines.clear();
@@ -285,6 +261,7 @@ public class RenderingBackend {
         float sy = (float) (start.y - camPos.y);
         float sz = (float) (start.z - camPos.z);
         Matrix4f mat = pose.pose();
+
         for (RenderTypes.LineFromCursor line : linesFromCursor) {
             float ex = (float) (line.point.x - camPos.x);
             float ey = (float) (line.point.y - camPos.y);
@@ -391,6 +368,4 @@ public class RenderingBackend {
     public static void addLineFromCursor(RenderTypes.LineFromCursor lineFromCursor) {
         if (!linesFromCursor.contains(lineFromCursor)) linesFromCursor.add(lineFromCursor);
     }
-
 }
-//#endif

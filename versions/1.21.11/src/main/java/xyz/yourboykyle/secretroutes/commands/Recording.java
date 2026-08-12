@@ -34,12 +34,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
-import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.dungeons.Room;
+import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.RoomDirectionUtils;
 
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.argument;
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.literal;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
 public class Recording {
     public static void register() {
@@ -69,11 +69,7 @@ public class Recording {
     private static int openGui(CommandContext<FabricClientCommandSource> context) {
         Minecraft client = Minecraft.getInstance();
         client.execute(() -> client.setScreenAndShow(SRMConfig.getScreen(
-                //? if >=26.2 {
-                client.gui.screen()
-                //?} elif <=26.1.2 {
-                //client.screen
-                //?}
+                client.screen
         )));
         return 1;
     }

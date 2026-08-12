@@ -17,7 +17,12 @@ permissions: write-all
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: "Build and test"
+
+    strategy:
+      matrix:
+        mc_version: ["1.21.11", "26.1.2", "26.2"]
+
+    name: "Build and test (${{ matrix.mc_version }})"
     steps:
       - uses: actions/checkout@v4
 
@@ -34,22 +39,22 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build with Gradle
-        run: ./gradlew build -x test --stacktrace
+        run: ./gradlew :${{ matrix.mc_version }}:build -x test --stacktrace
 
       - name: Extract version from Gradle
         id: extract_version
         run: |
-          VERSION=$(./gradlew properties -q | grep "^mod\.version:" | awk '{print $2}' | tr -d '\r')
+          VERSION=$(./gradlew :${{ matrix.mc_version }}:properties -q | grep "^mod\.version:" | awk '{print $2}' | tr -d '\r')
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
       - name: Find and rename JAR
         run: |
-          JAR_FILE=$(find build/libs/ -maxdepth 1 -name "*.jar" ! -name "*-sources.jar")
+          JAR_FILE=$(find versions/${{ matrix.mc_version }}/build/libs/ -maxdepth 1 -name "*.jar" ! -name "*-sources.jar")
           echo "JAR_FILE=${JAR_FILE}" >> $GITHUB_ENV
-          mv "$JAR_FILE" "build/libs/SecretRoutes-${{ env.VERSION }}-DEV.jar"
+          mv "$JAR_FILE" "versions/${{ matrix.mc_version }}/build/libs/SecretRoutes-${{ env.VERSION }}-${{ matrix.mc_version }}-DEV.jar"
 
       - uses: actions/upload-artifact@v4
         name: Upload SRM
         with:
-          name: "SecretRoutes-${{ env.VERSION }}-DEV"
-          path: build/libs/SecretRoutes-${{ env.VERSION }}-DEV.jar
+          name: "SecretRoutes-${{ env.VERSION }}-${{ matrix.mc_version }}-DEV"
+          path: versions/${{ matrix.mc_version }}/build/libs/SecretRoutes-${{ env.VERSION }}-${{ matrix.mc_version }}-DEV.jar

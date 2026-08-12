@@ -39,8 +39,8 @@ import xyz.yourboykyle.secretroutes.utils.FileUtils;
 
 import java.util.concurrent.CompletableFuture;
 
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.argument;
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.literal;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
 public class ChangeColorProfile {
     private static boolean loadDefault = false;
@@ -72,11 +72,7 @@ public class ChangeColorProfile {
     private static int openGui(CommandContext<FabricClientCommandSource> context) {
         Minecraft client = Minecraft.getInstance();
         client.execute(() -> client.setScreenAndShow(SRMConfig.getScreen(
-                //? if >=26.2 {
-                client.gui.screen()
-                //?} elif <=26.1.2 {
-                //client.screen
-                //?}
+                client.screen
         )));
         return 1;
     }
