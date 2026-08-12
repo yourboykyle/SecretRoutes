@@ -42,9 +42,11 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import org.joml.Vector2i;
 import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.dungeons.Room;
 import xyz.yourboykyle.secretroutes.dungeons.SecretUtils;
 import xyz.yourboykyle.secretroutes.events.OnEnterNewRoom;
+import xyz.yourboykyle.secretroutes.utils.DungeonUtil;
 import xyz.yourboykyle.secretroutes.utils.LocationUtils;
 
 import java.io.InputStreamReader;
@@ -71,12 +73,17 @@ public class DungeonScanner {
     private static final List<Direction> HORIZONTALS = Arrays.stream(Direction.values())
             .filter(d -> d.getAxis().isHorizontal()).toList();
 
-    private static Block BLUE_DYED_TERRACOTTA =
+    private static final Block BLUE_DYED_TERRACOTTA =
             //? if >=26.2 {
             Blocks.DYED_TERRACOTTA.blue();
             //?} elif <=26.1.2 {
             //Blocks.BLUE_TERRACOTTA;
             //?}
+
+    private static final int BOSS_MIN_X = -7;
+    private static final int BOSS_MAX_X = 134;
+    private static final int BOSS_MIN_Z = -7;
+    private static final int BOSS_MAX_Z = 147;
 
     public static void init() {
         ClientLifecycleEvents.CLIENT_STARTED.register(c -> loadResources());
@@ -114,6 +121,42 @@ public class DungeonScanner {
     private static void tick() {
         int playerX = (int) client.player.getX();
         int playerZ = (int) client.player.getZ();
+
+        // f7 detection
+        if (DungeonUtil.isF7() && playerX >= BOSS_MIN_X && playerX <= BOSS_MAX_X &&
+                playerZ >= BOSS_MIN_Z && playerZ <= BOSS_MAX_Z) {
+
+            boolean shouldShow = false;
+            if (SRMConfig.get().f7BossRoutesEnabled) {
+                DungeonUtil.F7Phase phase = DungeonUtil.getCurrentPhase();
+                if (phase == DungeonUtil.F7Phase.NONE || phase == DungeonUtil.F7Phase.MAXOR) {
+                    shouldShow = SRMConfig.get().f7Phase1Enabled;
+                } else if (phase == DungeonUtil.F7Phase.STORM) {
+                    shouldShow = SRMConfig.get().f7Phase2Enabled;
+                } else if (phase == DungeonUtil.F7Phase.GOLDOR) {
+                    shouldShow = SRMConfig.get().f7Phase3Enabled;
+                } else if (phase == DungeonUtil.F7Phase.NECRON) {
+                    shouldShow = SRMConfig.get().f7Phase4Enabled;
+                }
+            }
+
+            if (shouldShow) {
+                if (Main.currentRoom == null || !"f7boss".equals(Main.currentRoom.name)) {
+                    clearTransitionState();
+                    currentRoom = null;
+
+                    Main.currentRoom = new Room("f7boss");
+                    OnEnterNewRoom.onEnterNewRoom(Main.currentRoom);
+                }
+            } else {
+                if (Main.currentRoom != null && "f7boss".equals(Main.currentRoom.name)) {
+                    clearScannerState();
+                }
+            }
+
+            return;
+        }
+
         Vector2i roomCentre = getRoomCentre(playerX, playerZ);
         long now = System.nanoTime();
 
@@ -173,18 +216,34 @@ public class DungeonScanner {
     }
 
     public static boolean isPlayerInCurrentRoom() {
-        if (!LocationUtils.isInDungeons() || client.player == null || client.level == null || currentRoom == null) {
+        if (!LocationUtils.isInDungeons() || client.player == null || client.level == null) {
             return false;
         }
-        Vector2i playerRoomCentre = getRoomCentre((int) client.player.getX(), (int) client.player.getZ());
+
+        int playerX = (int) client.player.getX();
+        int playerZ = (int) client.player.getZ();
+
+        if (Main.currentRoom != null && "f7boss".equals(Main.currentRoom.name)) {
+            return playerX >= BOSS_MIN_X && playerX <= BOSS_MAX_X &&
+                    playerZ >= BOSS_MIN_Z && playerZ <= BOSS_MAX_Z;
+        }
+
+        if (currentRoom == null) return false;
+
+        Vector2i playerRoomCentre = getRoomCentre(playerX, playerZ);
         return hasComponent(currentRoom, playerRoomCentre);
     }
 
     public static boolean shouldRenderCurrentRoom() {
         if (!LocationUtils.isInDungeons() || client.player == null || client.level == null
-                || currentRoom == null || Main.currentRoom == null || Main.currentRoom.name == null) {
+                || Main.currentRoom == null || Main.currentRoom.name == null) {
             return false;
         }
+
+        if (!"f7boss".equals(Main.currentRoom.name) && currentRoom == null) {
+            return false;
+        }
+
         if (isPlayerInCurrentRoom()) {
             return true;
         }

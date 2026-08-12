@@ -19,7 +19,6 @@ package xyz.yourboykyle.secretroutes.config;
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-//#if FABRIC
 
 import com.google.gson.GsonBuilder;
 import dev.isxander.yacl3.api.*;
@@ -27,7 +26,12 @@ import dev.isxander.yacl3.api.controller.*;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
+
+//?if >1.21.11
 import dev.isxander.yacl3.gui.utils.GuiUtils;
+//?if 1.21.11
+//import net.minecraft.client.Minecraft;
+
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -71,6 +75,18 @@ public class SRMConfig {
     public boolean trackPersonalBests = true;
     @SerialEntry
     public boolean sendChatMessages = true;
+
+    // F7 Boss
+    @SerialEntry
+    public boolean f7BossRoutesEnabled = false;
+    @SerialEntry
+    public boolean f7Phase1Enabled = true;
+    @SerialEntry
+    public boolean f7Phase2Enabled = true;
+    @SerialEntry
+    public boolean f7Phase3Enabled = false;
+    @SerialEntry
+    public boolean f7Phase4Enabled = false;
 
     // Visual
     @SerialEntry
@@ -372,7 +388,11 @@ public class SRMConfig {
                             .description(OptionDescription.of(Component.literal("Loads the profile named above from its JSON file and closes the menu")))
                             .action((screen, opt) -> {
                                 ConfigUtils.loadColorConfig(config.copyFileName);
+                                //? if >1.21.11 {
                                 GuiUtils.setScreen(null);
+                                //?} else {
+                                // Minecraft.getInstance().setScreen(null);
+                                //?}
                             })
                             .build());
 
@@ -385,7 +405,11 @@ public class SRMConfig {
                             .description(OptionDescription.of(Component.literal("Loads " + profileName + ".json and closes menu")))
                             .action((screen, opt) -> {
                                 ConfigUtils.loadColorConfig(profileName);
+                                //? if >1.21.11 {
                                 GuiUtils.setScreen(null);
+                                //?} else {
+                                // Minecraft.getInstance().setScreen(null);
+                                //?}
                             })
                             .build());
                 }
@@ -590,6 +614,41 @@ public class SRMConfig {
                                     .build())
                             .build())
 
+                    // F7 Boss
+                    .category(ConfigCategory.createBuilder()
+                            .name(Component.literal("F7 Boss"))
+                            .option(Option.<Boolean>createBuilder()
+                                    .name(Component.literal("Enable F7 Boss Routes"))
+                                    .description(OptionDescription.of(Component.literal("Master toggle for showing routes during the F7 Boss fight.")))
+                                    .binding(false, () -> config.f7BossRoutesEnabled, v -> config.f7BossRoutesEnabled = v)
+                                    .controller(TickBoxControllerBuilder::create)
+                                    .build())
+                            .group(OptionGroup.createBuilder()
+                                    .name(Component.literal("Boss Phases"))
+                                    .description(OptionDescription.of(Component.literal("Toggle routes during specific phases of the boss fight.")))
+                                    .option(Option.<Boolean>createBuilder()
+                                            .name(Component.literal("Phase 1 (Maxor)"))
+                                            .binding(true, () -> config.f7Phase1Enabled, v -> config.f7Phase1Enabled = v)
+                                            .controller(TickBoxControllerBuilder::create)
+                                            .build())
+                                    .option(Option.<Boolean>createBuilder()
+                                            .name(Component.literal("Phase 2 (Storm)"))
+                                            .binding(true, () -> config.f7Phase2Enabled, v -> config.f7Phase2Enabled = v)
+                                            .controller(TickBoxControllerBuilder::create)
+                                            .build())
+                                    .option(Option.<Boolean>createBuilder()
+                                            .name(Component.literal("Phase 3 (Goldor)"))
+                                            .binding(false, () -> config.f7Phase3Enabled, v -> config.f7Phase3Enabled = v)
+                                            .controller(TickBoxControllerBuilder::create)
+                                            .build())
+                                    .option(Option.<Boolean>createBuilder()
+                                            .name(Component.literal("Phase 4 (Necron)"))
+                                            .binding(false, () -> config.f7Phase4Enabled, v -> config.f7Phase4Enabled = v)
+                                            .controller(TickBoxControllerBuilder::create)
+                                            .build())
+                                    .build())
+                            .build())
+
                     // Visuals
                     .category(ConfigCategory.createBuilder()
                             .name(Component.literal("Visuals"))
@@ -732,7 +791,7 @@ public class SRMConfig {
                                             .action((screen, opt) -> SecretSounds.preview(
                                                     customSoundTypeOption.pendingValue(),
                                                     customSoundVolumeOption.pendingValue(),
-                                            customSoundPitchOption.pendingValue()))
+                                                    customSoundPitchOption.pendingValue()))
                                             .build())
                                     .build())
                             .build())

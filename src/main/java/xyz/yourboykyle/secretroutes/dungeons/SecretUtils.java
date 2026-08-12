@@ -36,14 +36,12 @@ import xyz.yourboykyle.secretroutes.dungeons.rendering.RenderTypes;
 import xyz.yourboykyle.secretroutes.dungeons.rendering.RenderingBackend;
 import xyz.yourboykyle.secretroutes.utils.*;
 import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
-import xyz.yourboykyle.secretroutes.utils.multistorage.Tuple;
 
 import java.awt.*;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -65,6 +63,20 @@ public class SecretUtils {
     public static int targetEtherwarpIndex = 0;
     private static BlockPos currentEtherwarpTarget;
 
+    private static Triple<Double, Double, Double> getActualSafe(double x, double y, double z) {
+        if (Main.currentRoom != null && "f7boss".equals(Main.currentRoom.name)) {
+            return new Triple<>(x, y, z);
+        }
+        return RoomRotationUtils.relativeToActual(x, y, z, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
+    }
+
+    private static BlockPos getActualSafe(BlockPos relative) {
+        if (Main.currentRoom != null && "f7boss".equals(Main.currentRoom.name)) {
+            return relative;
+        }
+        return RoomRotationUtils.relativeToActual(relative, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
+    }
+
     private static String getColorCode(SRMConfig.TextColor color) {
         return color.formatting.toString();
     }
@@ -81,10 +93,7 @@ public class SecretUtils {
 
     private static BlockPos getActualWaypointPosition(JsonElement element) {
         JsonArray loc = element.getAsJsonArray();
-        return RoomRotationUtils.relativeToActual(
-                new BlockPos(loc.get(0).getAsInt(), loc.get(1).getAsInt(), loc.get(2).getAsInt()),
-                RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner()
-        );
+        return getActualSafe(new BlockPos(loc.get(0).getAsInt(), loc.get(1).getAsInt(), loc.get(2).getAsInt()));
     }
 
     private static boolean isPlayerNearEtherwarp(LocalPlayer player, BlockPos pos) {
@@ -197,8 +206,7 @@ public class SecretUtils {
             renderEnderPearls(waypoints, index2);
         }
 
-        // Render Current Secret Target
-        if (waypoints.has("secret")) {
+        if (waypoints.has("secret") && !waypoints.get("secret").isJsonNull() && waypoints.get("secret").isJsonObject()) {
             renderCurrentSecret(waypoints.getAsJsonObject("secret"), index2);
         }
 
@@ -253,9 +261,8 @@ public class SecretUtils {
 
         for (JsonElement element : lineLocations) {
             JsonArray loc = element.getAsJsonArray();
-            Triple<Double, Double, Double> linePos = RoomRotationUtils.relativeToActual(
-                    loc.get(0).getAsDouble(), loc.get(1).getAsDouble(), loc.get(2).getAsDouble(),
-                    RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner()
+            Triple<Double, Double, Double> linePos = getActualSafe(
+                    loc.get(0).getAsDouble(), loc.get(1).getAsDouble(), loc.get(2).getAsDouble()
             );
             linePoints.add(new Vector3d(linePos.getOne() + 0.5, linePos.getTwo() + 0.5, linePos.getThree() + 0.5));
         }
@@ -278,7 +285,7 @@ public class SecretUtils {
             double posY = loc.get(1).getAsDouble();
             double posZ = loc.get(2).getAsDouble();
 
-            Triple<Double, Double, Double> positions = RoomRotationUtils.relativeToActual(posX, posY, posZ, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
+            Triple<Double, Double, Double> positions = getActualSafe(posX, posY, posZ);
             posX = positions.getOne() - 0.25;
             posY = positions.getTwo();
             posZ = positions.getThree() - 0.25;
@@ -301,7 +308,9 @@ public class SecretUtils {
             double z = Math.cos(yawRad) * Math.cos(pitchRad);
 
             double sideLength = Math.sqrt(x * x + y * y + z * z);
-            x /= sideLength; y /= sideLength; z /= sideLength;
+            x /= sideLength;
+            y /= sideLength;
+            z /= sideLength;
 
             Vector3d start = new Vector3d(posX + 0.25F, posY + 1.62F, posZ + 0.25F);
             Vector3d end = new Vector3d(posX + x * length + 0.25, posY + y * length + 1.62, posZ + z * length + 0.25);
@@ -312,9 +321,11 @@ public class SecretUtils {
     }
 
     private static void renderCurrentSecret(JsonObject secret, int stepIndex) {
+        if (!secret.has("type") || !secret.has("location")) return;
+
         String type = secret.get("type").getAsString();
         JsonArray loc = secret.get("location").getAsJsonArray();
-        BlockPos pos = RoomRotationUtils.relativeToActual(new BlockPos(loc.get(0).getAsInt(), loc.get(1).getAsInt(), loc.get(2).getAsInt()), RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
+        BlockPos pos = getActualSafe(new BlockPos(loc.get(0).getAsInt(), loc.get(1).getAsInt(), loc.get(2).getAsInt()));
         Vector3d position = new Vector3d(pos.getX(), pos.getY(), pos.getZ());
 
         switch (type) {
@@ -344,16 +355,18 @@ public class SecretUtils {
 
         if (index2 == 0 && SRMConfig.get().startTextToggle) {
             JsonArray startCoords = waypoints.getAsJsonArray("locations").get(0).getAsJsonArray();
-            BlockPos pos = RoomRotationUtils.relativeToActual(new BlockPos(startCoords.get(0).getAsInt(), startCoords.get(1).getAsInt(), startCoords.get(2).getAsInt()), RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
+            BlockPos pos = getActualSafe(new BlockPos(startCoords.get(0).getAsInt(), startCoords.get(1).getAsInt(), startCoords.get(2).getAsInt()));
             RenderingBackend.addWorldText(new RenderTypes.WorldText(Component.literal(getColorCode(SRMConfig.get().startWaypointColor) + "Start"), new Vector3d(pos.getX(), pos.getY(), pos.getZ()), true, SRMConfig.get().startTextSize));
         }
 
-        if (index2 == Main.currentRoom.currentSecretRoute.getAsJsonArray().size() - 1 && SRMConfig.get().exitTextToggle) {
-            JsonObject secret = waypoints.getAsJsonObject("secret");
-            if (secret.get("type").getAsString().equals("exitroute")) {
-                JsonArray loc = secret.getAsJsonArray("location");
-                BlockPos pos = RoomRotationUtils.relativeToActual(new BlockPos(loc.get(0).getAsInt(), loc.get(1).getAsInt(), loc.get(2).getAsInt()), RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
-                RenderingBackend.addWorldText(new RenderTypes.WorldText(Component.literal(getColorCode(SRMConfig.get().exitWaypointColor) + "Exit"), new Vector3d(pos.getX(), pos.getY(), pos.getZ()), true, SRMConfig.get().exitTextSize));
+        if (index2 == Main.currentRoom.currentSecretRoute.size() - 1 && SRMConfig.get().exitTextToggle) {
+            if (waypoints.has("secret") && !waypoints.get("secret").isJsonNull() && waypoints.get("secret").isJsonObject()) {
+                JsonObject secret = waypoints.getAsJsonObject("secret");
+                if (secret.has("type") && secret.get("type").getAsString().equals("exitroute")) {
+                    JsonArray loc = secret.getAsJsonArray("location");
+                    BlockPos pos = getActualSafe(new BlockPos(loc.get(0).getAsInt(), loc.get(1).getAsInt(), loc.get(2).getAsInt()));
+                    RenderingBackend.addWorldText(new RenderTypes.WorldText(Component.literal(getColorCode(SRMConfig.get().exitWaypointColor) + "Exit"), new Vector3d(pos.getX(), pos.getY(), pos.getZ()), true, SRMConfig.get().exitTextSize));
+                }
             }
         }
     }
@@ -366,14 +379,15 @@ public class SecretUtils {
             JsonObject secretInfos = secret.getAsJsonObject();
             String name = secretInfos.get("secretName").getAsString();
 
-            if (!name.contains("Chest") && !name.contains("Bat") && !name.contains("Wither Essence") && !name.contains("Lever") && !name.contains("Item")) continue;
+            if (!name.contains("Chest") && !name.contains("Bat") && !name.contains("Wither Essence") && !name.contains("Lever") && !name.contains("Item"))
+                continue;
 
             int xPos = secretInfos.get("x").getAsInt();
             int yPos = secretInfos.get("y").getAsInt();
             int zPos = secretInfos.get("z").getAsInt();
             if (secretLocations.contains(BlockUtils.blockPos(new BlockPos(xPos, yPos, zPos)))) continue;
 
-            Triple<Double, Double, Double> abs = RoomRotationUtils.relativeToActual(xPos, yPos, zPos, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
+            Triple<Double, Double, Double> abs = getActualSafe(xPos, yPos, zPos);
             Vector3d boxPos = new Vector3d(abs.getOne(), abs.getTwo(), abs.getThree());
 
             if (name.contains("Chest") || name.contains("Wither Essence")) {
@@ -405,7 +419,7 @@ public class SecretUtils {
                     int y = secretInfos.get("y").getAsInt();
                     int z = secretInfos.get("z").getAsInt();
 
-                    Triple<Double, Double, Double> abs = RoomRotationUtils.relativeToActual(x, y, z, RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
+                    Triple<Double, Double, Double> abs = getActualSafe(x, y, z);
                     BlockPos pos = new BlockPos(abs.getOne().intValue(), abs.getTwo().intValue(), abs.getThree().intValue());
                     if (BlockUtils.blockPos(pos).equals(BlockUtils.blockPos(lastInteract))) {
                         leverNum = name.split(" ")[0];
@@ -449,7 +463,7 @@ public class SecretUtils {
             if (currentLeverPos == null) {
                 ChatUtils.sendChatMessage("§cLever not found :(");
             } else {
-                Triple<Double, Double, Double> abs = RoomRotationUtils.relativeToActual(currentLeverPos.getX(), currentLeverPos.getY(), currentLeverPos.getZ(), RoomDirectionUtils.roomDirection(), RoomDirectionUtils.roomCorner());
+                Triple<Double, Double, Double> abs = getActualSafe(currentLeverPos.getX(), currentLeverPos.getY(), currentLeverPos.getZ());
                 if (SRMConfig.get().secretsInteractFullBlock) {
                     Vector3d position = new Vector3d(abs.getOne(), abs.getTwo(), abs.getThree());
                     RenderingBackend.addFilledBox(new RenderTypes.FilledBox(position, SRMConfig.get().secretsInteract, 1f, 1f, SRMConfig.get().renderLinesThroughWalls));
@@ -482,8 +496,10 @@ public class SecretUtils {
     }
 
     private static void submitBoxAndText(Vector3d pos, Color boxColor, boolean isFull, float boxLineWidth, boolean textToggle, SRMConfig.TextColor textColor, String textContent, float textSize, boolean shiftTextUp) {
-        if (isFull) RenderingBackend.addFilledBox(new RenderTypes.FilledBox(pos, boxColor, 1, 1, SRMConfig.get().renderLinesThroughWalls));
-        else RenderingBackend.addOutlinedBox(new RenderTypes.OutlinedBox(pos, boxColor, 1, 1, boxLineWidth, SRMConfig.get().renderLinesThroughWalls));
+        if (isFull)
+            RenderingBackend.addFilledBox(new RenderTypes.FilledBox(pos, boxColor, 1, 1, SRMConfig.get().renderLinesThroughWalls));
+        else
+            RenderingBackend.addOutlinedBox(new RenderTypes.OutlinedBox(pos, boxColor, 1, 1, boxLineWidth, SRMConfig.get().renderLinesThroughWalls));
 
         if (textToggle && textContent != null) {
             Vector3d textPos = shiftTextUp ? new Vector3d(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5) : pos;

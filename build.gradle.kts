@@ -29,7 +29,6 @@ stonecutter {
             "commands/Recording.java",
             "commands/SRM.java",
             "config/SRMKeybinds.java",
-            "config/SRMConfig.java",
             "dungeons/rendering/RenderingBackend.java",
             "events/OnPlaySound.java",
             "utils/ChatUtils.java"
