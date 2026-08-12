@@ -71,6 +71,13 @@ public class DungeonScanner {
     private static final List<Direction> HORIZONTALS = Arrays.stream(Direction.values())
             .filter(d -> d.getAxis().isHorizontal()).toList();
 
+    private static Block BLUE_DYED_TERRACOTTA =
+            //? if >=26.2 {
+            Blocks.DYED_TERRACOTTA.blue();
+            //?} elif <=26.1.2 {
+            //Blocks.BLUE_TERRACOTTA;
+            //?}
+
     public static void init() {
         ClientLifecycleEvents.CLIENT_STARTED.register(c -> loadResources());
         ClientPlayConnectionEvents.JOIN.register((h, s, c) -> reset());
@@ -296,13 +303,13 @@ public class DungeonScanner {
 
     private static boolean isBlueTerracotta(BlockPos pos) {
         if (client.level == null) return false;
-        return client.level.getBlockState(pos).getBlock() == Blocks.DYED_TERRACOTTA.blue();
+        return client.level.getBlockState(pos).getBlock() == BLUE_DYED_TERRACOTTA;
     }
 
     private static boolean isBlueTerracottaOrAir(BlockPos pos) {
         if (client.level == null) return false;
         Block b = client.level.getBlockState(pos).getBlock();
-        return b == Blocks.AIR || b == Blocks.DYED_TERRACOTTA.blue();
+        return b == Blocks.AIR || b == BLUE_DYED_TERRACOTTA;
     }
 
     public static Vector2i getRoomCentre(int posX, int posZ) {

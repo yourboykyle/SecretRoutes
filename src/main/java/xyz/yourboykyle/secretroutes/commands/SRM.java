@@ -48,8 +48,15 @@ public class SRM {
 
     private static int executeCommand(CommandContext<FabricClientCommandSource> context) {
         LogUtils.info("Opening SRM GUI (command)...");
+        Minecraft client = Minecraft.getInstance();
         Minecraft.getInstance().execute(() ->
-                Minecraft.getInstance().setScreenAndShow(SRMConfig.getScreen(Minecraft.getInstance().gui.screen()))
+                Minecraft.getInstance().setScreenAndShow(SRMConfig.getScreen(
+                        //? if >=26.2 {
+                        client.gui.screen()
+                        //?} elif <=26.1.2 {
+                        //client.screen
+                        //?}
+                ))
         );
         return 1;
     }
