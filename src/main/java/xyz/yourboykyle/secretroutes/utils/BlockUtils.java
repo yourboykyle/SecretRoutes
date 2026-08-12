@@ -23,6 +23,7 @@ package xyz.yourboykyle.secretroutes.utils;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
 import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 
 public class BlockUtils {
@@ -74,9 +75,16 @@ public class BlockUtils {
 
     public static Triple<Integer, Integer, Integer> playerToWorld(int worldX, int worldY, int worldZ) {
         Minecraft mc = Minecraft.getInstance();
-        int playerX = (int) mc.gameRenderer.mainCamera().position().x;
-        int playerY = (int) mc.gameRenderer.mainCamera().position().y;
-        int playerZ = (int) mc.gameRenderer.mainCamera().position().z;
+        Vec3 pos =
+                //? if >=26.2 {
+                mc.gameRenderer.mainCamera().position();
+                //?} elif <=26.1.2 {
+                //mc.gameRenderer.getMainCamera().position();
+                //?}
+
+        int playerX = (int) pos.x;
+        int playerY = (int) pos.y;
+        int playerZ = (int) pos.z;
 
         return new Triple<>(worldX - playerX, worldY - playerY, worldZ - playerZ);
     }
