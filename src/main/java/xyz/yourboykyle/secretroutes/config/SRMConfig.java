@@ -19,7 +19,6 @@ package xyz.yourboykyle.secretroutes.config;
  * You should have received a copy of the GNU General Public License along
  * with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-//#if FABRIC
 
 import com.google.gson.GsonBuilder;
 import dev.isxander.yacl3.api.*;
@@ -27,7 +26,12 @@ import dev.isxander.yacl3.api.controller.*;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
+
+//?if >1.21.11
 import dev.isxander.yacl3.gui.utils.GuiUtils;
+//?if 1.21.11
+//import net.minecraft.client.Minecraft;
+
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -71,6 +75,12 @@ public class SRMConfig {
     public boolean trackPersonalBests = true;
     @SerialEntry
     public boolean sendChatMessages = true;
+
+    // F7 Boss
+    @SerialEntry
+    public boolean pdRoutesEnabled = false;
+    @SerialEntry
+    public boolean pdHideAfterPhase2 = true;
 
     // Visual
     @SerialEntry
@@ -372,7 +382,11 @@ public class SRMConfig {
                             .description(OptionDescription.of(Component.literal("Loads the profile named above from its JSON file and closes the menu")))
                             .action((screen, opt) -> {
                                 ConfigUtils.loadColorConfig(config.copyFileName);
+                                //? if >1.21.11 {
                                 GuiUtils.setScreen(null);
+                                //?} else {
+                                // Minecraft.getInstance().setScreen(null);
+                                //?}
                             })
                             .build());
 
@@ -385,7 +399,11 @@ public class SRMConfig {
                             .description(OptionDescription.of(Component.literal("Loads " + profileName + ".json and closes menu")))
                             .action((screen, opt) -> {
                                 ConfigUtils.loadColorConfig(profileName);
+                                //? if >1.21.11 {
                                 GuiUtils.setScreen(null);
+                                //?} else {
+                                // Minecraft.getInstance().setScreen(null);
+                                //?}
                             })
                             .build());
                 }
@@ -477,6 +495,23 @@ public class SRMConfig {
                                     .action((screen, opt) -> {
                                         RouteUtils.checkRoutesFiles();
                                     })
+                                    .build())
+                            .group(OptionGroup.createBuilder()
+                                    .name(Component.literal("Predev Routes"))
+                                    .description(OptionDescription.of(Component.literal("Configure routes for doing predev.")))
+                                    .collapsed(true)
+                                    .option(Option.<Boolean>createBuilder()
+                                            .name(Component.literal("Enable Predev Routes"))
+                                            .description(OptionDescription.of(Component.literal("Master toggle for showing predev routes during the F7 Boss fight.")))
+                                            .binding(false, () -> config.pdRoutesEnabled, v -> config.pdRoutesEnabled = v)
+                                            .controller(TickBoxControllerBuilder::create)
+                                            .build())
+                                    .option(Option.<Boolean>createBuilder()
+                                            .name(Component.literal("Hide After Storm"))
+                                            .description(OptionDescription.of(Component.literal("Hide predev routes when Storm ends.")))
+                                            .binding(true, () -> config.pdHideAfterPhase2, v -> config.pdHideAfterPhase2 = v)
+                                            .controller(TickBoxControllerBuilder::create)
+                                            .build())
                                     .build())
                             .group(OptionGroup.createBuilder()
                                     .name(Component.literal("Line to Etherwarp"))
@@ -589,7 +624,6 @@ public class SRMConfig {
                                             .build())
                                     .build())
                             .build())
-
                     // Visuals
                     .category(ConfigCategory.createBuilder()
                             .name(Component.literal("Visuals"))
@@ -732,7 +766,7 @@ public class SRMConfig {
                                             .action((screen, opt) -> SecretSounds.preview(
                                                     customSoundTypeOption.pendingValue(),
                                                     customSoundVolumeOption.pendingValue(),
-                                            customSoundPitchOption.pendingValue()))
+                                                    customSoundPitchOption.pendingValue()))
                                             .build())
                                     .build())
                             .build())
