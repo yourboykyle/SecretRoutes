@@ -40,7 +40,7 @@ import java.util.*;
 import static xyz.yourboykyle.secretroutes.utils.ParticleUtils.getParticleFromType;
 
 public class Room {
-    public enum WAYPOINT_TYPES { LOCATIONS, ETHERWARPS, MINES, INTERACTS, TNTS, ENDERPEARLS }
+    public enum WAYPOINT_TYPES { LOCATIONS, ETHERWARPS, MINES, INTERACTS, TNTS, ENDERPEARLS, BONZO_STAFFS }
     public enum SECRET_TYPES { INTERACT, ITEM, BAT, EXITROUTE }
 
     public String name;
