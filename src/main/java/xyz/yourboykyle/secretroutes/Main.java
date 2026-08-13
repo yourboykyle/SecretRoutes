@@ -181,6 +181,7 @@ public class Main implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         instance = this;
+        SecretSounds.register();
 
         String gameDir = Minecraft.getInstance().gameDirectory.getAbsolutePath();
         CONFIG_FOLDER_PATH = gameDir + File.separator + "config" + File.separator + "SecretRoutes";
