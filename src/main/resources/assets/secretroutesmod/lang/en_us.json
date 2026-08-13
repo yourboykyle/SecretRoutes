@@ -3,5 +3,6 @@
 
   "key.secretroutes.next_secret": "Next Secret Route",
   "key.secretroutes.last_secret": "Previous Secret Route",
+  "key.secretroutes.cycle_route": "Cycle Secret Route",
   "key.secretroutes.toggle_mod": "Toggle Secret Routes Mod Enabled"
 }
