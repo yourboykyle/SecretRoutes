@@ -879,8 +879,8 @@ public class SRMConfig {
         RANDOM_ORB("Experience Orb", "entity.experience_orb.pickup"),
         RANDOM_BREAK("Item Break", "entity.item.break"),
         MOB_GUARDIAN_LAND_HIT("Guardian Land Hit", "entity.guardian.hurt_land"),
-        NOTE_PLING("Note Pling", "block.note_block.pling");
-        // ZYRA_MEOW("Zyra Meow", null);
+        NOTE_PLING("Note Pling", "block.note_block.pling"),
+        ZYRA_MEOW("Zyra Meow", "secretroutesmod:zyra.meow");
         private final String name;
         public final String soundId;
 
