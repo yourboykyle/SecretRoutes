@@ -180,9 +180,9 @@ public class SRMConfig {
     @SerialEntry
     public float bonzoStaffBoxLineWidth = 5f;
     @SerialEntry
-    public Color bonzoStaff = new Color(255, 85, 85);
+    public Color bonzoStaff = new Color(255, 165, 0);
     @SerialEntry
-    public Color secondStepBonzoStaff = new Color(170, 50, 50);
+    public Color secondStepBonzoStaff = new Color(200, 110, 0);
 
     // Secrets
     @SerialEntry
