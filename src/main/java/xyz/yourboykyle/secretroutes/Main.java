@@ -181,6 +181,7 @@ public class Main implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         instance = this;
+        SecretSounds.register();
 
         String gameDir = Minecraft.getInstance().gameDirectory.getAbsolutePath();
         CONFIG_FOLDER_PATH = gameDir + File.separator + "config" + File.separator + "SecretRoutes";
@@ -272,6 +273,16 @@ public class Main implements ClientModInitializer {
             while (SRMKeybinds.LAST_SECRET.consumeClick()) {
                 if (Main.currentRoom != null && DungeonScanner.isPlayerInCurrentRoom()) {
                     Main.currentRoom.lastSecretKeybind();
+                }
+            }
+
+            while (SRMKeybinds.CYCLE_ROUTE.consumeClick()) {
+                if (Main.currentRoom != null && DungeonScanner.isPlayerInCurrentRoom()) {
+                    if (Main.currentRoom.cycleRoute(1)) {
+                        sendChatMessage(ChatFormatting.GREEN + "Secret Routes: " + Main.currentRoom.getSelectedRouteStatus());
+                    } else {
+                        sendChatMessage(ChatFormatting.YELLOW + "No alternative routes are available for this room.");
+                    }
                 }
             }
 
