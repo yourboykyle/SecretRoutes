@@ -22,15 +22,27 @@
 package xyz.yourboykyle.secretroutes.utils;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import org.joml.Vector3d;
+import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 
 public class SecretSounds {
+    private static final Identifier ZYRA_MEOW_ID = Identifier.fromNamespaceAndPath(Main.MODID, "zyra.meow");
     private static Minecraft mc = Minecraft.getInstance();
     private static long lastPlayed = System.currentTimeMillis();
+
+    public static void register() {
+        Registry.register(
+                BuiltInRegistries.SOUND_EVENT,
+                ZYRA_MEOW_ID,
+                SoundEvent.createVariableRangeEvent(ZYRA_MEOW_ID)
+        );
+    }
 
     public static void secretChime(Boolean bypass) {
         SRMConfig config = SRMConfig.get();
