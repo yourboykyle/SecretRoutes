@@ -196,6 +196,12 @@ public class SecretUtils {
                 SRMConfig.get().superboomsFullBlock, SRMConfig.get().superboomBoxLineWidth, SRMConfig.get().superboomsTextToggle, !SRMConfig.get().superboomsEnumToggle, SRMConfig.get().superboomsWaypointColor, "superboom", SRMConfig.get().superboomsTextSize, false
         );
 
+        // Bonzo Staff
+        renderWaypointCategory(
+                waypoints, index2, "bonzo_staffs", SRMConfig.get().renderBonzoStaff, SRMConfig.get().bonzoStaff, SRMConfig.get().secondStepBonzoStaff,
+                SRMConfig.get().bonzoStaffFullBlock, SRMConfig.get().bonzoStaffBoxLineWidth, SRMConfig.get().bonzoStaffTextToggle, !SRMConfig.get().bonzoStaffEnumToggle, SRMConfig.get().bonzoStaffWaypointColor, "bonzo staff", SRMConfig.get().bonzoStaffTextSize, false
+        );
+
         // Render Normal Lines
         if (waypoints.has("locations") && SRMConfig.get().lineType == SRMConfig.LineType.LINES) {
             renderConnectingLines(waypoints.getAsJsonArray("locations"));
