@@ -518,7 +518,7 @@ public class SRMConfig {
                                     .build())
                             .group(OptionGroup.createBuilder()
                                     .name(Component.literal("Predev Routes"))
-                                    .description(OptionDescription.of(Component.literal("Configure routes for doing predev.")))
+                                    .description(OptionDescription.of(Component.literal("Configure routes for doing predev. You should watch a tutorial as important information is not displayed in the route")))
                                     .collapsed(true)
                                     .option(Option.<Boolean>createBuilder()
                                             .name(Component.literal("Enable Predev Routes"))
