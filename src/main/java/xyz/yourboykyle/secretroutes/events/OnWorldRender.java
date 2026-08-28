@@ -43,12 +43,18 @@ public class OnWorldRender {
                 return;
             }
 
+            boolean isPredevRoute = "f7boss".equals(Main.currentRoom.name);
+            if (isPredevRoute && !DungeonScanner.shouldShowPredevRoute()) {
+                resetEtherwarpAimState();
+                return;
+            }
+
             boolean playerInCurrentRoom = DungeonScanner.isPlayerInCurrentRoom();
             if (!playerInCurrentRoom) {
                 resetEtherwarpAimState();
             }
 
-            boolean allSecretsFound = OnChatReceive.isAllFound();
+            boolean allSecretsFound = !isPredevRoute && OnChatReceive.isAllFound();
             if (allSecretsFound) {
                 resetEtherwarpAimState();
                 /*

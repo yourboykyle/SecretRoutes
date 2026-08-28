@@ -126,17 +126,7 @@ public class DungeonScanner {
         if (DungeonUtil.isF7() && playerX >= BOSS_MIN_X && playerX <= BOSS_MAX_X &&
                 playerZ >= BOSS_MIN_Z && playerZ <= BOSS_MAX_Z) {
 
-            boolean shouldShow = false;
-            if (SRMConfig.get().pdRoutesEnabled) {
-                DungeonUtil.F7Phase phase = DungeonUtil.getCurrentPhase();
-                if (SRMConfig.get().pdHideAfterPhase2) {
-                    if (phase == DungeonUtil.F7Phase.NONE || phase == DungeonUtil.F7Phase.MAXOR || phase == DungeonUtil.F7Phase.STORM) {
-                        shouldShow = true;
-                    }
-                } else {
-                    shouldShow = true;
-                }
-            }
+            boolean shouldShow = shouldShowPredevRoute();
 
             if (shouldShow) {
                 if (Main.currentRoom == null || !"f7boss".equals(Main.currentRoom.name)) {
@@ -195,6 +185,11 @@ public class DungeonScanner {
                 && now - visualGraceDeadlineNanos >= 0L) {
             invalidateActiveRoom();
         }
+    }
+
+    public static boolean shouldShowPredevRoute() {
+        return SRMConfig.get().pdRoutesEnabled
+                && (!SRMConfig.get().pdHideAfterPhase2 || !DungeonUtil.isPredevWindowClosed());
     }
 
     private static void enterRoom(DungeonRoom room) {

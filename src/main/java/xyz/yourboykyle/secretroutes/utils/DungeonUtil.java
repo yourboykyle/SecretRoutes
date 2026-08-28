@@ -29,13 +29,12 @@ import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
 
 public class DungeonUtil {
-    private static boolean inF7 = false;
-    private static int tickCounter = 0;
+    private static final String STORM_END_MESSAGE = "[BOSS] Storm: I should have known that I stood no chance.";
+    private static final String GOLDOR_START_MESSAGE = "[BOSS] Goldor: Who dares trespass into my domain?";
 
-    public enum F7Phase {
-        NONE, MAXOR, STORM, GOLDOR, NECRON
-    }
-    private static F7Phase currentPhase = F7Phase.NONE;
+    private static boolean inF7 = false;
+    private static boolean predevWindowClosed = false;
+    private static int tickCounter = 0;
 
     public static void init() {
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> reset());
@@ -44,7 +43,6 @@ public class DungeonUtil {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (!LocationUtils.isInDungeons() || client.level == null) {
                 inF7 = false;
-                currentPhase = F7Phase.NONE;
                 return;
             }
 
@@ -55,17 +53,17 @@ public class DungeonUtil {
             }
         });
 
-        ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
-            if (!inF7) return;
+        ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
+            if (overlay) return true;
 
-            String cleanText = ChatFormatting.stripFormatting(message.getString());
+            String cleanText = ChatFormatting.stripFormatting(message.getString()).trim();
 
-            switch (cleanText) {
-                case "[BOSS] Maxor: WELL WELL WELL LOOK WHO'S HERE!" -> currentPhase = F7Phase.MAXOR;
-                case "[BOSS] Storm: Pathetic Maxor, just like expected." -> currentPhase = F7Phase.STORM;
-                case "[BOSS] Goldor: Who dares trespass into my domain?" -> currentPhase = F7Phase.GOLDOR;
-                case "The Core entrance is opening!" -> currentPhase = F7Phase.NECRON;
+            if (!predevWindowClosed && (STORM_END_MESSAGE.equals(cleanText) || GOLDOR_START_MESSAGE.equals(cleanText))) {
+                predevWindowClosed = true;
+                LogUtils.info("Predev route window closed by boss message: " + cleanText);
             }
+
+            return true;
         });
     }
 
@@ -91,13 +89,13 @@ public class DungeonUtil {
         return inF7;
     }
 
-    public static F7Phase getCurrentPhase() {
-        return currentPhase;
+    public static boolean isPredevWindowClosed() {
+        return predevWindowClosed;
     }
 
     public static void reset() {
         inF7 = false;
+        predevWindowClosed = false;
         tickCounter = 0;
-        currentPhase = F7Phase.NONE;
     }
 }
