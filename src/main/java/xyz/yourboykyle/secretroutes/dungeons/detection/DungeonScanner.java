@@ -60,6 +60,7 @@ public class DungeonScanner {
     private static final Gson GSON = new Gson();
 
     private static final Map<Integer, RoomData> CORE_TO_ROOM_MAP = new HashMap<>();
+    private static final Map<String, String> NAME_TO_SHAPE_MAP = new HashMap<>();
 
     public static DungeonRoom currentRoom = null;
     public static final Set<DungeonRoom> passedRooms = new HashSet<>();
@@ -106,6 +107,7 @@ public class DungeonScanner {
 
     private static void loadResources() {
         CORE_TO_ROOM_MAP.clear();
+        NAME_TO_SHAPE_MAP.clear();
         client.getResourceManager().listResources("rooms.json", id -> id.getPath().endsWith("rooms.json"))
                 .forEach((id, resource) -> {
                     try (Reader reader = new InputStreamReader(resource.open())) {
@@ -113,6 +115,9 @@ public class DungeonScanner {
                         for (RoomData room : data) {
                             if (room.cores() != null) {
                                 for (Integer core : room.cores()) CORE_TO_ROOM_MAP.put(core, room);
+                            }
+                            if (room.name() != null && room.shape() != null) {
+                                NAME_TO_SHAPE_MAP.put(room.name().toLowerCase(Locale.ROOT), room.shape());
                             }
                         }
                     } catch (Exception e) { e.printStackTrace(); }
@@ -212,6 +217,12 @@ public class DungeonScanner {
         Room newRoomObj = new Room(room.data.name());
         Main.currentRoom = newRoomObj;
         OnEnterNewRoom.onEnterNewRoom(newRoomObj);
+    }
+
+    /** The floor shape of a room ("1x1", "1x2", "L", ...) as declared in rooms.json, or null if unknown. */
+    public static String getRoomShape(String roomName) {
+        if (roomName == null) return null;
+        return NAME_TO_SHAPE_MAP.get(roomName.toLowerCase(Locale.ROOT));
     }
 
     public static boolean isPlayerInCurrentRoom() {

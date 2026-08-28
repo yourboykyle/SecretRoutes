@@ -24,12 +24,15 @@ package xyz.yourboykyle.secretroutes.utils;
 import com.google.gson.stream.JsonReader;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
+import xyz.yourboykyle.secretroutes.dungeons.detection.DungeonScanner;
 
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TreeSet;
 
 /**
@@ -40,14 +43,37 @@ public class RoomToggleUtils {
     // The F7 boss route has its own toggle in the Predev Routes group
     private static final String BOSS_ROOM = "f7boss";
 
+    // Shapes as they appear in rooms.json, in the order they should show up in the config
+    private static final List<String> SHAPE_ORDER = List.of("1x1", "1x2", "1x3", "1x4", "2x2", "L");
+    private static final String UNKNOWN_SHAPE = "Unknown";
+
     private RoomToggleUtils() {
     }
 
     /**
-     * Every room that has a route in either route file, sorted alphabetically. Variants of the same room
-     * ("Withermancers-4:1") share the toggle of their base room.
+     * Every room that has a route in either route file, bucketed by floor shape and sorted alphabetically
+     * within each bucket. Variants of the same room ("Withermancers-4:1") share the toggle of their base room.
      */
-    public static List<String> listKnownRooms() {
+    public static Map<String, List<String>> listRoomsByShape() {
+        Map<String, List<String>> roomsByShape = new LinkedHashMap<>();
+        for (String shape : SHAPE_ORDER) roomsByShape.put(shape, new ArrayList<>());
+
+        for (String room : listKnownRooms()) {
+            String shape = DungeonScanner.getRoomShape(room);
+            if (shape == null || !roomsByShape.containsKey(shape)) shape = UNKNOWN_SHAPE;
+            roomsByShape.computeIfAbsent(shape, key -> new ArrayList<>()).add(room);
+        }
+
+        roomsByShape.values().removeIf(List::isEmpty);
+        return roomsByShape;
+    }
+
+    /** Turns a rooms.json shape into something readable in the config. */
+    public static String shapeDisplayName(String shape) {
+        return "L".equals(shape) ? "L-Shape" : shape;
+    }
+
+    private static List<String> listKnownRooms() {
         if (Main.ROUTES_PATH == null) return List.of();
 
         TreeSet<String> rooms = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);

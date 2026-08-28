@@ -38,6 +38,7 @@ public record RoomData(
         List<Integer> cores,
         int crypts,
         int secrets,
-        int trappedChests
+        int trappedChests,
+        String shape
 ) {}
 //#endif

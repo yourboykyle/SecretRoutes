@@ -47,6 +47,7 @@ import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class SRMConfig {
 
@@ -473,7 +474,7 @@ public class SRMConfig {
                     .controller(opt -> FloatSliderControllerBuilder.create(opt).range(0.5f, 2.0f).step(0.1f))
                     .build();
 
-            // Rooms - one toggle per room that has a route, grouped by first letter to stay navigable
+            // Rooms - one toggle per room that has a route, grouped by room shape to stay navigable
             List<Option<Boolean>> roomOptions = new ArrayList<>();
             var roomsCategory = ConfigCategory.createBuilder()
                     .name(Component.literal("Rooms"))
@@ -491,35 +492,30 @@ public class SRMConfig {
                             .action((screen, opt) -> roomOptions.forEach(roomOption -> roomOption.requestSet(false)))
                             .build());
 
-            List<String> knownRooms = RoomToggleUtils.listKnownRooms();
-            if (knownRooms.isEmpty()) {
+            Map<String, List<String>> roomsByShape = RoomToggleUtils.listRoomsByShape();
+            if (roomsByShape.isEmpty()) {
                 roomsCategory.option(LabelOption.create(Component.literal("§cNo route files found. Download the routes from the General tab first.")));
             } else {
-                OptionGroup.Builder letterGroup = null;
-                char currentLetter = 0;
+                for (Map.Entry<String, List<String>> shapeEntry : roomsByShape.entrySet()) {
+                    String shapeName = RoomToggleUtils.shapeDisplayName(shapeEntry.getKey());
+                    var shapeGroup = OptionGroup.createBuilder()
+                            .name(Component.literal(shapeName))
+                            .description(OptionDescription.of(Component.literal(shapeName + " rooms")))
+                            .collapsed(true);
 
-                for (String room : knownRooms) {
-                    char letter = Character.toUpperCase(room.charAt(0));
-                    if (letterGroup == null || letter != currentLetter) {
-                        if (letterGroup != null) roomsCategory.group(letterGroup.build());
-                        currentLetter = letter;
-                        letterGroup = OptionGroup.createBuilder()
-                                .name(Component.literal(String.valueOf(currentLetter)))
-                                .description(OptionDescription.of(Component.literal("Rooms starting with " + currentLetter)))
-                                .collapsed(true);
+                    for (String room : shapeEntry.getValue()) {
+                        Option<Boolean> roomOption = Option.<Boolean>createBuilder()
+                                .name(Component.literal(room))
+                                .description(OptionDescription.of(Component.literal("Shows the route for " + room + " when you enter it")))
+                                .binding(true, () -> RoomToggleUtils.isRoomEnabled(room), v -> RoomToggleUtils.setRoomEnabled(room, v))
+                                .controller(TickBoxControllerBuilder::create)
+                                .build();
+                        roomOptions.add(roomOption);
+                        shapeGroup.option(roomOption);
                     }
 
-                    Option<Boolean> roomOption = Option.<Boolean>createBuilder()
-                            .name(Component.literal(room))
-                            .description(OptionDescription.of(Component.literal("Shows the route for " + room + " when you enter it")))
-                            .binding(true, () -> RoomToggleUtils.isRoomEnabled(room), v -> RoomToggleUtils.setRoomEnabled(room, v))
-                            .controller(TickBoxControllerBuilder::create)
-                            .build();
-                    roomOptions.add(roomOption);
-                    letterGroup.option(roomOption);
+                    roomsCategory.group(shapeGroup.build());
                 }
-
-                roomsCategory.group(letterGroup.build());
             }
 
             return builder
