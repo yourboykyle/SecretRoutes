@@ -3,11 +3,7 @@ plugins {
     `maven-publish`
 }
 
-if (sc.current.parsed < "26") {
-    apply(plugin = "net.fabricmc.fabric-loom-remap")
-} else {
-    apply(plugin = "net.fabricmc.fabric-loom")
-}
+apply(plugin = "net.fabricmc.fabric-loom")
 
 fun prop(key: String): String = property(key) as String
 
@@ -19,28 +15,12 @@ val mod_archives_name = prop("mod.archives_name")
 
 stonecutter {
     properties.tags(current.version, "fabric")
-
-    if (current.parsed < "26") {
-        val excludedClasses = listOf(
-            "commands/ChangeColorProfile.java",
-            "commands/ChangeRoute.java",
-            "commands/Debug.java",
-            "commands/LoadRoute.java",
-            "commands/Recording.java",
-            "commands/SRM.java",
-            "config/SRMKeybinds.java",
-            "dungeons/rendering/RenderingBackend.java",
-            "events/OnPlaySound.java",
-            "utils/ChatUtils.java"
-        )
-        excludedClasses.forEach { filters.exclude("java/xyz/yourboykyle/secretroutes/$it") }
-    }
 }
 
 val minecraft_version = sc.current.version
 val loader_version = prop("loader_version")
 val fabric_version = prop("fabric_version")
-val yacl_version = prop("yacl_version")
+val configlib_version = prop("configlib_version")
 val hypixel_api_version = prop("hypixel_api_version")
 val modmenu_version = prop("modmenu_version")
 val iris_version = prop("iris_version")
@@ -54,28 +34,22 @@ base {
 }
 
 repositories {
+    // configlib 1.0.1 resolves from here until diegos-config-lib's docs/maven is pushed.
+    mavenLocal()
     mavenCentral()
     maven("https://api.modrinth.com/maven")
     maven("https://repo.hypixel.net/repository/Hypixel/")
     maven("https://maven.terraformersmc.com/")
-    maven("https://maven.isxander.dev/releases")
+    maven("https://diegolikespizza.github.io/diegos-config-lib/maven")
     maven("https://repo.nea.moe/releases")
 }
 
 dependencies {
     minecraft("com.mojang:minecraft:$minecraft_version")
 
-    if (sc.current.parsed < "26") {
-        val loom = project.extensions.getByName("loom") as net.fabricmc.loom.api.LoomGradleExtensionAPI
-        mappings(loom.layered {
-            officialMojangMappings()
-        })
-    }
-
     modImplementation("net.fabricmc:fabric-loader:$loader_version")
     modImplementation("net.fabricmc.fabric-api:fabric-api:$fabric_version")
 
-    modImplementation("dev.isxander:yet-another-config-lib:$yacl_version")
     modImplementation("com.terraformersmc:modmenu:$modmenu_version")
     modImplementation("maven.modrinth:iris:$iris_version")
 
@@ -83,13 +57,14 @@ dependencies {
 
     implementation("moe.nea:libautoupdate:$autoupdate_version")
     include("moe.nea:libautoupdate:$autoupdate_version")
+
+    // Plain `implementation`, not `modImplementation`: MC 26.x ships de-obfuscated, so Loom
+    // registers no remapping configurations. `include` nests it in the jar so users install nothing.
+    implementation("dev.diego:configlib:$configlib_version")
+    include("dev.diego:configlib:$configlib_version")
 }
 
-val targetJavaVersion = when {
-    sc.current.parsed >= "26" -> 25
-    sc.current.parsed >= "1.21.11" -> 21
-    else -> 17
-}
+val targetJavaVersion = 25
 
 java {
     val javaVersion = JavaVersion.toVersion(targetJavaVersion)

@@ -21,8 +21,6 @@ package xyz.yourboykyle.secretroutes.dungeons.rendering;
 import net.minecraft.network.chat.Component;
 import org.joml.Vector3d;
 
-import java.awt.*;
-
 public class RenderTypes {
     public static class WorldText {
         public Component text;
@@ -46,13 +44,14 @@ public class RenderTypes {
 
     public static class OutlinedBox {
         public Vector3d position;
-        public Color color;
+        /** Packed ARGB, as the config stores it. */
+        public int color;
         public float boxWidth;
         public float boxHeight;
         public float lineWidth;
         public boolean throughWalls;
 
-        public OutlinedBox(Vector3d position, Color color, float boxWidth, float boxHeight, float lineWidth, boolean throughWalls) {
+        public OutlinedBox(Vector3d position, int color, float boxWidth, float boxHeight, float lineWidth, boolean throughWalls) {
             this.position = position;
             this.color = color;
             this.boxWidth = boxWidth;
@@ -64,12 +63,13 @@ public class RenderTypes {
 
     public static class FilledBox {
         public Vector3d position;
-        public Color color;
+        /** Packed ARGB, as the config stores it. */
+        public int color;
         public float boxWidth;
         public float boxHeight;
         public boolean throughWalls;
 
-        public FilledBox(Vector3d position, Color color, float boxWidth, float boxHeight, boolean throughWalls) {
+        public FilledBox(Vector3d position, int color, float boxWidth, float boxHeight, boolean throughWalls) {
             this.position = position;
             this.color = color;
             this.boxWidth = boxWidth;
@@ -81,11 +81,12 @@ public class RenderTypes {
     public static class Line {
         public Vector3d start;
         public Vector3d end;
-        public Color color;
+        /** Packed ARGB, as the config stores it. */
+        public int color;
         public float lineWidth;
         public boolean throughWalls;
 
-        public Line(Vector3d start, Vector3d end, Color color, float lineWidth, boolean throughWalls) {
+        public Line(Vector3d start, Vector3d end, int color, float lineWidth, boolean throughWalls) {
             this.start = start;
             this.end = end;
             this.color = color;
@@ -96,10 +97,11 @@ public class RenderTypes {
 
     public static class LineFromCursor {
         public Vector3d point;
-        public Color color;
+        /** Packed ARGB, as the config stores it. */
+        public int color;
         public float lineWidth;
 
-        public LineFromCursor(Vector3d point, Color color, float lineWidth) {
+        public LineFromCursor(Vector3d point, int color, float lineWidth) {
             this.point = point;
             this.color = color;
             this.lineWidth = lineWidth;

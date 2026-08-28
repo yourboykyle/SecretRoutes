@@ -26,7 +26,6 @@ import net.fabricmc.loader.api.FabricLoader;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.config.SRMConfig.TextColor;
 
-import java.awt.*;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -66,7 +65,7 @@ public class ConfigUtils {
             "itemTextToggle", "batTextToggle", "etherwarpsTextToggle", "minesTextToggle",
             "superboomsTextToggle", "enderpearlTextToggle",
 
-            "interactsEnumToggle", "etherwarpsEnumToggle", "minesEnumToggle", "superboomsEnumToggle", "enderpearlEnumToggle",
+            "interactsEnumToggle", "etherwarpNumberingToggle", "minesEnumToggle", "superboomsEnumToggle", "enderpearlEnumToggle",
 
             "etherwarpFullBlock", "mineFullBlock", "superboomsFullBlock", "enderpearlFullBlock",
             "secretsItemFullBlock", "secretsInteractFullBlock", "secretsBatFullBlock", "interactsFullBlock",
@@ -98,9 +97,7 @@ public class ConfigUtils {
                 Field field = SRMConfig.class.getField(key);
                 Object value = field.get(config);
 
-                if (value instanceof Color c) {
-                    profileData.put(key, c.getRGB());
-                } else if (value instanceof Enum) {
+                if (value instanceof Enum) {
                     profileData.put(key, value.toString());
                 } else {
                     profileData.put(key, value);
@@ -160,11 +157,14 @@ public class ConfigUtils {
                     } else if (type == float.class) {
                         field.setFloat(config, element.getAsFloat());
                     } else if (type == int.class) {
-                        field.setInt(config, element.getAsInt());
+                        // Colours are ints now. A profile written before that holds a java.awt.Color
+                        // object here, so anything that is not already a number goes through the
+                        // legacy parser rather than failing the whole profile.
+                        field.setInt(config, element.isJsonPrimitive() && element.getAsJsonPrimitive().isNumber()
+                                ? element.getAsInt()
+                                : parseColorArgb(element));
                     } else if (type == String.class) {
                         field.set(config, element.getAsString());
-                    } else if (type == Color.class) {
-                        field.set(config, parseColor(element));
                     } else if (type == TextColor.class) {
                         try {
                             field.set(config, TextColor.valueOf(element.getAsString()));
@@ -195,10 +195,17 @@ public class ConfigUtils {
         return false;
     }
 
-    private static Color parseColor(JsonElement json) {
+    /**
+     * A colour from a profile or config written before colours were packed ARGB ints.
+     *
+     * <p>Handles the two shapes YACL wrote a {@code java.awt.Color} as - an HSBA object and a
+     * wrapped int - as well as a plain int. Anything unrecognisable comes back opaque white rather
+     * than taking the surrounding load down with it.
+     */
+    public static int parseColorArgb(JsonElement json) {
         try {
             if (json.isJsonPrimitive()) {
-                return new Color(json.getAsInt(), true);
+                return json.getAsInt();
             }
             if (json.isJsonObject()) {
                 JsonObject obj = json.getAsJsonObject();
@@ -209,17 +216,16 @@ public class ConfigUtils {
                     float b = hsba.get(2).getAsInt() / 100f;
                     int a = hsba.get(3).getAsInt();
 
-                    Color c = Color.getHSBColor(h, s, b);
-                    return new Color(c.getRed(), c.getGreen(), c.getBlue(), a);
+                    return (a & 0xFF) << 24 | (java.awt.Color.HSBtoRGB(h, s, b) & 0xFFFFFF);
                 }
                 if (obj.has("value")) {
-                    return new Color(obj.get("value").getAsInt(), true);
+                    return obj.get("value").getAsInt();
                 }
             }
         } catch (Exception e) {
             LogUtils.error(e);
         }
-        return Color.WHITE;
+        return 0xFFFFFFFF;
     }
 
     private static TextColor getTextColorFromLegacyIndex(int index) {

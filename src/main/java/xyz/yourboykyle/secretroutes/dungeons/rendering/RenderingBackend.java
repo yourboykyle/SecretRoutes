@@ -51,7 +51,6 @@ import org.joml.Vector3f;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.events.OnWorldRender;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -232,7 +231,7 @@ public class RenderingBackend {
             float minX = (float) fb.position.x - cx, minY = (float) fb.position.y - cy, minZ = (float) fb.position.z - cz;
             float maxX = minX + (float) fb.boxWidth, maxY = minY + (float) fb.boxHeight, maxZ = minZ + (float) fb.boxWidth;
             drawBoxFacesPrimitive(buffer, mat, minX, minY, minZ, maxX, maxY, maxZ,
-                    fb.color.getRed() / 255f, fb.color.getGreen() / 255f, fb.color.getBlue() / 255f, fb.color.getAlpha() / 255f);
+                    red(fb.color), green(fb.color), blue(fb.color), alpha(fb.color));
         }
     }
 
@@ -245,10 +244,10 @@ public class RenderingBackend {
             float minX = (float) ob.position.x - cx, minY = (float) ob.position.y - cy, minZ = (float) ob.position.z - cz;
             float width = (float) ob.boxWidth;
             float height = (float) ob.boxHeight;
-            float r = ob.color.getRed() / 255f;
-            float g = ob.color.getGreen() / 255f;
-            float b = ob.color.getBlue() / 255f;
-            float a = ob.color.getAlpha() / 255f;
+            float r = red(ob.color);
+            float g = green(ob.color);
+            float b = blue(ob.color);
+            float a = alpha(ob.color);
 
             drawCachedMesh(buffer, mat, BOX_MESH_CACHE.get(width, height, thickness), minX, minY, minZ, r, g, b, a);
         }
@@ -271,7 +270,7 @@ public class RenderingBackend {
             drawBillboardLinePrimitive(buffer, mat,
                     (float) line.start.x - cx, (float) line.start.y - cy, (float) line.start.z - cz,
                     (float) line.end.x - cx, (float) line.end.y - cy, (float) line.end.z - cz,
-                    line.color.getRed() / 255f, line.color.getGreen() / 255f, line.color.getBlue() / 255f, line.color.getAlpha() / 255f, thickness);
+                    red(line.color), green(line.color), blue(line.color), alpha(line.color), thickness);
         }
     }
 
@@ -293,10 +292,10 @@ public class RenderingBackend {
             if (SCRATCH_LINE_DIR.lengthSquared() < 0.0001f) continue;
             SCRATCH_LINE_DIR.normalize();
 
-            float r = line.color.getRed() / 255f;
-            float g = line.color.getGreen() / 255f;
-            float b = line.color.getBlue() / 255f;
-            float a = line.color.getAlpha() / 255f;
+            float r = red(line.color);
+            float g = green(line.color);
+            float b = blue(line.color);
+            float a = alpha(line.color);
             float width = Math.max(1.0f, line.lineWidth);
 
             buffer.addVertex(mat, sx, sy, sz)
@@ -377,11 +376,30 @@ public class RenderingBackend {
         if (!filledBoxes.contains(filledBox)) filledBoxes.add(filledBox);
     }
 
+    // Colours arrive packed ARGB, the way the config stores them. Unpacked here rather than at
+    // the call sites so nothing allocates a Color per waypoint per frame.
+
+    private static float red(int argb) {
+        return (argb >> 16 & 0xFF) / 255f;
+    }
+
+    private static float green(int argb) {
+        return (argb >> 8 & 0xFF) / 255f;
+    }
+
+    private static float blue(int argb) {
+        return (argb & 0xFF) / 255f;
+    }
+
+    private static float alpha(int argb) {
+        return (argb >>> 24) / 255f;
+    }
+
     public static void addLine(RenderTypes.Line line) {
         if (!lines.contains(line)) lines.add(line);
     }
 
-    public static void addLinesFromPoints(org.joml.Vector3d[] points, Color color, float lineWidth, boolean throughWalls) {
+    public static void addLinesFromPoints(org.joml.Vector3d[] points, int color, float lineWidth, boolean throughWalls) {
         for (int i = 0; i < points.length - 1; i++) {
             RenderTypes.Line line = new RenderTypes.Line(points[i], points[i + 1], color, lineWidth, throughWalls);
             addLine(line);

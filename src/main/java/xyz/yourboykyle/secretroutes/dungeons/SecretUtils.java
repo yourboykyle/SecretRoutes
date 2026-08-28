@@ -37,7 +37,6 @@ import xyz.yourboykyle.secretroutes.dungeons.rendering.RenderingBackend;
 import xyz.yourboykyle.secretroutes.utils.*;
 import xyz.yourboykyle.secretroutes.utils.multistorage.Triple;
 
-import java.awt.*;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -87,7 +86,7 @@ public class SecretUtils {
         return SRMConfig.get().wholeRoute || SRMConfig.get().allSteps || (stepIndex >= currentStepIndex && stepIndex < currentStepIndex + visibleRouteSteps);
     }
 
-    private static Color colorForRouteStep(int stepIndex, Color currentColor, Color secondStepColor) {
+    private static int colorForRouteStep(int stepIndex, int currentColor, int secondStepColor) {
         return stepIndex == Main.currentRoom.currentSecretIndex ? currentColor : secondStepColor;
     }
 
@@ -220,12 +219,12 @@ public class SecretUtils {
         renderStartAndExitLabels(waypoints, index2);
     }
 
-    private static void renderWaypointCategory(JsonObject waypoints, int stepIndex, String jsonKey, boolean isEnabled, Color primaryColor, Color secondaryColor, boolean isFullBlock, float boxLineWidth, boolean textToggle, boolean showNumbering, SRMConfig.TextColor textColor, String textPrefix, float textSize, boolean isEtherwarp) {
+    private static void renderWaypointCategory(JsonObject waypoints, int stepIndex, String jsonKey, boolean isEnabled, int primaryColor, int secondaryColor, boolean isFullBlock, float boxLineWidth, boolean textToggle, boolean showNumbering, SRMConfig.TextColor textColor, String textPrefix, float textSize, boolean isEtherwarp) {
         if (!isEnabled || !waypoints.has(jsonKey)) return;
 
         JsonArray locations = waypoints.getAsJsonArray(jsonKey);
         int counter = 1;
-        Color boxColor = colorForRouteStep(stepIndex, primaryColor, secondaryColor);
+        int boxColor = colorForRouteStep(stepIndex, primaryColor, secondaryColor);
 
         boolean isActiveStep = (stepIndex == Main.currentRoom.currentSecretIndex);
         boolean renderPlayerToEtherwarp = isEtherwarp && isActiveStep && !SRMConfig.get().wholeRoute && SRMConfig.get().playerToEtherwarp;
@@ -248,7 +247,7 @@ public class SecretUtils {
 
             if (renderPlayerToEtherwarp && pos.equals(currentEtherwarpTarget)) {
                 Vector3d point = new Vector3d(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
-                Color lineColor = SRMConfig.get().useEtherwarpColorForLine ? SRMConfig.get().etherWarp : SRMConfig.get().playerToEtherwarpLineColor;
+                int lineColor = SRMConfig.get().useEtherwarpColorForLine ? SRMConfig.get().etherWarp : SRMConfig.get().playerToEtherwarpLineColor;
                 RenderingBackend.addLineFromCursor(new RenderTypes.LineFromCursor(point, lineColor, SRMConfig.get().playerToEtherwarpLineWidth));
             }
 
@@ -281,7 +280,7 @@ public class SecretUtils {
         JsonArray enderpearlAnglesArray = waypoints.getAsJsonArray("enderpearlangles");
 
         int index = 0;
-        Color enderpearlColor = colorForRouteStep(stepIndex, SRMConfig.get().enderpearls, SRMConfig.get().secondStepEnderpearls);
+        int enderpearlColor = colorForRouteStep(stepIndex, SRMConfig.get().enderpearls, SRMConfig.get().secondStepEnderpearls);
 
         for (JsonElement element : pearlLocations) {
             JsonArray loc = element.getAsJsonArray();
@@ -337,19 +336,19 @@ public class SecretUtils {
         switch (type) {
             case "interact":
                 if (SRMConfig.get().renderSecretIteract) {
-                    Color c = colorForRouteStep(stepIndex, SRMConfig.get().secretsInteract, SRMConfig.get().secondStepSecretsInteract);
+                    int c = colorForRouteStep(stepIndex, SRMConfig.get().secretsInteract, SRMConfig.get().secondStepSecretsInteract);
                     submitBoxAndText(position, c, SRMConfig.get().secretsInteractFullBlock, SRMConfig.get().secretBoxLineWidth, SRMConfig.get().interactTextToggle, SRMConfig.get().interactWaypointColor, "Interact", SRMConfig.get().interactTextSize, true);
                 }
                 break;
             case "item":
                 if (SRMConfig.get().renderSecretsItem) {
-                    Color c = colorForRouteStep(stepIndex, SRMConfig.get().secretsItem, SRMConfig.get().secondStepSecretsItem);
+                    int c = colorForRouteStep(stepIndex, SRMConfig.get().secretsItem, SRMConfig.get().secondStepSecretsItem);
                     submitBoxAndText(position, c, SRMConfig.get().secretsItemFullBlock, SRMConfig.get().secretBoxLineWidth, SRMConfig.get().itemTextToggle, SRMConfig.get().itemWaypointColor, "Item", SRMConfig.get().itemTextSize, true);
                 }
                 break;
             case "bat":
                 if (SRMConfig.get().renderSecretBat) {
-                    Color c = colorForRouteStep(stepIndex, SRMConfig.get().secretsBat, SRMConfig.get().secondStepSecretsBat);
+                    int c = colorForRouteStep(stepIndex, SRMConfig.get().secretsBat, SRMConfig.get().secondStepSecretsBat);
                     submitBoxAndText(position, c, SRMConfig.get().secretsBatFullBlock, SRMConfig.get().secretBoxLineWidth, SRMConfig.get().batTextToggle, SRMConfig.get().batWaypointColor, "Bat", SRMConfig.get().batTextSize, true);
                 }
                 break;
@@ -501,7 +500,7 @@ public class SecretUtils {
         }
     }
 
-    private static void submitBoxAndText(Vector3d pos, Color boxColor, boolean isFull, float boxLineWidth, boolean textToggle, SRMConfig.TextColor textColor, String textContent, float textSize, boolean shiftTextUp) {
+    private static void submitBoxAndText(Vector3d pos, int boxColor, boolean isFull, float boxLineWidth, boolean textToggle, SRMConfig.TextColor textColor, String textContent, float textSize, boolean shiftTextUp) {
         if (isFull)
             RenderingBackend.addFilledBox(new RenderTypes.FilledBox(pos, boxColor, 1, 1, SRMConfig.get().renderLinesThroughWalls));
         else

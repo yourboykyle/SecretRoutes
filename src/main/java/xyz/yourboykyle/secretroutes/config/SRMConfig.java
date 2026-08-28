@@ -20,855 +20,835 @@ package xyz.yourboykyle.secretroutes.config;
  * with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import com.google.gson.GsonBuilder;
-import dev.isxander.yacl3.api.*;
-import dev.isxander.yacl3.api.controller.*;
-import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
-import dev.isxander.yacl3.config.v2.api.SerialEntry;
-import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
-
-//?if >1.21.11
-import dev.isxander.yacl3.gui.utils.GuiUtils;
-//?if 1.21.11
-//import net.minecraft.client.Minecraft;
-
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import dev.diego.configlib.ConfigHandle;
+import dev.diego.configlib.ConfigLib;
+import dev.diego.configlib.api.Labelled;
+import dev.diego.configlib.core.ConfigSpec;
+import dev.diego.configlib.core.SpecBuilder;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.ConfigUtils;
+import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.utils.RouteUtils;
 import xyz.yourboykyle.secretroutes.utils.SecretSounds;
 
-import java.awt.*;
 import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+/**
+ * Every setting the mod has, and the configlib spec that draws them.
+ *
+ * <p>The fields are deliberately flat and public: the render path reads them straight off
+ * {@link #get()} on every frame, {@code /srm debug varset} reaches them by name, and colour
+ * profiles are stored on disk keyed by field name. The menu's shape lives in {@link #buildSpec}
+ * instead, bound to those fields through getter/setter pairs, so reorganising the GUI never moves
+ * a field and never invalidates a saved profile.
+ *
+ * <p>Option ids match their field names for the same reason - what lands in the JSON is what you
+ * can grep for here.
+ *
+ * <p>Colours are packed ARGB ints rather than {@code java.awt.Color}: that is what configlib's
+ * picker edits, and it keeps the render path from boxing a colour per waypoint per frame.
+ */
 public class SRMConfig {
 
-    public static final ConfigClassHandler<SRMConfig> HANDLER = ConfigClassHandler.createBuilder(SRMConfig.class)
-            .id(Identifier.fromNamespaceAndPath(Main.MODID, "config"))
-            .serializer(config -> GsonConfigSerializerBuilder.create(config)
-                    .setPath(FabricLoader.getInstance().getConfigDir().resolve("SecretRoutes/xyz.yourboykyle.secretroutes.config.json"))
-                    .appendGsonBuilder(GsonBuilder::setPrettyPrinting)
-                    .setJson5(true)
-                    .build())
-            .build();
+    /** Where configlib keeps the settings - beside the colour profiles, in the mod's own folder. */
+    public static final Path FILE = FabricLoader.getInstance().getConfigDir()
+            .resolve("SecretRoutes/secretroutesmod.json");
+
+    /** The YACL file this mod used before configlib. Read once, then renamed. See {@link #migrate}. */
+    private static final Path LEGACY_FILE = FabricLoader.getInstance().getConfigDir()
+            .resolve("SecretRoutes/xyz.yourboykyle.secretroutes.config.json");
+
+    private static final SRMConfig INSTANCE = new SRMConfig();
 
     // General
-    @SerialEntry
     public boolean modEnabled = true;
-    @SerialEntry
     public RouteType routeType = RouteType.ROUTE_FOW;
-    @SerialEntry
     public boolean renderComplete = false;
-    @SerialEntry
     public boolean wholeRoute = false;
-    @SerialEntry
     public int visibleRouteSteps = 1;
-    @SerialEntry
     public boolean allSteps = false;
-    @SerialEntry
     public boolean allSecrets = false;
-    @SerialEntry
     public boolean trackPersonalBests = true;
-    @SerialEntry
     public boolean sendChatMessages = true;
 
     // F7 Boss
-    @SerialEntry
     public boolean pdRoutesEnabled = false;
-    @SerialEntry
     public boolean pdHideAfterPhase2 = true;
 
     // Visual
-    @SerialEntry
     public LineType lineType = LineType.LINES;
-    @SerialEntry
     public int width = 5;
-    @SerialEntry
-    public Color lineColor = new Color(255, 0, 0);
-    @SerialEntry
+    public int lineColor = 0xFFFF0000;
     public boolean renderLinesThroughWalls = true;
-    @SerialEntry
     public ParticleType particles = ParticleType.FLAME;
-    @SerialEntry
     public double particleDensity = 2.0;
-    @SerialEntry
     public float filledBoxAlpha = 0.5f;
-    @SerialEntry
     public int tickInterval = 1;
-    @SerialEntry
     public boolean playerWaypointLine = false;
-    @SerialEntry
     public int playerToSecretLineWidth = 4;
-    @SerialEntry
-    public Color playerToSecretLineColor = new Color(255, 0, 0);
-    @SerialEntry
+    public int playerToSecretLineColor = 0xFFFF0000;
     public boolean playerToEtherwarp = false;
-    @SerialEntry
     public int playerToEtherwarpLineWidth = 4;
-    @SerialEntry
     public boolean autoSkipEtherwarps = true;
-    @SerialEntry
     public float etherwarpDetectionDistance = 1.5f;
-    @SerialEntry
     public boolean etherwarpAimSound = false;
-    @SerialEntry
     public SoundType etherwarpAimSoundType = SoundType.NOTE_PLING;
-    @SerialEntry
     public float etherwarpAimSoundVolume = 0.35f;
-    @SerialEntry
     public float etherwarpAimSoundPitch = 1.6f;
-    @SerialEntry
     public int etherwarpAimSoundRearmDelay = 400;
-    @SerialEntry
     public boolean useEtherwarpColorForLine = true;
-    @SerialEntry
-    public Color playerToEtherwarpLineColor = new Color(128, 0, 128);
+    public int playerToEtherwarpLineColor = 0xFF800080;
 
     // Colours and toggles
-    @SerialEntry
     public boolean renderEtherwarps = true;
-    @SerialEntry
     public boolean etherwarpFullBlock = false;
-    @SerialEntry
     public float etherwarpBoxLineWidth = 7f;
-    @SerialEntry
-    public Color etherWarp = new Color(128, 0, 128);
-    @SerialEntry
-    public Color secondStepEtherWarp = new Color(95, 61, 97);
+    public int etherWarp = 0xFF800080;
+    public int secondStepEtherWarp = 0xFF5F3D61;
 
-    @SerialEntry
     public boolean renderMines = true;
-    @SerialEntry
     public boolean mineFullBlock = false;
-    @SerialEntry
     public float mineBoxLineWidth = 5f;
-    @SerialEntry
-    public Color mine = new Color(255, 236, 0, 82);
-    @SerialEntry
-    public Color secondStepMine = new Color(177, 173, 97);
+    public int mine = 0x52FFEC00;
+    public int secondStepMine = 0xFFB1AD61;
 
-    @SerialEntry
     public boolean renderSuperboom = true;
-    @SerialEntry
     public boolean superboomsFullBlock = false;
-    @SerialEntry
     public float superboomBoxLineWidth = 5f;
-    @SerialEntry
-    public Color superbooms = new Color(255, 0, 0);
-    @SerialEntry
-    public Color secondStepSuperbooms = new Color(168, 90, 90);
+    public int superbooms = 0xFFFF0000;
+    public int secondStepSuperbooms = 0xFFA85A5A;
 
-    @SerialEntry
     public boolean renderInteracts = true;
-    @SerialEntry
     public boolean interactsFullBlock = false;
-    @SerialEntry
     public float leverBoxLineWidth = 5f;
-    @SerialEntry
-    public Color interacts = new Color(0, 0, 255);
-    @SerialEntry
-    public Color secondStepInteracts = new Color(73, 82, 149);
+    public int interacts = 0xFF0000FF;
+    public int secondStepInteracts = 0xFF495295;
 
-    @SerialEntry
     public boolean renderBonzoStaff = true;
-    @SerialEntry
     public boolean bonzoStaffFullBlock = false;
-    @SerialEntry
     public float bonzoStaffBoxLineWidth = 5f;
-    @SerialEntry
-    public Color bonzoStaff = new Color(255, 165, 0);
-    @SerialEntry
-    public Color secondStepBonzoStaff = new Color(200, 110, 0);
+    public int bonzoStaff = 0xFFFFA500;
+    public int secondStepBonzoStaff = 0xFFC86E00;
 
     // Secrets
-    @SerialEntry
     public boolean renderSecretsItem = true;
-    @SerialEntry
     public float secretBoxLineWidth = 5f;
-    @SerialEntry
     public boolean secretsItemFullBlock = false;
-    @SerialEntry
-    public Color secretsItem = new Color(0, 255, 255);
-    @SerialEntry
-    public Color secondStepSecretsItem = new Color(95, 167, 167);
+    public int secretsItem = 0xFF00FFFF;
+    public int secondStepSecretsItem = 0xFF5FA7A7;
 
-    @SerialEntry
     public boolean renderSecretIteract = true;
-    @SerialEntry
     public boolean secretsInteractFullBlock = false;
-    @SerialEntry
-    public Color secretsInteract = new Color(0, 0, 255);
-    @SerialEntry
-    public Color secondStepSecretsInteract = new Color(73, 82, 149);
+    public int secretsInteract = 0xFF0000FF;
+    public int secondStepSecretsInteract = 0xFF495295;
 
-    @SerialEntry
     public boolean renderSecretBat = true;
-    @SerialEntry
     public boolean secretsBatFullBlock = false;
-    @SerialEntry
-    public Color secretsBat = new Color(0, 255, 0);
-    @SerialEntry
-    public Color secondStepSecretsBat = new Color(91, 154, 91);
+    public int secretsBat = 0xFF00FF00;
+    public int secondStepSecretsBat = 0xFF5B9A5B;
 
     // Ender pearls
-    @SerialEntry
     public boolean renderEnderpearls = true;
-    @SerialEntry
     public boolean enderpearlFullBlock = false;
-    @SerialEntry
     public float enderpearlBoxLineWidth = 5f;
-    @SerialEntry
-    public Color enderpearls = new Color(0, 255, 255);
-    @SerialEntry
-    public Color secondStepEnderpearls = new Color(95, 167, 167);
-    @SerialEntry
+    public int enderpearls = 0xFF00FFFF;
+    public int secondStepEnderpearls = 0xFF5FA7A7;
     public int pearlLineWidth = 5;
-    @SerialEntry
-    public Color pearlLineColor = new Color(0, 255, 255);
+    public int pearlLineColor = 0xFF00FFFF;
 
     // text
-    @SerialEntry
     public boolean startTextToggle = true;
-    @SerialEntry
     public TextColor startWaypointColor = TextColor.RED;
-    @SerialEntry
     public float startTextSize = 1.0f;
 
-    @SerialEntry
     public boolean exitTextToggle = true;
-    @SerialEntry
     public TextColor exitWaypointColor = TextColor.RED;
-    @SerialEntry
     public float exitTextSize = 1.0f;
 
-    @SerialEntry
     public boolean etherwarpsTextToggle = false;
-    @SerialEntry
     public boolean etherwarpNumberingToggle = false;
-    @SerialEntry
     public TextColor etherwarpsWaypointColor = TextColor.DARK_PURPLE;
-    @SerialEntry
     public float etherwarpsTextSize = 1.0f;
 
-    @SerialEntry
     public boolean minesTextToggle = false;
-    @SerialEntry
     public boolean minesEnumToggle = false;
-    @SerialEntry
     public TextColor minesWaypointColor = TextColor.YELLOW;
-    @SerialEntry
     public float minesTextSize = 1.0f;
 
-    @SerialEntry
     public boolean interactsTextToggle = true;
-    @SerialEntry
     public boolean interactsEnumToggle = false;
-    @SerialEntry
     public TextColor interactsWaypointColor = TextColor.BLUE;
-    @SerialEntry
     public float interactsTextSize = 1.0f;
 
-    @SerialEntry
     public boolean superboomsTextToggle = true;
-    @SerialEntry
     public boolean superboomsEnumToggle = false;
-    @SerialEntry
     public TextColor superboomsWaypointColor = TextColor.RED;
-    @SerialEntry
     public float superboomsTextSize = 1.0f;
 
-    @SerialEntry
     public boolean bonzoStaffTextToggle = true;
-    @SerialEntry
     public boolean bonzoStaffEnumToggle = false;
-    @SerialEntry
     public TextColor bonzoStaffWaypointColor = TextColor.RED;
-    @SerialEntry
     public float bonzoStaffTextSize = 1.0f;
 
-    @SerialEntry
     public boolean enderpearlTextToggle = true;
-    @SerialEntry
     public boolean enderpearlEnumToggle = false;
-    @SerialEntry
     public TextColor enderpearlWaypointColor = TextColor.AQUA;
-    @SerialEntry
     public float enderpearlTextSize = 1.0f;
 
-    @SerialEntry
     public boolean interactTextToggle = true;
-    @SerialEntry
     public TextColor interactWaypointColor = TextColor.BLUE;
-    @SerialEntry
     public float interactTextSize = 1.0f;
 
-    @SerialEntry
     public boolean itemTextToggle = true;
-    @SerialEntry
     public TextColor itemWaypointColor = TextColor.GREEN;
-    @SerialEntry
     public float itemTextSize = 1.0f;
 
-    @SerialEntry
     public boolean batTextToggle = true;
-    @SerialEntry
     public TextColor batWaypointColor = TextColor.GREEN;
-    @SerialEntry
     public float batTextSize = 1.0f;
 
-    @SerialEntry
     public boolean autoCheckUpdates = true;
-    @SerialEntry
     public boolean autoDownload = false;
-    @SerialEntry
     public boolean autoUpdateRoutes = false;
 
-    @SerialEntry
     public boolean customSecretSound = false;
-    @SerialEntry
     public SoundType customSecretSoundType = SoundType.NOTE_PLING;
-    @SerialEntry
     public float customSecretSoundVolume = 1.0f;
-    @SerialEntry
     public float customSecretSoundPitch = 1.0f;
 
     // Recording and Dev
-    @SerialEntry
     public int recordingHudX = 10;
-    @SerialEntry
     public int recordingHudY = 10;
-    @SerialEntry
-    public Color recordingHudColor = new Color(255, 255, 255);
+    public int recordingHudColor = 0xFFFFFFFF;
 
     // Dev
-    @SerialEntry
     public boolean verboseLogging = false;
-    @SerialEntry
     public boolean verboseRecording = true;
-    @SerialEntry
     public boolean verboseUpdating = true;
-    @SerialEntry
     public boolean verboseInfo = false;
-    @SerialEntry
     public boolean verboseRendering = false;
-    @SerialEntry
     public boolean bridge = false;
-    @SerialEntry
     public boolean disableServerChecking = false;
-    @SerialEntry
     public boolean forceUpdateDEBUG = false;
-    @SerialEntry
     public boolean sendData = true;
-    @SerialEntry
     public boolean actionbarInfo = false;
-    @SerialEntry
     public boolean verbosePersonalBests = false;
 
     public String route3ppopkaFileName = "3ppopkaroutes.json";
     public String routeFOWFileName = "fowroutes.json";
-    @SerialEntry
     public String copyFileName = "default";
-    @SerialEntry
     public int routeNumber = 0;
 
+    /**
+     * Registered eagerly, so the saved settings are in the fields before anything reads them.
+     *
+     * <p>{@code register()} loads the file itself, which is why nothing calls {@code reload()}.
+     */
+    public static final ConfigHandle<SRMConfig> HANDLER = ConfigLib.builder(Main.MODID)
+            .spec(buildSpec(INSTANCE))
+            .title("Secret Routes")
+            .subtitle("Secret Route Waypoints for Hypixel Skyblock Dungeons")
+            .file(FILE)
+            .register();
+
+    static {
+        migrate();
+    }
+
     public static SRMConfig get() {
-        return HANDLER.instance();
+        return INSTANCE;
     }
 
     public static Screen getScreen(Screen parent) {
-        return YetAnotherConfigLib.create(HANDLER, (defaults, config, builder) -> {
+        return HANDLER.screen(parent);
+    }
 
-            var colorProfilesGroup = OptionGroup.createBuilder()
-                    .name(Component.literal("Color Profiles"))
-                    .description(OptionDescription.of(Component.literal("Color Profiles to import, export and toggle to easily change how the visuals look")))
-                    .collapsed(true)
-                    .option(Option.<String>createBuilder()
-                            .name(Component.literal("Profile Name"))
-                            .description(OptionDescription.of(Component.literal("Enter name to Save/Load a specific profile")))
-                            .binding("default", () -> config.copyFileName != null ? config.copyFileName : "default", v -> config.copyFileName = v)
-                            .controller(StringControllerBuilder::create)
-                            .build())
-                    .option(ButtonOption.createBuilder()
-                            .name(Component.literal("Save Current Profile"))
-                            .description(OptionDescription.of(Component.literal("Saves current settings to the filename above")))
-                            .action((screen, opt) -> ConfigUtils.writeColorConfig(config.copyFileName))
-                            .build())
-                    .option(ButtonOption.createBuilder()
-                            .name(Component.literal("Load From Json"))
-                            .description(OptionDescription.of(Component.literal("Loads the profile named above from its JSON file and closes the menu")))
-                            .action((screen, opt) -> {
-                                ConfigUtils.loadColorConfig(config.copyFileName);
-                                //? if >1.21.11 {
-                                GuiUtils.setScreen(null);
-                                //?} else {
-                                // Minecraft.getInstance().setScreen(null);
-                                //?}
-                            })
-                            .build());
+    // ------------------------------------------------------------------ the menu
 
-            File[] profileFiles = ConfigUtils.COLOR_PROFILE_DIR.listFiles((dir, name) -> name.endsWith(".json"));
-            if (profileFiles != null) {
-                for (File file : profileFiles) {
-                    String profileName = file.getName().replace(".json", "");
-                    colorProfilesGroup.option(ButtonOption.createBuilder()
-                            .name(Component.literal(profileName.equalsIgnoreCase("default") ? "Restore to Default" : "Load: " + profileName))
-                            .description(OptionDescription.of(Component.literal("Loads " + profileName + ".json and closes menu")))
-                            .action((screen, opt) -> {
-                                ConfigUtils.loadColorConfig(profileName);
-                                //? if >1.21.11 {
-                                GuiUtils.setScreen(null);
-                                //?} else {
-                                // Minecraft.getInstance().setScreen(null);
-                                //?}
-                            })
-                            .build());
+    private static ConfigSpec buildSpec(SRMConfig c) {
+        SpecBuilder b = SpecBuilder.create().root(c);
+
+        declareUndrawn(b, c);
+
+        // ------------------------------------------------------------ General
+
+        b.category("general", "General", "✦", "Routes, waypoint lines and personal bests.", 0)
+                .toggle("modEnabled", "Mod Enabled",
+                        "Enables or disables all Secret Routes features",
+                        () -> c.modEnabled, v -> c.modEnabled = v)
+                .choiceOfEnum("routeType", "Route Type",
+                        "A toggle between different routes. FlameOfWar: routes by FlameOfWar, with "
+                                + "recorded videos of each route at hypixeldungeons.com. 3ppopka: "
+                                + "routes by 3ppopka, with instructions available when using Odin "
+                                + "Dungeon Waypoints, found in the Odin Discord server.",
+                        RouteType.class,
+                        () -> c.routeType == null ? RouteType.ROUTE_FOW : c.routeType,
+                        v -> c.routeType = v, false)
+                .toggle("renderComplete", "Render Completed Rooms",
+                        "Renders secrets even if the room is cleared",
+                        () -> c.renderComplete, v -> c.renderComplete = v)
+                .toggle("wholeRoute", "Show Whole Route",
+                        "Render all steps at once instead of sequential",
+                        () -> c.wholeRoute, v -> c.wholeRoute = v)
+                .intSlider("visibleRouteSteps", "Visible Route Steps",
+                        "How many route steps to show at once when Show Whole Route is off",
+                        () -> c.visibleRouteSteps, v -> c.visibleRouteSteps = v, 1, 5)
+                .toggle("allSecrets", "Show All Secrets",
+                        "Highlight all secrets in the room, not just the route",
+                        () -> c.allSecrets, v -> c.allSecrets = v)
+                .action("updateRoutes", "Update Routes",
+                        "Updates to the latest route files from GitHub, overwriting the old routes",
+                        "Download", false, RouteUtils::checkRoutesFiles);
+
+        b.section("Predev Routes",
+                        "Configure routes for doing predev. You should watch a tutorial, as important "
+                                + "information is not displayed in the route", 0)
+                .toggle("pdRoutesEnabled", "Enable Predev Routes",
+                        "Master toggle for showing predev routes during the F7 Boss fight.",
+                        () -> c.pdRoutesEnabled, v -> c.pdRoutesEnabled = v)
+                .toggle("pdHideAfterPhase2", "Hide After Storm",
+                        "Hide predev routes when Storm ends.",
+                        () -> c.pdHideAfterPhase2, v -> c.pdHideAfterPhase2 = v);
+
+        b.section("Line to Etherwarp",
+                        "Controls the line from your crosshair to the next Etherwarp waypoint", 0)
+                .toggle("playerToEtherwarp", "Enabled",
+                        "Draws a line from your crosshair to the next Etherwarp waypoint",
+                        () -> c.playerToEtherwarp, v -> c.playerToEtherwarp = v)
+                .intSlider("playerToEtherwarpLineWidth", "Line Width",
+                        "Controls the thickness of the line to the next Etherwarp",
+                        () -> c.playerToEtherwarpLineWidth, v -> c.playerToEtherwarpLineWidth = v, 1, 10)
+                .toggle("autoSkipEtherwarps", "Auto Skip Etherwarps",
+                        "Automatically skips to the next etherwarp when standing near an etherwarp "
+                                + "further in the route, so the line never stays stuck on one you "
+                                + "have already passed",
+                        () -> c.autoSkipEtherwarps, v -> c.autoSkipEtherwarps = v)
+                .slider("etherwarpDetectionDistance", "Detection Distance",
+                        "How close you need to be to an Etherwarp waypoint for it to count as reached",
+                        () -> (double) c.etherwarpDetectionDistance,
+                        v -> c.etherwarpDetectionDistance = v.floatValue(),
+                        0.5, 5.0, 0.5, 1, "", false)
+                .toggle("useEtherwarpColorForLine", "Use Etherwarp Color",
+                        "Uses the colour set in Components -> Etherwarps as the colour for the line",
+                        () -> c.useEtherwarpColorForLine, v -> c.useEtherwarpColorForLine = v)
+                .color("playerToEtherwarpLineColor", "Line Color",
+                        "Sets the line colour when Use Etherwarp Color is disabled",
+                        () -> c.playerToEtherwarpLineColor, v -> c.playerToEtherwarpLineColor = v, true);
+
+        b.section("Etherwarp Aim Sound",
+                        "Controls the sound played when aiming directly at the current Etherwarp "
+                                + "waypoint", 0)
+                .toggle("etherwarpAimSound", "Enabled",
+                        "Plays a sound when your crosshair acquires the current Etherwarp waypoint "
+                                + "while sneaking",
+                        () -> c.etherwarpAimSound, v -> c.etherwarpAimSound = v)
+                .choiceOfEnum("etherwarpAimSoundType", "Aim Sound",
+                        "Selects the sound played when acquiring an Etherwarp target", SoundType.class,
+                        () -> c.etherwarpAimSoundType == null
+                                ? SoundType.NOTE_PLING : c.etherwarpAimSoundType,
+                        v -> c.etherwarpAimSoundType = v, false)
+                .slider("etherwarpAimSoundVolume", "Aim Sound Volume",
+                        "Controls the volume of the Etherwarp aim sound",
+                        () -> (double) c.etherwarpAimSoundVolume,
+                        v -> c.etherwarpAimSoundVolume = v.floatValue(), 0.0, 5.0, 0.1, 1, "", false)
+                .slider("etherwarpAimSoundPitch", "Aim Sound Pitch",
+                        "Controls the pitch of the Etherwarp aim sound",
+                        () -> (double) c.etherwarpAimSoundPitch,
+                        v -> c.etherwarpAimSoundPitch = v.floatValue(), 0.5, 2.0, 0.1, 1, "", false)
+                .slider("etherwarpAimSoundRearmDelay", "Rearm Delay",
+                        "Controls how long you must look away or stop sneaking before the aim sound "
+                                + "can play again",
+                        () -> (double) c.etherwarpAimSoundRearmDelay,
+                        v -> c.etherwarpAimSoundRearmDelay = v.intValue(),
+                        0, 1000, 50, 0, " ms", false)
+                .action("previewAimSound", "Preview Aim Sound",
+                        "Plays the selected aim sound using the current volume and pitch",
+                        "Play", false, () -> SecretSounds.preview(
+                                c.etherwarpAimSoundType == null
+                                        ? SoundType.NOTE_PLING : c.etherwarpAimSoundType,
+                                c.etherwarpAimSoundVolume, c.etherwarpAimSoundPitch));
+
+        b.section("Line to Secret", "Controls the line from your crosshair to the next secret", 0)
+                .toggle("playerWaypointLine", "Enabled",
+                        "Draws a line from your crosshair to the next secret",
+                        () -> c.playerWaypointLine, v -> c.playerWaypointLine = v)
+                .intSlider("playerToSecretLineWidth", "Line Width",
+                        "Controls the thickness of the line to the next secret",
+                        () -> c.playerToSecretLineWidth, v -> c.playerToSecretLineWidth = v, 1, 10)
+                .color("playerToSecretLineColor", "Line Color",
+                        "Sets the colour of the line to the next secret",
+                        () -> c.playerToSecretLineColor, v -> c.playerToSecretLineColor = v, true);
+
+        b.section("Personal Bests",
+                        "Tracks and reports your fastest completion time for each room", 0)
+                .toggle("trackPersonalBests", "Track Personal Bests",
+                        "Tracks your fastest completion time for each room",
+                        () -> c.trackPersonalBests, v -> c.trackPersonalBests = v)
+                .toggle("sendChatMessages", "Send Chat Messages",
+                        "Sends a chat message when you set a new personal best",
+                        () -> c.sendChatMessages, v -> c.sendChatMessages = v);
+
+        // ------------------------------------------------------------ Visuals
+
+        b.category("visuals", "Visuals", "◩", "Lines, particles, labels and colour profiles.", 1)
+                .toggle("renderLinesThroughWalls", "See Through Walls",
+                        "Renders waypoints through walls",
+                        () -> c.renderLinesThroughWalls, v -> c.renderLinesThroughWalls = v);
+
+        b.section("Movement Lines",
+                        "Controls the lines connecting movement points throughout a route", 0)
+                .choiceOfEnum("lineType", "Line Style",
+                        "Chooses between different styles of your movement path", LineType.class,
+                        () -> c.lineType == null ? LineType.LINES : c.lineType,
+                        v -> c.lineType = v, true)
+                .intSlider("width", "Line Width",
+                        "Controls the thickness of solid movement lines",
+                        () -> c.width, v -> c.width = v, 1, 10)
+                .color("lineColor", "Line Color", "Sets the colour of solid movement lines",
+                        () -> c.lineColor, v -> c.lineColor = v, true);
+
+        b.section("Particles",
+                        "Visual settings for the particles used when the movement line style is "
+                                + "set to Particles", 0)
+                .choiceOfEnum("particles", "Type",
+                        "Selects the particle used for particle-based movement paths",
+                        ParticleType.class,
+                        () -> c.particles == null ? ParticleType.FLAME : c.particles,
+                        v -> c.particles = v, false)
+                .slider("particleDensity", "Density",
+                        "Controls the spacing of particles along movement paths",
+                        () -> c.particleDensity, v -> c.particleDensity = v, 0.1, 10.0, 0.1, 1, "", false);
+
+        b.section("Color Profiles",
+                        "Colour profiles to import, export and switch between, so the visuals can be "
+                                + "changed without redoing every setting", 0)
+                .text("copyFileName", "Profile Name", "The name that saving writes to",
+                        () -> c.copyFileName, v -> c.copyFileName = v, "default", 64, 220)
+                .action("saveProfile", "Save Current Profile",
+                        "Saves the current colours and label settings under the name above",
+                        "Save", false, () -> ConfigUtils.writeColorConfig(c.copyFileName))
+                .picker("loadProfile", "Load Profile",
+                        "Loads a saved profile. The open menu updates in place, so the change is "
+                                + "visible straight away",
+                        SRMConfig::colorProfileNames, () -> "", ConfigUtils::loadColorConfig,
+                        name -> name.equalsIgnoreCase("default") ? "Restore to Default" : name,
+                        "Choose a profile...");
+
+        b.section("Etherwarps Text", "Controls labels displayed on Etherwarp waypoints", 0)
+                .toggle("etherwarpsTextToggle", "Show", "Shows labels on Etherwarp waypoints",
+                        () -> c.etherwarpsTextToggle, v -> c.etherwarpsTextToggle = v)
+                .toggle("etherwarpNumberingToggle", "Numbering",
+                        "Adds a sequence number to each Etherwarp label",
+                        () -> c.etherwarpNumberingToggle, v -> c.etherwarpNumberingToggle = v)
+                .choiceOfEnum("etherwarpsWaypointColor", "Color",
+                        "Sets the colour of Etherwarp labels", TextColor.class,
+                        () -> c.etherwarpsWaypointColor == null
+                                ? TextColor.DARK_PURPLE : c.etherwarpsWaypointColor,
+                        v -> c.etherwarpsWaypointColor = v, false)
+                .slider("etherwarpsTextSize", "Size", "Controls the size of Etherwarp labels",
+                        () -> (double) c.etherwarpsTextSize,
+                        v -> c.etherwarpsTextSize = v.floatValue(), 0.1, 5.0, 0.1, 1, "", false);
+
+        b.section("Interacts Text", "Controls labels displayed on lever and interact waypoints", 0)
+                .toggle("interactsTextToggle", "Show", "Shows labels on interact waypoints",
+                        () -> c.interactsTextToggle, v -> c.interactsTextToggle = v)
+                .toggle("interactsEnumToggle", "Numbering",
+                        "Adds a sequence number to each interact label",
+                        () -> c.interactsEnumToggle, v -> c.interactsEnumToggle = v)
+                .choiceOfEnum("interactsWaypointColor", "Color",
+                        "Sets the colour of interact labels", TextColor.class,
+                        () -> c.interactsWaypointColor == null
+                                ? TextColor.BLUE : c.interactsWaypointColor,
+                        v -> c.interactsWaypointColor = v, false)
+                .slider("interactsTextSize", "Size", "Controls the size of interact labels",
+                        () -> (double) c.interactsTextSize,
+                        v -> c.interactsTextSize = v.floatValue(), 0.1, 5.0, 0.1, 1, "", false);
+
+        b.section("Bonzo Staffs Text", "Controls labels displayed on Bonzo Staff waypoints", 0)
+                .toggle("bonzoStaffTextToggle", "Show", "Shows labels on Bonzo Staff waypoints",
+                        () -> c.bonzoStaffTextToggle, v -> c.bonzoStaffTextToggle = v)
+                .toggle("bonzoStaffEnumToggle", "Numbering",
+                        "Adds a sequence number to each Bonzo Staff label",
+                        () -> c.bonzoStaffEnumToggle, v -> c.bonzoStaffEnumToggle = v)
+                .choiceOfEnum("bonzoStaffWaypointColor", "Color",
+                        "Sets the colour of Bonzo Staff labels", TextColor.class,
+                        () -> c.bonzoStaffWaypointColor == null
+                                ? TextColor.RED : c.bonzoStaffWaypointColor,
+                        v -> c.bonzoStaffWaypointColor = v, false)
+                .slider("bonzoStaffTextSize", "Size", "Controls the size of Bonzo Staff labels",
+                        () -> (double) c.bonzoStaffTextSize,
+                        v -> c.bonzoStaffTextSize = v.floatValue(), 0.1, 5.0, 0.1, 1, "", false);
+
+        b.section("Start/Exit", "Controls the Start and Exit labels of a route", 0)
+                .toggle("startTextToggle", "Show Start", "Shows the Start label",
+                        () -> c.startTextToggle, v -> c.startTextToggle = v)
+                .choiceOfEnum("startWaypointColor", "Start Color",
+                        "Sets the colour of the Start label", TextColor.class,
+                        () -> c.startWaypointColor == null ? TextColor.RED : c.startWaypointColor,
+                        v -> c.startWaypointColor = v, false)
+                .toggle("exitTextToggle", "Show Exit", "Shows the Exit label",
+                        () -> c.exitTextToggle, v -> c.exitTextToggle = v)
+                .choiceOfEnum("exitWaypointColor", "Exit Color",
+                        "Sets the colour of the Exit label", TextColor.class,
+                        () -> c.exitWaypointColor == null ? TextColor.RED : c.exitWaypointColor,
+                        v -> c.exitWaypointColor = v, false);
+
+        // ------------------------------------------------------------ Components
+
+        b.category("components", "Components", "▦",
+                "Per-waypoint colours, box styles and the secret sound.", 2);
+
+        b.section("Etherwarps", "Etherwarp waypoints", 0)
+                .toggle("renderEtherwarps", "Enabled", "Renders Etherwarp waypoints",
+                        () -> c.renderEtherwarps, v -> c.renderEtherwarps = v)
+                .color("etherWarp", "Color", "The colour of the current Etherwarp waypoint",
+                        () -> c.etherWarp, v -> c.etherWarp = v, true)
+                .color("secondStepEtherWarp", "Second Step Color",
+                        "The colour of Etherwarp waypoints further along the route",
+                        () -> c.secondStepEtherWarp, v -> c.secondStepEtherWarp = v, true)
+                .toggle("etherwarpFullBlock", "Full Block",
+                        "Draws a filled box instead of an outline",
+                        () -> c.etherwarpFullBlock, v -> c.etherwarpFullBlock = v)
+                .slider("etherwarpBoxLineWidth", "Box Line Width", "Outline thickness",
+                        () -> (double) c.etherwarpBoxLineWidth,
+                        v -> c.etherwarpBoxLineWidth = v.floatValue(), 1.0, 10.0, 0.5, 1, "", false);
+
+        b.section("Secrets", "Item, interact and bat secrets", 0)
+                .toggle("renderSecretsItem", "Items", "Renders item secrets",
+                        () -> c.renderSecretsItem, v -> c.renderSecretsItem = v)
+                .color("secretsItem", "Item Color", "The colour of the current item secret",
+                        () -> c.secretsItem, v -> c.secretsItem = v, true)
+                .color("secondStepSecretsItem", "Item Second Step Color",
+                        "The colour of item secrets further along the route",
+                        () -> c.secondStepSecretsItem, v -> c.secondStepSecretsItem = v, true)
+                .toggle("renderSecretIteract", "Interacts", "Renders interact secrets",
+                        () -> c.renderSecretIteract, v -> c.renderSecretIteract = v)
+                .color("secretsInteract", "Interact Color",
+                        "The colour of the current interact secret",
+                        () -> c.secretsInteract, v -> c.secretsInteract = v, true)
+                .color("secondStepSecretsInteract", "Interact Second Step Color",
+                        "The colour of interact secrets further along the route",
+                        () -> c.secondStepSecretsInteract, v -> c.secondStepSecretsInteract = v, true)
+                .toggle("renderSecretBat", "Bats", "Renders bat secrets",
+                        () -> c.renderSecretBat, v -> c.renderSecretBat = v)
+                .color("secretsBat", "Bat Color", "The colour of the current bat secret",
+                        () -> c.secretsBat, v -> c.secretsBat = v, true)
+                .color("secondStepSecretsBat", "Bat Second Step Color",
+                        "The colour of bat secrets further along the route",
+                        () -> c.secondStepSecretsBat, v -> c.secondStepSecretsBat = v, true)
+                .slider("secretBoxLineWidth", "Box Line Width", "Outline thickness",
+                        () -> (double) c.secretBoxLineWidth,
+                        v -> c.secretBoxLineWidth = v.floatValue(), 1.0, 10.0, 0.5, 1, "", false);
+
+        b.section("Mines", "Mine waypoints", 0)
+                .toggle("renderMines", "Enabled", "Renders mine waypoints",
+                        () -> c.renderMines, v -> c.renderMines = v)
+                .color("mine", "Color", "The colour of the current mine waypoint",
+                        () -> c.mine, v -> c.mine = v, true)
+                .color("secondStepMine", "Second Step Color",
+                        "The colour of mine waypoints further along the route",
+                        () -> c.secondStepMine, v -> c.secondStepMine = v, true)
+                .toggle("mineFullBlock", "Full Block", "Draws a filled box instead of an outline",
+                        () -> c.mineFullBlock, v -> c.mineFullBlock = v)
+                .slider("mineBoxLineWidth", "Box Line Width", "Outline thickness",
+                        () -> (double) c.mineBoxLineWidth,
+                        v -> c.mineBoxLineWidth = v.floatValue(), 1.0, 10.0, 0.5, 1, "", false);
+
+        b.section("Levers", "Lever waypoints", 0)
+                .toggle("renderInteracts", "Enabled", "Renders lever waypoints",
+                        () -> c.renderInteracts, v -> c.renderInteracts = v)
+                .color("interacts", "Color", "The colour of the current lever waypoint",
+                        () -> c.interacts, v -> c.interacts = v, true)
+                .color("secondStepInteracts", "Second Step Color",
+                        "The colour of lever waypoints further along the route",
+                        () -> c.secondStepInteracts, v -> c.secondStepInteracts = v, true)
+                .toggle("interactsFullBlock", "Full Block",
+                        "Draws a filled box instead of an outline",
+                        () -> c.interactsFullBlock, v -> c.interactsFullBlock = v)
+                .slider("leverBoxLineWidth", "Box Line Width", "Outline thickness",
+                        () -> (double) c.leverBoxLineWidth,
+                        v -> c.leverBoxLineWidth = v.floatValue(), 1.0, 10.0, 0.5, 1, "", false);
+
+        b.section("Superbooms", "Superboom wall waypoints", 0)
+                .toggle("renderSuperboom", "Enabled", "Renders superboom waypoints",
+                        () -> c.renderSuperboom, v -> c.renderSuperboom = v)
+                .color("superbooms", "Color", "The colour of the current superboom waypoint",
+                        () -> c.superbooms, v -> c.superbooms = v, true)
+                .color("secondStepSuperbooms", "Second Step Color",
+                        "The colour of superboom waypoints further along the route",
+                        () -> c.secondStepSuperbooms, v -> c.secondStepSuperbooms = v, true)
+                .toggle("superboomsFullBlock", "Full Block",
+                        "Draws a filled box instead of an outline",
+                        () -> c.superboomsFullBlock, v -> c.superboomsFullBlock = v)
+                .slider("superboomBoxLineWidth", "Box Line Width", "Outline thickness",
+                        () -> (double) c.superboomBoxLineWidth,
+                        v -> c.superboomBoxLineWidth = v.floatValue(), 1.0, 10.0, 0.5, 1, "", false);
+
+        b.section("Bonzo Staffs", "Bonzo Staff waypoints", 0)
+                .toggle("renderBonzoStaff", "Enabled", "Renders Bonzo Staff waypoints",
+                        () -> c.renderBonzoStaff, v -> c.renderBonzoStaff = v)
+                .color("bonzoStaff", "Color", "The colour of the current Bonzo Staff waypoint",
+                        () -> c.bonzoStaff, v -> c.bonzoStaff = v, true)
+                .color("secondStepBonzoStaff", "Second Step Color",
+                        "The colour of Bonzo Staff waypoints further along the route",
+                        () -> c.secondStepBonzoStaff, v -> c.secondStepBonzoStaff = v, true)
+                .toggle("bonzoStaffFullBlock", "Full Block",
+                        "Draws a filled box instead of an outline",
+                        () -> c.bonzoStaffFullBlock, v -> c.bonzoStaffFullBlock = v)
+                .slider("bonzoStaffBoxLineWidth", "Box Line Width", "Outline thickness",
+                        () -> (double) c.bonzoStaffBoxLineWidth,
+                        v -> c.bonzoStaffBoxLineWidth = v.floatValue(), 1.0, 10.0, 0.5, 1, "", false);
+
+        b.section("Enderpearls", "Enderpearl waypoints and the line between them", 0)
+                .toggle("renderEnderpearls", "Enabled", "Renders enderpearl waypoints",
+                        () -> c.renderEnderpearls, v -> c.renderEnderpearls = v)
+                .color("enderpearls", "Color", "The colour of the current enderpearl waypoint",
+                        () -> c.enderpearls, v -> c.enderpearls = v, true)
+                .color("secondStepEnderpearls", "Second Step Color",
+                        "The colour of enderpearl waypoints further along the route",
+                        () -> c.secondStepEnderpearls, v -> c.secondStepEnderpearls = v, true)
+                .toggle("enderpearlFullBlock", "Full Block",
+                        "Draws a filled box instead of an outline",
+                        () -> c.enderpearlFullBlock, v -> c.enderpearlFullBlock = v)
+                .slider("enderpearlBoxLineWidth", "Box Line Width", "Outline thickness",
+                        () -> (double) c.enderpearlBoxLineWidth,
+                        v -> c.enderpearlBoxLineWidth = v.floatValue(), 1.0, 10.0, 0.5, 1, "", false)
+                .color("pearlLineColor", "Line Color",
+                        "The colour of the line between enderpearl waypoints",
+                        () -> c.pearlLineColor, v -> c.pearlLineColor = v, true)
+                .intSlider("pearlLineWidth", "Line Width",
+                        "The thickness of the line between enderpearl waypoints",
+                        () -> c.pearlLineWidth, v -> c.pearlLineWidth = v, 1, 10);
+
+        b.section("Custom Secret Sound", "A sound played whenever a secret is collected", 0)
+                .toggle("customSecretSound", "Enabled",
+                        "Plays the selected sound when a secret is collected",
+                        () -> c.customSecretSound, v -> c.customSecretSound = v)
+                .choiceOfEnum("customSecretSoundType", "Sound", "Selects which sound is played",
+                        SoundType.class,
+                        () -> c.customSecretSoundType == null
+                                ? SoundType.NOTE_PLING : c.customSecretSoundType,
+                        v -> c.customSecretSoundType = v, false)
+                .slider("customSecretSoundVolume", "Volume",
+                        "Controls the volume of the secret sound",
+                        () -> (double) c.customSecretSoundVolume,
+                        v -> c.customSecretSoundVolume = v.floatValue(), 0.0, 5.0, 0.1, 1, "", false)
+                .slider("customSecretSoundPitch", "Pitch", "Controls the pitch of the secret sound",
+                        () -> (double) c.customSecretSoundPitch,
+                        v -> c.customSecretSoundPitch = v.floatValue(), 0.5, 2.0, 0.1, 1, "", false)
+                .action("previewSecretSound", "Preview Sound",
+                        "Plays the selected sound using the current volume and pitch",
+                        "Play", false, () -> SecretSounds.preview(
+                                c.customSecretSoundType == null
+                                        ? SoundType.NOTE_PLING : c.customSecretSoundType,
+                                c.customSecretSoundVolume, c.customSecretSoundPitch));
+
+        return b.build();
+    }
+
+    /**
+     * Settings that are persisted but never drawn.
+     *
+     * <p>The menu does not expose these, but the render path, {@code /srm debug varset}, the update
+     * checker and the colour profiles all read and write them, so they still have to survive a
+     * restart. Declared before any category so their keys stay unqualified.
+     */
+    private static void declareUndrawn(SpecBuilder b, SRMConfig c) {
+        b.hidden("allSteps", boolean.class, () -> c.allSteps, v -> c.allSteps = (boolean) v);
+        b.hidden("filledBoxAlpha", float.class, () -> c.filledBoxAlpha, v -> c.filledBoxAlpha = ((Number) v).floatValue());
+        b.hidden("tickInterval", int.class, () -> c.tickInterval, v -> c.tickInterval = ((Number) v).intValue());
+        b.hidden("routeNumber", int.class, () -> c.routeNumber, v -> c.routeNumber = ((Number) v).intValue());
+
+        b.hidden("startTextSize", float.class, () -> c.startTextSize, v -> c.startTextSize = ((Number) v).floatValue());
+        b.hidden("exitTextSize", float.class, () -> c.exitTextSize, v -> c.exitTextSize = ((Number) v).floatValue());
+
+        b.hidden("minesTextToggle", boolean.class, () -> c.minesTextToggle, v -> c.minesTextToggle = (boolean) v);
+        b.hidden("minesEnumToggle", boolean.class, () -> c.minesEnumToggle, v -> c.minesEnumToggle = (boolean) v);
+        b.hidden("minesWaypointColor", TextColor.class, () -> c.minesWaypointColor, v -> c.minesWaypointColor = (TextColor) v);
+        b.hidden("minesTextSize", float.class, () -> c.minesTextSize, v -> c.minesTextSize = ((Number) v).floatValue());
+
+        b.hidden("superboomsTextToggle", boolean.class, () -> c.superboomsTextToggle, v -> c.superboomsTextToggle = (boolean) v);
+        b.hidden("superboomsEnumToggle", boolean.class, () -> c.superboomsEnumToggle, v -> c.superboomsEnumToggle = (boolean) v);
+        b.hidden("superboomsWaypointColor", TextColor.class, () -> c.superboomsWaypointColor, v -> c.superboomsWaypointColor = (TextColor) v);
+        b.hidden("superboomsTextSize", float.class, () -> c.superboomsTextSize, v -> c.superboomsTextSize = ((Number) v).floatValue());
+
+        b.hidden("enderpearlTextToggle", boolean.class, () -> c.enderpearlTextToggle, v -> c.enderpearlTextToggle = (boolean) v);
+        b.hidden("enderpearlEnumToggle", boolean.class, () -> c.enderpearlEnumToggle, v -> c.enderpearlEnumToggle = (boolean) v);
+        b.hidden("enderpearlWaypointColor", TextColor.class, () -> c.enderpearlWaypointColor, v -> c.enderpearlWaypointColor = (TextColor) v);
+        b.hidden("enderpearlTextSize", float.class, () -> c.enderpearlTextSize, v -> c.enderpearlTextSize = ((Number) v).floatValue());
+
+        b.hidden("interactTextToggle", boolean.class, () -> c.interactTextToggle, v -> c.interactTextToggle = (boolean) v);
+        b.hidden("interactWaypointColor", TextColor.class, () -> c.interactWaypointColor, v -> c.interactWaypointColor = (TextColor) v);
+        b.hidden("interactTextSize", float.class, () -> c.interactTextSize, v -> c.interactTextSize = ((Number) v).floatValue());
+
+        b.hidden("itemTextToggle", boolean.class, () -> c.itemTextToggle, v -> c.itemTextToggle = (boolean) v);
+        b.hidden("itemWaypointColor", TextColor.class, () -> c.itemWaypointColor, v -> c.itemWaypointColor = (TextColor) v);
+        b.hidden("itemTextSize", float.class, () -> c.itemTextSize, v -> c.itemTextSize = ((Number) v).floatValue());
+
+        b.hidden("batTextToggle", boolean.class, () -> c.batTextToggle, v -> c.batTextToggle = (boolean) v);
+        b.hidden("batWaypointColor", TextColor.class, () -> c.batWaypointColor, v -> c.batWaypointColor = (TextColor) v);
+        b.hidden("batTextSize", float.class, () -> c.batTextSize, v -> c.batTextSize = ((Number) v).floatValue());
+
+        b.hidden("secretsItemFullBlock", boolean.class, () -> c.secretsItemFullBlock, v -> c.secretsItemFullBlock = (boolean) v);
+        b.hidden("secretsInteractFullBlock", boolean.class, () -> c.secretsInteractFullBlock, v -> c.secretsInteractFullBlock = (boolean) v);
+        b.hidden("secretsBatFullBlock", boolean.class, () -> c.secretsBatFullBlock, v -> c.secretsBatFullBlock = (boolean) v);
+
+        b.hidden("autoCheckUpdates", boolean.class, () -> c.autoCheckUpdates, v -> c.autoCheckUpdates = (boolean) v);
+        b.hidden("autoDownload", boolean.class, () -> c.autoDownload, v -> c.autoDownload = (boolean) v);
+        b.hidden("autoUpdateRoutes", boolean.class, () -> c.autoUpdateRoutes, v -> c.autoUpdateRoutes = (boolean) v);
+
+        b.hidden("recordingHudX", int.class, () -> c.recordingHudX, v -> c.recordingHudX = ((Number) v).intValue());
+        b.hidden("recordingHudY", int.class, () -> c.recordingHudY, v -> c.recordingHudY = ((Number) v).intValue());
+        b.hidden("recordingHudColor", int.class, () -> c.recordingHudColor, v -> c.recordingHudColor = ((Number) v).intValue());
+
+        b.hidden("verboseLogging", boolean.class, () -> c.verboseLogging, v -> c.verboseLogging = (boolean) v);
+        b.hidden("verboseRecording", boolean.class, () -> c.verboseRecording, v -> c.verboseRecording = (boolean) v);
+        b.hidden("verboseUpdating", boolean.class, () -> c.verboseUpdating, v -> c.verboseUpdating = (boolean) v);
+        b.hidden("verboseInfo", boolean.class, () -> c.verboseInfo, v -> c.verboseInfo = (boolean) v);
+        b.hidden("verboseRendering", boolean.class, () -> c.verboseRendering, v -> c.verboseRendering = (boolean) v);
+        b.hidden("verbosePersonalBests", boolean.class, () -> c.verbosePersonalBests, v -> c.verbosePersonalBests = (boolean) v);
+        b.hidden("bridge", boolean.class, () -> c.bridge, v -> c.bridge = (boolean) v);
+        b.hidden("disableServerChecking", boolean.class, () -> c.disableServerChecking, v -> c.disableServerChecking = (boolean) v);
+        b.hidden("forceUpdateDEBUG", boolean.class, () -> c.forceUpdateDEBUG, v -> c.forceUpdateDEBUG = (boolean) v);
+        b.hidden("sendData", boolean.class, () -> c.sendData, v -> c.sendData = (boolean) v);
+        b.hidden("actionbarInfo", boolean.class, () -> c.actionbarInfo, v -> c.actionbarInfo = (boolean) v);
+    }
+
+    /** Every saved colour profile, re-listed each time the picker opens. */
+    private static List<String> colorProfileNames() {
+        File[] files = ConfigUtils.COLOR_PROFILE_DIR.listFiles((dir, name) -> name.endsWith(".json"));
+        if (files == null) {
+            return List.of();
+        }
+        List<String> names = new ArrayList<>(files.length);
+        for (File file : files) {
+            String name = file.getName();
+            names.add(name.substring(0, name.length() - ".json".length()));
+        }
+        names.sort(String.CASE_INSENSITIVE_ORDER);
+        return names;
+    }
+
+    // ------------------------------------------------------------------ migration
+
+    /**
+     * Carries a pre-configlib YACL config across, once.
+     *
+     * <p>The field names never changed, so this is a name-for-name copy; only colours need real
+     * work, since YACL wrote them as objects where configlib wants a packed int. The old file is
+     * renamed rather than deleted, so a mistake here stays recoverable by hand.
+     */
+    private static void migrate() {
+        if (Files.exists(FILE) || !Files.exists(LEGACY_FILE)) {
+            return;
+        }
+        try (Reader reader = Files.newBufferedReader(LEGACY_FILE)) {
+            JsonElement parsed = JsonParser.parseReader(reader);
+            if (!parsed.isJsonObject()) {
+                return;
+            }
+            JsonObject old = parsed.getAsJsonObject();
+            int carried = 0;
+            for (String key : old.keySet()) {
+                try {
+                    if (applyLegacy(SRMConfig.class.getField(key), old.get(key))) {
+                        carried++;
+                    }
+                } catch (NoSuchFieldException ignored) {
+                    // A setting that no longer exists. Dropping it is the point of a migration.
+                } catch (Exception e) {
+                    LogUtils.error(new IOException("Could not migrate setting '" + key + "'", e));
                 }
             }
-
-            Option<SoundType> customSoundTypeOption = Option.<SoundType>createBuilder()
-                    .name(Component.literal("Sound"))
-                    .description(OptionDescription.of(Component.literal("Selects which sound is played")))
-                    .binding(SoundType.NOTE_PLING, () -> config.customSecretSoundType != null ? config.customSecretSoundType : SoundType.NOTE_PLING, v -> config.customSecretSoundType = v)
-                    .controller(opt -> EnumControllerBuilder.create(opt).enumClass(SoundType.class))
-                    .build();
-            Option<Float> customSoundVolumeOption = Option.<Float>createBuilder()
-                    .name(Component.literal("Volume"))
-                    .description(OptionDescription.of(Component.literal("Controls the volume of the secret sound")))
-                    .binding(1.0f, () -> config.customSecretSoundVolume, v -> config.customSecretSoundVolume = v)
-                    .controller(opt -> FloatSliderControllerBuilder.create(opt).range(0.0f, 5.0f).step(0.1f))
-                    .build();
-            Option<Float> customSoundPitchOption = Option.<Float>createBuilder()
-                    .name(Component.literal("Pitch"))
-                    .description(OptionDescription.of(Component.literal("Controls the pitch of the secret sound")))
-                    .binding(1.0f, () -> config.customSecretSoundPitch, v -> config.customSecretSoundPitch = v)
-                    .controller(opt -> FloatSliderControllerBuilder.create(opt).range(0.5f, 2.0f).step(0.1f))
-                    .build();
-            Option<SoundType> etherwarpAimSoundTypeOption = Option.<SoundType>createBuilder()
-                    .name(Component.literal("Aim Sound"))
-                    .description(OptionDescription.of(Component.literal("Selects the sound played when acquiring an Etherwarp target")))
-                    .binding(SoundType.NOTE_PLING, () -> config.etherwarpAimSoundType != null ? config.etherwarpAimSoundType : SoundType.NOTE_PLING, v -> config.etherwarpAimSoundType = v)
-                    .controller(opt -> EnumControllerBuilder.create(opt).enumClass(SoundType.class))
-                    .build();
-            Option<Float> etherwarpAimSoundVolumeOption = Option.<Float>createBuilder()
-                    .name(Component.literal("Aim Sound Volume"))
-                    .description(OptionDescription.of(Component.literal("Controls the volume of the Etherwarp aim sound")))
-                    .binding(0.35f, () -> config.etherwarpAimSoundVolume, v -> config.etherwarpAimSoundVolume = v)
-                    .controller(opt -> FloatSliderControllerBuilder.create(opt).range(0.0f, 5.0f).step(0.1f))
-                    .build();
-            Option<Float> etherwarpAimSoundPitchOption = Option.<Float>createBuilder()
-                    .name(Component.literal("Aim Sound Pitch"))
-                    .description(OptionDescription.of(Component.literal("Controls the pitch of the Etherwarp aim sound")))
-                    .binding(1.6f, () -> config.etherwarpAimSoundPitch, v -> config.etherwarpAimSoundPitch = v)
-                    .controller(opt -> FloatSliderControllerBuilder.create(opt).range(0.5f, 2.0f).step(0.1f))
-                    .build();
-
-            return builder
-                    .title(Component.literal("Secret Routes Config"))
-
-                    // General
-                    .category(ConfigCategory.createBuilder()
-                            .name(Component.literal("General"))
-                            .option(Option.<Boolean>createBuilder()
-                                    .name(Component.literal("Mod Enabled"))
-                                    .description(OptionDescription.of(Component.literal("Enables or disables all Secret Routes features")))
-                                    .binding(true, () -> config.modEnabled, v -> config.modEnabled = v)
-                                    .controller(TickBoxControllerBuilder::create)
-                                    .build())
-                            .option(Option.<RouteType>createBuilder()
-                                    .name(Component.literal("Route Type"))
-                                    .description(OptionDescription.of(Component.literal("A toggle between different routes\n\n§n§6FlameOfWar: Routes by FlameOfWar.§r§f\nRecorded Videos of each route can be found here: §nhypixeldungeons.com§r\n\n§n§b3ppopka: Routes by 3ppopka.§n§f\nInstructions of Routes can be found when using Odin Dungeon Waypoints, found in the Odin Discord Server")))
-                                    .binding(RouteType.ROUTE_FOW, () -> config.routeType != null ? config.routeType : RouteType.ROUTE_FOW, v -> config.routeType = v)
-                                    .controller(opt -> EnumControllerBuilder.create(opt).enumClass(RouteType.class))
-                                    .build())
-                            .option(Option.<Boolean>createBuilder()
-                                    .name(Component.literal("Render Completed Rooms"))
-                                    .description(OptionDescription.of(Component.literal("Renders secrets even if the room is cleared")))
-                                    .binding(false, () -> config.renderComplete, v -> config.renderComplete = v)
-                                    .controller(TickBoxControllerBuilder::create)
-                                    .build())
-                            .option(Option.<Boolean>createBuilder()
-                                    .name(Component.literal("Show Whole Route"))
-                                    .description(OptionDescription.of(Component.literal("Render all steps at once instead of sequential")))
-                                    .binding(false, () -> config.wholeRoute, v -> config.wholeRoute = v)
-                                    .controller(TickBoxControllerBuilder::create)
-                                    .build())
-                            .option(Option.<Integer>createBuilder()
-                                    .name(Component.literal("Visible Route Steps"))
-                                    .description(OptionDescription.of(Component.literal("How many route steps to show at once when Show Whole Route is off")))
-                                    .binding(1, () -> config.visibleRouteSteps, v -> config.visibleRouteSteps = v)
-                                    .controller(opt -> IntegerSliderControllerBuilder.create(opt).range(1, 5).step(1))
-                                    .build())
-                            .option(Option.<Boolean>createBuilder()
-                                    .name(Component.literal("Show All Secrets"))
-                                    .description(OptionDescription.of(Component.literal("Highlight all secrets in the room, not just the route")))
-                                    .binding(false, () -> config.allSecrets, v -> config.allSecrets = v)
-                                    .controller(TickBoxControllerBuilder::create)
-                                    .build())
-                            .option(ButtonOption.createBuilder()
-                                    .name(Component.literal("Update Routes"))
-                                    .description(OptionDescription.of(Component.literal("Updates to the latest route files from GitHub, overwriting the old routes")))
-                                    .text(Component.literal("Download"))
-                                    .action((screen, opt) -> {
-                                        RouteUtils.checkRoutesFiles();
-                                    })
-                                    .build())
-                            .group(OptionGroup.createBuilder()
-                                    .name(Component.literal("Predev Routes"))
-                                    .description(OptionDescription.of(Component.literal("Configure routes for doing predev. You should watch a tutorial as important information is not displayed in the route")))
-                                    .collapsed(true)
-                                    .option(Option.<Boolean>createBuilder()
-                                            .name(Component.literal("Enable Predev Routes"))
-                                            .description(OptionDescription.of(Component.literal("Master toggle for showing predev routes during the F7 Boss fight.")))
-                                            .binding(false, () -> config.pdRoutesEnabled, v -> config.pdRoutesEnabled = v)
-                                            .controller(TickBoxControllerBuilder::create)
-                                            .build())
-                                    .option(Option.<Boolean>createBuilder()
-                                            .name(Component.literal("Hide After Storm"))
-                                            .description(OptionDescription.of(Component.literal("Hide predev routes when Storm ends.")))
-                                            .binding(true, () -> config.pdHideAfterPhase2, v -> config.pdHideAfterPhase2 = v)
-                                            .controller(TickBoxControllerBuilder::create)
-                                            .build())
-                                    .build())
-                            .group(OptionGroup.createBuilder()
-                                    .name(Component.literal("Line to Etherwarp"))
-                                    .description(OptionDescription.of(Component.literal("Controls the line from your crosshair to the next Etherwarp waypoint")))
-                                    .collapsed(true)
-                                    .option(Option.<Boolean>createBuilder()
-                                            .name(Component.literal("Enabled"))
-                                            .description(OptionDescription.of(Component.literal("Draws a line from your crosshair to the next Etherwarp waypoint")))
-                                            .binding(false, () -> config.playerToEtherwarp, v -> config.playerToEtherwarp = v)
-                                            .controller(TickBoxControllerBuilder::create)
-                                            .build())
-                                    .option(Option.<Integer>createBuilder()
-                                            .name(Component.literal("Line Width"))
-                                            .description(OptionDescription.of(Component.literal("Controls the thickness of the line to the next Etherwarp")))
-                                            .binding(4, () -> config.playerToEtherwarpLineWidth, v -> config.playerToEtherwarpLineWidth = v)
-                                            .controller(opt -> IntegerSliderControllerBuilder.create(opt).range(1, 10).step(1))
-                                            .build())
-                                    .option(Option.<Boolean>createBuilder()
-                                            .name(Component.literal("Auto Skip Etherwarps"))
-                                            .description(OptionDescription.of(Component.literal("automatically skips to the next etherwarp when standing near an etherwarp further in the route. This avoids having the etherwarp line stuck on a previous etherwarp waypoint and automatically jumps to the correct one")))
-                                            .binding(true, () -> config.autoSkipEtherwarps, v -> config.autoSkipEtherwarps = v)
-                                            .controller(TickBoxControllerBuilder::create)
-                                            .build())
-                                    .option(Option.<Float>createBuilder()
-                                            .name(Component.literal("Detection Distance"))
-                                            .description(OptionDescription.of(Component.literal("How close you need to be to an Etherwarp waypoint for it to count as reached")))
-                                            .binding(1.5f, () -> config.etherwarpDetectionDistance, v -> config.etherwarpDetectionDistance = v)
-                                            .controller(opt -> FloatSliderControllerBuilder.create(opt).range(0.5f, 5.0f).step(0.5f))
-                                            .build())
-                                    .option(Option.<Boolean>createBuilder()
-                                            .name(Component.literal("Use Etherwarp Color"))
-                                            .description(OptionDescription.of(Component.literal("uses the color set in the components -> etherwarps tab as the color for the line")))
-                                            .binding(true, () -> config.useEtherwarpColorForLine, v -> config.useEtherwarpColorForLine = v)
-                                            .controller(TickBoxControllerBuilder::create)
-                                            .build())
-                                    .option(Option.<Color>createBuilder()
-                                            .name(Component.literal("Line Color"))
-                                            .description(OptionDescription.of(Component.literal("Sets the line color when Use Etherwarp Color is disabled")))
-                                            .binding(new Color(128, 0, 128), () -> config.playerToEtherwarpLineColor != null ? config.playerToEtherwarpLineColor : new Color(128, 0, 128), v -> config.playerToEtherwarpLineColor = v)
-                                            .controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true))
-                                            .build())
-                                    .build())
-                            .group(OptionGroup.createBuilder()
-                                    .name(Component.literal("Etherwarp Aim Sound"))
-                                    .description(OptionDescription.of(Component.literal("Controls the sound played when aiming directly at the current Etherwarp waypoint")))
-                                    .collapsed(true)
-                                    .option(Option.<Boolean>createBuilder()
-                                            .name(Component.literal("Enabled"))
-                                            .description(OptionDescription.of(Component.literal("Plays a sound when your crosshair acquires the current Etherwarp waypoint while sneaking")))
-                                            .binding(false, () -> config.etherwarpAimSound, v -> config.etherwarpAimSound = v)
-                                            .controller(TickBoxControllerBuilder::create)
-                                            .build())
-                                    .option(etherwarpAimSoundTypeOption)
-                                    .option(etherwarpAimSoundVolumeOption)
-                                    .option(etherwarpAimSoundPitchOption)
-                                    .option(Option.<Integer>createBuilder()
-                                            .name(Component.literal("Rearm Delay (ms)"))
-                                            .description(OptionDescription.of(Component.literal("Controls how long you must look away or stop sneaking before the aim sound can play again")))
-                                            .binding(400, () -> config.etherwarpAimSoundRearmDelay, v -> config.etherwarpAimSoundRearmDelay = v)
-                                            .controller(opt -> IntegerSliderControllerBuilder.create(opt).range(0, 1000).step(50))
-                                            .build())
-                                    .option(ButtonOption.createBuilder()
-                                            .name(Component.literal("Preview Aim Sound"))
-                                            .description(OptionDescription.of(Component.literal("Plays the selected aim sound using the current volume and pitch")))
-                                            .text(Component.literal("Play"))
-                                            .action((screen, opt) -> SecretSounds.preview(
-                                                    etherwarpAimSoundTypeOption.pendingValue(),
-                                                    etherwarpAimSoundVolumeOption.pendingValue(),
-                                                    etherwarpAimSoundPitchOption.pendingValue()))
-                                            .build())
-                                    .build())
-                            .group(OptionGroup.createBuilder()
-                                    .name(Component.literal("Line to Secret"))
-                                    .description(OptionDescription.of(Component.literal("Controls the line from your crosshair to the next secret")))
-                                    .collapsed(true)
-                                    .option(Option.<Boolean>createBuilder()
-                                            .name(Component.literal("Enabled"))
-                                            .description(OptionDescription.of(Component.literal("Draws a line from your crosshair to the next secret")))
-                                            .binding(false, () -> config.playerWaypointLine, v -> config.playerWaypointLine = v)
-                                            .controller(TickBoxControllerBuilder::create)
-                                            .build())
-                                    .option(Option.<Integer>createBuilder()
-                                            .name(Component.literal("Line Width"))
-                                            .description(OptionDescription.of(Component.literal("Controls the thickness of the line to the next secret")))
-                                            .binding(4, () -> config.playerToSecretLineWidth, v -> config.playerToSecretLineWidth = v)
-                                            .controller(opt -> IntegerSliderControllerBuilder.create(opt).range(1, 10).step(1))
-                                            .build())
-                                    .option(Option.<Color>createBuilder()
-                                            .name(Component.literal("Line Color"))
-                                            .description(OptionDescription.of(Component.literal("Sets the color of the line to the next secret")))
-                                            .binding(new Color(255, 0, 0), () -> config.playerToSecretLineColor != null ? config.playerToSecretLineColor : new Color(255, 0, 0), v -> config.playerToSecretLineColor = v)
-                                            .controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true))
-                                            .build())
-                                    .build())
-                            .group(OptionGroup.createBuilder()
-                                    .name(Component.literal("Personal Bests"))
-                                    .description(OptionDescription.of(Component.literal("Tracks and reports your fastest completion time for each room")))
-                                    .collapsed(true)
-                                    .option(Option.<Boolean>createBuilder()
-                                            .name(Component.literal("Track Personal Bests"))
-                                            .description(OptionDescription.of(Component.literal("Tracks your fastest completion time for each room")))
-                                            .binding(true, () -> config.trackPersonalBests, v -> config.trackPersonalBests = v)
-                                            .controller(TickBoxControllerBuilder::create)
-                                            .build())
-                                    .option(Option.<Boolean>createBuilder()
-                                            .name(Component.literal("Send Chat Messages"))
-                                            .description(OptionDescription.of(Component.literal("Sends a chat message when you set a new personal best")))
-                                            .binding(true, () -> config.sendChatMessages, v -> config.sendChatMessages = v)
-                                            .controller(TickBoxControllerBuilder::create)
-                                            .build())
-                                    .build())
-                            .build())
-                    // Visuals
-                    .category(ConfigCategory.createBuilder()
-                            .name(Component.literal("Visuals"))
-                            .option(Option.<Boolean>createBuilder()
-                                    .name(Component.literal("See Through Walls"))
-                                    .description(OptionDescription.of(Component.literal("Renders waypoints through walls")))
-                                    .binding(true, () -> config.renderLinesThroughWalls, v -> config.renderLinesThroughWalls = v)
-                                    .controller(TickBoxControllerBuilder::create)
-                                    .build())
-                            .group(OptionGroup.createBuilder()
-                                    .name(Component.literal("Movement Lines"))
-                                    .description(OptionDescription.of(Component.literal("Controls the lines connecting movement points throughout a route")))
-                                    .collapsed(true)
-                                    .option(Option.<LineType>createBuilder()
-                                            .name(Component.literal("Line Style"))
-                                            .description(OptionDescription.of(Component.literal("Chooses between different styles of your movement path")))
-                                            .binding(LineType.LINES, () -> config.lineType != null ? config.lineType : LineType.LINES, v -> config.lineType = v)
-                                            .controller(opt -> EnumControllerBuilder.create(opt).enumClass(LineType.class))
-                                            .build())
-                                    .option(Option.<Integer>createBuilder()
-                                            .name(Component.literal("Line Width"))
-                                            .description(OptionDescription.of(Component.literal("Controls the thickness of solid movement lines")))
-                                            .binding(5, () -> config.width, v -> config.width = v)
-                                            .controller(opt -> IntegerSliderControllerBuilder.create(opt).range(1, 10).step(1))
-                                            .build())
-                                    .option(Option.<Color>createBuilder()
-                                            .name(Component.literal("Line Color"))
-                                            .description(OptionDescription.of(Component.literal("Sets the color of solid movement lines")))
-                                            .binding(new Color(255, 0, 0), () -> config.lineColor != null ? config.lineColor : new Color(255, 0, 0), v -> config.lineColor = v)
-                                            .controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true))
-                                            .build())
-                                    .build())
-                            .group(OptionGroup.createBuilder()
-                                    .name(Component.literal("Particles"))
-                                    .description(OptionDescription.of(Component.literal("Visual settings for the particles when having your movement line style set to particles")))
-                                    .collapsed(true)
-                                    .option(Option.<ParticleType>createBuilder()
-                                            .name(Component.literal("Type"))
-                                            .description(OptionDescription.of(Component.literal("Selects the particle used for particle-based movement paths")))
-                                            .binding(ParticleType.FLAME, () -> config.particles != null ? config.particles : ParticleType.FLAME, v -> config.particles = v)
-                                            .controller(opt -> EnumControllerBuilder.create(opt).enumClass(ParticleType.class))
-                                            .build())
-                                    .option(Option.<Double>createBuilder()
-                                            .name(Component.literal("Density"))
-                                            .description(OptionDescription.of(Component.literal("Controls the spacing of particles along movement paths")))
-                                            .binding(2.0, () -> config.particleDensity, v -> config.particleDensity = v)
-                                            .controller(opt -> DoubleSliderControllerBuilder.create(opt).range(0.1, 10.0).step(0.1))
-                                            .build())
-                                    .build())
-                            .group(colorProfilesGroup.build())
-                            .group(OptionGroup.createBuilder()
-                                    .name(Component.literal("Etherwarps Text"))
-                                    .description(OptionDescription.of(Component.literal("Controls labels displayed on Etherwarp waypoints")))
-                                    .collapsed(true)
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Show")).description(OptionDescription.of(Component.literal("Shows labels on Etherwarp waypoints"))).binding(false, () -> config.etherwarpsTextToggle, v -> config.etherwarpsTextToggle = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Numbering")).description(OptionDescription.of(Component.literal("Adds a sequence number to each Etherwarp label"))).binding(false, () -> config.etherwarpNumberingToggle, v -> config.etherwarpNumberingToggle = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<TextColor>createBuilder().name(Component.literal("Color")).description(OptionDescription.of(Component.literal("Sets the color of Etherwarp labels"))).binding(TextColor.DARK_PURPLE, () -> config.etherwarpsWaypointColor != null ? config.etherwarpsWaypointColor : TextColor.DARK_PURPLE, v -> config.etherwarpsWaypointColor = v).controller(opt -> EnumControllerBuilder.create(opt).enumClass(TextColor.class)).build())
-                                    .option(Option.<Float>createBuilder().name(Component.literal("Size")).description(OptionDescription.of(Component.literal("Controls the size of Etherwarp labels"))).binding(1.0f, () -> config.etherwarpsTextSize, v -> config.etherwarpsTextSize = v).controller(opt -> FloatSliderControllerBuilder.create(opt).range(0.1f, 5f).step(0.1f)).build())
-                                    .build())
-                            .group(OptionGroup.createBuilder()
-                                    .name(Component.literal("Interacts Text"))
-                                    .description(OptionDescription.of(Component.literal("Controls labels displayed on lever and interact waypoints")))
-                                    .collapsed(true)
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Show")).description(OptionDescription.of(Component.literal("Shows labels on lever and interact waypoints"))).binding(true, () -> config.interactsTextToggle, v -> config.interactsTextToggle = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Numbering")).description(OptionDescription.of(Component.literal("Adds a sequence number to each lever or interact label"))).binding(false, () -> config.interactsEnumToggle, v -> config.interactsEnumToggle = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<TextColor>createBuilder().name(Component.literal("Color")).description(OptionDescription.of(Component.literal("Sets the color of lever and interact labels"))).binding(TextColor.BLUE, () -> config.interactsWaypointColor != null ? config.interactsWaypointColor : TextColor.BLUE, v -> config.interactsWaypointColor = v).controller(opt -> EnumControllerBuilder.create(opt).enumClass(TextColor.class)).build())
-                                    .option(Option.<Float>createBuilder().name(Component.literal("Size")).description(OptionDescription.of(Component.literal("Controls the size of lever and interact labels"))).binding(1.0f, () -> config.interactsTextSize, v -> config.interactsTextSize = v).controller(opt -> FloatSliderControllerBuilder.create(opt).range(0.1f, 5f).step(0.1f)).build())
-                                    .build())
-                            .group(OptionGroup.createBuilder()
-                                    .name(Component.literal("Bonzo Staffs Text"))
-                                    .description(OptionDescription.of(Component.literal("Controls labels displayed on Bonzo Staff waypoints")))
-                                    .collapsed(true)
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Show")).description(OptionDescription.of(Component.literal("Shows labels on Bonzo Staff waypoints"))).binding(true, () -> config.bonzoStaffTextToggle, v -> config.bonzoStaffTextToggle = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Numbering")).description(OptionDescription.of(Component.literal("Adds a sequence number to each Bonzo Staff label"))).binding(false, () -> config.bonzoStaffEnumToggle, v -> config.bonzoStaffEnumToggle = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<TextColor>createBuilder().name(Component.literal("Color")).description(OptionDescription.of(Component.literal("Sets the color of Bonzo Staff labels"))).binding(TextColor.RED, () -> config.bonzoStaffWaypointColor != null ? config.bonzoStaffWaypointColor : TextColor.RED, v -> config.bonzoStaffWaypointColor = v).controller(opt -> EnumControllerBuilder.create(opt).enumClass(TextColor.class)).build())
-                                    .option(Option.<Float>createBuilder().name(Component.literal("Size")).description(OptionDescription.of(Component.literal("Controls the size of Bonzo Staff labels"))).binding(1.0f, () -> config.bonzoStaffTextSize, v -> config.bonzoStaffTextSize = v).controller(opt -> FloatSliderControllerBuilder.create(opt).range(0.1f, 5f).step(0.1f)).build())
-                                    .build())
-                            .group(OptionGroup.createBuilder()
-                                    .name(Component.literal("Start/Exit"))
-                                    .description(OptionDescription.of(Component.literal("Controls labels displayed at route entrances and exits")))
-                                    .collapsed(true)
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Show Start")).description(OptionDescription.of(Component.literal("Shows a label at the beginning of the route"))).binding(true, () -> config.startTextToggle, v -> config.startTextToggle = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<TextColor>createBuilder().name(Component.literal("Start Color")).description(OptionDescription.of(Component.literal("Sets the color of the route-start label"))).binding(TextColor.RED, () -> config.startWaypointColor != null ? config.startWaypointColor : TextColor.RED, v -> config.startWaypointColor = v).controller(opt -> EnumControllerBuilder.create(opt).enumClass(TextColor.class)).build())
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Show Exit")).description(OptionDescription.of(Component.literal("Shows a label at the room exit"))).binding(true, () -> config.exitTextToggle, v -> config.exitTextToggle = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<TextColor>createBuilder().name(Component.literal("Exit Color")).description(OptionDescription.of(Component.literal("Sets the color of the room-exit label"))).binding(TextColor.RED, () -> config.exitWaypointColor != null ? config.exitWaypointColor : TextColor.RED, v -> config.exitWaypointColor = v).controller(opt -> EnumControllerBuilder.create(opt).enumClass(TextColor.class)).build())
-                                    .build())
-                            .build())
-
-                    // Components
-                    .category(ConfigCategory.createBuilder()
-                            .name(Component.literal("Components"))
-                            .group(OptionGroup.createBuilder()
-                                    .name(Component.literal("Etherwarps"))
-                                    .description(OptionDescription.of(Component.literal("Controls the visuals of Etherwarp waypoints")))
-                                    .collapsed(true)
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Enabled")).description(OptionDescription.of(Component.literal("Shows Etherwarp waypoint boxes"))).binding(true, () -> config.renderEtherwarps, v -> config.renderEtherwarps = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<Color>createBuilder().name(Component.literal("Color")).description(OptionDescription.of(Component.literal("Sets the color of Etherwarps in the current route step"))).binding(new Color(128, 0, 128), () -> config.etherWarp != null ? config.etherWarp : new Color(128, 0, 128), v -> config.etherWarp = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
-                                    .option(Option.<Color>createBuilder().name(Component.literal("Second Step Color")).description(OptionDescription.of(Component.literal("Used for etherwarp waypoints in the second and later visible route steps"))).binding(new Color(95, 61, 97), () -> config.secondStepEtherWarp != null ? config.secondStepEtherWarp : new Color(95, 61, 97), v -> config.secondStepEtherWarp = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Full Block")).description(OptionDescription.of(Component.literal("Renders Etherwarps as filled blocks instead of outlines"))).binding(false, () -> config.etherwarpFullBlock, v -> config.etherwarpFullBlock = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<Float>createBuilder().name(Component.literal("Box Line Width")).description(OptionDescription.of(Component.literal("Controls the Etherwarp outline thickness when Full Block is disabled"))).binding(7.0f, () -> config.etherwarpBoxLineWidth, v -> config.etherwarpBoxLineWidth = v).controller(opt -> FloatSliderControllerBuilder.create(opt).range(1.0f, 10.0f).step(0.5f)).build())
-                                    .build())
-                            .group(OptionGroup.createBuilder()
-                                    .name(Component.literal("Secrets"))
-                                    .description(OptionDescription.of(Component.literal("Controls the visuals of item, interact and bat secrets")))
-                                    .collapsed(true)
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Items")).description(OptionDescription.of(Component.literal("Shows item-secret waypoint boxes"))).binding(true, () -> config.renderSecretsItem, v -> config.renderSecretsItem = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<Color>createBuilder().name(Component.literal("Item Color")).description(OptionDescription.of(Component.literal("Sets the color of item secrets in the current route step"))).binding(new Color(0, 255, 255), () -> config.secretsItem != null ? config.secretsItem : new Color(0, 255, 255), v -> config.secretsItem = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
-                                    .option(Option.<Color>createBuilder().name(Component.literal("Item Second Step Color")).description(OptionDescription.of(Component.literal("Used for item secret waypoints in the second and later visible route steps"))).binding(new Color(95, 167, 167), () -> config.secondStepSecretsItem != null ? config.secondStepSecretsItem : new Color(95, 167, 167), v -> config.secondStepSecretsItem = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Interacts")).description(OptionDescription.of(Component.literal("Shows interact-secret waypoint boxes"))).binding(true, () -> config.renderSecretIteract, v -> config.renderSecretIteract = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<Color>createBuilder().name(Component.literal("Interact Color")).description(OptionDescription.of(Component.literal("Sets the color of interact secrets in the current route step"))).binding(new Color(0, 0, 255), () -> config.secretsInteract != null ? config.secretsInteract : new Color(0, 0, 255), v -> config.secretsInteract = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
-                                    .option(Option.<Color>createBuilder().name(Component.literal("Interact Second Step Color")).description(OptionDescription.of(Component.literal("Used for interact secret waypoints in the second and later visible route steps"))).binding(new Color(73, 82, 149), () -> config.secondStepSecretsInteract != null ? config.secondStepSecretsInteract : new Color(73, 82, 149), v -> config.secondStepSecretsInteract = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Bats")).description(OptionDescription.of(Component.literal("Shows bat-secret waypoint boxes"))).binding(true, () -> config.renderSecretBat, v -> config.renderSecretBat = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<Color>createBuilder().name(Component.literal("Bat Color")).description(OptionDescription.of(Component.literal("Sets the color of bat secrets in the current route step"))).binding(new Color(0, 255, 0), () -> config.secretsBat != null ? config.secretsBat : new Color(0, 255, 0), v -> config.secretsBat = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
-                                    .option(Option.<Color>createBuilder().name(Component.literal("Bat Second Step Color")).description(OptionDescription.of(Component.literal("Used for bat secret waypoints in the second and later visible route steps"))).binding(new Color(91, 154, 91), () -> config.secondStepSecretsBat != null ? config.secondStepSecretsBat : new Color(91, 154, 91), v -> config.secondStepSecretsBat = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
-                                    .option(Option.<Float>createBuilder().name(Component.literal("Box Line Width")).description(OptionDescription.of(Component.literal("Controls the outline thickness of all secret boxes"))).binding(5.0f, () -> config.secretBoxLineWidth, v -> config.secretBoxLineWidth = v).controller(opt -> FloatSliderControllerBuilder.create(opt).range(1.0f, 10.0f).step(0.5f)).build())
-                                    .build())
-                            .group(OptionGroup.createBuilder()
-                                    .name(Component.literal("Mines"))
-                                    .description(OptionDescription.of(Component.literal("Controls the visuals of mine waypoints")))
-                                    .collapsed(true)
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Enabled")).description(OptionDescription.of(Component.literal("Shows mine waypoint boxes"))).binding(true, () -> config.renderMines, v -> config.renderMines = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<Color>createBuilder().name(Component.literal("Color")).description(OptionDescription.of(Component.literal("Sets the color of mines in the current route step"))).binding(new Color(255, 236, 0, 82), () -> config.mine != null ? config.mine : new Color(255, 236, 0, 82), v -> config.mine = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
-                                    .option(Option.<Color>createBuilder().name(Component.literal("Second Step Color")).description(OptionDescription.of(Component.literal("Used for mine waypoints in the second and later visible route steps"))).binding(new Color(177, 173, 97), () -> config.secondStepMine != null ? config.secondStepMine : new Color(177, 173, 97), v -> config.secondStepMine = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Full Block")).description(OptionDescription.of(Component.literal("Renders mines as filled blocks instead of outlines"))).binding(false, () -> config.mineFullBlock, v -> config.mineFullBlock = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<Float>createBuilder().name(Component.literal("Box Line Width")).description(OptionDescription.of(Component.literal("Controls the mine outline thickness when Full Block is disabled"))).binding(5.0f, () -> config.mineBoxLineWidth, v -> config.mineBoxLineWidth = v).controller(opt -> FloatSliderControllerBuilder.create(opt).range(1.0f, 10.0f).step(0.5f)).build())
-                                    .build())
-                            .group(OptionGroup.createBuilder()
-                                    .name(Component.literal("Levers"))
-                                    .description(OptionDescription.of(Component.literal("Controls the visuals of lever waypoints")))
-                                    .collapsed(true)
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Enabled")).description(OptionDescription.of(Component.literal("Shows lever waypoint boxes"))).binding(true, () -> config.renderInteracts, v -> config.renderInteracts = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<Color>createBuilder().name(Component.literal("Color")).description(OptionDescription.of(Component.literal("Sets the color of levers in the current route step"))).binding(new Color(0, 0, 255), () -> config.interacts != null ? config.interacts : new Color(0, 0, 255), v -> config.interacts = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
-                                    .option(Option.<Color>createBuilder().name(Component.literal("Second Step Color")).description(OptionDescription.of(Component.literal("Used for lever waypoints in the second and later visible route steps"))).binding(new Color(73, 82, 149), () -> config.secondStepInteracts != null ? config.secondStepInteracts : new Color(73, 82, 149), v -> config.secondStepInteracts = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Full Block")).description(OptionDescription.of(Component.literal("Renders levers as filled blocks instead of outlines"))).binding(false, () -> config.interactsFullBlock, v -> config.interactsFullBlock = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<Float>createBuilder().name(Component.literal("Box Line Width")).description(OptionDescription.of(Component.literal("Controls the lever outline thickness when Full Block is disabled"))).binding(5.0f, () -> config.leverBoxLineWidth, v -> config.leverBoxLineWidth = v).controller(opt -> FloatSliderControllerBuilder.create(opt).range(1.0f, 10.0f).step(0.5f)).build())
-                                    .build())
-                            .group(OptionGroup.createBuilder()
-                                    .name(Component.literal("Superbooms"))
-                                    .description(OptionDescription.of(Component.literal("Controls the visuals of Superboom waypoints")))
-                                    .collapsed(true)
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Enabled")).description(OptionDescription.of(Component.literal("Shows Superboom waypoint boxes"))).binding(true, () -> config.renderSuperboom, v -> config.renderSuperboom = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<Color>createBuilder().name(Component.literal("Color")).description(OptionDescription.of(Component.literal("Sets the color of Superbooms in the current route step"))).binding(new Color(255, 0, 0), () -> config.superbooms != null ? config.superbooms : new Color(255, 0, 0), v -> config.superbooms = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
-                                    .option(Option.<Color>createBuilder().name(Component.literal("Second Step Color")).description(OptionDescription.of(Component.literal("Used for superboom waypoints in the second and later visible route steps"))).binding(new Color(168, 90, 90), () -> config.secondStepSuperbooms != null ? config.secondStepSuperbooms : new Color(168, 90, 90), v -> config.secondStepSuperbooms = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Full Block")).description(OptionDescription.of(Component.literal("Renders Superbooms as filled blocks instead of outlines"))).binding(false, () -> config.superboomsFullBlock, v -> config.superboomsFullBlock = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<Float>createBuilder().name(Component.literal("Box Line Width")).description(OptionDescription.of(Component.literal("Controls the Superboom outline thickness when Full Block is disabled"))).binding(5.0f, () -> config.superboomBoxLineWidth, v -> config.superboomBoxLineWidth = v).controller(opt -> FloatSliderControllerBuilder.create(opt).range(1.0f, 10.0f).step(0.5f)).build())
-                                    .build())
-                            .group(OptionGroup.createBuilder()
-                                    .name(Component.literal("Bonzo Staffs"))
-                                    .description(OptionDescription.of(Component.literal("Controls the visuals of Bonzo Staff waypoints")))
-                                    .collapsed(true)
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Enabled")).description(OptionDescription.of(Component.literal("Shows Bonzo Staff waypoint boxes"))).binding(true, () -> config.renderBonzoStaff, v -> config.renderBonzoStaff = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<Color>createBuilder().name(Component.literal("Color")).description(OptionDescription.of(Component.literal("Sets the color of Bonzo Staffs in the current route step"))).binding(new Color(255, 165, 0), () -> config.bonzoStaff != null ? config.bonzoStaff : new Color(255, 165, 0), v -> config.bonzoStaff = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
-                                    .option(Option.<Color>createBuilder().name(Component.literal("Second Step Color")).description(OptionDescription.of(Component.literal("Used for Bonzo Staff waypoints in the second and later visible route steps"))).binding(new Color(200, 110, 0), () -> config.secondStepBonzoStaff != null ? config.secondStepBonzoStaff : new Color(200, 110, 0), v -> config.secondStepBonzoStaff = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Full Block")).description(OptionDescription.of(Component.literal("Renders Bonzo Staffs as filled blocks instead of outlines"))).binding(false, () -> config.bonzoStaffFullBlock, v -> config.bonzoStaffFullBlock = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<Float>createBuilder().name(Component.literal("Box Line Width")).description(OptionDescription.of(Component.literal("Controls the Bonzo Staff outline thickness when Full Block is disabled"))).binding(5.0f, () -> config.bonzoStaffBoxLineWidth, v -> config.bonzoStaffBoxLineWidth = v).controller(opt -> FloatSliderControllerBuilder.create(opt).range(1.0f, 10.0f).step(0.5f)).build())
-                                    .build())
-                            .group(OptionGroup.createBuilder()
-                                    .name(Component.literal("Enderpearls"))
-                                    .description(OptionDescription.of(Component.literal("Controls the visuals of Enderpearl waypoints and their directional guide lines")))
-                                    .collapsed(true)
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Enabled")).description(OptionDescription.of(Component.literal("Shows Enderpearl waypoints and their directional guide lines"))).binding(true, () -> config.renderEnderpearls, v -> config.renderEnderpearls = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<Color>createBuilder().name(Component.literal("Color")).description(OptionDescription.of(Component.literal("Sets the color of Enderpearl waypoint boxes in the current route step"))).binding(new Color(0, 255, 255), () -> config.enderpearls != null ? config.enderpearls : new Color(0, 255, 255), v -> config.enderpearls = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
-                                    .option(Option.<Color>createBuilder().name(Component.literal("Second Step Color")).description(OptionDescription.of(Component.literal("Used for enderpearl waypoints in the second and later visible route steps"))).binding(new Color(95, 167, 167), () -> config.secondStepEnderpearls != null ? config.secondStepEnderpearls : new Color(95, 167, 167), v -> config.secondStepEnderpearls = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Full Block")).description(OptionDescription.of(Component.literal("Renders Enderpearl waypoints as filled blocks instead of outlines"))).binding(false, () -> config.enderpearlFullBlock, v -> config.enderpearlFullBlock = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<Float>createBuilder().name(Component.literal("Box Line Width")).description(OptionDescription.of(Component.literal("Controls the Enderpearl outline thickness when Full Block is disabled"))).binding(5.0f, () -> config.enderpearlBoxLineWidth, v -> config.enderpearlBoxLineWidth = v).controller(opt -> FloatSliderControllerBuilder.create(opt).range(1.0f, 10.0f).step(0.5f)).build())
-                                    .option(Option.<Color>createBuilder().name(Component.literal("Line Color")).description(OptionDescription.of(Component.literal("Sets the color of Enderpearl directional guide lines"))).binding(new Color(0, 255, 255), () -> config.pearlLineColor != null ? config.pearlLineColor : new Color(0, 255, 255), v -> config.pearlLineColor = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
-                                    .option(Option.<Integer>createBuilder().name(Component.literal("Line Width")).description(OptionDescription.of(Component.literal("Controls the thickness of Enderpearl directional guide lines"))).binding(5, () -> config.pearlLineWidth, v -> config.pearlLineWidth = v).controller(opt -> IntegerSliderControllerBuilder.create(opt).range(1, 10).step(1)).build())
-                                    .build())
-                            .group(OptionGroup.createBuilder()
-                                    .name(Component.literal("Custom Secret Sound"))
-                                    .description(OptionDescription.of(Component.literal("Controls the sound played when a secret is collected")))
-                                    .collapsed(true)
-                                    .option(Option.<Boolean>createBuilder()
-                                            .name(Component.literal("Enabled"))
-                                            .description(OptionDescription.of(Component.literal("Plays the selected sound when a secret is collected")))
-                                            .binding(false, () -> config.customSecretSound, v -> config.customSecretSound = v)
-                                            .controller(TickBoxControllerBuilder::create)
-                                            .build())
-                                    .option(customSoundTypeOption)
-                                    .option(customSoundVolumeOption)
-                                    .option(customSoundPitchOption)
-                                    .option(ButtonOption.createBuilder()
-                                            .name(Component.literal("Preview Sound"))
-                                            .description(OptionDescription.of(Component.literal("Plays the selected sound using the current volume and pitch")))
-                                            .text(Component.literal("Play"))
-                                            .action((screen, opt) -> SecretSounds.preview(
-                                                    customSoundTypeOption.pendingValue(),
-                                                    customSoundVolumeOption.pendingValue(),
-                                                    customSoundPitchOption.pendingValue()))
-                                            .build())
-                                    .build())
-                            .build());
-
-        }).generateScreen(parent);
+            HANDLER.save();
+            Files.move(LEGACY_FILE,
+                    LEGACY_FILE.resolveSibling(LEGACY_FILE.getFileName() + ".migrated"));
+            LogUtils.info("§bMigrated " + carried + " settings from the old config to configlib");
+        } catch (Exception e) {
+            LogUtils.error(e);
+        }
     }
 
-    public enum LineType implements NameableEnum {
+    private static boolean applyLegacy(Field field, JsonElement value) throws IllegalAccessException {
+        if (value == null || value.isJsonNull()) {
+            return false;
+        }
+        Class<?> type = field.getType();
+        if (type == boolean.class) {
+            field.setBoolean(INSTANCE, value.getAsBoolean());
+        } else if (type == int.class) {
+            // Colours were java.awt.Color and are ints now; every other int was already a number.
+            field.setInt(INSTANCE, value.isJsonPrimitive() && value.getAsJsonPrimitive().isNumber()
+                    ? value.getAsInt()
+                    : ConfigUtils.parseColorArgb(value));
+        } else if (type == float.class) {
+            field.setFloat(INSTANCE, value.getAsFloat());
+        } else if (type == double.class) {
+            field.setDouble(INSTANCE, value.getAsDouble());
+        } else if (type == String.class) {
+            field.set(INSTANCE, value.getAsString());
+        } else if (type.isEnum()) {
+            String name = value.getAsString();
+            Object constant = Arrays.stream(type.getEnumConstants())
+                    .filter(k -> ((Enum<?>) k).name().equals(name))
+                    .findFirst().orElse(null);
+            if (constant == null) {
+                return false;
+            }
+            field.set(INSTANCE, constant);
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    // ------------------------------------------------------------------ enums
+
+    public enum LineType implements Labelled {
         PARTICLES("Particles"), LINES("Lines"), NONE("None");
-        private final String name;
 
-        LineType(String name) {
-            this.name = name;
+        private final String label;
+
+        LineType(String label) {
+            this.label = label;
         }
 
         @Override
-        public Component getDisplayName() {
-            return Component.literal(name);
+        public String label() {
+            return label;
         }
     }
 
-    public enum RouteType implements NameableEnum {
+    public enum RouteType implements Labelled {
         ROUTE_3ppopka("3ppopka"), ROUTE_FOW("FlameOfWar");
-        private final String name;
 
-        RouteType(String name) {
-            this.name = name;
+        private final String label;
+
+        RouteType(String label) {
+            this.label = label;
         }
 
         @Override
-        public Component getDisplayName() {
-            return Component.literal(name);
+        public String label() {
+            return label;
         }
     }
 
-    public enum SoundType implements NameableEnum {
+    public enum SoundType implements Labelled {
         MOB_BLAZE_HIT("Blaze Hit", "entity.blaze.hurt"),
         FIRE_IGNITE("Fire Ignite", "item.flintandsteel.use"),
         RANDOM_ORB("Experience Orb", "entity.experience_orb.pickup"),
@@ -876,21 +856,22 @@ public class SRMConfig {
         MOB_GUARDIAN_LAND_HIT("Guardian Land Hit", "entity.guardian.hurt_land"),
         NOTE_PLING("Note Pling", "block.note_block.pling"),
         ZYRA_MEOW("Zyra Meow", "secretroutesmod:zyra.meow");
-        private final String name;
+
+        private final String label;
         public final String soundId;
 
-        SoundType(String name, String soundId) {
-            this.name = name;
+        SoundType(String label, String soundId) {
+            this.label = label;
             this.soundId = soundId;
         }
 
         @Override
-        public Component getDisplayName() {
-            return Component.literal(name);
+        public String label() {
+            return label;
         }
     }
 
-    public enum TextColor implements NameableEnum {
+    public enum TextColor implements Labelled {
         BLACK("Black", ChatFormatting.BLACK), DARK_BLUE("Dark Blue", ChatFormatting.DARK_BLUE),
         DARK_GREEN("Dark Green", ChatFormatting.DARK_GREEN), DARK_AQUA("Dark Aqua", ChatFormatting.DARK_AQUA),
         DARK_RED("Dark Red", ChatFormatting.DARK_RED), DARK_PURPLE("Dark Purple", ChatFormatting.DARK_PURPLE),
@@ -901,20 +882,20 @@ public class SRMConfig {
         YELLOW("Yellow", ChatFormatting.YELLOW), WHITE("White", ChatFormatting.WHITE);
 
         public final ChatFormatting formatting;
-        private final String name;
+        private final String label;
 
-        TextColor(String name, ChatFormatting formatting) {
-            this.name = name;
+        TextColor(String label, ChatFormatting formatting) {
+            this.label = label;
             this.formatting = formatting;
         }
 
         @Override
-        public Component getDisplayName() {
-            return Component.literal(name).withStyle(formatting);
+        public String label() {
+            return label;
         }
     }
 
-    public enum ParticleType implements NameableEnum {
+    public enum ParticleType implements Labelled {
         EXPLOSION_NORMAL("Explosion Normal"), EXPLOSION_LARGE("Explosion Large"), EXPLOSION_HUGE("Explosion Huge"),
         FIREWORKS_SPARK("Fireworks Spark"), BUBBLE("Bubble"), WATER_SPLASH("Water Splash"), WATER_WAKE("Water Wake"),
         SUSPENDED("Suspended"), SUSPENDED_DEPTH("Suspended Depth"), CRIT("Crit"), MAGIC_CRIT("Magic Crit"),
@@ -927,15 +908,15 @@ public class SRMConfig {
         SLIME("Slime"), HEART("Heart"), BARRIER("Barrier"), WATER_DROP("Water Drop"),
         ITEM_TAKE("Item Take"), MOB_APPEARANCE("Mob Appearance");
 
-        private final String name;
+        private final String label;
 
-        ParticleType(String name) {
-            this.name = name;
+        ParticleType(String label) {
+            this.label = label;
         }
 
         @Override
-        public Component getDisplayName() {
-            return Component.literal(name);
+        public String label() {
+            return label;
         }
     }
 }

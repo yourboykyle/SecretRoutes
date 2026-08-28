@@ -232,9 +232,7 @@ public class Main implements ClientModInitializer {
         LogUtils.info("§bSetting ssl certificate");
         SSLUtils.setSSlCertificate();
 
-        // Load YACL Config
-        SRMConfig.HANDLER.load();
-
+        // Touching the class registers the config with configlib, which loads it from disk.
         // Migrate legacy route types to the new default
         if (SRMConfig.get().routeType == null) {
             SRMConfig.get().routeType = SRMConfig.RouteType.ROUTE_FOW;
