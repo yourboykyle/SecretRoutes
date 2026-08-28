@@ -39,11 +39,14 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.ConfigUtils;
+import xyz.yourboykyle.secretroutes.utils.RoomToggleUtils;
 import xyz.yourboykyle.secretroutes.utils.RouteUtils;
 import xyz.yourboykyle.secretroutes.utils.SecretSounds;
 
 import java.awt.*;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SRMConfig {
 
@@ -75,6 +78,10 @@ public class SRMConfig {
     public boolean trackPersonalBests = true;
     @SerialEntry
     public boolean sendChatMessages = true;
+
+    // Rooms - only disabled rooms are stored, so rooms are enabled by default
+    @SerialEntry
+    public List<String> disabledRooms = new ArrayList<>();
 
     // F7 Boss
     @SerialEntry
@@ -466,6 +473,55 @@ public class SRMConfig {
                     .controller(opt -> FloatSliderControllerBuilder.create(opt).range(0.5f, 2.0f).step(0.1f))
                     .build();
 
+            // Rooms - one toggle per room that has a route, grouped by first letter to stay navigable
+            List<Option<Boolean>> roomOptions = new ArrayList<>();
+            var roomsCategory = ConfigCategory.createBuilder()
+                    .name(Component.literal("Rooms"))
+                    .tooltip(Component.literal("Turn routes on or off for individual rooms"))
+                    .option(ButtonOption.createBuilder()
+                            .name(Component.literal("Enable All Rooms"))
+                            .description(OptionDescription.of(Component.literal("Turns the routes back on for every room")))
+                            .text(Component.literal("Enable All"))
+                            .action((screen, opt) -> roomOptions.forEach(roomOption -> roomOption.requestSet(true)))
+                            .build())
+                    .option(ButtonOption.createBuilder()
+                            .name(Component.literal("Disable All Rooms"))
+                            .description(OptionDescription.of(Component.literal("Turns the routes off for every room")))
+                            .text(Component.literal("Disable All"))
+                            .action((screen, opt) -> roomOptions.forEach(roomOption -> roomOption.requestSet(false)))
+                            .build());
+
+            List<String> knownRooms = RoomToggleUtils.listKnownRooms();
+            if (knownRooms.isEmpty()) {
+                roomsCategory.option(LabelOption.create(Component.literal("§cNo route files found. Download the routes from the General tab first.")));
+            } else {
+                OptionGroup.Builder letterGroup = null;
+                char currentLetter = 0;
+
+                for (String room : knownRooms) {
+                    char letter = Character.toUpperCase(room.charAt(0));
+                    if (letterGroup == null || letter != currentLetter) {
+                        if (letterGroup != null) roomsCategory.group(letterGroup.build());
+                        currentLetter = letter;
+                        letterGroup = OptionGroup.createBuilder()
+                                .name(Component.literal(String.valueOf(currentLetter)))
+                                .description(OptionDescription.of(Component.literal("Rooms starting with " + currentLetter)))
+                                .collapsed(true);
+                    }
+
+                    Option<Boolean> roomOption = Option.<Boolean>createBuilder()
+                            .name(Component.literal(room))
+                            .description(OptionDescription.of(Component.literal("Shows the route for " + room + " when you enter it")))
+                            .binding(true, () -> RoomToggleUtils.isRoomEnabled(room), v -> RoomToggleUtils.setRoomEnabled(room, v))
+                            .controller(TickBoxControllerBuilder::create)
+                            .build();
+                    roomOptions.add(roomOption);
+                    letterGroup.option(roomOption);
+                }
+
+                roomsCategory.group(letterGroup.build());
+            }
+
             return builder
                     .title(Component.literal("Secret Routes Config"))
 
@@ -644,6 +700,9 @@ public class SRMConfig {
                                             .build())
                                     .build())
                             .build())
+                    // Rooms
+                    .category(roomsCategory.build())
+
                     // Visuals
                     .category(ConfigCategory.createBuilder()
                             .name(Component.literal("Visuals"))

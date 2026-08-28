@@ -48,6 +48,7 @@ import xyz.yourboykyle.secretroutes.dungeons.SecretUtils;
 import xyz.yourboykyle.secretroutes.events.OnEnterNewRoom;
 import xyz.yourboykyle.secretroutes.utils.DungeonUtil;
 import xyz.yourboykyle.secretroutes.utils.LocationUtils;
+import xyz.yourboykyle.secretroutes.utils.RoomToggleUtils;
 
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -239,6 +240,10 @@ public class DungeonScanner {
         }
 
         if (!"f7boss".equals(Main.currentRoom.name) && currentRoom == null) {
+            return false;
+        }
+
+        if (!RoomToggleUtils.isRoomEnabled(Main.currentRoom.name)) {
             return false;
         }
 
