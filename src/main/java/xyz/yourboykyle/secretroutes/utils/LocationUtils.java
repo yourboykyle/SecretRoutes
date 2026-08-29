@@ -16,10 +16,12 @@ public class LocationUtils {
         HypixelModAPI.getInstance().subscribeToEventPacket(ClientboundLocationPacket.class);
 
         HypixelModAPI.getInstance().createHandler(ClientboundLocationPacket.class, packet -> {
+            boolean wasInDungeons = inDungeons;
+
             if (packet.getMode().isPresent()) {
                 String mode = packet.getMode().get();
                 inDungeons = mode.equalsIgnoreCase("dungeon");
-                if (inDungeons)  {
+                if (inDungeons && !wasInDungeons) {
                     DungeonUtil.reset();
                 }
             } else {
