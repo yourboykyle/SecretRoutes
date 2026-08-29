@@ -48,6 +48,7 @@ import xyz.yourboykyle.secretroutes.dungeons.SecretUtils;
 import xyz.yourboykyle.secretroutes.events.OnEnterNewRoom;
 import xyz.yourboykyle.secretroutes.utils.DungeonUtil;
 import xyz.yourboykyle.secretroutes.utils.LocationUtils;
+import xyz.yourboykyle.secretroutes.utils.RoomToggleUtils;
 
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -59,6 +60,7 @@ public class DungeonScanner {
     private static final Gson GSON = new Gson();
 
     private static final Map<Integer, RoomData> CORE_TO_ROOM_MAP = new HashMap<>();
+    private static final Map<String, String> NAME_TO_SHAPE_MAP = new HashMap<>();
 
     public static DungeonRoom currentRoom = null;
     public static final Set<DungeonRoom> passedRooms = new HashSet<>();
@@ -105,6 +107,7 @@ public class DungeonScanner {
 
     private static void loadResources() {
         CORE_TO_ROOM_MAP.clear();
+        NAME_TO_SHAPE_MAP.clear();
         client.getResourceManager().listResources("rooms.json", id -> id.getPath().endsWith("rooms.json"))
                 .forEach((id, resource) -> {
                     try (Reader reader = new InputStreamReader(resource.open())) {
@@ -112,6 +115,9 @@ public class DungeonScanner {
                         for (RoomData room : data) {
                             if (room.cores() != null) {
                                 for (Integer core : room.cores()) CORE_TO_ROOM_MAP.put(core, room);
+                            }
+                            if (room.name() != null && room.shape() != null) {
+                                NAME_TO_SHAPE_MAP.put(room.name().toLowerCase(Locale.ROOT), room.shape());
                             }
                         }
                     } catch (Exception e) { e.printStackTrace(); }
@@ -213,6 +219,12 @@ public class DungeonScanner {
         OnEnterNewRoom.onEnterNewRoom(newRoomObj);
     }
 
+    /** The floor shape of a room ("1x1", "1x2", "L", ...) as declared in rooms.json, or null if unknown. */
+    public static String getRoomShape(String roomName) {
+        if (roomName == null) return null;
+        return NAME_TO_SHAPE_MAP.get(roomName.toLowerCase(Locale.ROOT));
+    }
+
     public static boolean isPlayerInCurrentRoom() {
         if (!LocationUtils.isInDungeons() || client.player == null || client.level == null) {
             return false;
@@ -239,6 +251,10 @@ public class DungeonScanner {
         }
 
         if (!"f7boss".equals(Main.currentRoom.name) && currentRoom == null) {
+            return false;
+        }
+
+        if (!RoomToggleUtils.isRoomEnabled(Main.currentRoom.name)) {
             return false;
         }
 
