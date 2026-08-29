@@ -148,7 +148,7 @@ Discord: [https://discord.gg/qmtQmz4V3X](https://discord.gg/qmtQmz4V3X)
 ---
 
 ### Credits:
-- @yourboykyle (me) - developer (yourboykyle)
+- @yourboykyle - developer (yourboykyle)
 - @wyannnnn - developer (R-aMcC)
 - @christechs - developer (Richard Rampokker Stalman/@eskom_sa)
 - @Itplays - modern route recording + various things
