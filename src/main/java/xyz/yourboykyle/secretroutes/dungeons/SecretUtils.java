@@ -486,13 +486,7 @@ public class SecretUtils {
 
                 if (first) {
                     removeBannerTime = System.currentTimeMillis() + 5000;
-                    new Thread(() -> {
-                        try {
-                            Thread.sleep(5000);
-                            removeBannerTime = null;
-                        } catch (InterruptedException ignored) {
-                        }
-                    }).start();
+                    SchedulerUtils.schedule(5000, () -> removeBannerTime = null);
                     first = false;
                 }
             }

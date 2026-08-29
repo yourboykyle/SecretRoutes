@@ -84,15 +84,11 @@ public class OnChatReceive {
         }
         if (formatted.startsWith("§r§cThat chest is locked")) {
             LogUtils.info("§aLocked chest detected!");
-            new Thread(() -> {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException ignored) {
-                }
+            SchedulerUtils.schedule(100, () -> {
                 if (SecretUtils.lastInteract != null) {
                     SecretUtils.secretLocations.remove(BlockUtils.blockPos(SecretUtils.lastInteract));
                 }
-            }).start();
+            });
             SecretUtils.renderLever = true;
 
             if (Main.currentRoom.currentSecretRoute != null && Main.currentRoom.currentSecretIndex > 0) {
