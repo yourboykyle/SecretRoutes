@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        mc_version: ["1.21.11", "26.1.2", "26.2"]
+        mc_version: ["26.1.2", "26.2"]
 
     name: "Build and test (${{ matrix.mc_version }})"
     steps:

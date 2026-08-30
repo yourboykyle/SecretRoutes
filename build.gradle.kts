@@ -1,12 +1,6 @@
 plugins {
-    id("dev.kikugie.loom-back-compat")
+    id("net.fabricmc.fabric-loom") version "1.17.20"
     `maven-publish`
-}
-
-if (sc.current.parsed < "26") {
-    apply(plugin = "net.fabricmc.fabric-loom-remap")
-} else {
-    apply(plugin = "net.fabricmc.fabric-loom")
 }
 
 fun prop(key: String): String = property(key) as String
@@ -19,22 +13,6 @@ val mod_archives_name = prop("mod.archives_name")
 
 stonecutter {
     properties.tags(current.version, "fabric")
-
-    if (current.parsed < "26") {
-        val excludedClasses = listOf(
-            "commands/ChangeColorProfile.java",
-            "commands/ChangeRoute.java",
-            "commands/Debug.java",
-            "commands/LoadRoute.java",
-            "commands/Recording.java",
-            "commands/SRM.java",
-            "config/SRMKeybinds.java",
-            "dungeons/rendering/RenderingBackend.java",
-            "events/OnPlaySound.java",
-            "utils/ChatUtils.java"
-        )
-        excludedClasses.forEach { filters.exclude("java/xyz/yourboykyle/secretroutes/$it") }
-    }
 }
 
 val minecraft_version = sc.current.version
@@ -65,19 +43,12 @@ repositories {
 dependencies {
     minecraft("com.mojang:minecraft:$minecraft_version")
 
-    if (sc.current.parsed < "26") {
-        val loom = project.extensions.getByName("loom") as net.fabricmc.loom.api.LoomGradleExtensionAPI
-        mappings(loom.layered {
-            officialMojangMappings()
-        })
-    }
+    implementation("net.fabricmc:fabric-loader:$loader_version")
+    implementation("net.fabricmc.fabric-api:fabric-api:$fabric_version")
 
-    modImplementation("net.fabricmc:fabric-loader:$loader_version")
-    modImplementation("net.fabricmc.fabric-api:fabric-api:$fabric_version")
-
-    modImplementation("dev.isxander:yet-another-config-lib:$yacl_version")
-    modImplementation("com.terraformersmc:modmenu:$modmenu_version")
-    modImplementation("maven.modrinth:iris:$iris_version")
+    implementation("dev.isxander:yet-another-config-lib:$yacl_version")
+    implementation("com.terraformersmc:modmenu:$modmenu_version")
+    implementation("maven.modrinth:iris:$iris_version")
 
     implementation("net.hypixel:mod-api:$hypixel_api_version")
 
@@ -85,25 +56,16 @@ dependencies {
     include("moe.nea:libautoupdate:$autoupdate_version")
 }
 
-val targetJavaVersion = when {
-    sc.current.parsed >= "26" -> 25
-    sc.current.parsed >= "1.21.11" -> 21
-    else -> 17
-}
+val targetJavaVersion = 25
 
 java {
-    val javaVersion = JavaVersion.toVersion(targetJavaVersion)
-    if (JavaVersion.current() < javaVersion) {
-        toolchain.languageVersion.set(JavaLanguageVersion.of(targetJavaVersion))
-    }
+    toolchain.languageVersion.set(JavaLanguageVersion.of(targetJavaVersion))
     withSourcesJar()
 }
 
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
-    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible) {
-        options.release.set(targetJavaVersion)
-    }
+    options.release.set(targetJavaVersion)
 }
 
 tasks.processResources {
