@@ -9,12 +9,11 @@ pluginManagement {
 
 plugins {
     id("dev.kikugie.stonecutter") version "0.9.7"
-    id("dev.kikugie.loom-back-compat") version "0.4.1"
 }
 
 stonecutter {
     create(rootProject) {
-        versions("1.21.11", "26.1.2", "26.2")
+        versions("26.1.2", "26.2")
         vcsVersion = "26.2"
     }
 }
