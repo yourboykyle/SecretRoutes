@@ -478,6 +478,7 @@ public class SRMConfig {
             List<Option<Boolean>> roomOptions = new ArrayList<>();
             var roomsCategory = ConfigCategory.createBuilder()
                     .name(Component.literal("Rooms"))
+                    .tooltip(Component.literal("Turn routes on or off for individual rooms"))
                     .option(ButtonOption.createBuilder()
                             .name(Component.literal("Enable All Rooms"))
                             .description(OptionDescription.of(Component.literal("Turns the routes back on for every room")))
