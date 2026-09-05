@@ -54,6 +54,13 @@ dependencies {
 
     implementation("moe.nea:libautoupdate:$autoupdate_version")
     include("moe.nea:libautoupdate:$autoupdate_version")
+
+    testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.11.4")
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 val targetJavaVersion = 25
@@ -74,6 +81,7 @@ tasks.processResources {
         "mc_version" to minecraft_version,
         "minecraft_version" to minecraft_version,
         "loader_version" to loader_version,
+        "yacl_version" to yacl_version,
         "mod_id" to mod_id,
         "mod_version" to mod_version,
         "mod_name" to mod_name,

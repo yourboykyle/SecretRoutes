@@ -27,10 +27,9 @@ import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
 
-import dev.isxander.yacl3.gui.utils.GuiUtils;
-
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -43,6 +42,8 @@ import xyz.yourboykyle.secretroutes.utils.SecretSounds;
 import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -80,6 +81,8 @@ public class SRMConfig {
     // Rooms - only disabled rooms are stored, so rooms are enabled by default
     @SerialEntry
     public List<String> disabledRooms = new ArrayList<>();
+    @SerialEntry
+    public Map<String, RoomRouteProvider> roomRouteTypes = new HashMap<>();
 
     // F7 Boss
     @SerialEntry
@@ -384,6 +387,20 @@ public class SRMConfig {
         return HANDLER.instance();
     }
 
+    public RouteType effectiveRouteType(String roomName) {
+        return RoomRouteOverrides.get(roomRouteTypes, roomName).resolve(routeType);
+    }
+
+    private RoomRouteSettings roomSettings(String roomName) {
+        return new RoomRouteSettings(RoomToggleUtils.isRoomEnabled(roomName), RoomRouteOverrides.get(roomRouteTypes, roomName));
+    }
+
+    private void setRoomSettings(String roomName, RoomRouteSettings value) {
+        RoomToggleUtils.setRoomEnabled(roomName, value.enabled());
+        if (roomRouteTypes == null) roomRouteTypes = new HashMap<>();
+        RoomRouteOverrides.set(roomRouteTypes, roomName, value.provider());
+    }
+
     public static Screen getScreen(Screen parent) {
         return YetAnotherConfigLib.create(HANDLER, (defaults, config, builder) -> {
 
@@ -407,7 +424,7 @@ public class SRMConfig {
                             .description(OptionDescription.of(Component.literal("Loads the profile named above from its JSON file and closes the menu")))
                             .action((screen, opt) -> {
                                 ConfigUtils.loadColorConfig(config.copyFileName);
-                                GuiUtils.setScreen(null);
+                                Minecraft.getInstance().setScreenAndShow(null);
                             })
                             .build());
 
@@ -420,7 +437,7 @@ public class SRMConfig {
                             .description(OptionDescription.of(Component.literal("Loads " + profileName + ".json and closes menu")))
                             .action((screen, opt) -> {
                                 ConfigUtils.loadColorConfig(profileName);
-                                GuiUtils.setScreen(null);
+                                Minecraft.getInstance().setScreenAndShow(null);
                             })
                             .build());
                 }
@@ -463,22 +480,11 @@ public class SRMConfig {
                     .controller(opt -> FloatSliderControllerBuilder.create(opt).range(0.5f, 2.0f).step(0.1f))
                     .build();
 
-            // Rooms - one toggle per room that has a route, grouped by room shape to stay navigable
-            List<Option<Boolean>> roomOptions = new ArrayList<>();
+            // One shared option per room, including the current-room shortcut.
+            Map<String, Option<RoomRouteSettings>> roomOptions = new LinkedHashMap<>();
             var roomsCategory = ConfigCategory.createBuilder()
                     .name(Component.literal("Rooms"))
-                    .option(ButtonOption.createBuilder()
-                            .name(Component.literal("Enable All Rooms"))
-                            .description(OptionDescription.of(Component.literal("Turns the routes back on for every room")))
-                            .text(Component.literal("Enable All"))
-                            .action((screen, opt) -> roomOptions.forEach(roomOption -> roomOption.requestSet(true)))
-                            .build())
-                    .option(ButtonOption.createBuilder()
-                            .name(Component.literal("Disable All Rooms"))
-                            .description(OptionDescription.of(Component.literal("Turns the routes off for every room")))
-                            .text(Component.literal("Disable All"))
-                            .action((screen, opt) -> roomOptions.forEach(roomOption -> roomOption.requestSet(false)))
-                            .build());
+                    .option(LabelOption.create(Component.literal("Default follows General > Route Type. Apply to save room choices.")));
 
             Map<String, List<String>> roomsByShape = RoomToggleUtils.listRoomsByShape();
             if (roomsByShape.isEmpty()) {
@@ -492,13 +498,13 @@ public class SRMConfig {
                             .collapsed(true);
 
                     for (String room : shapeEntry.getValue()) {
-                        Option<Boolean> roomOption = Option.<Boolean>createBuilder()
+                        Option<RoomRouteSettings> roomOption = Option.<RoomRouteSettings>createBuilder()
                                 .name(Component.literal(room))
-                                .description(OptionDescription.of(Component.literal("Shows the route for " + room + " when you enter it")))
-                                .binding(true, () -> RoomToggleUtils.isRoomEnabled(room), v -> RoomToggleUtils.setRoomEnabled(room, v))
-                                .controller(TickBoxControllerBuilder::create)
+                                .description(OptionDescription.of(Component.literal("Enable routes for " + room + " and choose a provider. Default follows the main Route Type. Disabling this room keeps its provider choice.")))
+                                .binding(RoomRouteSettings.DEFAULT, () -> config.roomSettings(room), v -> config.setRoomSettings(room, v))
+                                .customController(RoomRouteController::new)
                                 .build();
-                        roomOptions.add(roomOption);
+                        roomOptions.put(RoomRouteOverrides.normalize(room), roomOption);
                         shapeGroup.option(roomOption);
                     }
 
@@ -506,8 +512,39 @@ public class SRMConfig {
                 }
             }
 
+            if (Main.currentRoom != null) {
+                var currentOption = roomOptions.get(RoomRouteOverrides.normalize(Main.currentRoom.name));
+                if (currentOption != null) {
+                    roomsCategory.option(LabelOption.create(Component.literal("Current room"))).option(currentOption);
+                }
+            }
+            roomsCategory
+                    .option(ButtonOption.createBuilder()
+                            .name(Component.literal("Enable All Rooms"))
+                            .description(OptionDescription.of(Component.literal("Enables every room without changing provider choices")))
+                            .text(Component.literal("Enable All"))
+                            .action((screen, opt) -> roomOptions.values().forEach(roomOption -> roomOption.requestSet(roomOption.pendingValue().withEnabled(true))))
+                            .build())
+                    .option(ButtonOption.createBuilder()
+                            .name(Component.literal("Disable All Rooms"))
+                            .description(OptionDescription.of(Component.literal("Disables every room without changing provider choices")))
+                            .text(Component.literal("Disable All"))
+                            .action((screen, opt) -> roomOptions.values().forEach(roomOption -> roomOption.requestSet(roomOption.pendingValue().withEnabled(false))))
+                            .build())
+                    .option(ButtonOption.createBuilder()
+                            .name(Component.literal("Reset Room Routes to Default"))
+                            .description(OptionDescription.of(Component.literal("Makes every room follow the main Route Type; keeps enabled/disabled choices. Apply to save.")))
+                            .text(Component.literal("Reset Providers"))
+                            .action((screen, opt) -> roomOptions.values().forEach(roomOption -> roomOption.requestSet(roomOption.pendingValue().withProvider(RoomRouteProvider.DEFAULT))))
+                            .build());
+
             return builder
                     .title(Component.literal("Secret Routes Config"))
+                    .save(() -> {
+                        HANDLER.save();
+                        // All bindings have now applied: reload once only if the final provider changed.
+                        if (Main.currentRoom != null) Main.currentRoom.reloadIfRouteTypeChanged();
+                    })
 
                     // General
                     .category(ConfigCategory.createBuilder()
