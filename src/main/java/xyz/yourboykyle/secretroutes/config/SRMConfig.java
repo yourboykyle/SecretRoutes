@@ -480,11 +480,10 @@ public class SRMConfig {
                     .controller(opt -> FloatSliderControllerBuilder.create(opt).range(0.5f, 2.0f).step(0.1f))
                     .build();
 
-            // One shared option per room, including the current-room shortcut.
+            // One option per room, grouped by shape and searchable by name.
             Map<String, Option<RoomRouteSettings>> roomOptions = new LinkedHashMap<>();
             var roomsCategory = ConfigCategory.createBuilder()
-                    .name(Component.literal("Rooms"))
-                    .option(LabelOption.create(Component.literal("Default follows General > Route Type. Apply to save room choices.")));
+                    .name(Component.literal("Rooms"));
 
             Map<String, List<String>> roomsByShape = RoomToggleUtils.listRoomsByShape();
             if (roomsByShape.isEmpty()) {
@@ -512,12 +511,6 @@ public class SRMConfig {
                 }
             }
 
-            if (Main.currentRoom != null) {
-                var currentOption = roomOptions.get(RoomRouteOverrides.normalize(Main.currentRoom.name));
-                if (currentOption != null) {
-                    roomsCategory.option(LabelOption.create(Component.literal("Current room"))).option(currentOption);
-                }
-            }
             roomsCategory
                     .option(ButtonOption.createBuilder()
                             .name(Component.literal("Enable All Rooms"))

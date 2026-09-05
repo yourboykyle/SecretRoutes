@@ -5,6 +5,7 @@ import dev.isxander.yacl3.api.Controller;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.StateManager;
 import dev.isxander.yacl3.gui.controllers.dropdown.EnumDropdownController;
+import dev.isxander.yacl3.gui.controllers.dropdown.EnumDropdownControllerElement;
 import dev.isxander.yacl3.api.controller.TickBoxControllerBuilder;
 import dev.isxander.yacl3.api.utils.Dimension;
 import dev.isxander.yacl3.gui.AbstractWidget;
@@ -73,6 +74,36 @@ public record RoomRouteController(Option<RoomRouteSettings> option) implements C
         @Override
         public boolean isValueValid(String value) {
             return getAllowedValues().stream().anyMatch(label -> label.equalsIgnoreCase(value));
+        }
+
+        String selectedLabel(int index) {
+            var labels = getAllowedValues();
+            return index >= 0 && index < labels.size() ? labels.get(index) : getString();
+        }
+
+        @Override
+        public AbstractWidget provideWidget(YACLScreen screen, Dimension<Integer> dimension) {
+            return new EnumDropdownControllerElement<>(this, screen, dimension) {
+                @Override
+                public void createDropdownWidget() {
+                    super.createDropdownWidget();
+                    dropdownWidget.selectVisibleItem(option().pendingValue().ordinal());
+                }
+
+                @Override
+                public void ensureValidValue() {
+                    if (dropdownWidget != null) {
+                        // Native dropdowns only accept the highlighted entry when typed text is
+                        // invalid. Our current label is valid, so explicitly accept the selection.
+                        inputField = selectedLabel(dropdownWidget.selectedIndex());
+                        caretPos = getDefaultCaretPos();
+                        selectionLength = 0;
+                        matchingValues = computeMatchingValues();
+                    } else {
+                        super.ensureValidValue();
+                    }
+                }
+            };
         }
     }
 

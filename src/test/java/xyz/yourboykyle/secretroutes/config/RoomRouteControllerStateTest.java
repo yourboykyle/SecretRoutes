@@ -12,6 +12,25 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class RoomRouteControllerStateTest {
     @Test
+    void highlightedEntryReplacesAnAlreadyValidProviderLabel() {
+        var saved = new AtomicReference<>(RoomRouteSettings.DEFAULT);
+        var room = option(saved);
+        var dropdown = (RoomRouteController.RoomProviderDropdown)
+                RoomRouteController.controlsFor(room).provider().controller();
+        for (var current : RoomRouteProvider.values()) {
+            room.requestSet(room.pendingValue().withProvider(current));
+            for (var selected : RoomRouteProvider.values()) {
+                assertTrue(dropdown.isValueValid(dropdown.getString()));
+                dropdown.setFromString(dropdown.selectedLabel(selected.ordinal()));
+                assertEquals(selected, room.pendingValue().provider());
+                assertEquals(RoomRouteSettings.DEFAULT, saved.get());
+            }
+        }
+        assertEquals(dropdown.getString(), dropdown.selectedLabel(-1));
+        assertEquals(dropdown.getString(), dropdown.selectedLabel(3));
+    }
+
+    @Test
     void dropdownOffersEveryProviderAndSelectsEachWithoutCommittingUntilApply() {
         var saved = new AtomicReference<>(RoomRouteSettings.DEFAULT);
         var room = option(saved);
