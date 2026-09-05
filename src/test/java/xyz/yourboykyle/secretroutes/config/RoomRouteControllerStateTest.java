@@ -6,10 +6,31 @@ import net.minecraft.network.chat.Component;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class RoomRouteControllerStateTest {
+    @Test
+    void dropdownOffersEveryProviderAndSelectsEachWithoutCommittingUntilApply() {
+        var saved = new AtomicReference<>(RoomRouteSettings.DEFAULT);
+        var room = option(saved);
+        var controls = RoomRouteController.controlsFor(room);
+        var dropdown = (RoomRouteController.RoomProviderDropdown) controls.provider().controller();
+        var labels = List.of("Default", "FlameOfWar", "3ppopka");
+        for (var provider : RoomRouteProvider.values()) {
+            String label = provider.getDisplayName().getString();
+            dropdown.setFromString(label);
+            assertEquals(provider, room.pendingValue().provider());
+            assertEquals(labels, dropdown.getValidEnumConstants(dropdown.getString()).toList());
+            assertTrue(dropdown.isValueValid(label));
+            assertEquals(RoomRouteSettings.DEFAULT, saved.get());
+        }
+        assertFalse(dropdown.isValueValid("missing"));
+        room.applyValue();
+        assertEquals(RoomRouteProvider.THREE_PPOPKA, saved.get().provider());
+    }
+
     @Test
     void childControlsOnlyCommitWhenParentApplies() {
         var saved = new AtomicReference<>(RoomRouteSettings.DEFAULT);

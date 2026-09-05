@@ -4,7 +4,7 @@ package xyz.yourboykyle.secretroutes.config;
 import dev.isxander.yacl3.api.Controller;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.StateManager;
-import dev.isxander.yacl3.api.controller.EnumDropdownControllerBuilder;
+import dev.isxander.yacl3.gui.controllers.dropdown.EnumDropdownController;
 import dev.isxander.yacl3.api.controller.TickBoxControllerBuilder;
 import dev.isxander.yacl3.api.utils.Dimension;
 import dev.isxander.yacl3.gui.AbstractWidget;
@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 /** One YACL option, with native checkbox and dropdown widgets editing its pending value. */
 public record RoomRouteController(Option<RoomRouteSettings> option) implements Controller<RoomRouteSettings> {
@@ -53,9 +54,26 @@ public record RoomRouteController(Option<RoomRouteSettings> option) implements C
         Option<RoomRouteProvider> provider = Option.<RoomRouteProvider>createBuilder()
                 .name(Component.empty())
                 .stateManager(new RoomFieldState<>(room, RoomRouteSettings::provider, RoomRouteSettings::withProvider))
-                .controller(opt -> EnumDropdownControllerBuilder.create(opt).valueFormatter(RoomRouteProvider::getDisplayName))
+                .customController(RoomProviderDropdown::new)
                 .build();
         return new Controls(enabled, provider);
+    }
+
+    static final class RoomProviderDropdown extends EnumDropdownController<RoomRouteProvider> {
+        RoomProviderDropdown(Option<RoomRouteProvider> option) {
+            super(option, RoomRouteProvider::getDisplayName);
+        }
+
+        @Override
+        protected Stream<String> getValidEnumConstants(String value) {
+            // This is a three-choice selector: never filter out providers using the current label.
+            return getAllowedValues().stream();
+        }
+
+        @Override
+        public boolean isValueValid(String value) {
+            return getAllowedValues().stream().anyMatch(label -> label.equalsIgnoreCase(value));
+        }
     }
 
     private static final class RoomFieldState<T> implements StateManager<T> {
