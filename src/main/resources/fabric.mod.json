@@ -26,7 +26,7 @@
     "minecraft": "~${minor_mc_version}",
     "fabricloader": ">=0.15.11",
     "fabric-api": "*",
-    "yet_another_config_lib_v3": ">=3.9.5+26.2-fabric",
+    "yet_another_config_lib_v3": ">=${yacl_version}",
     "hypixel-mod-api": ">=1.0.1"
   },
   "custom": {

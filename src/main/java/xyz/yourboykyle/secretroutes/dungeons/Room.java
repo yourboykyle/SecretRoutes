@@ -23,6 +23,7 @@ package xyz.yourboykyle.secretroutes.dungeons;
 
 import com.google.gson.*;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
@@ -49,6 +50,8 @@ public class Room {
     private List<RouteVariantSelector.RouteVariant> routeVariants = List.of();
     private int selectedRouteIndex = -1;
     private double selectedRouteDistanceSquared = Double.POSITIVE_INFINITY;
+    private long loadRequestId;
+    private SRMConfig.RouteType configuredRouteType;
     int c = 0;
 
     public Room(String roomName) {
@@ -56,18 +59,7 @@ public class Room {
         try {
             name = roomName;
             if (roomName != null) {
-                String filePath = "";
-                if (SRMConfig.get().routeType == SRMConfig.RouteType.ROUTE_FOW) {
-                    String fileName = SRMConfig.get().routeFOWFileName;
-                    filePath = Main.ROUTES_PATH + File.separator + (!fileName.equals("") ? fileName : "fowroutes.json");
-                } else if (SRMConfig.get().routeType == SRMConfig.RouteType.ROUTE_3ppopka) {
-                    String fileName = SRMConfig.get().route3ppopkaFileName;
-                    filePath = Main.ROUTES_PATH + File.separator + (!fileName.equals("") ? fileName : "3ppopkaroutes.json");
-                }
-
-                if (!filePath.isEmpty()) {
-                    getData(filePath);
-                }
+                getData(configuredRoutePath());
             } else {
                 currentSecretRoute = null;
             }
@@ -81,6 +73,7 @@ public class Room {
         try {
             name = roomName;
             if (roomName != null) {
+                configuredRouteType = SRMConfig.get().effectiveRouteType(name);
                 getData(filePath);
             } else {
                 currentSecretRoute = null;
@@ -229,7 +222,48 @@ public class Room {
         }
     }
 
+    private String configuredRoutePath() {
+        configuredRouteType = SRMConfig.get().effectiveRouteType(name);
+        boolean fow = configuredRouteType != SRMConfig.RouteType.ROUTE_3ppopka;
+        String fileName = fow ? SRMConfig.get().routeFOWFileName : SRMConfig.get().route3ppopkaFileName;
+        if (fileName == null || fileName.isEmpty()) fileName = fow ? "fowroutes.json" : "3ppopkaroutes.json";
+        return Main.ROUTES_PATH + File.separator + fileName;
+    }
+
+    /** Called on the client thread after the provider setting is committed. */
+    public void reloadIfRouteTypeChanged() {
+        if (configuredRouteType != SRMConfig.get().effectiveRouteType(name)) reloadConfiguredRoute();
+    }
+
+    public void reloadConfiguredRoute() {
+        if (Main.currentRoom != this || name == null || !LocationUtils.isInDungeons()) return;
+        clearRoute();
+        PBUtils.pbIsValid = false;
+        PBUtils.startTime = 0;
+        SecretUtils.clearEtherwarpTargetTracking();
+        EtherwarpAimAssist.reset();
+        getData(configuredRoutePath(), true);
+    }
+
+    private void clearRoute() {
+        routeVariants = List.of();
+        selectedRouteIndex = -1;
+        selectedRouteDistanceSquared = Double.POSITIVE_INFINITY;
+        currentSecretIndex = 0;
+        currentSecretRoute = null;
+        currentSecretWaypoints = null;
+        c = 0;
+    }
+
     public void getData(String filePath) {
+        getData(filePath, false);
+    }
+
+    private void getData(String filePath, boolean notifyMissing) {
+        long requestId = ++loadRequestId;
+        Minecraft client = Minecraft.getInstance();
+        ClientLevel level = client.level;
+        String roomName = name;
         new Thread(() -> {
             try {
                 Gson gson = new GsonBuilder().create();
@@ -239,12 +273,31 @@ public class Room {
                 }
 
                 List<RouteVariantSelector.RouteVariant> loadedVariants =
-                        RouteVariantSelector.parseVariants(rawData, name);
-                Minecraft.getInstance().execute(() -> installLoadedVariants(loadedVariants));
+                        RouteVariantSelector.parseVariants(rawData, roomName);
+                client.execute(() -> {
+                    if (!isCurrentLoad(requestId, level)) return;
+                    installLoadedVariants(loadedVariants);
+                    if (notifyMissing && loadedVariants.isEmpty()) {
+                        ChatUtils.sendChatMessage("§eNo route for " + roomName + " in " + new File(filePath).getName() + ".");
+                    }
+                });
             } catch (Exception e) {
-                LogUtils.error(e);
+                client.execute(() -> {
+                    if (!isCurrentLoad(requestId, level)) return;
+                    LogUtils.error(e);
+                    if (notifyMissing) {
+                        ChatUtils.sendChatMessage("§cCould not load " + new File(filePath).getName() + ". Check the route file and try switching again.");
+                    }
+                });
             }
         }, "SecretRoutes-RouteLoader").start();
+    }
+
+    private boolean isCurrentLoad(long requestId, ClientLevel level) {
+        Minecraft client = Minecraft.getInstance();
+        return requestId == loadRequestId && Main.currentRoom == this
+                && level != null && client.level == level && client.player != null
+                && LocationUtils.isInDungeons();
     }
 
     private void installLoadedVariants(List<RouteVariantSelector.RouteVariant> loadedVariants) {
@@ -256,10 +309,7 @@ public class Room {
 
         routeVariants = loadedVariants;
         if (routeVariants.isEmpty()) {
-            selectedRouteIndex = -1;
-            selectedRouteDistanceSquared = Double.POSITIVE_INFINITY;
-            currentSecretRoute = null;
-            currentSecretWaypoints = null;
+            clearRoute();
             return;
         }
 

@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -78,12 +79,23 @@ public class RoomToggleUtils {
 
         TreeSet<String> rooms = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
 
-        for (String fileName : new String[]{"fowroutes.json", "3ppopkaroutes.json"}) {
+        var files = new LinkedHashSet<>(List.of("fowroutes.json", "3ppopkaroutes.json"));
+        SRMConfig config = SRMConfig.get();
+        if (config.routeFOWFileName != null && !config.routeFOWFileName.isBlank()) files.add(config.routeFOWFileName);
+        if (config.route3ppopkaFileName != null && !config.route3ppopkaFileName.isBlank()) files.add(config.route3ppopkaFileName);
+        for (String fileName : files) {
             for (String key : readRouteKeys(new File(Main.ROUTES_PATH, fileName))) {
                 if (key.startsWith("#") || key.equals("Version")) continue;
 
                 String roomName = baseRoomName(key);
                 if (!roomName.isEmpty() && !roomName.equalsIgnoreCase(BOSS_ROOM)) rooms.add(roomName);
+            }
+        }
+
+        // Keep saved overrides editable/resettable even if the corresponding file was removed.
+        if (config.roomRouteTypes != null) {
+            for (String room : config.roomRouteTypes.keySet()) {
+                if (room != null && !room.isEmpty() && !room.equalsIgnoreCase(BOSS_ROOM)) rooms.add(baseRoomName(room));
             }
         }
 
