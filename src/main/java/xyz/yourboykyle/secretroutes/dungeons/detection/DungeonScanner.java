@@ -79,8 +79,8 @@ public class DungeonScanner {
             //? if >=26.2 {
             Blocks.DYED_TERRACOTTA.blue();
             //?} elif <=26.1.2 {
-            //Blocks.BLUE_TERRACOTTA;
-            //?}
+            /*Blocks.BLUE_TERRACOTTA;
+            *///?}
 
     private static final int BOSS_MIN_X = -7;
     private static final int BOSS_MAX_X = 134;
