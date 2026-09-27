@@ -79,8 +79,8 @@ public class BlockUtils {
                 //? if >=26.2 {
                 mc.gameRenderer.mainCamera().position();
                 //?} elif <=26.1.2 {
-                //mc.gameRenderer.getMainCamera().position();
-                //?}
+                /*mc.gameRenderer.getMainCamera().position();
+                *///?}
 
         int playerX = (int) pos.x;
         int playerY = (int) pos.y;

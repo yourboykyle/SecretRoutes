@@ -21,13 +21,20 @@
 
 package xyz.yourboykyle.secretroutes.dungeons.rendering;
 
-//? if >=26.2
+//? if =26.2
 import com.mojang.blaze3d.PrimitiveTopology;
 
 //? if <=26.1.2
 //import com.mojang.blaze3d.vertex.VertexFormat;
 
+//? if <= 26.2
 import com.mojang.blaze3d.pipeline.RenderPipeline;
+
+//? if >= 26.3 {
+ /*import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
+ import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+*///? }
+
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -66,8 +73,8 @@ public class RenderingBackend {
                     .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR)
                     .withPrimitiveTopology(PrimitiveTopology.QUADS)
                     //?} elif <=26.1.2 {
-                    //.withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
-                    //?}
+                    /*.withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
+                    *///?}
                     .withDepthStencilState(Optional.empty())
                     .withCull(false)
                     .build()
@@ -84,8 +91,8 @@ public class RenderingBackend {
                     .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR)
                     .withPrimitiveTopology(PrimitiveTopology.QUADS)
                     //?} elif <=26.1.2 {
-                    //.withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
-                    //?}
+                    /*.withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
+                    *///?}
                     .withCull(false)
                     .build()
     );
@@ -101,8 +108,8 @@ public class RenderingBackend {
                     .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH)
                     .withPrimitiveTopology(PrimitiveTopology.LINES)
                     //?} elif <=26.1.2 {
-                    //.withVertexFormat(DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH, VertexFormat.Mode.LINES)
-                    //?}
+                    /*.withVertexFormat(DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH, VertexFormat.Mode.LINES)
+                    *///?}
                     .withDepthStencilState(Optional.empty())
                     .build()
     );
@@ -120,6 +127,7 @@ public class RenderingBackend {
     private static final Vector3f SCRATCH_LINE_DIR = new Vector3f();
     private static final Vector3f SCRATCH_CAM_DIR = new Vector3f();
     private static final Vector3f SCRATCH_WIDTH_DIR = new Vector3f();
+    private static final Matrix4f SCRATCH_ROTATION_MAT = new Matrix4f();
     private static final BoxMeshCache BOX_MESH_CACHE = new BoxMeshCache();
 
     public static void register() {
@@ -146,8 +154,8 @@ public class RenderingBackend {
                 //? if >=26.2 {
                 mc.gameRenderer.mainCamera();
                 //?} elif <=26.1.2 {
-                //mc.gameRenderer.getMainCamera();
-                //?}
+                /*mc.gameRenderer.getMainCamera();
+                *///?}
         Vec3 camPos = camera.position();
         OrderedSubmitNodeCollector collector = context.submitNodeCollector();
 
@@ -195,12 +203,12 @@ public class RenderingBackend {
 
         if (!worldTexts.isEmpty()) {
             Font font = Minecraft.getInstance().font;
-            Quaternionf cameraRotation = camera.rotation();
+            SCRATCH_ROTATION_MAT.identity().rotate(camera.rotation());
 
             for (RenderTypes.WorldText wt : worldTexts) {
                 poseStack.pushPose();
                 poseStack.translate(wt.position.x - camPos.x, wt.position.y - camPos.y, wt.position.z - camPos.z);
-                poseStack.mulPose(cameraRotation);
+                poseStack.mulPose(SCRATCH_ROTATION_MAT);
                 poseStack.scale(0.025f, -0.025f, 0.025f);
 
                 Font.DisplayMode displayMode = wt.throughWalls ? Font.DisplayMode.SEE_THROUGH : Font.DisplayMode.NORMAL;
