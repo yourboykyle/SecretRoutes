@@ -129,7 +129,14 @@ public class OnPlayerInteract {
 
                         // Stuff so items from chests don't count as secrets (because they're not)
                         OnItemPickedUp.itemSecretOnCooldown = true;
-                        SchedulerUtils.schedule(2000, () -> OnItemPickedUp.itemSecretOnCooldown = false);
+                        Thread.startVirtualThread(() -> {
+                            try {
+                                Thread.sleep(2000);
+                                OnItemPickedUp.itemSecretOnCooldown = false;
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
                     }
                 }
             }
