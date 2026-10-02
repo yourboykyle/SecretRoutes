@@ -97,6 +97,7 @@ public class FileUtils {
             Path targetFilePath = targetDirectory.resolve(sourceFile.getName());
 
             Files.copy(sourceFile.toPath(), targetFilePath, StandardCopyOption.REPLACE_EXISTING);
+            RouteFileCache.SHARED.invalidate(targetFilePath);
         } catch (IOException e) {
             LogUtils.error(e);
         }
@@ -121,6 +122,7 @@ public class FileUtils {
 
             // Copy the target file to the new location with the given name
             Files.copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+            RouteFileCache.SHARED.invalidate(destinationPath);
             System.out.println("File copied successfully to: " + destinationPath);
         } catch (IOException e) {
             e.printStackTrace();

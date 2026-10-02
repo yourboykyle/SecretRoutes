@@ -21,9 +21,6 @@
 
 package xyz.yourboykyle.secretroutes.commands;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -35,10 +32,11 @@ import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.utils.LogUtils;
 import xyz.yourboykyle.secretroutes.dungeons.Room;
 import xyz.yourboykyle.secretroutes.utils.RoomDirectionUtils;
+import xyz.yourboykyle.secretroutes.utils.RouteFileCache;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Path;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.literal;
 
@@ -57,13 +55,13 @@ public class LoadRoute {
         String filePath = System.getProperty("user.home") + File.separator + "Downloads" + File.separator + "routes.json";
 
         try {
-            Gson gson = new GsonBuilder().create();
-            FileReader reader = new FileReader(filePath);
-
-            gson.fromJson(reader, JsonObject.class);
-            reader.close();
-
-            Main.currentRoom = new Room(RoomDirectionUtils.roomName(), filePath);
+            String roomName = RoomDirectionUtils.roomName();
+            Path routeFile = Path.of(filePath);
+            RouteFileCache.SHARED.invalidate(routeFile);
+            RouteFileCache.SHARED.roomData(routeFile, roomName);
+            Room replacement = new Room(roomName, filePath);
+            replacement.inheritPersonalBestVisit(Main.currentRoom);
+            Main.currentRoom = replacement;
 
             context.getSource().sendFeedback(
                     Component.literal("Loaded route for room: " + RoomDirectionUtils.roomName()).withStyle(ChatFormatting.GREEN)
