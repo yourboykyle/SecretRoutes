@@ -34,12 +34,19 @@ import xyz.yourboykyle.secretroutes.events.OnSecretComplete;
 import xyz.yourboykyle.secretroutes.utils.*;
 
 import java.io.File;
-import java.io.FileReader;
+import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static xyz.yourboykyle.secretroutes.utils.ParticleUtils.getParticleFromType;
 
 public class Room {
+    private static final ExecutorService ROUTE_LOADER = Executors.newSingleThreadExecutor(task -> {
+        Thread thread = new Thread(task, "SecretRoutes-RouteLoader");
+        thread.setDaemon(true);
+        return thread;
+    });
     public enum WAYPOINT_TYPES { LOCATIONS, ETHERWARPS, MINES, INTERACTS, TNTS, ENDERPEARLS, BONZO_STAFFS }
     public enum SECRET_TYPES { INTERACT, ITEM, BAT, EXITROUTE }
 
@@ -52,6 +59,7 @@ public class Room {
     private double selectedRouteDistanceSquared = Double.POSITIVE_INFINITY;
     private long loadRequestId;
     private SRMConfig.RouteType configuredRouteType;
+    private RouteAttempt personalBestAttempt;
     int c = 0;
 
     public Room(String roomName) {
@@ -84,7 +92,7 @@ public class Room {
     }
 
     public void lastSecretKeybind() {
-        PBUtils.pbIsValid = false;
+        invalidatePersonalBest();
         if (currentSecretIndex > 0) currentSecretIndex--;
         updateWaypoints();
     }
@@ -96,7 +104,7 @@ public class Room {
     }
 
     public void nextSecretKeybind() {
-        PBUtils.pbIsValid = false;
+        invalidatePersonalBest();
         if (currentSecretRoute != null && currentSecretIndex < currentSecretRoute.size() - 1) {
             currentSecretIndex++;
         }
@@ -115,7 +123,7 @@ public class Room {
         if (routeVariants.size() <= 1) return false;
 
         int newIndex = RouteVariantSelector.cycleIndex(selectedRouteIndex, routeVariants.size(), direction);
-        return selectRoute(newIndex, true);
+        return selectRoute(newIndex);
     }
 
     public int getSelectedRouteIndex() {
@@ -131,7 +139,7 @@ public class Room {
         return routeVariants.get(selectedRouteIndex).jsonKey() + " (" + (selectedRouteIndex + 1) + "/" + routeVariants.size() + ")";
     }
 
-    private boolean selectRoute(int routeIndex, boolean manual) {
+    private boolean selectRoute(int routeIndex) {
         if (routeIndex < 0 || routeIndex >= routeVariants.size()) return false;
 
         RouteVariantSelector.RouteVariant route = routeVariants.get(routeIndex);
@@ -141,8 +149,38 @@ public class Room {
         updateWaypoints();
         SecretUtils.clearEtherwarpTargetTracking();
 
-        if (manual) PBUtils.pbIsValid = false;
+        if (personalBestAttempt != null) personalBestAttempt.bindRoute(currentSecretRoute);
         return true;
+    }
+
+    public void startPersonalBestVisit() {
+        personalBestAttempt = name != null && !"f7boss".equals(name) && SRMConfig.get().trackPersonalBests
+                ? new RouteAttempt(System::nanoTime) : null;
+        if (personalBestAttempt != null) personalBestAttempt.bindRoute(currentSecretRoute);
+    }
+
+    public void invalidatePersonalBest() {
+        if (personalBestAttempt != null) personalBestAttempt.invalidate();
+    }
+
+    /** Loading a custom route is not a new room entry. Keep the visit's original clock. */
+    public void inheritPersonalBestVisit(Room previous) {
+        if (previous != null && Objects.equals(name, previous.name)) {
+            personalBestAttempt = previous.personalBestAttempt;
+            previous.personalBestAttempt = null;
+        }
+    }
+
+    public void recordPersonalBestStep() {
+        if (personalBestAttempt == null) return;
+        if (!SRMConfig.get().trackPersonalBests) {
+            invalidatePersonalBest();
+            return;
+        }
+        OptionalLong completed = personalBestAttempt.completeStep(currentSecretIndex);
+        if (completed.isPresent()) {
+            PBUtils.completeRoute(name, completed.getAsLong(), personalBestAttempt.splitsMillis());
+        }
     }
 
     public SECRET_TYPES getSecretType() {
@@ -238,11 +276,11 @@ public class Room {
     public void reloadConfiguredRoute() {
         if (Main.currentRoom != this || name == null || !LocationUtils.isInDungeons()) return;
         clearRoute();
-        PBUtils.pbIsValid = false;
-        PBUtils.startTime = 0;
         SecretUtils.clearEtherwarpTargetTracking();
         EtherwarpAimAssist.reset();
-        getData(configuredRoutePath(), true);
+        String path = configuredRoutePath();
+        RouteFileCache.SHARED.invalidate(Path.of(path));
+        getData(path, true);
     }
 
     private void clearRoute() {
@@ -264,14 +302,9 @@ public class Room {
         Minecraft client = Minecraft.getInstance();
         ClientLevel level = client.level;
         String roomName = name;
-        new Thread(() -> {
+        ROUTE_LOADER.execute(() -> {
             try {
-                Gson gson = new GsonBuilder().create();
-                JsonObject rawData;
-                try (FileReader reader = new FileReader(filePath)) {
-                    rawData = gson.fromJson(reader, JsonObject.class);
-                }
-
+                JsonObject rawData = RouteFileCache.SHARED.roomData(Path.of(filePath), roomName);
                 List<RouteVariantSelector.RouteVariant> loadedVariants =
                         RouteVariantSelector.parseVariants(rawData, roomName);
                 client.execute(() -> {
@@ -290,7 +323,7 @@ public class Room {
                     }
                 });
             }
-        }, "SecretRoutes-RouteLoader").start();
+        });
     }
 
     private boolean isCurrentLoad(long requestId, ClientLevel level) {
@@ -329,7 +362,7 @@ public class Room {
         if (selection == null) return;
 
         selectedRouteDistanceSquared = selection.distanceSquared();
-        selectRoute(selection.index(), false);
+        selectRoute(selection.index());
         LogUtils.info("Selected route " + getSelectedRouteStatus()
                 + " at distance " + String.format(Locale.ROOT, "%.2f", Math.sqrt(selectedRouteDistanceSquared)));
     }

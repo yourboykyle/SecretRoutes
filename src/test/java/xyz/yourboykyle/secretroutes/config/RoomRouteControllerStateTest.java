@@ -2,50 +2,31 @@
 package xyz.yourboykyle.secretroutes.config;
 
 import dev.isxander.yacl3.api.Option;
+import dev.isxander.yacl3.gui.controllers.cycling.EnumController;
 import net.minecraft.network.chat.Component;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class RoomRouteControllerStateTest {
     @Test
-    void highlightedEntryReplacesAnAlreadyValidProviderLabel() {
+    void cyclingProviderSelectsAllChoicesWithoutCommittingUntilApply() {
         var saved = new AtomicReference<>(RoomRouteSettings.DEFAULT);
         var room = option(saved);
-        var dropdown = (RoomRouteController.RoomProviderDropdown)
+        var cycling = (EnumController<RoomRouteProvider>)
                 RoomRouteController.controlsFor(room).provider().controller();
-        for (var current : RoomRouteProvider.values()) {
-            room.requestSet(room.pendingValue().withProvider(current));
-            for (var selected : RoomRouteProvider.values()) {
-                assertTrue(dropdown.isValueValid(dropdown.getString()));
-                dropdown.setFromString(dropdown.selectedLabel(selected.ordinal()));
-                assertEquals(selected, room.pendingValue().provider());
-                assertEquals(RoomRouteSettings.DEFAULT, saved.get());
-            }
-        }
-        assertEquals(dropdown.getString(), dropdown.selectedLabel(-1));
-        assertEquals(dropdown.getString(), dropdown.selectedLabel(3));
-    }
-
-    @Test
-    void dropdownOffersEveryProviderAndSelectsEachWithoutCommittingUntilApply() {
-        var saved = new AtomicReference<>(RoomRouteSettings.DEFAULT);
-        var room = option(saved);
-        var controls = RoomRouteController.controlsFor(room);
-        var dropdown = (RoomRouteController.RoomProviderDropdown) controls.provider().controller();
-        var labels = List.of("Default", "FlameOfWar", "3ppopka");
-        for (var provider : RoomRouteProvider.values()) {
-            String label = provider.getDisplayName().getString();
-            dropdown.setFromString(label);
-            assertEquals(provider, room.pendingValue().provider());
-            assertEquals(labels, dropdown.getValidEnumConstants(dropdown.getString()).toList());
-            assertTrue(dropdown.isValueValid(label));
+        assertEquals(3, cycling.getCycleLength());
+        assertEquals("Default", cycling.formatValue().getString());
+        for (var expected : new RoomRouteProvider[]{
+                RoomRouteProvider.FLAME_OF_WAR, RoomRouteProvider.THREE_PPOPKA, RoomRouteProvider.DEFAULT}) {
+            cycling.setPendingValue((cycling.getPendingValue() + 1) % cycling.getCycleLength());
+            assertEquals(expected, room.pendingValue().provider());
+            assertEquals(expected.getDisplayName(), cycling.formatValue());
             assertEquals(RoomRouteSettings.DEFAULT, saved.get());
         }
-        assertFalse(dropdown.isValueValid("missing"));
+        cycling.setPendingValue(RoomRouteProvider.THREE_PPOPKA.ordinal());
         room.applyValue();
         assertEquals(RoomRouteProvider.THREE_PPOPKA, saved.get().provider());
     }

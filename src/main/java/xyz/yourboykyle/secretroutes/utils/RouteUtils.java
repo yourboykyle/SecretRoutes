@@ -7,9 +7,7 @@ import xyz.yourboykyle.secretroutes.Main;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.InputStreamReader;
-import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -54,9 +52,8 @@ public class RouteUtils {
                             LogUtils.info("Updating " + displayName + " from version " +
                                     (localVersion == null ? "None" : localVersion) + " to " + remoteVersion);
 
-                            try (Writer writer = new FileWriter(localFile)) {
-                                GSON.toJson(remoteData, writer);
-                            }
+                            JsonFileUtils.writeAtomically(localFile.toPath(), remoteData);
+                            RouteFileCache.SHARED.invalidate(localFile.toPath());
                         } else {
                             LogUtils.info(displayName + " is up to date (Version: " + localVersion + ").");
                         }

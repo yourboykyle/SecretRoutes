@@ -155,11 +155,15 @@ public class DungeonScanner {
         long now = System.nanoTime();
 
         if (currentRoom != null && hasComponent(currentRoom, roomCentre)) {
+            if (visualGraceDeadlineNanos >= 0L && Main.currentRoom != null) {
+                Main.currentRoom.startPersonalBestVisit();
+            }
             clearTransitionState();
             return;
         }
 
         if (currentRoom != null && visualGraceDeadlineNanos < 0L) {
+            if (Main.currentRoom != null) Main.currentRoom.invalidatePersonalBest();
             visualGraceDeadlineNanos = now + ROOM_VISUAL_GRACE_NANOS;
         }
 
@@ -260,6 +264,7 @@ public class DungeonScanner {
     }
 
     private static void invalidateActiveRoom() {
+        if (Main.currentRoom != null) Main.currentRoom.invalidatePersonalBest();
         currentRoom = null;
         Main.currentRoom = new Room(null);
         SecretUtils.secrets = null;
@@ -426,6 +431,7 @@ public class DungeonScanner {
     }
 
     private static void reset() {
+        if (Main.currentRoom != null) Main.currentRoom.invalidatePersonalBest();
         currentRoom = null;
         passedRooms.clear();
         Main.currentRoom = null;
