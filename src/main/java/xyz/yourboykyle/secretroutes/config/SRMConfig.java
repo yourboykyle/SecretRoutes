@@ -76,6 +76,8 @@ public class SRMConfig {
     @SerialEntry
     public boolean trackPersonalBests = true;
     @SerialEntry
+    public boolean showSecretSplits = false;
+    @SerialEntry
     public boolean sendChatMessages = true;
 
     // Rooms - only disabled rooms are stored, so rooms are enabled by default
@@ -702,8 +704,14 @@ public class SRMConfig {
                                     .collapsed(true)
                                     .option(Option.<Boolean>createBuilder()
                                             .name(Component.literal("Track Personal Bests"))
-                                            .description(OptionDescription.of(Component.literal("Tracks your fastest completion time for each room")))
+                                            .description(OptionDescription.of(Component.literal("Tracks your fastest completion time for each room. Starts the timer at room entry")))
                                             .binding(true, () -> config.trackPersonalBests, v -> config.trackPersonalBests = v)
+                                            .controller(TickBoxControllerBuilder::create)
+                                            .build())
+                                    .option(Option.<Boolean>createBuilder()
+                                            .name(Component.literal("Show Secret Splits"))
+                                            .description(OptionDescription.of(Component.literal("Shows each secret's split time in chat after completing a valid route. The first split starts at room entry")))
+                                            .binding(false, () -> config.showSecretSplits, v -> config.showSecretSplits = v)
                                             .controller(TickBoxControllerBuilder::create)
                                             .build())
                                     .option(Option.<Boolean>createBuilder()
