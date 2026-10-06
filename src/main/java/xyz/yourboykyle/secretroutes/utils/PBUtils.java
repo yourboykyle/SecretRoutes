@@ -21,13 +21,11 @@
 
 package xyz.yourboykyle.secretroutes.utils;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import net.minecraft.ChatFormatting;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 
-import java.io.*;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,97 +33,73 @@ import static xyz.yourboykyle.secretroutes.Main.CONFIG_FOLDER_PATH;
 import static xyz.yourboykyle.secretroutes.utils.ChatUtils.sendChatMessage;
 
 public class PBUtils {
-    public static JsonObject personalBests = new JsonObject();
-    public static String filePath = CONFIG_FOLDER_PATH + File.separator + "personal_bests.json";
-
-    // Stuff for tracking personal bests
-    public static long startTime = System.currentTimeMillis();
-    public static boolean pbIsValid = false; // If a person uses one of the prev or next secret keybinds, its invalid. This it to prevent people from spamming the keybind until the last secret and clicking it legit for super fast PBs.
+    private static PersonalBestStore store;
 
     // Load the PB data from the personal_bests.json file
     public static boolean loadPBData() {
-        if (!new File(filePath).exists()) {
-            sendChatMessage(ChatFormatting.RED + "Personal bests file not found.");
-            return false;
-        }
-        Gson gson = new GsonBuilder().create();
-        FileReader reader = null;
+        store = new PersonalBestStore(Path.of(CONFIG_FOLDER_PATH, "personal_bests.json"));
         try {
-            reader = new FileReader(filePath);
-            personalBests = gson.fromJson(reader, JsonObject.class);
-        } catch (FileNotFoundException e) {
-            //This should never happen...
+            store.load();
+            if (store.backupPath() != null) {
+                LogUtils.info("Previous PB data preserved at " + store.backupPath());
+                sendChatMessage("§ePrevious PB data was backed up. Room-entry timing uses fresh records.");
+            }
+            return true;
+        } catch (IOException e) {
             LogUtils.error(e);
-            sendChatMessage("§4 THIS SHOULD NEVER HAVE HAPPENED... (ConfigUtils 123)");
+            sendChatMessage("§cCould not load personal bests. Existing records have been preserved.");
             return false;
         }
-
-        return true;
     }
 
     public static void setPersonalBest(String roomName, long timeInMs) {
         if (!SRMConfig.get().trackPersonalBests) return;
-        // Add the data to the json object, in the form of 2 strings. One being the room name, the other being the time formatted as a string, like: 364d 1h 10m 30.524s
-        personalBests.addProperty(roomName, formatTime(timeInMs));
-        writePBData();
+        try {
+            if (store != null) store.record(roomName, timeInMs);
+        } catch (IOException e) {
+            LogUtils.error(e);
+            sendChatMessage("§cCould not save your personal best. Existing records have been preserved.");
+        }
     }
 
     public static void removePersonalBest(String roomName) {
         if (!SRMConfig.get().trackPersonalBests) return;
-        if (personalBests.has(roomName)) {
-            personalBests.remove(roomName);
-            writePBData();
+        try {
+            if (store != null) store.remove(roomName);
+        } catch (IOException e) {
+            LogUtils.error(e);
         }
     }
 
     public static long getPBForRoom(String roomName) {
-        if (personalBests.has(roomName)) {
-            String formattedTime = personalBests.get(roomName).getAsString();
-            return parseTimeToMillis(formattedTime); // Convert formatted time back to milliseconds
-        }
-        return -1; // Return -1 if no personal best exists for the given room
+        return store == null ? -1L : store.get(roomName);
     }
 
-    public static void writePBData() {
-        if (!SRMConfig.get().trackPersonalBests) return;
-        try (FileWriter writer = new FileWriter(filePath)) {
-            writer.write(personalBests.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void startRoute() {
-        if (!SRMConfig.get().trackPersonalBests) return;
-        startTime = System.currentTimeMillis();
-    }
-
-    public static void stopRoute() {
-        if (!SRMConfig.get().trackPersonalBests) return;
-
-        if (!pbIsValid) {
-            ChatUtils.sendVerboseMessage("PB is invalid, not saving.", "Personal Bests");
-            return;
-        }
-
-        long time = System.currentTimeMillis() - startTime;
-        startTime = 0;
-        // Check if it's a PB
-        long pbTime = getPBForRoom(RoomDirectionUtils.roomName());
-        ChatUtils.sendVerboseMessage("PB for " + RoomDirectionUtils.roomName() + ": " + (pbTime == -1 ? "N/A" : formatTime(pbTime)), "Personal Bests");
-        if (pbTime == -1 || time < pbTime) {
-            // New PB
-            if (SRMConfig.get().sendChatMessages) {
-                sendChatMessage("§rNew personal best for " + RoomDirectionUtils.roomName() + ": §a" + formatTime(time));
+    public static void completeRoute(String roomName, long time, List<Long> splits) {
+        if (!SRMConfig.get().trackPersonalBests || store == null) return;
+        try {
+            if (store.record(roomName, time) && SRMConfig.get().sendChatMessages) {
+                sendChatMessage("§rNew personal best for " + roomName + ": §a" + formatTime(time));
             }
-            setPersonalBest(RoomDirectionUtils.roomName(), time);
+        } catch (IOException e) {
+            LogUtils.error(e);
+            sendChatMessage("§cCould not save your personal best. Existing records have been preserved.");
         }
-
-        PBUtils.pbIsValid = false;
-        ChatUtils.sendVerboseMessage("Time for " + RoomDirectionUtils.roomName() + ": §a" + formatTime(time), "Personal Bests");
+        ChatUtils.sendVerboseMessage("Time for " + roomName + ": §a" + formatTime(time), "Personal Bests");
+        if (SRMConfig.get().showSecretSplits) {
+            StringBuilder summary = new StringBuilder("§rSecret splits for " + roomName + ": ");
+            long previous = 0;
+            for (int i = 0; i < splits.size(); i++) {
+                if (i > 0) summary.append(", ");
+                summary.append(i + 1).append(": §a").append(formatTime(splits.get(i) - previous)).append("§r");
+                previous = splits.get(i);
+            }
+            sendChatMessage(summary.toString());
+        }
     }
 
     public static String formatTime(long millis) {
+        if (millis == 0) return "0.000s";
         long days = millis / (1000 * 60 * 60 * 24);
         millis %= (1000 * 60 * 60 * 24);
         long hours = millis / (1000 * 60 * 60);

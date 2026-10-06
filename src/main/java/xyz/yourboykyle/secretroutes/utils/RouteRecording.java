@@ -406,6 +406,7 @@ public class RouteRecording {
             writer.write(prettyPrint(allSecretRoutes));
             writer.flush();
             writer.close();
+            RouteFileCache.SHARED.invalidate(file.toPath());
             sendChatMessage(ChatFormatting.DARK_GREEN + "Exported routes to " + filePath + File.separator + fileName);
         } catch (IOException e) {
             LogUtils.error(e);

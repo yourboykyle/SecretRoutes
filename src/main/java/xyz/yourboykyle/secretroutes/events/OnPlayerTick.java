@@ -60,6 +60,7 @@ public class OnPlayerTick {
         }*/
 
             boolean playerInCurrentRoom = DungeonScanner.isPlayerInCurrentRoom();
+            if (!SRMConfig.get().trackPersonalBests) room.invalidatePersonalBest();
 
             // Keep the previous route's particle visuals during the room-transition grace.
             if (SRMConfig.get().modEnabled && DungeonScanner.shouldRenderCurrentRoom()) {

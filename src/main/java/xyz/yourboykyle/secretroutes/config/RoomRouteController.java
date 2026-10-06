@@ -4,8 +4,7 @@ package xyz.yourboykyle.secretroutes.config;
 import dev.isxander.yacl3.api.Controller;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.StateManager;
-import dev.isxander.yacl3.gui.controllers.dropdown.EnumDropdownController;
-import dev.isxander.yacl3.gui.controllers.dropdown.EnumDropdownControllerElement;
+import dev.isxander.yacl3.api.controller.EnumControllerBuilder;
 import dev.isxander.yacl3.api.controller.TickBoxControllerBuilder;
 import dev.isxander.yacl3.api.utils.Dimension;
 import dev.isxander.yacl3.gui.AbstractWidget;
@@ -28,9 +27,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
-/** One YACL option, with native checkbox and dropdown widgets editing its pending value. */
+/** One YACL option, with native checkbox and cycling widgets editing its pending value. */
 public record RoomRouteController(Option<RoomRouteSettings> option) implements Controller<RoomRouteSettings> {
     @Override
     public Component formatValue() {
@@ -55,56 +53,9 @@ public record RoomRouteController(Option<RoomRouteSettings> option) implements C
         Option<RoomRouteProvider> provider = Option.<RoomRouteProvider>createBuilder()
                 .name(Component.empty())
                 .stateManager(new RoomFieldState<>(room, RoomRouteSettings::provider, RoomRouteSettings::withProvider))
-                .customController(RoomProviderDropdown::new)
+                .controller(opt -> EnumControllerBuilder.create(opt).enumClass(RoomRouteProvider.class))
                 .build();
         return new Controls(enabled, provider);
-    }
-
-    static final class RoomProviderDropdown extends EnumDropdownController<RoomRouteProvider> {
-        RoomProviderDropdown(Option<RoomRouteProvider> option) {
-            super(option, RoomRouteProvider::getDisplayName);
-        }
-
-        @Override
-        protected Stream<String> getValidEnumConstants(String value) {
-            // This is a three-choice selector: never filter out providers using the current label.
-            return getAllowedValues().stream();
-        }
-
-        @Override
-        public boolean isValueValid(String value) {
-            return getAllowedValues().stream().anyMatch(label -> label.equalsIgnoreCase(value));
-        }
-
-        String selectedLabel(int index) {
-            var labels = getAllowedValues();
-            return index >= 0 && index < labels.size() ? labels.get(index) : getString();
-        }
-
-        @Override
-        public AbstractWidget provideWidget(YACLScreen screen, Dimension<Integer> dimension) {
-            return new EnumDropdownControllerElement<>(this, screen, dimension) {
-                @Override
-                public void createDropdownWidget() {
-                    super.createDropdownWidget();
-                    dropdownWidget.selectVisibleItem(option().pendingValue().ordinal());
-                }
-
-                @Override
-                public void ensureValidValue() {
-                    if (dropdownWidget != null) {
-                        // Native dropdowns only accept the highlighted entry when typed text is
-                        // invalid. Our current label is valid, so explicitly accept the selection.
-                        inputField = selectedLabel(dropdownWidget.selectedIndex());
-                        caretPos = getDefaultCaretPos();
-                        selectionLength = 0;
-                        matchingValues = computeMatchingValues();
-                    } else {
-                        super.ensureValidValue();
-                    }
-                }
-            };
-        }
     }
 
     private static final class RoomFieldState<T> implements StateManager<T> {
@@ -269,7 +220,7 @@ public record RoomRouteController(Option<RoomRouteSettings> option) implements C
             super.updateNarration(output);
             output.add(NarratedElementType.TITLE, control.option().name().copy().append(": ").append(control.formatValue()));
             output.add(NarratedElementType.USAGE, Component.literal(
-                    "Tab between enable checkbox and route provider. Space toggles enable; Enter opens provider choices. Default follows the main Route Type."));
+                    "Tab between enable checkbox and route provider. Space toggles enable; Enter cycles providers. Default follows the main Route Type."));
         }
     }
 }
