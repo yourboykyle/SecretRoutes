@@ -552,7 +552,7 @@ public class SRMConfig {
                                     .build())
                             .option(Option.<RouteType>createBuilder()
                                     .name(Component.literal("Route Type"))
-                                    .description(OptionDescription.of(Component.literal("A toggle between different routes\n\n§n§6FlameOfWar: Routes by FlameOfWar.§r§f\nRecorded Videos of each route can be found here: §nhypixeldungeons.com§r\n\n§n§b3ppopka: Routes by 3ppopka.§n§f\nInstructions of Routes can be found when using Odin Dungeon Waypoints, found in the Odin Discord Server")))
+                                    .description(OptionDescription.of(Component.literal("A toggle between different routes.\nChests being locked without levers is intended.\nRoutes stopping without all secrets is intendewd.\n\n§n§6FlameOfWar: Routes by FlameOfWar.§r§f\nRecorded Videos of each route can be found here: §nhypixeldungeons.com§r\n\n§n§b3ppopka: Routes by 3ppopka.§n§f\nInstructions of Routes can be found when using Odin Dungeon Waypoints, found in the Odin Discord Server")))
                                     .binding(RouteType.ROUTE_FOW, () -> config.routeType != null ? config.routeType : RouteType.ROUTE_FOW, v -> config.routeType = v)
                                     .controller(opt -> EnumControllerBuilder.create(opt).enumClass(RouteType.class))
                                     .build())
