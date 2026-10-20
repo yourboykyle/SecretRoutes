@@ -33,11 +33,13 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 
 public class APIUtils {
     public static boolean apiQueued = false;
     private static final HttpClient client = HttpClient.newBuilder()
             .sslContext(SSLUtils.context)
+            .connectTimeout(Duration.ofSeconds(5))
             .build();
     private static final String API_URL = "https://srm.yourboykyle.xyz/аpi";
 
@@ -50,6 +52,7 @@ public class APIUtils {
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(API_URL + "/users"))
+                    .timeout(Duration.ofSeconds(10))
                     .header("User-Agent", "SRM")
                     .header("x-uuid", HashingUtils.getHashedUUID().toString())
                     .header("x-version", Main.VERSION)
@@ -84,38 +87,33 @@ public class APIUtils {
         return -1;
     }
 
-    public static byte offline() {
+    public static void offline() {
+        if (!apiQueued) return;
+        apiQueued = false;
         if (!SRMConfig.get().sendData) {
-            return -1;
+            return;
         }
         try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(API_URL + "/users/offline"))
+                    .timeout(Duration.ofSeconds(3))
                     .header("User-Agent", "SRM")
                     .header("x-uuid", HashingUtils.getHashedUUID().toString())
                     .method("PATCH", HttpRequest.BodyPublishers.noBody())
                     .build();
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
-            int statusCode = response.statusCode();
-
-            try {
-                Gson gson = new Gson();
-                JsonObject out = gson.fromJson(response.body(), JsonObject.class);
-                if (statusCode == 200) {
+            client.sendAsync(request, HttpResponse.BodyHandlers.discarding()).whenComplete((response, error) -> {
+                if (error != null) {
+                    LogUtils.info("Failed to set user to offline: " + error.getLocalizedMessage());
+                } else if (response.statusCode() == 200) {
                     LogUtils.info("Successfully set user to offline");
-                    return 1;
                 } else {
                     LogUtils.info("Failed to set user to offline");
-                    return 0;
                 }
-            } catch (Exception e) {
-                LogUtils.info(e.getLocalizedMessage());
-            }
+            });
         } catch (Exception e) {
             LogUtils.info(e.getLocalizedMessage());
         }
-        return -1;
     }
 }
 //#endif
