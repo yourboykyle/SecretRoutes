@@ -606,7 +606,7 @@ public class SRMConfig {
                                             .build())
                                     .option(Option.<BossRouteMode>createBuilder()
                                             .name(Component.literal("Roles"))
-                                            .description(OptionDescription.of(Component.literal("Choose ADG or Classic roles for the F7 predev route. Only the selected setup is shown; if its route is missing, no route is displayed.")))
+                                            .description(OptionDescription.of(Component.literal("Choose ADG or Classic roles for the F7 predev route. Classic predev consists of both the second and third device, while ADG contains Checkpoint Maxor. Lower level parties will usually use Classic Roles, while high level f7 or m7 parties will use ADG. Note that. Note that 'm7r' usually means Classic roles and not ADG.")))
                                             .binding(BossRouteMode.ADG, config::bossRouteMode, v -> config.pdRouteMode = v)
                                             .controller(opt -> EnumControllerBuilder.create(opt).enumClass(BossRouteMode.class))
                                             .build())
