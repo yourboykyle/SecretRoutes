@@ -25,6 +25,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.core.BlockPos;
+import xyz.yourboykyle.secretroutes.config.BossRouteMode;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -42,12 +43,18 @@ final class RouteVariantSelector {
     }
 
     static List<RouteVariant> parseVariants(JsonObject rawData, String roomName) {
+        return parseVariants(rawData, roomName, BossRouteMode.ADG);
+    }
+
+    static List<RouteVariant> parseVariants(JsonObject rawData, String roomName, BossRouteMode bossRouteMode) {
         if (rawData == null || roomName == null) return List.of();
 
         String normalizedRoomName = roomName.toLowerCase(Locale.ROOT);
+        BossRouteMode mode = bossRouteMode != null ? bossRouteMode : BossRouteMode.ADG;
         List<RouteVariant> variants = new ArrayList<>();
 
         for (var entry : rawData.entrySet()) {
+            if (normalizedRoomName.equals("f7boss") && !entry.getKey().equalsIgnoreCase(mode.routeKey())) continue;
             int variantNumber = getVariantNumber(entry.getKey(), normalizedRoomName);
             if (variantNumber < 0) continue;
 
