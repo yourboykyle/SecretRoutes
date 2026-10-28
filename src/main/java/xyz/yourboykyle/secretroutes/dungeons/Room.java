@@ -28,6 +28,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import xyz.yourboykyle.secretroutes.Main;
+import xyz.yourboykyle.secretroutes.config.BossRouteMode;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
 import xyz.yourboykyle.secretroutes.dungeons.detection.DungeonScanner;
 import xyz.yourboykyle.secretroutes.events.OnSecretComplete;
@@ -59,6 +60,7 @@ public class Room {
     private double selectedRouteDistanceSquared = Double.POSITIVE_INFINITY;
     private long loadRequestId;
     private SRMConfig.RouteType configuredRouteType;
+    private BossRouteMode configuredBossRouteMode;
     private RouteAttempt personalBestAttempt;
     int c = 0;
 
@@ -268,9 +270,13 @@ public class Room {
         return Main.ROUTES_PATH + File.separator + fileName;
     }
 
-    /** Called on the client thread after the provider setting is committed. */
-    public void reloadIfRouteTypeChanged() {
-        if (configuredRouteType != SRMConfig.get().effectiveRouteType(name)) reloadConfiguredRoute();
+    /** Called on the client thread after the route settings are committed. */
+    public void reloadIfRouteSettingsChanged() {
+        SRMConfig config = SRMConfig.get();
+        if (configuredRouteType != config.effectiveRouteType(name)
+                || ("f7boss".equals(name) && configuredBossRouteMode != config.bossRouteMode())) {
+            reloadConfiguredRoute();
+        }
     }
 
     public void reloadConfiguredRoute() {
@@ -302,16 +308,20 @@ public class Room {
         Minecraft client = Minecraft.getInstance();
         ClientLevel level = client.level;
         String roomName = name;
+        boolean bossRoom = "f7boss".equals(roomName);
+        BossRouteMode bossRouteMode = SRMConfig.get().bossRouteMode();
+        configuredBossRouteMode = bossRouteMode;
         ROUTE_LOADER.execute(() -> {
             try {
                 JsonObject rawData = RouteFileCache.SHARED.roomData(Path.of(filePath), roomName);
                 List<RouteVariantSelector.RouteVariant> loadedVariants =
-                        RouteVariantSelector.parseVariants(rawData, roomName);
+                        RouteVariantSelector.parseVariants(rawData, roomName, bossRouteMode);
                 client.execute(() -> {
                     if (!isCurrentLoad(requestId, level)) return;
                     installLoadedVariants(loadedVariants);
-                    if (notifyMissing && loadedVariants.isEmpty()) {
-                        ChatUtils.sendChatMessage("§eNo route for " + roomName + " in " + new File(filePath).getName() + ".");
+                    if (loadedVariants.isEmpty() && (notifyMissing || bossRoom)) {
+                        String routeDescription = bossRoom ? bossRouteMode.label() + " predev" : roomName;
+                        ChatUtils.sendChatMessage("§eNo route for " + routeDescription + " in " + new File(filePath).getName() + ".");
                     }
                 });
             } catch (Exception e) {

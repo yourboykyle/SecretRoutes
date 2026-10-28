@@ -90,6 +90,8 @@ public class SRMConfig {
     @SerialEntry
     public boolean pdRoutesEnabled = false;
     @SerialEntry
+    public BossRouteMode pdRouteMode = BossRouteMode.ADG;
+    @SerialEntry
     public boolean pdHideAfterPhase2 = true;
 
     // Visual
@@ -393,6 +395,10 @@ public class SRMConfig {
         return RoomRouteOverrides.get(roomRouteTypes, roomName).resolve(routeType);
     }
 
+    public BossRouteMode bossRouteMode() {
+        return pdRouteMode != null ? pdRouteMode : BossRouteMode.ADG;
+    }
+
     private RoomRouteSettings roomSettings(String roomName) {
         return new RoomRouteSettings(RoomToggleUtils.isRoomEnabled(roomName), RoomRouteOverrides.get(roomRouteTypes, roomName));
     }
@@ -537,8 +543,8 @@ public class SRMConfig {
                     .title(Component.literal("Secret Routes Config"))
                     .save(() -> {
                         HANDLER.save();
-                        // All bindings have now applied: reload once only if the final provider changed.
-                        if (Main.currentRoom != null) Main.currentRoom.reloadIfRouteTypeChanged();
+                        // All bindings have now applied: reload once if the provider or boss roles changed.
+                        if (Main.currentRoom != null) Main.currentRoom.reloadIfRouteSettingsChanged();
                     })
 
                     // General
@@ -597,6 +603,12 @@ public class SRMConfig {
                                             .description(OptionDescription.of(Component.literal("Master toggle for showing predev routes during the F7 Boss fight.")))
                                             .binding(false, () -> config.pdRoutesEnabled, v -> config.pdRoutesEnabled = v)
                                             .controller(TickBoxControllerBuilder::create)
+                                            .build())
+                                    .option(Option.<BossRouteMode>createBuilder()
+                                            .name(Component.literal("Roles"))
+                                            .description(OptionDescription.of(Component.literal("Choose ADG or Classic roles for the F7 predev route. Only the selected setup is shown; if its route is missing, no route is displayed.")))
+                                            .binding(BossRouteMode.ADG, config::bossRouteMode, v -> config.pdRouteMode = v)
+                                            .controller(opt -> EnumControllerBuilder.create(opt).enumClass(BossRouteMode.class))
                                             .build())
                                     .option(Option.<Boolean>createBuilder()
                                             .name(Component.literal("Hide After Storm"))
