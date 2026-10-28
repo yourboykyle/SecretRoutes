@@ -23,13 +23,14 @@
 <details>
     <summary><strong>Dungeon Routes</strong></summary>
     <ul>
-        <li>Some of the best routes on the internet for secrets </li>
-        <li>Tracking line made by particles or OpenGL Render lines </li>
+        <li>The communities best secret routes </li>
+        <li>Movement lines made by particles or Rendered lines </li>
         <li>AOTV waypoints </li>
         <li>Interact waypoints</li>
         <li>Superboom waypoints</li>
         <li>Stonk waypoints</li>
         <li>Ender pearl waypoints/ Pearl launch angle lines </li>
+        <li>Floor7/Master Mode7 Predev route waypoints</li>
         <li>Render entire route (instead of just one secret at a time)</li>
         <li>Render all secrets (Renders all secrets and levers in the room) </li>
         <li>Supports multiple routes in the same room (picks closest one)</li>
@@ -76,6 +77,7 @@
         <li>Make bridge bot messages look nicer in SRM Guild <em>(/g join srm)</em></li>
     </ul>
 </details>
+
 
 
 #### More to come...

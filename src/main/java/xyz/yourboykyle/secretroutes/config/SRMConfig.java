@@ -90,6 +90,8 @@ public class SRMConfig {
     @SerialEntry
     public boolean pdRoutesEnabled = false;
     @SerialEntry
+    public BossRouteMode pdRouteMode = BossRouteMode.ADG;
+    @SerialEntry
     public boolean pdHideAfterPhase2 = true;
 
     // Visual
@@ -393,6 +395,10 @@ public class SRMConfig {
         return RoomRouteOverrides.get(roomRouteTypes, roomName).resolve(routeType);
     }
 
+    public BossRouteMode bossRouteMode() {
+        return pdRouteMode != null ? pdRouteMode : BossRouteMode.ADG;
+    }
+
     private RoomRouteSettings roomSettings(String roomName) {
         return new RoomRouteSettings(RoomToggleUtils.isRoomEnabled(roomName), RoomRouteOverrides.get(roomRouteTypes, roomName));
     }
@@ -537,8 +543,8 @@ public class SRMConfig {
                     .title(Component.literal("Secret Routes Config"))
                     .save(() -> {
                         HANDLER.save();
-                        // All bindings have now applied: reload once only if the final provider changed.
-                        if (Main.currentRoom != null) Main.currentRoom.reloadIfRouteTypeChanged();
+                        // All bindings have now applied: reload once if the provider or boss roles changed.
+                        if (Main.currentRoom != null) Main.currentRoom.reloadIfRouteSettingsChanged();
                     })
 
                     // General
@@ -552,7 +558,7 @@ public class SRMConfig {
                                     .build())
                             .option(Option.<RouteType>createBuilder()
                                     .name(Component.literal("Route Type"))
-                                    .description(OptionDescription.of(Component.literal("A toggle between different routes\n\n§n§6FlameOfWar: Routes by FlameOfWar.§r§f\nRecorded Videos of each route can be found here: §nhypixeldungeons.com§r\n\n§n§b3ppopka: Routes by 3ppopka.§n§f\nInstructions of Routes can be found when using Odin Dungeon Waypoints, found in the Odin Discord Server")))
+                                    .description(OptionDescription.of(Component.literal("A toggle between different routes.\nChests being locked without levers is intended.\nRoutes stopping without all secrets is intended.\n\n§n§6FlameOfWar: Routes by FlameOfWar.§r§f\nRecorded Videos of each route can be found here: §nhypixeldungeons.com§r\n\n§n§b3ppopka: Routes by 3ppopka.§n§f\nInstructions of Routes can be found when using Odin Dungeon Waypoints, found in the Odin Discord Server")))
                                     .binding(RouteType.ROUTE_FOW, () -> config.routeType != null ? config.routeType : RouteType.ROUTE_FOW, v -> config.routeType = v)
                                     .controller(opt -> EnumControllerBuilder.create(opt).enumClass(RouteType.class))
                                     .build())
@@ -597,6 +603,12 @@ public class SRMConfig {
                                             .description(OptionDescription.of(Component.literal("Master toggle for showing predev routes during the F7 Boss fight.")))
                                             .binding(false, () -> config.pdRoutesEnabled, v -> config.pdRoutesEnabled = v)
                                             .controller(TickBoxControllerBuilder::create)
+                                            .build())
+                                    .option(Option.<BossRouteMode>createBuilder()
+                                            .name(Component.literal("Roles"))
+                                            .description(OptionDescription.of(Component.literal("Choose ADG or Classic roles for the F7 predev route.\n\nClassic predev consists of both the second and third device.\n\nADG contains Checkpoint Maxor and the third device.\n\nLower level parties will usually use Classic Roles, while high level f7 or m7 parties will use ADG.\nNote that 'm7r' usually means Classic roles and not ADG.")))
+                                            .binding(BossRouteMode.ADG, config::bossRouteMode, v -> config.pdRouteMode = v)
+                                            .controller(opt -> EnumControllerBuilder.create(opt).enumClass(BossRouteMode.class))
                                             .build())
                                     .option(Option.<Boolean>createBuilder()
                                             .name(Component.literal("Hide After Storm"))
