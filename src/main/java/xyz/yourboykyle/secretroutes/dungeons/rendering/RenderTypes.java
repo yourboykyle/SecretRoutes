@@ -19,6 +19,7 @@
 package xyz.yourboykyle.secretroutes.dungeons.rendering;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.phys.AABB;
 import org.joml.Vector3d;
 
 import java.awt.*;
@@ -31,9 +32,7 @@ public class RenderTypes {
         public float scale;
 
         public WorldText(Component text, Vector3d position, boolean throughWalls) {
-            this.text = text;
-            this.position = position;
-            this.throughWalls = throughWalls;
+            this(text, position, throughWalls, 1.0f);
         }
 
         public WorldText(Component text, Vector3d position, boolean throughWalls, float scale) {
@@ -49,14 +48,25 @@ public class RenderTypes {
         public Color color;
         public float boxWidth;
         public float boxHeight;
+        public float boxDepth;
         public float lineWidth;
         public boolean throughWalls;
 
         public OutlinedBox(Vector3d position, Color color, float boxWidth, float boxHeight, float lineWidth, boolean throughWalls) {
+            this(position, color, boxWidth, boxHeight, boxWidth, lineWidth, throughWalls);
+        }
+
+        public OutlinedBox(AABB bounds, Color color, float lineWidth, boolean throughWalls) {
+            this(new Vector3d(bounds.minX, bounds.minY, bounds.minZ), color,
+                    (float) bounds.getXsize(), (float) bounds.getYsize(), (float) bounds.getZsize(), lineWidth, throughWalls);
+        }
+
+        private OutlinedBox(Vector3d position, Color color, float boxWidth, float boxHeight, float boxDepth, float lineWidth, boolean throughWalls) {
             this.position = position;
             this.color = color;
             this.boxWidth = boxWidth;
             this.boxHeight = boxHeight;
+            this.boxDepth = boxDepth;
             this.lineWidth = lineWidth;
             this.throughWalls = throughWalls;
         }
@@ -67,13 +77,24 @@ public class RenderTypes {
         public Color color;
         public float boxWidth;
         public float boxHeight;
+        public float boxDepth;
         public boolean throughWalls;
 
         public FilledBox(Vector3d position, Color color, float boxWidth, float boxHeight, boolean throughWalls) {
+            this(position, color, boxWidth, boxHeight, boxWidth, throughWalls);
+        }
+
+        public FilledBox(AABB bounds, Color color, boolean throughWalls) {
+            this(new Vector3d(bounds.minX, bounds.minY, bounds.minZ), color,
+                    (float) bounds.getXsize(), (float) bounds.getYsize(), (float) bounds.getZsize(), throughWalls);
+        }
+
+        private FilledBox(Vector3d position, Color color, float boxWidth, float boxHeight, float boxDepth, boolean throughWalls) {
             this.position = position;
             this.color = color;
             this.boxWidth = boxWidth;
             this.boxHeight = boxHeight;
+            this.boxDepth = boxDepth;
             this.throughWalls = throughWalls;
         }
     }

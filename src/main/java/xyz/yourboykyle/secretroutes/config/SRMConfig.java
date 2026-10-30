@@ -174,6 +174,7 @@ public class SRMConfig {
     @SerialEntry
     public Color secondStepSuperbooms = new Color(168, 90, 90);
 
+    // Lever settings retain their legacy "interacts" names for saved configs and color profiles.
     @SerialEntry
     public boolean renderInteracts = true;
     @SerialEntry
@@ -202,6 +203,10 @@ public class SRMConfig {
     @SerialEntry
     public float secretBoxLineWidth = 5f;
     @SerialEntry
+    public Float itemBoxLineWidth = null;
+    @SerialEntry
+    public Float batBoxLineWidth = null;
+    @SerialEntry
     public boolean secretsItemFullBlock = false;
     @SerialEntry
     public Color secretsItem = new Color(0, 255, 255);
@@ -212,6 +217,8 @@ public class SRMConfig {
     public boolean renderSecretIteract = true;
     @SerialEntry
     public boolean secretsInteractFullBlock = false;
+    @SerialEntry
+    public float interactBoxLineWidth = 5f;
     @SerialEntry
     public Color secretsInteract = new Color(0, 0, 255);
     @SerialEntry
@@ -391,6 +398,15 @@ public class SRMConfig {
         return HANDLER.instance();
     }
 
+    // Unset per-type widths inherit the shared value from older configs and profiles.
+    public float effectiveItemBoxLineWidth() {
+        return itemBoxLineWidth != null ? itemBoxLineWidth : secretBoxLineWidth;
+    }
+
+    public float effectiveBatBoxLineWidth() {
+        return batBoxLineWidth != null ? batBoxLineWidth : secretBoxLineWidth;
+    }
+
     public RouteType effectiveRouteType(String roomName) {
         return RoomRouteOverrides.get(roomRouteTypes, roomName).resolve(routeType);
     }
@@ -562,30 +578,6 @@ public class SRMConfig {
                                     .binding(RouteType.ROUTE_FOW, () -> config.routeType != null ? config.routeType : RouteType.ROUTE_FOW, v -> config.routeType = v)
                                     .controller(opt -> EnumControllerBuilder.create(opt).enumClass(RouteType.class))
                                     .build())
-                            .option(Option.<Boolean>createBuilder()
-                                    .name(Component.literal("Render Completed Rooms"))
-                                    .description(OptionDescription.of(Component.literal("Renders secrets even if the room is cleared")))
-                                    .binding(false, () -> config.renderComplete, v -> config.renderComplete = v)
-                                    .controller(TickBoxControllerBuilder::create)
-                                    .build())
-                            .option(Option.<Boolean>createBuilder()
-                                    .name(Component.literal("Show Whole Route"))
-                                    .description(OptionDescription.of(Component.literal("Render all steps at once instead of sequential")))
-                                    .binding(false, () -> config.wholeRoute, v -> config.wholeRoute = v)
-                                    .controller(TickBoxControllerBuilder::create)
-                                    .build())
-                            .option(Option.<Integer>createBuilder()
-                                    .name(Component.literal("Visible Route Steps"))
-                                    .description(OptionDescription.of(Component.literal("How many route steps to show at once when Show Whole Route is off")))
-                                    .binding(1, () -> config.visibleRouteSteps, v -> config.visibleRouteSteps = v)
-                                    .controller(opt -> IntegerSliderControllerBuilder.create(opt).range(1, 5).step(1))
-                                    .build())
-                            .option(Option.<Boolean>createBuilder()
-                                    .name(Component.literal("Show All Secrets"))
-                                    .description(OptionDescription.of(Component.literal("Highlight all secrets in the room, not just the route")))
-                                    .binding(false, () -> config.allSecrets, v -> config.allSecrets = v)
-                                    .controller(TickBoxControllerBuilder::create)
-                                    .build())
                             .option(ButtonOption.createBuilder()
                                     .name(Component.literal("Update Routes"))
                                     .description(OptionDescription.of(Component.literal("Updates to the latest route files from GitHub, overwriting the old routes")))
@@ -615,6 +607,29 @@ public class SRMConfig {
                                             .description(OptionDescription.of(Component.literal("Hide predev routes when Storm ends.")))
                                             .binding(true, () -> config.pdHideAfterPhase2, v -> config.pdHideAfterPhase2 = v)
                                             .controller(TickBoxControllerBuilder::create)
+                                            .build())
+                                    .build())
+                            .group(OptionGroup.createBuilder()
+                                    .name(Component.literal("Line to Secret"))
+                                    .description(OptionDescription.of(Component.literal("Controls the line from your crosshair to the next secret")))
+                                    .collapsed(true)
+                                    .option(Option.<Boolean>createBuilder()
+                                            .name(Component.literal("Enabled"))
+                                            .description(OptionDescription.of(Component.literal("Draws a line from your crosshair to the next secret")))
+                                            .binding(false, () -> config.playerWaypointLine, v -> config.playerWaypointLine = v)
+                                            .controller(TickBoxControllerBuilder::create)
+                                            .build())
+                                    .option(Option.<Integer>createBuilder()
+                                            .name(Component.literal("Line Width"))
+                                            .description(OptionDescription.of(Component.literal("Controls the thickness of the line to the next secret")))
+                                            .binding(4, () -> config.playerToSecretLineWidth, v -> config.playerToSecretLineWidth = v)
+                                            .controller(opt -> IntegerSliderControllerBuilder.create(opt).range(1, 10).step(1))
+                                            .build())
+                                    .option(Option.<Color>createBuilder()
+                                            .name(Component.literal("Line Color"))
+                                            .description(OptionDescription.of(Component.literal("Sets the color of the line to the next secret")))
+                                            .binding(new Color(255, 0, 0), () -> config.playerToSecretLineColor != null ? config.playerToSecretLineColor : new Color(255, 0, 0), v -> config.playerToSecretLineColor = v)
+                                            .controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true))
                                             .build())
                                     .build())
                             .group(OptionGroup.createBuilder()
@@ -688,29 +703,6 @@ public class SRMConfig {
                                             .build())
                                     .build())
                             .group(OptionGroup.createBuilder()
-                                    .name(Component.literal("Line to Secret"))
-                                    .description(OptionDescription.of(Component.literal("Controls the line from your crosshair to the next secret")))
-                                    .collapsed(true)
-                                    .option(Option.<Boolean>createBuilder()
-                                            .name(Component.literal("Enabled"))
-                                            .description(OptionDescription.of(Component.literal("Draws a line from your crosshair to the next secret")))
-                                            .binding(false, () -> config.playerWaypointLine, v -> config.playerWaypointLine = v)
-                                            .controller(TickBoxControllerBuilder::create)
-                                            .build())
-                                    .option(Option.<Integer>createBuilder()
-                                            .name(Component.literal("Line Width"))
-                                            .description(OptionDescription.of(Component.literal("Controls the thickness of the line to the next secret")))
-                                            .binding(4, () -> config.playerToSecretLineWidth, v -> config.playerToSecretLineWidth = v)
-                                            .controller(opt -> IntegerSliderControllerBuilder.create(opt).range(1, 10).step(1))
-                                            .build())
-                                    .option(Option.<Color>createBuilder()
-                                            .name(Component.literal("Line Color"))
-                                            .description(OptionDescription.of(Component.literal("Sets the color of the line to the next secret")))
-                                            .binding(new Color(255, 0, 0), () -> config.playerToSecretLineColor != null ? config.playerToSecretLineColor : new Color(255, 0, 0), v -> config.playerToSecretLineColor = v)
-                                            .controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true))
-                                            .build())
-                                    .build())
-                            .group(OptionGroup.createBuilder()
                                     .name(Component.literal("Personal Bests"))
                                     .description(OptionDescription.of(Component.literal("Tracks and reports your fastest completion time for each room")))
                                     .collapsed(true)
@@ -734,12 +726,33 @@ public class SRMConfig {
                                             .build())
                                     .build())
                             .build())
-                    // Rooms
-                    .category(roomsCategory.build())
-
-                    // Visuals
+                    // Rendering
                     .category(ConfigCategory.createBuilder()
-                            .name(Component.literal("Visuals"))
+                            .name(Component.literal("Rendering"))
+                            .option(Option.<Boolean>createBuilder()
+                                    .name(Component.literal("Render Completed Rooms"))
+                                    .description(OptionDescription.of(Component.literal("Renders secrets even if the room is cleared")))
+                                    .binding(false, () -> config.renderComplete, v -> config.renderComplete = v)
+                                    .controller(TickBoxControllerBuilder::create)
+                                    .build())
+                            .option(Option.<Boolean>createBuilder()
+                                    .name(Component.literal("Show All Secrets"))
+                                    .description(OptionDescription.of(Component.literal("Highlight all secrets in the room, not just the route")))
+                                    .binding(false, () -> config.allSecrets, v -> config.allSecrets = v)
+                                    .controller(TickBoxControllerBuilder::create)
+                                    .build())
+                            .option(Option.<Boolean>createBuilder()
+                                    .name(Component.literal("Show Whole Route"))
+                                    .description(OptionDescription.of(Component.literal("Render all steps at once instead of sequential")))
+                                    .binding(false, () -> config.wholeRoute, v -> config.wholeRoute = v)
+                                    .controller(TickBoxControllerBuilder::create)
+                                    .build())
+                            .option(Option.<Integer>createBuilder()
+                                    .name(Component.literal("Visible Route Steps"))
+                                    .description(OptionDescription.of(Component.literal("How many route steps to show at once when Show Whole Route is off")))
+                                    .binding(1, () -> config.visibleRouteSteps, v -> config.visibleRouteSteps = v)
+                                    .controller(opt -> IntegerSliderControllerBuilder.create(opt).range(1, 5).step(1))
+                                    .build())
                             .option(Option.<Boolean>createBuilder()
                                     .name(Component.literal("See Through Walls"))
                                     .description(OptionDescription.of(Component.literal("Renders waypoints through walls")))
@@ -788,33 +801,6 @@ public class SRMConfig {
                                     .build())
                             .group(colorProfilesGroup.build())
                             .group(OptionGroup.createBuilder()
-                                    .name(Component.literal("Etherwarps Text"))
-                                    .description(OptionDescription.of(Component.literal("Controls labels displayed on Etherwarp waypoints")))
-                                    .collapsed(true)
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Show")).description(OptionDescription.of(Component.literal("Shows labels on Etherwarp waypoints"))).binding(false, () -> config.etherwarpsTextToggle, v -> config.etherwarpsTextToggle = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Numbering")).description(OptionDescription.of(Component.literal("Adds a sequence number to each Etherwarp label"))).binding(false, () -> config.etherwarpNumberingToggle, v -> config.etherwarpNumberingToggle = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<TextColor>createBuilder().name(Component.literal("Color")).description(OptionDescription.of(Component.literal("Sets the color of Etherwarp labels"))).binding(TextColor.DARK_PURPLE, () -> config.etherwarpsWaypointColor != null ? config.etherwarpsWaypointColor : TextColor.DARK_PURPLE, v -> config.etherwarpsWaypointColor = v).controller(opt -> EnumControllerBuilder.create(opt).enumClass(TextColor.class)).build())
-                                    .option(Option.<Float>createBuilder().name(Component.literal("Size")).description(OptionDescription.of(Component.literal("Controls the size of Etherwarp labels"))).binding(1.0f, () -> config.etherwarpsTextSize, v -> config.etherwarpsTextSize = v).controller(opt -> FloatSliderControllerBuilder.create(opt).range(0.1f, 5f).step(0.1f)).build())
-                                    .build())
-                            .group(OptionGroup.createBuilder()
-                                    .name(Component.literal("Interacts Text"))
-                                    .description(OptionDescription.of(Component.literal("Controls labels displayed on lever and interact waypoints")))
-                                    .collapsed(true)
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Show")).description(OptionDescription.of(Component.literal("Shows labels on lever and interact waypoints"))).binding(true, () -> config.interactsTextToggle, v -> config.interactsTextToggle = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Numbering")).description(OptionDescription.of(Component.literal("Adds a sequence number to each lever or interact label"))).binding(false, () -> config.interactsEnumToggle, v -> config.interactsEnumToggle = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<TextColor>createBuilder().name(Component.literal("Color")).description(OptionDescription.of(Component.literal("Sets the color of lever and interact labels"))).binding(TextColor.BLUE, () -> config.interactsWaypointColor != null ? config.interactsWaypointColor : TextColor.BLUE, v -> config.interactsWaypointColor = v).controller(opt -> EnumControllerBuilder.create(opt).enumClass(TextColor.class)).build())
-                                    .option(Option.<Float>createBuilder().name(Component.literal("Size")).description(OptionDescription.of(Component.literal("Controls the size of lever and interact labels"))).binding(1.0f, () -> config.interactsTextSize, v -> config.interactsTextSize = v).controller(opt -> FloatSliderControllerBuilder.create(opt).range(0.1f, 5f).step(0.1f)).build())
-                                    .build())
-                            .group(OptionGroup.createBuilder()
-                                    .name(Component.literal("Bonzo Staffs Text"))
-                                    .description(OptionDescription.of(Component.literal("Controls labels displayed on Bonzo Staff waypoints")))
-                                    .collapsed(true)
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Show")).description(OptionDescription.of(Component.literal("Shows labels on Bonzo Staff waypoints"))).binding(true, () -> config.bonzoStaffTextToggle, v -> config.bonzoStaffTextToggle = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Numbering")).description(OptionDescription.of(Component.literal("Adds a sequence number to each Bonzo Staff label"))).binding(false, () -> config.bonzoStaffEnumToggle, v -> config.bonzoStaffEnumToggle = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<TextColor>createBuilder().name(Component.literal("Color")).description(OptionDescription.of(Component.literal("Sets the color of Bonzo Staff labels"))).binding(TextColor.RED, () -> config.bonzoStaffWaypointColor != null ? config.bonzoStaffWaypointColor : TextColor.RED, v -> config.bonzoStaffWaypointColor = v).controller(opt -> EnumControllerBuilder.create(opt).enumClass(TextColor.class)).build())
-                                    .option(Option.<Float>createBuilder().name(Component.literal("Size")).description(OptionDescription.of(Component.literal("Controls the size of Bonzo Staff labels"))).binding(1.0f, () -> config.bonzoStaffTextSize, v -> config.bonzoStaffTextSize = v).controller(opt -> FloatSliderControllerBuilder.create(opt).range(0.1f, 5f).step(0.1f)).build())
-                                    .build())
-                            .group(OptionGroup.createBuilder()
                                     .name(Component.literal("Start/Exit"))
                                     .description(OptionDescription.of(Component.literal("Controls labels displayed at route entrances and exits")))
                                     .collapsed(true)
@@ -829,6 +815,48 @@ public class SRMConfig {
                     .category(ConfigCategory.createBuilder()
                             .name(Component.literal("Components"))
                             .group(OptionGroup.createBuilder()
+                                    .name(Component.literal("Interacts"))
+                                    .description(OptionDescription.of(Component.literal("Controls the visuals of chest and essence secret waypoints")))
+                                    .collapsed(true)
+                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Enabled")).description(OptionDescription.of(Component.literal("Shows interact-secret waypoint boxes"))).binding(true, () -> config.renderSecretIteract, v -> config.renderSecretIteract = v).controller(TickBoxControllerBuilder::create).build())
+                                    .option(Option.<Color>createBuilder().name(Component.literal("Color")).description(OptionDescription.of(Component.literal("Sets the color of interact secrets in the current route step"))).binding(new Color(0, 0, 255), () -> config.secretsInteract != null ? config.secretsInteract : new Color(0, 0, 255), v -> config.secretsInteract = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
+                                    .option(Option.<Color>createBuilder().name(Component.literal("Second Step Color")).description(OptionDescription.of(Component.literal("Used for interact secret waypoints in the second and later visible route steps"))).binding(new Color(73, 82, 149), () -> config.secondStepSecretsInteract != null ? config.secondStepSecretsInteract : new Color(73, 82, 149), v -> config.secondStepSecretsInteract = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
+                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Filled")).description(OptionDescription.of(Component.literal("Renders interact secrets as filled boxes instead of outlines"))).binding(false, () -> config.secretsInteractFullBlock, v -> config.secretsInteractFullBlock = v).controller(TickBoxControllerBuilder::create).build())
+                                    .option(Option.<Float>createBuilder().name(Component.literal("Box Line Width")).description(OptionDescription.of(Component.literal("Controls the interact-secret outline thickness when Filled is disabled"))).binding(5.0f, () -> config.interactBoxLineWidth, v -> config.interactBoxLineWidth = v).controller(opt -> FloatSliderControllerBuilder.create(opt).range(1.0f, 10.0f).step(0.5f)).build())
+                                    .option(TextConfigurationScreen.button("Interacts",
+                                            Binding.generic(defaults.interactTextToggle, () -> config.interactTextToggle, v -> config.interactTextToggle = v),
+                                            Binding.generic(defaults.interactWaypointColor, () -> config.interactWaypointColor != null ? config.interactWaypointColor : defaults.interactWaypointColor, v -> config.interactWaypointColor = v),
+                                            Binding.generic(defaults.interactTextSize, () -> config.interactTextSize, v -> config.interactTextSize = v)))
+                                    .build())
+                            .group(OptionGroup.createBuilder()
+                                    .name(Component.literal("Items"))
+                                    .description(OptionDescription.of(Component.literal("Controls the visuals of item-secret waypoints")))
+                                    .collapsed(true)
+                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Enabled")).description(OptionDescription.of(Component.literal("Shows item-secret waypoint boxes"))).binding(true, () -> config.renderSecretsItem, v -> config.renderSecretsItem = v).controller(TickBoxControllerBuilder::create).build())
+                                    .option(Option.<Color>createBuilder().name(Component.literal("Color")).description(OptionDescription.of(Component.literal("Sets the color of item secrets in the current route step"))).binding(new Color(0, 255, 255), () -> config.secretsItem != null ? config.secretsItem : new Color(0, 255, 255), v -> config.secretsItem = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
+                                    .option(Option.<Color>createBuilder().name(Component.literal("Second Step Color")).description(OptionDescription.of(Component.literal("Used for item secret waypoints in the second and later visible route steps"))).binding(new Color(95, 167, 167), () -> config.secondStepSecretsItem != null ? config.secondStepSecretsItem : new Color(95, 167, 167), v -> config.secondStepSecretsItem = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
+                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Filled")).description(OptionDescription.of(Component.literal("Renders item secrets as filled boxes instead of outlines"))).binding(false, () -> config.secretsItemFullBlock, v -> config.secretsItemFullBlock = v).controller(TickBoxControllerBuilder::create).build())
+                                    .option(Option.<Float>createBuilder().name(Component.literal("Box Line Width")).description(OptionDescription.of(Component.literal("Controls the item-secret outline thickness when Filled is disabled"))).binding(5.0f, config::effectiveItemBoxLineWidth, v -> config.itemBoxLineWidth = v).controller(opt -> FloatSliderControllerBuilder.create(opt).range(1.0f, 10.0f).step(0.5f)).build())
+                                    .option(TextConfigurationScreen.button("Items",
+                                            Binding.generic(defaults.itemTextToggle, () -> config.itemTextToggle, v -> config.itemTextToggle = v),
+                                            Binding.generic(defaults.itemWaypointColor, () -> config.itemWaypointColor != null ? config.itemWaypointColor : defaults.itemWaypointColor, v -> config.itemWaypointColor = v),
+                                            Binding.generic(defaults.itemTextSize, () -> config.itemTextSize, v -> config.itemTextSize = v)))
+                                    .build())
+                            .group(OptionGroup.createBuilder()
+                                    .name(Component.literal("Bats"))
+                                    .description(OptionDescription.of(Component.literal("Controls the visuals of bat-secret waypoints")))
+                                    .collapsed(true)
+                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Enabled")).description(OptionDescription.of(Component.literal("Shows bat-secret waypoint boxes"))).binding(true, () -> config.renderSecretBat, v -> config.renderSecretBat = v).controller(TickBoxControllerBuilder::create).build())
+                                    .option(Option.<Color>createBuilder().name(Component.literal("Color")).description(OptionDescription.of(Component.literal("Sets the color of bat secrets in the current route step"))).binding(new Color(0, 255, 0), () -> config.secretsBat != null ? config.secretsBat : new Color(0, 255, 0), v -> config.secretsBat = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
+                                    .option(Option.<Color>createBuilder().name(Component.literal("Second Step Color")).description(OptionDescription.of(Component.literal("Used for bat secret waypoints in the second and later visible route steps"))).binding(new Color(91, 154, 91), () -> config.secondStepSecretsBat != null ? config.secondStepSecretsBat : new Color(91, 154, 91), v -> config.secondStepSecretsBat = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
+                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Filled")).description(OptionDescription.of(Component.literal("Renders bat secrets as filled boxes instead of outlines"))).binding(false, () -> config.secretsBatFullBlock, v -> config.secretsBatFullBlock = v).controller(TickBoxControllerBuilder::create).build())
+                                    .option(Option.<Float>createBuilder().name(Component.literal("Box Line Width")).description(OptionDescription.of(Component.literal("Controls the bat-secret outline thickness when Filled is disabled"))).binding(5.0f, config::effectiveBatBoxLineWidth, v -> config.batBoxLineWidth = v).controller(opt -> FloatSliderControllerBuilder.create(opt).range(1.0f, 10.0f).step(0.5f)).build())
+                                    .option(TextConfigurationScreen.button("Bats",
+                                            Binding.generic(defaults.batTextToggle, () -> config.batTextToggle, v -> config.batTextToggle = v),
+                                            Binding.generic(defaults.batWaypointColor, () -> config.batWaypointColor != null ? config.batWaypointColor : defaults.batWaypointColor, v -> config.batWaypointColor = v),
+                                            Binding.generic(defaults.batTextSize, () -> config.batTextSize, v -> config.batTextSize = v)))
+                                    .build())
+                            .group(OptionGroup.createBuilder()
                                     .name(Component.literal("Etherwarps"))
                                     .description(OptionDescription.of(Component.literal("Controls the visuals of Etherwarp waypoints")))
                                     .collapsed(true)
@@ -837,21 +865,11 @@ public class SRMConfig {
                                     .option(Option.<Color>createBuilder().name(Component.literal("Second Step Color")).description(OptionDescription.of(Component.literal("Used for etherwarp waypoints in the second and later visible route steps"))).binding(new Color(95, 61, 97), () -> config.secondStepEtherWarp != null ? config.secondStepEtherWarp : new Color(95, 61, 97), v -> config.secondStepEtherWarp = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
                                     .option(Option.<Boolean>createBuilder().name(Component.literal("Full Block")).description(OptionDescription.of(Component.literal("Renders Etherwarps as filled blocks instead of outlines"))).binding(false, () -> config.etherwarpFullBlock, v -> config.etherwarpFullBlock = v).controller(TickBoxControllerBuilder::create).build())
                                     .option(Option.<Float>createBuilder().name(Component.literal("Box Line Width")).description(OptionDescription.of(Component.literal("Controls the Etherwarp outline thickness when Full Block is disabled"))).binding(7.0f, () -> config.etherwarpBoxLineWidth, v -> config.etherwarpBoxLineWidth = v).controller(opt -> FloatSliderControllerBuilder.create(opt).range(1.0f, 10.0f).step(0.5f)).build())
-                                    .build())
-                            .group(OptionGroup.createBuilder()
-                                    .name(Component.literal("Secrets"))
-                                    .description(OptionDescription.of(Component.literal("Controls the visuals of item, interact and bat secrets")))
-                                    .collapsed(true)
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Items")).description(OptionDescription.of(Component.literal("Shows item-secret waypoint boxes"))).binding(true, () -> config.renderSecretsItem, v -> config.renderSecretsItem = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<Color>createBuilder().name(Component.literal("Item Color")).description(OptionDescription.of(Component.literal("Sets the color of item secrets in the current route step"))).binding(new Color(0, 255, 255), () -> config.secretsItem != null ? config.secretsItem : new Color(0, 255, 255), v -> config.secretsItem = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
-                                    .option(Option.<Color>createBuilder().name(Component.literal("Item Second Step Color")).description(OptionDescription.of(Component.literal("Used for item secret waypoints in the second and later visible route steps"))).binding(new Color(95, 167, 167), () -> config.secondStepSecretsItem != null ? config.secondStepSecretsItem : new Color(95, 167, 167), v -> config.secondStepSecretsItem = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Interacts")).description(OptionDescription.of(Component.literal("Shows interact-secret waypoint boxes"))).binding(true, () -> config.renderSecretIteract, v -> config.renderSecretIteract = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<Color>createBuilder().name(Component.literal("Interact Color")).description(OptionDescription.of(Component.literal("Sets the color of interact secrets in the current route step"))).binding(new Color(0, 0, 255), () -> config.secretsInteract != null ? config.secretsInteract : new Color(0, 0, 255), v -> config.secretsInteract = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
-                                    .option(Option.<Color>createBuilder().name(Component.literal("Interact Second Step Color")).description(OptionDescription.of(Component.literal("Used for interact secret waypoints in the second and later visible route steps"))).binding(new Color(73, 82, 149), () -> config.secondStepSecretsInteract != null ? config.secondStepSecretsInteract : new Color(73, 82, 149), v -> config.secondStepSecretsInteract = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Bats")).description(OptionDescription.of(Component.literal("Shows bat-secret waypoint boxes"))).binding(true, () -> config.renderSecretBat, v -> config.renderSecretBat = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<Color>createBuilder().name(Component.literal("Bat Color")).description(OptionDescription.of(Component.literal("Sets the color of bat secrets in the current route step"))).binding(new Color(0, 255, 0), () -> config.secretsBat != null ? config.secretsBat : new Color(0, 255, 0), v -> config.secretsBat = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
-                                    .option(Option.<Color>createBuilder().name(Component.literal("Bat Second Step Color")).description(OptionDescription.of(Component.literal("Used for bat secret waypoints in the second and later visible route steps"))).binding(new Color(91, 154, 91), () -> config.secondStepSecretsBat != null ? config.secondStepSecretsBat : new Color(91, 154, 91), v -> config.secondStepSecretsBat = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
-                                    .option(Option.<Float>createBuilder().name(Component.literal("Box Line Width")).description(OptionDescription.of(Component.literal("Controls the outline thickness of all secret boxes"))).binding(5.0f, () -> config.secretBoxLineWidth, v -> config.secretBoxLineWidth = v).controller(opt -> FloatSliderControllerBuilder.create(opt).range(1.0f, 10.0f).step(0.5f)).build())
+                                    .option(TextConfigurationScreen.button("Etherwarps",
+                                            Binding.generic(defaults.etherwarpsTextToggle, () -> config.etherwarpsTextToggle, v -> config.etherwarpsTextToggle = v),
+                                            Binding.generic(defaults.etherwarpsWaypointColor, () -> config.etherwarpsWaypointColor != null ? config.etherwarpsWaypointColor : defaults.etherwarpsWaypointColor, v -> config.etherwarpsWaypointColor = v),
+                                            Binding.generic(defaults.etherwarpsTextSize, () -> config.etherwarpsTextSize, v -> config.etherwarpsTextSize = v),
+                                            Binding.generic(defaults.etherwarpNumberingToggle, () -> config.etherwarpNumberingToggle, v -> config.etherwarpNumberingToggle = v)))
                                     .build())
                             .group(OptionGroup.createBuilder()
                                     .name(Component.literal("Mines"))
@@ -862,6 +880,11 @@ public class SRMConfig {
                                     .option(Option.<Color>createBuilder().name(Component.literal("Second Step Color")).description(OptionDescription.of(Component.literal("Used for mine waypoints in the second and later visible route steps"))).binding(new Color(177, 173, 97), () -> config.secondStepMine != null ? config.secondStepMine : new Color(177, 173, 97), v -> config.secondStepMine = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
                                     .option(Option.<Boolean>createBuilder().name(Component.literal("Full Block")).description(OptionDescription.of(Component.literal("Renders mines as filled blocks instead of outlines"))).binding(false, () -> config.mineFullBlock, v -> config.mineFullBlock = v).controller(TickBoxControllerBuilder::create).build())
                                     .option(Option.<Float>createBuilder().name(Component.literal("Box Line Width")).description(OptionDescription.of(Component.literal("Controls the mine outline thickness when Full Block is disabled"))).binding(5.0f, () -> config.mineBoxLineWidth, v -> config.mineBoxLineWidth = v).controller(opt -> FloatSliderControllerBuilder.create(opt).range(1.0f, 10.0f).step(0.5f)).build())
+                                    .option(TextConfigurationScreen.button("Mines",
+                                            Binding.generic(defaults.minesTextToggle, () -> config.minesTextToggle, v -> config.minesTextToggle = v),
+                                            Binding.generic(defaults.minesWaypointColor, () -> config.minesWaypointColor != null ? config.minesWaypointColor : defaults.minesWaypointColor, v -> config.minesWaypointColor = v),
+                                            Binding.generic(defaults.minesTextSize, () -> config.minesTextSize, v -> config.minesTextSize = v),
+                                            Binding.generic(!defaults.minesEnumToggle, () -> !config.minesEnumToggle, v -> config.minesEnumToggle = !v)))
                                     .build())
                             .group(OptionGroup.createBuilder()
                                     .name(Component.literal("Levers"))
@@ -870,8 +893,13 @@ public class SRMConfig {
                                     .option(Option.<Boolean>createBuilder().name(Component.literal("Enabled")).description(OptionDescription.of(Component.literal("Shows lever waypoint boxes"))).binding(true, () -> config.renderInteracts, v -> config.renderInteracts = v).controller(TickBoxControllerBuilder::create).build())
                                     .option(Option.<Color>createBuilder().name(Component.literal("Color")).description(OptionDescription.of(Component.literal("Sets the color of levers in the current route step"))).binding(new Color(0, 0, 255), () -> config.interacts != null ? config.interacts : new Color(0, 0, 255), v -> config.interacts = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
                                     .option(Option.<Color>createBuilder().name(Component.literal("Second Step Color")).description(OptionDescription.of(Component.literal("Used for lever waypoints in the second and later visible route steps"))).binding(new Color(73, 82, 149), () -> config.secondStepInteracts != null ? config.secondStepInteracts : new Color(73, 82, 149), v -> config.secondStepInteracts = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
-                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Full Block")).description(OptionDescription.of(Component.literal("Renders levers as filled blocks instead of outlines"))).binding(false, () -> config.interactsFullBlock, v -> config.interactsFullBlock = v).controller(TickBoxControllerBuilder::create).build())
-                                    .option(Option.<Float>createBuilder().name(Component.literal("Box Line Width")).description(OptionDescription.of(Component.literal("Controls the lever outline thickness when Full Block is disabled"))).binding(5.0f, () -> config.leverBoxLineWidth, v -> config.leverBoxLineWidth = v).controller(opt -> FloatSliderControllerBuilder.create(opt).range(1.0f, 10.0f).step(0.5f)).build())
+                                    .option(Option.<Boolean>createBuilder().name(Component.literal("Filled")).description(OptionDescription.of(Component.literal("Fills the lever's selection shape instead of outlining it"))).binding(false, () -> config.interactsFullBlock, v -> config.interactsFullBlock = v).controller(TickBoxControllerBuilder::create).build())
+                                    .option(Option.<Float>createBuilder().name(Component.literal("Box Line Width")).description(OptionDescription.of(Component.literal("Controls the lever outline thickness when Filled is disabled"))).binding(5.0f, () -> config.leverBoxLineWidth, v -> config.leverBoxLineWidth = v).controller(opt -> FloatSliderControllerBuilder.create(opt).range(1.0f, 10.0f).step(0.5f)).build())
+                                    .option(TextConfigurationScreen.button("Levers",
+                                            Binding.generic(defaults.interactsTextToggle, () -> config.interactsTextToggle, v -> config.interactsTextToggle = v),
+                                            Binding.generic(defaults.interactsWaypointColor, () -> config.interactsWaypointColor != null ? config.interactsWaypointColor : defaults.interactsWaypointColor, v -> config.interactsWaypointColor = v),
+                                            Binding.generic(defaults.interactsTextSize, () -> config.interactsTextSize, v -> config.interactsTextSize = v),
+                                            Binding.generic(!defaults.interactsEnumToggle, () -> !config.interactsEnumToggle, v -> config.interactsEnumToggle = !v)))
                                     .build())
                             .group(OptionGroup.createBuilder()
                                     .name(Component.literal("Superbooms"))
@@ -882,6 +910,11 @@ public class SRMConfig {
                                     .option(Option.<Color>createBuilder().name(Component.literal("Second Step Color")).description(OptionDescription.of(Component.literal("Used for superboom waypoints in the second and later visible route steps"))).binding(new Color(168, 90, 90), () -> config.secondStepSuperbooms != null ? config.secondStepSuperbooms : new Color(168, 90, 90), v -> config.secondStepSuperbooms = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
                                     .option(Option.<Boolean>createBuilder().name(Component.literal("Full Block")).description(OptionDescription.of(Component.literal("Renders Superbooms as filled blocks instead of outlines"))).binding(false, () -> config.superboomsFullBlock, v -> config.superboomsFullBlock = v).controller(TickBoxControllerBuilder::create).build())
                                     .option(Option.<Float>createBuilder().name(Component.literal("Box Line Width")).description(OptionDescription.of(Component.literal("Controls the Superboom outline thickness when Full Block is disabled"))).binding(5.0f, () -> config.superboomBoxLineWidth, v -> config.superboomBoxLineWidth = v).controller(opt -> FloatSliderControllerBuilder.create(opt).range(1.0f, 10.0f).step(0.5f)).build())
+                                    .option(TextConfigurationScreen.button("Superbooms",
+                                            Binding.generic(defaults.superboomsTextToggle, () -> config.superboomsTextToggle, v -> config.superboomsTextToggle = v),
+                                            Binding.generic(defaults.superboomsWaypointColor, () -> config.superboomsWaypointColor != null ? config.superboomsWaypointColor : defaults.superboomsWaypointColor, v -> config.superboomsWaypointColor = v),
+                                            Binding.generic(defaults.superboomsTextSize, () -> config.superboomsTextSize, v -> config.superboomsTextSize = v),
+                                            Binding.generic(!defaults.superboomsEnumToggle, () -> !config.superboomsEnumToggle, v -> config.superboomsEnumToggle = !v)))
                                     .build())
                             .group(OptionGroup.createBuilder()
                                     .name(Component.literal("Bonzo Staffs"))
@@ -892,6 +925,11 @@ public class SRMConfig {
                                     .option(Option.<Color>createBuilder().name(Component.literal("Second Step Color")).description(OptionDescription.of(Component.literal("Used for Bonzo Staff waypoints in the second and later visible route steps"))).binding(new Color(200, 110, 0), () -> config.secondStepBonzoStaff != null ? config.secondStepBonzoStaff : new Color(200, 110, 0), v -> config.secondStepBonzoStaff = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
                                     .option(Option.<Boolean>createBuilder().name(Component.literal("Full Block")).description(OptionDescription.of(Component.literal("Renders Bonzo Staffs as filled blocks instead of outlines"))).binding(false, () -> config.bonzoStaffFullBlock, v -> config.bonzoStaffFullBlock = v).controller(TickBoxControllerBuilder::create).build())
                                     .option(Option.<Float>createBuilder().name(Component.literal("Box Line Width")).description(OptionDescription.of(Component.literal("Controls the Bonzo Staff outline thickness when Full Block is disabled"))).binding(5.0f, () -> config.bonzoStaffBoxLineWidth, v -> config.bonzoStaffBoxLineWidth = v).controller(opt -> FloatSliderControllerBuilder.create(opt).range(1.0f, 10.0f).step(0.5f)).build())
+                                    .option(TextConfigurationScreen.button("Bonzo Staffs",
+                                            Binding.generic(defaults.bonzoStaffTextToggle, () -> config.bonzoStaffTextToggle, v -> config.bonzoStaffTextToggle = v),
+                                            Binding.generic(defaults.bonzoStaffWaypointColor, () -> config.bonzoStaffWaypointColor != null ? config.bonzoStaffWaypointColor : defaults.bonzoStaffWaypointColor, v -> config.bonzoStaffWaypointColor = v),
+                                            Binding.generic(defaults.bonzoStaffTextSize, () -> config.bonzoStaffTextSize, v -> config.bonzoStaffTextSize = v),
+                                            Binding.generic(!defaults.bonzoStaffEnumToggle, () -> !config.bonzoStaffEnumToggle, v -> config.bonzoStaffEnumToggle = !v)))
                                     .build())
                             .group(OptionGroup.createBuilder()
                                     .name(Component.literal("Enderpearls"))
@@ -904,6 +942,11 @@ public class SRMConfig {
                                     .option(Option.<Float>createBuilder().name(Component.literal("Box Line Width")).description(OptionDescription.of(Component.literal("Controls the Enderpearl outline thickness when Full Block is disabled"))).binding(5.0f, () -> config.enderpearlBoxLineWidth, v -> config.enderpearlBoxLineWidth = v).controller(opt -> FloatSliderControllerBuilder.create(opt).range(1.0f, 10.0f).step(0.5f)).build())
                                     .option(Option.<Color>createBuilder().name(Component.literal("Line Color")).description(OptionDescription.of(Component.literal("Sets the color of Enderpearl directional guide lines"))).binding(new Color(0, 255, 255), () -> config.pearlLineColor != null ? config.pearlLineColor : new Color(0, 255, 255), v -> config.pearlLineColor = v).controller(opt -> ColorControllerBuilder.create(opt).allowAlpha(true)).build())
                                     .option(Option.<Integer>createBuilder().name(Component.literal("Line Width")).description(OptionDescription.of(Component.literal("Controls the thickness of Enderpearl directional guide lines"))).binding(5, () -> config.pearlLineWidth, v -> config.pearlLineWidth = v).controller(opt -> IntegerSliderControllerBuilder.create(opt).range(1, 10).step(1)).build())
+                                    .option(TextConfigurationScreen.button("Enderpearls",
+                                            Binding.generic(defaults.enderpearlTextToggle, () -> config.enderpearlTextToggle, v -> config.enderpearlTextToggle = v),
+                                            Binding.generic(defaults.enderpearlWaypointColor, () -> config.enderpearlWaypointColor != null ? config.enderpearlWaypointColor : defaults.enderpearlWaypointColor, v -> config.enderpearlWaypointColor = v),
+                                            Binding.generic(defaults.enderpearlTextSize, () -> config.enderpearlTextSize, v -> config.enderpearlTextSize = v),
+                                            Binding.generic(!defaults.enderpearlEnumToggle, () -> !config.enderpearlEnumToggle, v -> config.enderpearlEnumToggle = !v)))
                                     .build())
                             .group(OptionGroup.createBuilder()
                                     .name(Component.literal("Custom Secret Sound"))
@@ -928,7 +971,10 @@ public class SRMConfig {
                                                     customSoundPitchOption.pendingValue()))
                                             .build())
                                     .build())
-                            .build());
+                            .build())
+
+                    // Rooms
+                    .category(roomsCategory.build());
 
         }).generateScreen(parent);
     }
