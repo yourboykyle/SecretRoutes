@@ -29,6 +29,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.AABB;
 import org.joml.Vector3d;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.config.SRMConfig;
@@ -188,7 +190,7 @@ public class SecretUtils {
 
         renderWaypointCategory(
                 waypoints, index2, "interacts", SRMConfig.get().renderInteracts, SRMConfig.get().interacts, SRMConfig.get().secondStepInteracts,
-                SRMConfig.get().interactsFullBlock, SRMConfig.get().leverBoxLineWidth, SRMConfig.get().interactsTextToggle, !SRMConfig.get().interactsEnumToggle, SRMConfig.get().interactWaypointColor, "interact", SRMConfig.get().interactsTextSize, false
+                SRMConfig.get().interactsFullBlock, SRMConfig.get().leverBoxLineWidth, SRMConfig.get().interactsTextToggle, !SRMConfig.get().interactsEnumToggle, SRMConfig.get().interactsWaypointColor, "Lever", SRMConfig.get().interactsTextSize, false
         );
 
         renderWaypointCategory(
@@ -257,7 +259,11 @@ public class SecretUtils {
                 textContent = showNumbering ? textPrefix + " " + currentNum : textPrefix;
             }
 
-            submitBoxAndText(position, boxColor, isFullBlock, boxLineWidth, textToggle, textColor, textContent, textSize, false);
+            if (jsonKey.equals("interacts")) {
+                submitLeverBoxAndText(pos, boxColor, textContent);
+            } else {
+                submitBoxAndText(position, boxColor, isFullBlock, boxLineWidth, textToggle, textColor, textContent, textSize, false);
+            }
         }
     }
 
@@ -338,19 +344,19 @@ public class SecretUtils {
             case "interact":
                 if (SRMConfig.get().renderSecretIteract) {
                     Color c = colorForRouteStep(stepIndex, SRMConfig.get().secretsInteract, SRMConfig.get().secondStepSecretsInteract);
-                    submitBoxAndText(position, c, SRMConfig.get().secretsInteractFullBlock, SRMConfig.get().secretBoxLineWidth, SRMConfig.get().interactTextToggle, SRMConfig.get().interactWaypointColor, "Interact", SRMConfig.get().interactTextSize, true);
+                    submitBoxAndText(position, c, SRMConfig.get().secretsInteractFullBlock, SRMConfig.get().interactBoxLineWidth, SRMConfig.get().interactTextToggle, SRMConfig.get().interactWaypointColor, "Interact", SRMConfig.get().interactTextSize, true);
                 }
                 break;
             case "item":
                 if (SRMConfig.get().renderSecretsItem) {
                     Color c = colorForRouteStep(stepIndex, SRMConfig.get().secretsItem, SRMConfig.get().secondStepSecretsItem);
-                    submitBoxAndText(position, c, SRMConfig.get().secretsItemFullBlock, SRMConfig.get().secretBoxLineWidth, SRMConfig.get().itemTextToggle, SRMConfig.get().itemWaypointColor, "Item", SRMConfig.get().itemTextSize, true);
+                    submitBoxAndText(position, c, SRMConfig.get().secretsItemFullBlock, SRMConfig.get().effectiveItemBoxLineWidth(), SRMConfig.get().itemTextToggle, SRMConfig.get().itemWaypointColor, "Item", SRMConfig.get().itemTextSize, true);
                 }
                 break;
             case "bat":
                 if (SRMConfig.get().renderSecretBat) {
                     Color c = colorForRouteStep(stepIndex, SRMConfig.get().secretsBat, SRMConfig.get().secondStepSecretsBat);
-                    submitBoxAndText(position, c, SRMConfig.get().secretsBatFullBlock, SRMConfig.get().secretBoxLineWidth, SRMConfig.get().batTextToggle, SRMConfig.get().batWaypointColor, "Bat", SRMConfig.get().batTextSize, true);
+                    submitBoxAndText(position, c, SRMConfig.get().secretsBatFullBlock, SRMConfig.get().effectiveBatBoxLineWidth(), SRMConfig.get().batTextToggle, SRMConfig.get().batWaypointColor, "Bat", SRMConfig.get().batTextSize, true);
                 }
                 break;
         }
@@ -397,18 +403,27 @@ public class SecretUtils {
             Vector3d boxPos = new Vector3d(abs.getOne(), abs.getTwo(), abs.getThree());
 
             if (name.contains("Chest") || name.contains("Wither Essence")) {
-                submitBoxAndText(boxPos, SRMConfig.get().secretsInteract, false, SRMConfig.get().secretBoxLineWidth, SRMConfig.get().interactTextToggle, SRMConfig.get().interactWaypointColor, "Interact", SRMConfig.get().interactTextSize, true);
+                if (SRMConfig.get().renderSecretIteract) {
+                    submitBoxAndText(boxPos, SRMConfig.get().secretsInteract, SRMConfig.get().secretsInteractFullBlock, SRMConfig.get().interactBoxLineWidth, SRMConfig.get().interactTextToggle, SRMConfig.get().interactWaypointColor, "Interact", SRMConfig.get().interactTextSize, true);
+                }
             } else if (name.contains("Bat")) {
-                submitBoxAndText(boxPos, SRMConfig.get().secretsBat, false, SRMConfig.get().secretBoxLineWidth, SRMConfig.get().batTextToggle, SRMConfig.get().batWaypointColor, "Bat", SRMConfig.get().batTextSize, true);
+                if (SRMConfig.get().renderSecretBat) {
+                    submitBoxAndText(boxPos, SRMConfig.get().secretsBat, SRMConfig.get().secretsBatFullBlock, SRMConfig.get().effectiveBatBoxLineWidth(), SRMConfig.get().batTextToggle, SRMConfig.get().batWaypointColor, "Bat", SRMConfig.get().batTextSize, true);
+                }
             } else if (name.contains("Lever")) {
-                submitBoxAndText(boxPos, SRMConfig.get().interacts, false, SRMConfig.get().leverBoxLineWidth, SRMConfig.get().interactsTextToggle, SRMConfig.get().interactWaypointColor, "Interact", SRMConfig.get().interactsTextSize, true);
+                if (SRMConfig.get().renderInteracts) {
+                    submitLeverBoxAndText(new BlockPos(abs.getOne().intValue(), abs.getTwo().intValue(), abs.getThree().intValue()), SRMConfig.get().interacts, "Lever");
+                }
             } else if (name.contains("Item")) {
-                submitBoxAndText(boxPos, SRMConfig.get().secretsItem, false, SRMConfig.get().secretBoxLineWidth, SRMConfig.get().itemTextToggle, SRMConfig.get().itemWaypointColor, "Item", SRMConfig.get().itemTextSize, true);
+                if (SRMConfig.get().renderSecretsItem) {
+                    submitBoxAndText(boxPos, SRMConfig.get().secretsItem, SRMConfig.get().secretsItemFullBlock, SRMConfig.get().effectiveItemBoxLineWidth(), SRMConfig.get().itemTextToggle, SRMConfig.get().itemWaypointColor, "Item", SRMConfig.get().itemTextSize, true);
+                }
             }
         }
     }
 
     public static void renderLever() {
+        if (!SRMConfig.get().renderInteracts) return;
         ArrayList<JsonElement> levers = new ArrayList<>();
         JsonArray csr = getSecrets();
         String leverNum = null;
@@ -470,19 +485,7 @@ public class SecretUtils {
                 ChatUtils.sendChatMessage("§cLever not found :(");
             } else {
                 Triple<Double, Double, Double> abs = getActualSafe(currentLeverPos.getX(), currentLeverPos.getY(), currentLeverPos.getZ());
-                if (SRMConfig.get().secretsInteractFullBlock) {
-                    Vector3d position = new Vector3d(abs.getOne(), abs.getTwo(), abs.getThree());
-                    RenderingBackend.addFilledBox(new RenderTypes.FilledBox(position, SRMConfig.get().secretsInteract, 1f, 1f, SRMConfig.get().renderLinesThroughWalls));
-                } else {
-                    Vector3d position = new Vector3d(abs.getOne(), abs.getTwo(), abs.getThree());
-                    RenderingBackend.addOutlinedBox(new RenderTypes.OutlinedBox(position, SRMConfig.get().secretsInteract, 1f, 1f, SRMConfig.get().secretBoxLineWidth, SRMConfig.get().renderLinesThroughWalls));
-                }
-
-                if (SRMConfig.get().interactsTextToggle) {
-                    Component text = Component.literal(getColorCode(SRMConfig.get().interactsWaypointColor) + "Locked chest lever");
-                    Vector3d position = new Vector3d(abs.getOne(), abs.getTwo(), abs.getThree());
-                    RenderingBackend.addWorldText(new RenderTypes.WorldText(text, position, true, SRMConfig.get().interactsTextSize));
-                }
+                submitLeverBoxAndText(new BlockPos(abs.getOne().intValue(), abs.getTwo().intValue(), abs.getThree().intValue()), SRMConfig.get().interacts, "Locked chest lever");
 
                 if (first) {
                     removeBannerTime = System.currentTimeMillis() + 5000;
@@ -499,6 +502,27 @@ public class SecretUtils {
             }
         } else {
             ChatUtils.sendChatMessage("§cLever not found :(");
+        }
+    }
+
+    private static void submitLeverBoxAndText(BlockPos pos, Color boxColor, String textContent) {
+        var level = Minecraft.getInstance().level;
+        if (level == null) return;
+        var state = level.getBlockState(pos);
+        if (!state.is(Blocks.LEVER)) return;
+
+        // Use the selection shape, since levers have no collision box. It includes mounting orientation.
+        AABB bounds = state.getShape(level, pos).bounds().move(pos);
+        SRMConfig config = SRMConfig.get();
+        if (config.interactsFullBlock) {
+            RenderingBackend.addFilledBox(new RenderTypes.FilledBox(bounds, boxColor, config.renderLinesThroughWalls));
+        } else {
+            RenderingBackend.addOutlinedBox(new RenderTypes.OutlinedBox(bounds, boxColor, config.leverBoxLineWidth, config.renderLinesThroughWalls));
+        }
+
+        if (config.interactsTextToggle && textContent != null) {
+            Vector3d textPos = new Vector3d((bounds.minX + bounds.maxX) / 2, bounds.maxY + 0.15, (bounds.minZ + bounds.maxZ) / 2);
+            RenderingBackend.addWorldText(new RenderTypes.WorldText(Component.literal(getColorCode(config.interactsWaypointColor) + textContent), textPos, true, config.interactsTextSize));
         }
     }
 

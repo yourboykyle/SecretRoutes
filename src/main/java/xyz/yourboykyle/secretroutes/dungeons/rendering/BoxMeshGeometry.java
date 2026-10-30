@@ -8,12 +8,16 @@ final class BoxMeshGeometry {
     }
 
     static float[] generate(float width, float height, float thickness) {
+        return generate(width, height, width, thickness);
+    }
+
+    static float[] generate(float width, float height, float depth, float thickness) {
         FloatMeshSink sink = new FloatMeshSink(VERTEX_COUNT * 3);
-        emitUnified(width, height, thickness, sink);
+        emitUnified(width, height, depth, thickness, sink);
         return sink.finish();
     }
 
-    private static void emitUnified(float width, float height, float thickness, VertexSink sink) {
+    private static void emitUnified(float width, float height, float depth, float thickness, VertexSink sink) {
         float h = thickness / 2.0f;
         float x0 = -h;
         float x1 = h;
@@ -25,8 +29,8 @@ final class BoxMeshGeometry {
         float y3 = height + h;
         float z0 = -h;
         float z1 = h;
-        float z2 = width - h;
-        float z3 = width + h;
+        float z2 = depth - h;
+        float z3 = depth + h;
 
         addFrameX(sink, x0, false, y0, y1, y2, y3, z0, z1, z2, z3);
         addFrameX(sink, x3, true, y0, y1, y2, y3, z0, z1, z2, z3);

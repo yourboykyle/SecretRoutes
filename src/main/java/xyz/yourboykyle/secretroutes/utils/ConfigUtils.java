@@ -56,7 +56,7 @@ public class ConfigUtils {
             "itemTextSize", "batTextSize", "etherwarpsTextSize",
             "minesTextSize", "superboomsTextSize", "enderpearlTextSize",
             "pearlLineWidth", "playerToSecretLineWidth", "playerToEtherwarpLineWidth", "etherwarpDetectionDistance",
-            "etherwarpBoxLineWidth", "secretBoxLineWidth", "mineBoxLineWidth",
+            "etherwarpBoxLineWidth", "secretBoxLineWidth", "itemBoxLineWidth", "batBoxLineWidth", "interactBoxLineWidth", "mineBoxLineWidth",
             "leverBoxLineWidth", "superboomBoxLineWidth", "enderpearlBoxLineWidth",
 
             // Toggles
@@ -153,12 +153,18 @@ public class ConfigUtils {
                         }
                     }
 
-                    if (element == null) continue;
+                    if (element == null) {
+                        if ((key.equals("itemBoxLineWidth") || key.equals("batBoxLineWidth")) && data.has("secretBoxLineWidth")) {
+                            field.set(config, null);
+                            changed = true;
+                        }
+                        continue;
+                    }
 
                     if (type == boolean.class) {
                         field.setBoolean(config, element.getAsBoolean());
-                    } else if (type == float.class) {
-                        field.setFloat(config, element.getAsFloat());
+                    } else if (type == float.class || type == Float.class) {
+                        field.set(config, element.isJsonNull() ? null : element.getAsFloat());
                     } else if (type == int.class) {
                         field.setInt(config, element.getAsInt());
                     } else if (type == String.class) {

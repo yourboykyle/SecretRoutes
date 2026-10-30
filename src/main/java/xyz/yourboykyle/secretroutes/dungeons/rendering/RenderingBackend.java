@@ -209,7 +209,8 @@ public class RenderingBackend {
                 poseStack.pushPose();
                 poseStack.translate(wt.position.x - camPos.x, wt.position.y - camPos.y, wt.position.z - camPos.z);
                 poseStack.mulPose(SCRATCH_ROTATION_MAT);
-                poseStack.scale(0.025f, -0.025f, 0.025f);
+                float textScale = 0.025f * wt.scale;
+                poseStack.scale(textScale, -textScale, textScale);
 
                 Font.DisplayMode displayMode = wt.throughWalls ? Font.DisplayMode.SEE_THROUGH : Font.DisplayMode.NORMAL;
                 float xOffset = -font.width(wt.text) / 2f;
@@ -238,7 +239,7 @@ public class RenderingBackend {
         for (RenderTypes.FilledBox fb : filledBoxes) {
             if (fb.throughWalls != throughWalls) continue;
             float minX = (float) fb.position.x - cx, minY = (float) fb.position.y - cy, minZ = (float) fb.position.z - cz;
-            float maxX = minX + (float) fb.boxWidth, maxY = minY + (float) fb.boxHeight, maxZ = minZ + (float) fb.boxWidth;
+            float maxX = minX + fb.boxWidth, maxY = minY + fb.boxHeight, maxZ = minZ + fb.boxDepth;
             drawBoxFacesPrimitive(buffer, mat, minX, minY, minZ, maxX, maxY, maxZ,
                     fb.color.getRed() / 255f, fb.color.getGreen() / 255f, fb.color.getBlue() / 255f, fb.color.getAlpha() / 255f);
         }
@@ -258,7 +259,7 @@ public class RenderingBackend {
             float b = ob.color.getBlue() / 255f;
             float a = ob.color.getAlpha() / 255f;
 
-            drawCachedMesh(buffer, mat, BOX_MESH_CACHE.get(width, height, thickness), minX, minY, minZ, r, g, b, a);
+            drawCachedMesh(buffer, mat, BOX_MESH_CACHE.get(width, height, ob.boxDepth, thickness), minX, minY, minZ, r, g, b, a);
         }
     }
 
