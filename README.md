@@ -20,29 +20,34 @@
 ---
 
 ### Features
+
 <details>
-    <summary><strong>Dungeon Routes</strong></summary>
+    <summary><strong>General</strong></summary>
     <ul>
         <li>The communities best secret routes </li>
+        <li>Floor7/Master Mode7 Predev route waypoints</li>
+        <li>Supports multiple routes in the same room (picks closest one)</li>
+        <li>Custom secret completion sounds</li>
+        <li>Personal best tracking for room routes</li>
+        <li>Auto inform new updates (Toggle on by default)</li>
+        <li>Auto download new updates (Toggled off by default)</li>
+        <li>Configurable with an organised YetAnotherConfigLib interface to easily find all features</li>
+    </ul>
+</details>
+
+<details>
+    <summary><strong>Route Rendering</strong></summary>
+    <ul>
         <li>Movement lines made by particles or Rendered lines </li>
         <li>AOTV waypoints </li>
         <li>Interact waypoints</li>
         <li>Superboom waypoints</li>
         <li>Stonk waypoints</li>
         <li>Ender pearl waypoints/ Pearl launch angle lines </li>
-        <li>Floor7/Master Mode7 Predev route waypoints</li>
         <li>Render entire route (instead of just one secret at a time)</li>
         <li>Render all secrets (Renders all secrets and levers in the room) </li>
-        <li>Supports multiple routes in the same room (picks closest one)</li>
         <li>Render multiple steps at the same time</li>
-        <li>Custom secret completion sounds</li>
-        <li><strong>Custom Routes</strong>
-            <ul>
-                <li>Record your own custom routes: <a href="https://github.com/ChrisTechs/SRM-Route-Recorder">ChrisTechs/SRM-Route-Recorder</a></li>
-                <li>Easy Scoreboard display for some recording information</li>
-                <li>Easily import routes created by others</li>
-            </ul>
-        </li>
+        <li>Rendering configurations for each Room</li>
         <li><strong>Customizable</strong>
             <ul>
                 <li>Recolor every single OpenGL rendering item</li>
@@ -57,18 +62,11 @@
 </details>
 
 <details>
-    <summary><strong>Interface</strong></summary>
+    <summary><strong>Custom Routes</strong></summary>
     <ul>
-        <li>Configurable with an organised YetAnotherConfigLib interface to easily find all features</li>
-    </ul>
-</details>
-
-<details>
-    <summary><strong>General</strong></summary>
-    <ul>
-        <li>Personal best tracking for room routes</li>
-        <li>Auto inform new updates (Toggle on by default)</li>
-        <li>Auto download new updates (Toggled off by default)</li>
+        <li>Record your own custom routes: <a href="https://github.com/ChrisTechs/SRM-Route-Recorder">ChrisTechs/SRM-Route-Recorder</a></li>
+        <li>Easy Scoreboard display for some recording information</li>
+        <li>Easily import routes created by others</li>
     </ul>
 </details>
 
