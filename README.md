@@ -20,29 +20,34 @@
 ---
 
 ### Features
+
 <details>
-    <summary><strong>Dungeon Routes</strong></summary>
+    <summary><strong>General</strong></summary>
     <ul>
         <li>The communities best secret routes </li>
+        <li>Floor7/Master Mode7 Predev route waypoints</li>
+        <li>Supports multiple routes in the same room (picks closest one)</li>
+        <li>Custom secret completion sounds</li>
+        <li>Personal best tracking for room routes</li>
+        <li>Auto inform new updates (Toggle on by default)</li>
+        <li>Auto download new updates (Toggled off by default)</li>
+        <li>Configurable with an organised YetAnotherConfigLib interface to easily find all features</li>
+    </ul>
+</details>
+
+<details>
+    <summary><strong>Route Rendering</strong></summary>
+    <ul>
         <li>Movement lines made by particles or Rendered lines </li>
         <li>AOTV waypoints </li>
         <li>Interact waypoints</li>
         <li>Superboom waypoints</li>
         <li>Stonk waypoints</li>
         <li>Ender pearl waypoints/ Pearl launch angle lines </li>
-        <li>Floor7/Master Mode7 Predev route waypoints</li>
         <li>Render entire route (instead of just one secret at a time)</li>
         <li>Render all secrets (Renders all secrets and levers in the room) </li>
-        <li>Supports multiple routes in the same room (picks closest one)</li>
         <li>Render multiple steps at the same time</li>
-        <li>Custom secret completion sounds</li>
-        <li><strong>Custom Routes</strong>
-            <ul>
-                <li>Record your own custom routes: <a href="https://github.com/ChrisTechs/SRM-Route-Recorder">ChrisTechs/SRM-Route-Recorder</a></li>
-                <li>Easy Scoreboard display for some recording information</li>
-                <li>Easily import routes created by others</li>
-            </ul>
-        </li>
+        <li>Rendering configurations for each Room</li>
         <li><strong>Customizable</strong>
             <ul>
                 <li>Recolor every single OpenGL rendering item</li>
@@ -57,26 +62,14 @@
 </details>
 
 <details>
-    <summary><strong>Interface</strong></summary>
+    <summary><strong>Custom Routes</strong></summary>
     <ul>
-        <li>Configurable with an organised YetAnotherConfigLib interface to easily find all features</li>
+        <li>Record your own custom routes: <a href="https://github.com/ChrisTechs/SRM-Route-Recorder">ChrisTechs/SRM-Route-Recorder</a></li>
+        <li>Easy Scoreboard display for some recording information</li>
+        <li>Easily import routes created by others</li>
     </ul>
 </details>
 
-<details>
-    <summary><strong>General</strong></summary>
-    <ul>
-        <li>Personal best tracking for room routes</li>
-        <li>Auto inform new updates (Toggle on by default)</li>
-        <li>Auto download new updates (Toggled off by default)</li>
-    </ul>
-</details>
-<details>
-    <summary><strong>Bridge</strong></summary>
-    <ul>
-        <li>Make bridge bot messages look nicer in SRM Guild <em>(/g join srm)</em></li>
-    </ul>
-</details>
 
 
 
@@ -87,39 +80,6 @@
 <ul>
     <li><strong>/srm</strong> -> Opens main config menu</li>
     <li><strong>/loadroute</strong> -> Loads the current route from the downloads folder</li>
-    <li>
-        <details>
-        <summary><strong>/recording</strong> -> <em>All of these are also buttons in the config menu</em></summary>
-        <ul>
-            <li><strong>start</strong> -> Starts route recording process</li>
-            <li><strong>stop</strong> -> Stops route recording process</li>
-            <li><strong>export</strong> -> Exports the recorded routes to the routes.json file in your downloads</li>
-            <li><strong>getroom</strong> -> Sends a chat message with information about the current room</li>
-            <li><strong>setbat</strong> -> Sets a bat in the current secret route</li>
-            <li><strong>setexit</strong> -> Sets an exit waypoint in the route, and stops recording</li>
-            <li><strong>import</strong> -> Imports routes from the downloads route folder into memory</li>
-        </ul>
-        </details>
-    </li>
-    <li>
-        <details>
-            <summary><strong>/changecolorprofile</strong> -> <em>also some buttons</em></summary>
-            <ul>
-                <li><strong>list</strong> -> Lists all files in the ColorProfiles directory</li>
-                <li><strong>load</strong> -> Loads a color profile with the name of the following argument (loads default if no argument specified)</li>
-                <li><strong>save</strong> -> Saves the currently selected options to a file with the name specified</li>
-            </ul>
-        </details>
-    </li>
-    <li>
-        <details>
-            <summary><strong>/changeroute</strong> -> <em>also some buttons</em></summary>
-            <ul>
-                <li><strong>list</strong> -> Lists all files in the Routes directory</li>
-                <li><strong>load</strong> -> Loads a color profile with the name of the following argument (loads default if no argument specified)</li>
-            </ul>
-        </details>
-    </li>
     <li>
         <details>
             <summary><strong>/srmdebug</strong> -> <em>some debug commands and variable modification</em></summary>
@@ -136,7 +96,6 @@
 ### Instructions:
 - Download the latest release: https://modrinth.com/mod/secret-routes-mod
 - Put the .jar in your `.minecraft/mods` folder
-- Watch the video for instructions: https://youtu.be/p3-KPTbXWFw
 - If you have any questions, join the discord: [https://discord.gg/qmtQmz4V3X](https://discord.gg/qmtQmz4V3X)
 ---
 ### Links:
