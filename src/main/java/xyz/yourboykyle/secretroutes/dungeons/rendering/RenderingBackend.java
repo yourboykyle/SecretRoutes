@@ -171,10 +171,6 @@ public class RenderingBackend {
                 IrisApi.getInstance().assignPipeline(SEE_THROUGH_PIPELINE, IrisProgram.BASIC);
                 IrisApi.getInstance().assignPipeline(NORMAL_PIPELINE, IrisProgram.BASIC);
                 IrisApi.getInstance().assignPipeline(CURSOR_LINE_PIPELINE, IrisProgram.LINES);
-                //? if >=26.3 {
-                /*IrisApi.getInstance().assignPipeline(OIT_SEE_THROUGH_QUADS, IrisProgram.BASIC);
-                IrisApi.getInstance().assignPipeline(OIT_CURSOR_LINES, IrisProgram.LINES);
-                *///?}
             } catch (Exception e) {
                 e.printStackTrace(System.err);
             }
@@ -215,12 +211,12 @@ public class RenderingBackend {
         }
 
         //? if >=26.3 {
-        /*boolean fabulous = Minecraft.getInstance().options.graphicsPreset().get() == GraphicsPreset.FABULOUS;
+        /*boolean improvedTransparency = Minecraft.getInstance().options.improvedTransparency().get();
         *///?}
 
         if (hasSeeThrough) {
             //? if >=26.3 {
-            /*if (fabulous) {
+            /*if (improvedTransparency) {
                 collector.submitCustomGeometry(poseStack, SEE_THROUGH_OIT_LAYER, (pose, buffer) -> {
                     Matrix4f matrix = pose.pose();
                     renderFilledBoxes(buffer, matrix, camPos, true);
@@ -256,7 +252,7 @@ public class RenderingBackend {
 
         if (!linesFromCursor.isEmpty()) {
             //? if >=26.3 {
-            /*if (fabulous) {
+            /*if (improvedTransparency) {
                 collector.submitCustomGeometry(poseStack, CURSOR_LINE_OIT_LAYER, (pose, buffer) ->
                         renderLinesFromCursor(buffer, pose, camPos)
                 );
