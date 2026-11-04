@@ -31,7 +31,9 @@ import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 
 //? if >= 26.3 {
- /*import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
+ /*import net.minecraft.client.GraphicsPreset;
+ import net.minecraft.client.renderer.oit.OitPipelineSet;
+ import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
  import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 *///? }
 
@@ -118,6 +120,36 @@ public class RenderingBackend {
             RenderSetup.builder(CURSOR_LINE_PIPELINE).createRenderSetup()
     );
 
+    //? if >=26.3 {
+    /*private static final OitPipelineSet OIT_SEE_THROUGH_QUADS = RenderPipelines.register(
+            OitPipelineSet.builder("secretroutes_see_through_quads",
+                            RenderPipeline.builder(RenderPipelines.OIT_DEBUG_FILLED_SNIPPET))
+                    .withoutDepthTest()
+                    .build()
+    );
+
+    private static final OitPipelineSet OIT_CURSOR_LINES = RenderPipelines.register(
+            OitPipelineSet.builder("secretroutes_cursor_lines_esp",
+                            RenderPipeline.builder(RenderPipelines.OIT_LINES_SNIPPET))
+                    .withoutDepthTest()
+                    .build()
+    );
+
+    private static final RenderType SEE_THROUGH_OIT_LAYER = RenderType.create(
+            "secretroutes_see_through_oit",
+            RenderSetup.builder(SEE_THROUGH_PIPELINE)
+                    .setOitPipelines(OIT_SEE_THROUGH_QUADS)
+                    .createRenderSetup()
+    );
+
+    private static final RenderType CURSOR_LINE_OIT_LAYER = RenderType.create(
+            "secretroutes_cursor_lines_oit",
+            RenderSetup.builder(CURSOR_LINE_PIPELINE)
+                    .setOitPipelines(OIT_CURSOR_LINES)
+                    .createRenderSetup()
+    );
+    *///?}
+
     public static List<RenderTypes.WorldText> worldTexts = new ArrayList<>();
     public static List<RenderTypes.OutlinedBox> outlinedBoxes = new ArrayList<>();
     public static List<RenderTypes.FilledBox> filledBoxes = new ArrayList<>();
@@ -177,13 +209,36 @@ public class RenderingBackend {
             if (line.throughWalls) hasSeeThrough = true;
             else hasNormal = true;
         }
+
+        //? if >=26.3 {
+        /*boolean improvedTransparency = Minecraft.getInstance().options.improvedTransparency().get();
+        *///?}
+
         if (hasSeeThrough) {
+            //? if >=26.3 {
+            /*if (improvedTransparency) {
+                collector.submitCustomGeometry(poseStack, SEE_THROUGH_OIT_LAYER, (pose, buffer) -> {
+                    Matrix4f matrix = pose.pose();
+                    renderFilledBoxes(buffer, matrix, camPos, true);
+                    renderOutlinedBoxesAsQuads(buffer, matrix, camPos, true);
+                    renderLinesAsQuads(buffer, matrix, camPos, true);
+                });
+            } else {
+                collector.submitCustomGeometry(poseStack, SEE_THROUGH_LAYER, (pose, buffer) -> {
+                    Matrix4f matrix = pose.pose();
+                    renderFilledBoxes(buffer, matrix, camPos, true);
+                    renderOutlinedBoxesAsQuads(buffer, matrix, camPos, true);
+                    renderLinesAsQuads(buffer, matrix, camPos, true);
+                });
+            }
+            *///?} elif <=26.2 {
             collector.submitCustomGeometry(poseStack, SEE_THROUGH_LAYER, (pose, buffer) -> {
                 Matrix4f matrix = pose.pose();
                 renderFilledBoxes(buffer, matrix, camPos, true);
                 renderOutlinedBoxesAsQuads(buffer, matrix, camPos, true);
                 renderLinesAsQuads(buffer, matrix, camPos, true);
             });
+             //?}
         }
 
         if (hasNormal) {
@@ -196,9 +251,20 @@ public class RenderingBackend {
         }
 
         if (!linesFromCursor.isEmpty()) {
+            //? if >=26.3 {
+            /*if (improvedTransparency) {
+                collector.submitCustomGeometry(poseStack, CURSOR_LINE_OIT_LAYER, (pose, buffer) ->
+                        renderLinesFromCursor(buffer, pose, camPos)
+                );
+            } else {
+                collector.submitCustomGeometry(poseStack, CURSOR_LINE_LAYER, (pose, buffer) ->
+                        renderLinesFromCursor(buffer, pose, camPos)
+                );            }
+            *///?} elif <=26.2 {
             collector.submitCustomGeometry(poseStack, CURSOR_LINE_LAYER, (pose, buffer) ->
                     renderLinesFromCursor(buffer, pose, camPos)
             );
+             //?}
         }
 
         if (!worldTexts.isEmpty()) {
