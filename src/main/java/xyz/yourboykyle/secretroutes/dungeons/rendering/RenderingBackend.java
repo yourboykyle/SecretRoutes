@@ -21,20 +21,31 @@
 
 package xyz.yourboykyle.secretroutes.dungeons.rendering;
 
-//? if =26.2
+//? if =26.2 {
 import com.mojang.blaze3d.PrimitiveTopology;
+import com.mojang.blaze3d.pipeline.DepthStencilState;
+import com.mojang.blaze3d.platform.CompareOp;
+import net.minecraft.client.renderer.BindGroupLayouts;
+//? }
 
-//? if <=26.1.2
-//import com.mojang.blaze3d.vertex.VertexFormat;
+//? if <=26.1.2 {
+/*import com.mojang.blaze3d.pipeline.DepthStencilState;
+import com.mojang.blaze3d.platform.CompareOp;
+*///? }
 
-//? if <= 26.2
+//? if <= 26.2 {
+import com.mojang.blaze3d.pipeline.BlendFunction;
+import com.mojang.blaze3d.pipeline.ColorTargetState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.vertex.VertexFormat;
+//? }
 
 //? if >= 26.3 {
- /*import net.minecraft.client.GraphicsPreset;
- import net.minecraft.client.renderer.oit.OitPipelineSet;
- import com.mojang.renderpearl.api.pipeline.PrimitiveTopology;
- import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+/*import com.mojang.renderpearl.api.pipeline.*;
+import com.mojang.renderpearl.api.vertex.VertexFormat;
+import net.minecraft.client.GraphicsPreset;
+import net.minecraft.client.renderer.BindGroupLayouts;
+import net.minecraft.client.renderer.oit.OitPipelineSet;
 *///? }
 
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
@@ -48,6 +59,7 @@ import net.irisshaders.iris.api.v0.IrisProgram;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+
 import net.minecraft.client.renderer.OrderedSubmitNodeCollector;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
@@ -55,7 +67,6 @@ import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import xyz.yourboykyle.secretroutes.Main;
 import xyz.yourboykyle.secretroutes.events.OnWorldRender;
@@ -69,85 +80,156 @@ public class RenderingBackend {
     private static final float THICKNESS_MULTIPLIER = 0.01f;
 
     private static final RenderPipeline SEE_THROUGH_PIPELINE = RenderPipelines.register(
-            RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
-                    .withLocation(Identifier.fromNamespaceAndPath(Main.MODID, "see_through_overlay"))
-                    //? if >=26.2 {
-                    .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR)
-                    .withPrimitiveTopology(PrimitiveTopology.QUADS)
-                    //?} elif <=26.1.2 {
-                    /*.withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
-                    *///?}
-                    .withDepthStencilState(Optional.empty())
-                    .withCull(false)
-                    .build()
-    );
-    private static final RenderType SEE_THROUGH_LAYER = RenderType.create(
-            "secretroutes_see_through",
-            RenderSetup.builder(SEE_THROUGH_PIPELINE).createRenderSetup()
+            createBasePipeline(
+                    Identifier.fromNamespaceAndPath(Main.MODID, "no_depth"),
+                    DefaultVertexFormat.POSITION_COLOR,
+                    //? if <=26.1.2 {
+                    /*VertexFormat.Mode.QUADS,
+                     *///?} elif >=26.2 {
+                    PrimitiveTopology.QUADS,
+                    //?}
+                    false
+            ).withDepthStencilState(Optional.empty()).build()
     );
 
     private static final RenderPipeline NORMAL_PIPELINE = RenderPipelines.register(
-            RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
-                    .withLocation(Identifier.fromNamespaceAndPath(Main.MODID, "normal_overlay"))
-                    //? if >=26.2 {
-                    .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR)
-                    .withPrimitiveTopology(PrimitiveTopology.QUADS)
-                    //?} elif <=26.1.2 {
-                    /*.withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
-                    *///?}
-                    .withCull(false)
-                    .build()
-    );
-    private static final RenderType NORMAL_LAYER = RenderType.create(
-            "secretroutes_normal",
-            RenderSetup.builder(NORMAL_PIPELINE).createRenderSetup()
+            createBasePipeline(
+                    Identifier.fromNamespaceAndPath(Main.MODID, "with_depth"),
+                    DefaultVertexFormat.POSITION_COLOR,
+                    //? if <=26.1.2 {
+                    /*VertexFormat.Mode.QUADS,
+                     *///?} elif >=26.2 {
+                    PrimitiveTopology.QUADS,
+                    //?}
+                    false
+            ).build()
     );
 
     private static final RenderPipeline CURSOR_LINE_PIPELINE = RenderPipelines.register(
-            RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
-                    .withLocation(Identifier.fromNamespaceAndPath(Main.MODID, "cursor_lines_xray"))
-                    //? if >=26.2 {
-                    .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH)
-                    .withPrimitiveTopology(PrimitiveTopology.LINES)
-                    //?} elif <=26.1.2 {
-                    /*.withVertexFormat(DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH, VertexFormat.Mode.LINES)
-                    *///?}
-                    .withDepthStencilState(Optional.empty())
-                    .build()
+            createBasePipeline(
+                    Identifier.fromNamespaceAndPath(Main.MODID, "cursor_lines_no_depth"),
+                    DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH,
+                    //? if <=26.1.2 {
+                    /*VertexFormat.Mode.LINES,
+                     *///?} elif >=26.2 {
+                    PrimitiveTopology.LINES,
+                    //?}
+                    true
+            ).withDepthStencilState(Optional.empty()).build()
     );
+
+    private static final RenderType SEE_THROUGH_LAYER = RenderType.create(
+            Main.MODID + "_no_depth",
+            RenderSetup.builder(SEE_THROUGH_PIPELINE).createRenderSetup()
+    );
+
+    private static final RenderType NORMAL_LAYER = RenderType.create(
+            Main.MODID + "_with_depth",
+            RenderSetup.builder(NORMAL_PIPELINE).createRenderSetup()
+    );
+
     private static final RenderType CURSOR_LINE_LAYER = RenderType.create(
-            "secretroutes_cursor_lines_xray",
+            Main.MODID + "_cursor_lines_no_depth",
             RenderSetup.builder(CURSOR_LINE_PIPELINE).createRenderSetup()
     );
 
-    //? if >=26.3 {
-    /*private static final OitPipelineSet OIT_SEE_THROUGH_QUADS = RenderPipelines.register(
-            OitPipelineSet.builder("secretroutes_see_through_quads",
-                            RenderPipeline.builder(RenderPipelines.OIT_DEBUG_FILLED_SNIPPET))
+    //? if >= 26.3 {
+    /*private static final OitPipelineSet OIT_SEE_THROUGH_PIPELINE = RenderPipelines.register(
+            OitPipelineSet.builder(Main.MODID + "_no_depth_oit",
+                            createOITPipeline())
                     .withoutDepthTest()
                     .build()
     );
 
-    private static final OitPipelineSet OIT_CURSOR_LINES = RenderPipelines.register(
-            OitPipelineSet.builder("secretroutes_cursor_lines_esp",
-                            RenderPipeline.builder(RenderPipelines.OIT_LINES_SNIPPET))
+    private static final OitPipelineSet OIT_NORMAL_PIPELINE = RenderPipelines.register(
+            OitPipelineSet.builder(Main.MODID + "_with_depth_oit",
+                            createOITPipeline())
+                    .build()
+    );
+
+    private static final OitPipelineSet OIT_CURSOR_LINE_PIPELINE = RenderPipelines.register(
+            OitPipelineSet.builder(Main.MODID + "_cursor_lines_no_depth_oit",
+                            RenderPipeline.builder()
+                                    .withBindGroupLayout(BindGroupLayouts.DYNAMIC_TRANSFORMS)
+                                    .withVertexShader("core/position_color")
+                                    .withFragmentShader("core/position_color")
+                                    .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH)
+                                    .withPrimitiveTopology(PrimitiveTopology.LINES)
+                                    .withCull(false))
                     .withoutDepthTest()
                     .build()
     );
 
     private static final RenderType SEE_THROUGH_OIT_LAYER = RenderType.create(
-            "secretroutes_see_through_oit",
+            Main.MODID + "_no_depth_oit",
             RenderSetup.builder(SEE_THROUGH_PIPELINE)
-                    .setOitPipelines(OIT_SEE_THROUGH_QUADS)
+                    .setOitPipelines(OIT_SEE_THROUGH_PIPELINE)
+                    .createRenderSetup()
+    );
+
+    private static final RenderType NORMAL_OIT_LAYER = RenderType.create(
+            Main.MODID + "_with_depth_oit",
+            RenderSetup.builder(NORMAL_PIPELINE)
+                    .setOitPipelines(OIT_NORMAL_PIPELINE)
                     .createRenderSetup()
     );
 
     private static final RenderType CURSOR_LINE_OIT_LAYER = RenderType.create(
-            "secretroutes_cursor_lines_oit",
+            Main.MODID + "_cursor_lines_no_depth_oit",
             RenderSetup.builder(CURSOR_LINE_PIPELINE)
-                    .setOitPipelines(OIT_CURSOR_LINES)
+                    .setOitPipelines(OIT_CURSOR_LINE_PIPELINE)
                     .createRenderSetup()
     );
+    *///?}
+
+    private static RenderPipeline.Builder createBasePipeline(
+            Identifier location,
+            VertexFormat format,
+            //? if <=26.1.2 {
+            /*VertexFormat.Mode topology,
+             *///?} elif >=26.2 {
+            PrimitiveTopology topology,
+            //?}
+            boolean isLineShader
+    ) {
+        return
+                //? if <=26.1.2 {
+        /*RenderPipeline.builder(isLineShader
+            ? new RenderPipeline.Snippet[]{RenderPipelines.MATRICES_PROJECTION_SNIPPET, RenderPipelines.FOG_SNIPPET}
+            : new RenderPipeline.Snippet[]{RenderPipelines.MATRICES_PROJECTION_SNIPPET})
+        .withVertexShader(isLineShader ? "core/rendertype_lines" : "core/position_color")
+        .withFragmentShader(isLineShader ? "core/rendertype_lines" : "core/position_color")
+        .withVertexFormat(format, topology)
+        *///?} elif >=26.2 {
+                RenderPipeline.builder()
+                        .withBindGroupLayout(BindGroupLayouts.PROJECTION)
+                        .withBindGroupLayout(BindGroupLayouts.DYNAMIC_TRANSFORMS)
+                        .withVertexShader("core/position_color")
+                        .withFragmentShader("core/position_color")
+                        .withVertexBinding(0, format)
+                        .withPrimitiveTopology(topology)
+                        //?}
+                        .withLocation(location)
+                        .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
+                        //? if <=26.1.2 {
+                        /*.withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false))
+                         *///?} elif >=26.2 {
+                        .withDepthStencilState(new DepthStencilState(CompareOp.GREATER_THAN_OR_EQUAL, false))
+                        //?}
+                        .withCull(false);
+    }
+    //? if >= 26.3 {
+    
+    /*private static RenderPipeline.Builder createOITPipeline() {
+        return RenderPipeline.builder()
+                .withBindGroupLayout(BindGroupLayouts.DYNAMIC_TRANSFORMS)
+                .withVertexShader("core/position_color")
+                .withFragmentShader("core/position_color")
+                .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR)
+                .withPrimitiveTopology(PrimitiveTopology.QUADS)
+                .withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false))
+                .withCull(false);
+    }
     *///?}
 
     public static List<RenderTypes.WorldText> worldTexts = new ArrayList<>();
@@ -185,9 +267,9 @@ public class RenderingBackend {
         Camera camera =
                 //? if >=26.2 {
                 mc.gameRenderer.mainCamera();
-                //?} elif <=26.1.2 {
-                /*mc.gameRenderer.getMainCamera();
-                *///?}
+        //?} elif <=26.1.2 {
+        /*mc.gameRenderer.getMainCamera();
+         *///?}
         Vec3 camPos = camera.position();
         OrderedSubmitNodeCollector collector = context.submitNodeCollector();
 
@@ -212,7 +294,7 @@ public class RenderingBackend {
 
         //? if >=26.3 {
         /*boolean improvedTransparency = Minecraft.getInstance().options.improvedTransparency().get();
-        *///?}
+         *///?}
 
         if (hasSeeThrough) {
             //? if >=26.3 {
@@ -238,16 +320,34 @@ public class RenderingBackend {
                 renderOutlinedBoxesAsQuads(buffer, matrix, camPos, true);
                 renderLinesAsQuads(buffer, matrix, camPos, true);
             });
-             //?}
+            //?}
         }
 
         if (hasNormal) {
+            //? if >= 26.3 {
+            /*if (improvedTransparency) {
+                collector.submitCustomGeometry(poseStack, NORMAL_OIT_LAYER, (pose, buffer) -> {
+                    Matrix4f matrix = pose.pose();
+                    renderFilledBoxes(buffer, matrix, camPos, false);
+                    renderOutlinedBoxesAsQuads(buffer, matrix, camPos, false);
+                    renderLinesAsQuads(buffer, matrix, camPos, false);
+                });
+            } else {
+                collector.submitCustomGeometry(poseStack, NORMAL_LAYER, (pose, buffer) -> {
+                    Matrix4f matrix = pose.pose();
+                    renderFilledBoxes(buffer, matrix, camPos, false);
+                    renderOutlinedBoxesAsQuads(buffer, matrix, camPos, false);
+                    renderLinesAsQuads(buffer, matrix, camPos, false);
+                });
+            }
+            *///?} elif <= 26.2 {
             collector.submitCustomGeometry(poseStack, NORMAL_LAYER, (pose, buffer) -> {
                 Matrix4f matrix = pose.pose();
                 renderFilledBoxes(buffer, matrix, camPos, false);
                 renderOutlinedBoxesAsQuads(buffer, matrix, camPos, false);
                 renderLinesAsQuads(buffer, matrix, camPos, false);
             });
+            //?}
         }
 
         if (!linesFromCursor.isEmpty()) {
@@ -264,7 +364,7 @@ public class RenderingBackend {
             collector.submitCustomGeometry(poseStack, CURSOR_LINE_LAYER, (pose, buffer) ->
                     renderLinesFromCursor(buffer, pose, camPos)
             );
-             //?}
+            //?}
         }
 
         if (!worldTexts.isEmpty()) {
