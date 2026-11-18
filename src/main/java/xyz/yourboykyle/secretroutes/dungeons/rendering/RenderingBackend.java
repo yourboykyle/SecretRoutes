@@ -150,9 +150,12 @@ public class RenderingBackend {
     private static final OitPipelineSet OIT_CURSOR_LINE_PIPELINE = RenderPipelines.register(
             OitPipelineSet.builder(Main.MODID + "_cursor_lines_no_depth_oit",
                             RenderPipeline.builder()
+                                    .withBindGroupLayout(BindGroupLayouts.PROJECTION)
                                     .withBindGroupLayout(BindGroupLayouts.DYNAMIC_TRANSFORMS)
-                                    .withVertexShader("core/position_color")
-                                    .withFragmentShader("core/position_color")
+                                    .withBindGroupLayout(BindGroupLayouts.GLOBALS)
+                                    .withBindGroupLayout(BindGroupLayouts.FOG)
+                                    .withVertexShader("core/rendertype_lines")
+                                    .withFragmentShader("core/rendertype_lines")
                                     .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH)
                                     .withPrimitiveTopology(PrimitiveTopology.LINES)
                                     .withCull(false))
@@ -194,18 +197,24 @@ public class RenderingBackend {
     ) {
         return
                 //? if <=26.1.2 {
-        /*RenderPipeline.builder(isLineShader
-            ? new RenderPipeline.Snippet[]{RenderPipelines.MATRICES_PROJECTION_SNIPPET, RenderPipelines.FOG_SNIPPET}
-            : new RenderPipeline.Snippet[]{RenderPipelines.MATRICES_PROJECTION_SNIPPET})
-        .withVertexShader(isLineShader ? "core/rendertype_lines" : "core/position_color")
-        .withFragmentShader(isLineShader ? "core/rendertype_lines" : "core/position_color")
-        .withVertexFormat(format, topology)
+                /*RenderPipeline.builder(isLineShader
+                    ? new RenderPipeline.Snippet[]{RenderPipelines.MATRICES_PROJECTION_SNIPPET, RenderPipelines.FOG_SNIPPET}
+                    : new RenderPipeline.Snippet[]{RenderPipelines.MATRICES_PROJECTION_SNIPPET})
+                    .withVertexShader(isLineShader ? "core/rendertype_lines" : "core/position_color")
+                    .withFragmentShader(isLineShader ? "core/rendertype_lines" : "core/position_color")
+                    .withVertexFormat(format, topology)
         *///?} elif >=26.2 {
-                RenderPipeline.builder()
+                (isLineShader
+                        ? RenderPipeline.builder()
                         .withBindGroupLayout(BindGroupLayouts.PROJECTION)
                         .withBindGroupLayout(BindGroupLayouts.DYNAMIC_TRANSFORMS)
-                        .withVertexShader("core/position_color")
-                        .withFragmentShader("core/position_color")
+                        .withBindGroupLayout(BindGroupLayouts.GLOBALS)
+                        .withBindGroupLayout(BindGroupLayouts.FOG)
+                        : RenderPipeline.builder()
+                        .withBindGroupLayout(BindGroupLayouts.PROJECTION)
+                        .withBindGroupLayout(BindGroupLayouts.DYNAMIC_TRANSFORMS))
+                        .withVertexShader(isLineShader ? "core/rendertype_lines" : "core/position_color")
+                        .withFragmentShader(isLineShader ? "core/rendertype_lines" : "core/position_color")
                         .withVertexBinding(0, format)
                         .withPrimitiveTopology(topology)
                         //?}
@@ -218,6 +227,8 @@ public class RenderingBackend {
                         //?}
                         .withCull(false);
     }
+
+
     //? if >= 26.3 {
     
     /*private static RenderPipeline.Builder createOITPipeline() {
